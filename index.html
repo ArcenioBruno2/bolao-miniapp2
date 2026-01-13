@@ -545,6 +545,7 @@
         <div class="tabs">
             <button class="tab-btn active" data-tab="palpites">🎯 Palpites</button>
             <button class="tab-btn" data-tab="ranking">📊 Ranking</button>
+            <button class="tab-btn" data-tab="rodadas">➕ Rodadas</button>
             <button class="tab-btn" data-tab="admin">⚙️ Admin</button>
         </div>
 
@@ -594,6 +595,26 @@
                         </select>
                     </div>
                     <div id="ranking-rodada-table"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: RODADAS -->
+        <div class="tab-content" id="rodadas">
+            <div class="content">
+                <div class="admin-section">
+                    <h3>➕ Criar Nova Rodada</h3>
+                    <div class="admin-form">
+                        <input type="number" id="nova-rodada-numero" placeholder="Número da rodada" min="1">
+                        <button class="btn btn-success btn-block" id="btn-criar-rodada">
+                            ➕ Criar Rodada
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h3>📋 Rodadas Criadas</h3>
+                    <div id="rodadas-lista"></div>
                 </div>
             </div>
         </div>
@@ -682,6 +703,7 @@
             // Carregar dados iniciais
             carregarRodadas();
             carregarRankingGeral();
+            carregarRodasasLista();
         }
 
         function setupEventListeners() {
@@ -733,6 +755,9 @@
                     carregarRankingRodada(parseInt(e.target.value));
                 }
             });
+
+            // Criar rodada
+            document.getElementById('btn-criar-rodada').addEventListener('click', criarNovaRodada);
         }
 
         // ========================================================================
@@ -1048,6 +1073,11 @@
         function renderizarRanking(ranking, containerId) {
             const container = document.getElementById(containerId);
 
+            if (!ranking || ranking.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 2rem;">Nenhum dado de ranking disponível</p>';
+                return;
+            }
+
             const html = `
                 <table class="ranking-table">
                     <thead>
@@ -1076,6 +1106,72 @@
             `;
 
             container.innerHTML = html;
+        }
+
+        // ========================================================================
+        // CRIAR RODADAS
+        // ========================================================================
+
+        async function criarNovaRodada() {
+            const numero = document.getElementById('nova-rodada-numero').value;
+
+            if (!numero) {
+                mostrarAlerta('Digite o número da rodada', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/criar_rodada`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Key': 'admin-secret'
+                    },
+                    body: JSON.stringify({
+                        numero: parseInt(numero)
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarAlerta('Rodada criada com sucesso!', 'success');
+                    document.getElementById('nova-rodada-numero').value = '';
+                    carregarRodadas();
+                    carregarRodasasParaRanking();
+                    carregarRodasasAdmin();
+                    carregarRodasasLista();
+                } else {
+                    mostrarAlerta(data.message || 'Erro ao criar rodada', 'error');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarAlerta('Erro ao criar rodada', 'error');
+            }
+        }
+
+        async function carregarRodasasLista() {
+            try {
+                const response = await fetch(`${API_BASE}/rodadas`);
+                const data = await response.json();
+
+                if (!data.success) return;
+
+                const container = document.getElementById('rodadas-lista');
+                
+                if (data.rodadas.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-light);">Nenhuma rodada criada</p>';
+                    return;
+                }
+
+                container.innerHTML = data.rodadas.map(rodada => `
+                    <div style="padding: 1rem; background: var(--light); border-radius: 8px; margin-bottom: 0.5rem;">
+                        <strong>${rodada.nome}</strong> - Status: ${rodada.status}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erro:', error);
+            }
         }
 
         // ========================================================================
