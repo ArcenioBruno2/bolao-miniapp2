@@ -164,4 +164,727 @@
         
         .game-date {
             font-size: 12px;
-            color: var(--tg-theme-h
+            color: var(--tg-theme-hint-color);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .input-field {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--tg-theme-secondary-bg-color);
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--tg-theme-button-color);
+        }
+        
+        .user-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .user-chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            background: var(--tg-theme-secondary-bg-color);
+            font-size: 13px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .user-chip:hover {
+            transform: scale(1.05);
+        }
+        
+        .user-chip.selected {
+            background: rgba(36, 129, 204, 0.15);
+            border-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-color);
+        }
+        
+        .user-chip.trunfo.selected {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+        
+        .user-chip.dobrada.selected {
+            background: rgba(220, 53, 69, 0.15);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quick-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--tg-theme-secondary-bg-color);
+            background: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .quick-btn:hover {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+        }
+        
+        .summary-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color);
+            padding: 12px 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .summary-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .summary-label {
+            font-size: 11px;
+            color: var(--tg-theme-hint-color);
+            text-transform: uppercase;
+        }
+        
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--tg-theme-button-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            color: var(--danger-color);
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        .info-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--info-color);
+            color: white;
+            font-size: 11px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 10px;
+            background: var(--success-color);
+            color: white;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translate(-50%, -20px);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                padding-bottom: 100px;
+            }
+            
+            .section {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .summary-stats {
+                gap: 10px;
+            }
+            
+            .summary-value {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <span id="loading-text">Carregando configuração...</span>
+    </div>
+    
+    <div id="app" style="display: none;">
+        <div class="header">
+            <h1>⚙️ Configurar Rodada</h1>
+            <small id="rodada-info">Rodada --</small>
+        </div>
+        
+        <div class="container">
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <div class="section-title">🔄 Selecionar Rodada</div>
+                    <button class="collapse-btn">▼</button>
+                </div>
+                <div class="section-content">
+                    <select class="input-field" id="rodada-select" onchange="mudarRodada()"></select>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="selecionarTodosJogos()">✓ Todos jogos</button>
+                        <button class="quick-btn" onclick="limparTodosJogos()">✗ Limpar jogos</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <div class="section-title">📋 Jogos da Rodada <span id="jogos-count" class="info-badge">0</span></div>
+                    <button class="collapse-btn">▼</button>
+                </div>
+                <div class="section-content">
+                    <div id="games-list"></div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <div class="section-title">⏰ Encerramento</div>
+                    <button class="collapse-btn">▼</button>
+                </div>
+                <div class="section-content">
+                    <div class="input-group">
+                        <input type="date" class="input-field" id="input-data" min="">
+                        <input type="time" class="input-field" id="input-hora" value="16:00">
+                    </div>
+                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 5px;">
+                        Os palpites serão fechados automaticamente neste horário
+                    </small>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <div class="section-title">🎖️ Trunfos <span id="trunfos-count" class="info-badge">0</span></div>
+                    <button class="collapse-btn">▼</button>
+                </div>
+                <div class="section-content">
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="selecionarTodosTrunfos()">✓ Todos trunfos</button>
+                        <button class="quick-btn" onclick="limparTodosTrunfos()">✗ Limpar trunfos</button>
+                    </div>
+                    <div class="user-chips" id="trunfo-list"></div>
+                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 10px;">
+                        Trunfo: 30 minutos extras para palpitar
+                    </small>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <div class="section-title">⭐ Dobradas <span id="dobradas-count" class="info-badge">0</span></div>
+                    <button class="collapse-btn">▼</button>
+                </div>
+                <div class="section-content">
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="selecionarTodasDobradas()">✓ Todas dobradas</button>
+                        <button class="quick-btn" onclick="limparTodasDobradas()">✗ Limpar dobradas</button>
+                    </div>
+                    <div class="user-chips" id="dobrada-list"></div>
+                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 10px;">
+                        Dobrada: Pontuação em dobro nesta rodada
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-bar">
+            <div class="summary-stats">
+                <div class="summary-item">
+                    <div class="summary-value" id="summary-jogos">0</div>
+                    <div class="summary-label">Jogos</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summary-trunfos">0</div>
+                    <div class="summary-label">Trunfos</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value" id="summary-dobradas">0</div>
+                    <div class="summary-label">Dobradas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // INICIALIZAÇÃO TELEGRAM
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    // Configurar botão principal
+    tg.MainButton.setText("PUBLICAR RODADA");
+    tg.MainButton.setParams({color: "#28a745"}); // Verde para ação principal
+    tg.MainButton.show();
+    tg.MainButton.onClick(() => submitConfig());
+
+    // Variáveis globais
+    let rodadaAtual = 0;
+    let todasRodadas = {};
+    let usuariosData = [];
+    let persistencia = {};
+    
+    // Data mínima para hoje
+    document.getElementById('input-data').min = new Date().toISOString().split('T')[0];
+
+    function init() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataRaw = urlParams.get('data');
+            
+            if (!dataRaw) {
+                throw new Error("Nenhum dado recebido");
+            }
+            
+            // Decodificação Base64 UTF-8
+            const decodedData = decodeData(dataRaw);
+            processarDados(decodedData);
+            
+            // Configurar data padrão para amanhã
+            const amanha = new Date();
+            amanha.setDate(amanha.getDate() + 1);
+            document.getElementById('input-data').value = amanha.toISOString().split('T')[0];
+            
+        } catch (error) {
+            console.error('Erro na inicialização:', error);
+            showError("Erro ao carregar dados. Por favor, tente novamente.");
+        }
+    }
+
+    function decodeData(dataRaw) {
+        try {
+            // Converter Base64 para string
+            const base64 = dataRaw.replace(/-/g, '+').replace(/_/g, '/');
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            const text = new TextDecoder().decode(bytes);
+            return JSON.parse(text);
+            
+        } catch (error) {
+            console.error('Erro na decodificação:', error);
+            throw new Error('Dados inválidos');
+        }
+    }
+
+    function processarDados(data) {
+        // Validar dados recebidos
+        if (!data.rodadas || !data.usuarios) {
+            throw new Error("Dados incompletos");
+        }
+
+        todasRodadas = data.rodadas;
+        usuariosData = data.usuarios;
+
+        // Inicializar persistência para cada rodada
+        Object.keys(todasRodadas).forEach(rodada => {
+            persistencia[rodada] = {
+                games: new Set(),
+                trunfos: new Set(),
+                dobradas: new Set()
+            };
+        });
+
+        // Selecionar primeira rodada por padrão
+        const rodadasDisponiveis = Object.keys(todasRodadas);
+        if (rodadasDisponiveis.length > 0) {
+            rodadaAtual = rodadasDisponiveis[0];
+            
+            // Preencher select de rodadas
+            const select = document.getElementById('rodada-select');
+            select.innerHTML = rodadasDisponiveis.map(r => 
+                `<option value="${r}">Rodada ${r} (${todasRodadas[r].length} jogos)</option>`
+            ).join('');
+            
+            // Mostrar interface
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            // Renderizar tudo
+            renderizarTudo();
+            
+            // Mostrar notificação de boas-vindas
+            showNotification(`Selecione os jogos da Rodada ${rodadaAtual}`);
+        } else {
+            throw new Error("Nenhuma rodada disponível");
+        }
+    }
+
+    function renderizarTudo() {
+        const jogos = todasRodadas[rodadaAtual] || [];
+        
+        // Atualizar info da rodada
+        document.getElementById('rodada-info').innerText = `Rodada ${rodadaAtual} • ${jogos.length} jogos disponíveis`;
+        
+        // Renderizar lista de jogos
+        const gamesList = document.getElementById('games-list');
+        gamesList.innerHTML = jogos.map(jogo => {
+            const isSelected = persistencia[rodadaAtual].games.has(jogo.id.toString());
+            return `
+                <div class="game-item ${isSelected ? 'selected' : ''}" onclick="toggleGame(this, '${jogo.id}')">
+                    <div class="game-checkbox"></div>
+                    <div class="game-info">
+                        <div class="game-teams">${jogo.home} x ${jogo.away}</div>
+                        <div class="game-date">${formatarData(jogo.data)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Atualizar contadores
+        document.getElementById('jogos-count').textContent = persistencia[rodadaAtual].games.size;
+        document.getElementById('trunfos-count').textContent = persistencia[rodadaAtual].trunfos.size;
+        document.getElementById('dobradas-count').textContent = persistencia[rodadaAtual].dobradas.size;
+
+        // Renderizar usuários para trunfos e dobradas
+        renderizarUsuarios('trunfo', persistencia[rodadaAtual].trunfos);
+        renderizarUsuarios('dobrada', persistencia[rodadaAtual].dobradas);
+        
+        // Atualizar resumo
+        atualizarResumo();
+        
+        // Habilitar/desabilitar botão principal
+        atualizarBotaoPrincipal();
+    }
+
+    function renderizarUsuarios(tipo, setSelecionados) {
+        const container = document.getElementById(`${tipo}-list`);
+        container.innerHTML = usuariosData.map(usuario => {
+            const isSelected = setSelecionados.has(usuario.id.toString());
+            return `
+                <span class="user-chip ${tipo} ${isSelected ? 'selected' : ''}" 
+                      onclick="toggleUsuario('${tipo}', ${usuario.id}, this)">
+                    ${usuario.nome}
+                </span>
+            `;
+        }).join('');
+    }
+
+    function toggleGame(elemento, gameId) {
+        const set = persistencia[rodadaAtual].games;
+        
+        if (set.has(gameId)) {
+            set.delete(gameId);
+            elemento.classList.remove('selected');
+        } else {
+            set.add(gameId);
+            elemento.classList.add('selected');
+        }
+        
+        // Atualizar contador
+        document.getElementById('jogos-count').textContent = set.size;
+        atualizarResumo();
+        atualizarBotaoPrincipal();
+    }
+
+    function toggleUsuario(tipo, usuarioId, elemento) {
+        const set = persistencia[rodadaAtual][tipo === 'trunfo' ? 'trunfos' : 'dobradas'];
+        
+        if (set.has(usuarioId.toString())) {
+            set.delete(usuarioId.toString());
+            elemento.classList.remove('selected');
+        } else {
+            set.add(usuarioId.toString());
+            elemento.classList.add('selected');
+        }
+        
+        // Atualizar contador
+        document.getElementById(`${tipo === 'trunfo' ? 'trunfos' : 'dobradas'}-count`).textContent = set.size;
+        atualizarResumo();
+    }
+
+    function mudarRodada() {
+        rodadaAtual = document.getElementById('rodada-select').value;
+        renderizarTudo();
+        showNotification(`Rodada ${rodadaAtual} selecionada`);
+    }
+
+    function atualizarResumo() {
+        const p = persistencia[rodadaAtual];
+        
+        document.getElementById('summary-jogos').textContent = p.games.size;
+        document.getElementById('summary-trunfos').textContent = p.trunfos.size;
+        document.getElementById('summary-dobradas').textContent = p.dobradas.size;
+    }
+
+    function atualizarBotaoPrincipal() {
+        const temJogos = persistencia[rodadaAtual].games.size > 0;
+        
+        if (temJogos) {
+            tg.MainButton.enable();
+            tg.MainButton.setParams({color: "#28a745"}); // Verde
+        } else {
+            tg.MainButton.disable();
+            tg.MainButton.setParams({color: "#cccccc"}); // Cinza
+        }
+    }
+
+    // Funções de atalho
+    function selecionarTodosJogos() {
+        const jogos = todasRodadas[rodadaAtual] || [];
+        const set = persistencia[rodadaAtual].games;
+        
+        jogos.forEach(jogo => set.add(jogo.id.toString()));
+        renderizarTudo();
+        showNotification(`Todos os ${jogos.length} jogos selecionados`);
+    }
+
+    function limparTodosJogos() {
+        persistencia[rodadaAtual].games.clear();
+        renderizarTudo();
+        showNotification('Jogos limpos');
+    }
+
+    function selecionarTodosTrunfos() {
+        const set = persistencia[rodadaAtual].trunfos;
+        usuariosData.forEach(usuario => set.add(usuario.id.toString()));
+        renderizarTudo();
+        showNotification('Todos os trunfos selecionados');
+    }
+
+    function limparTodosTrunfos() {
+        persistencia[rodadaAtual].trunfos.clear();
+        renderizarTudo();
+        showNotification('Trunfos limpos');
+    }
+
+    function selecionarTodasDobradas() {
+        const set = persistencia[rodadaAtual].dobradas;
+        usuariosData.forEach(usuario => set.add(usuario.id.toString()));
+        renderizarTudo();
+        showNotification('Todas as dobradas selecionadas');
+    }
+
+    function limparTodasDobradas() {
+        persistencia[rodadaAtual].dobradas.clear();
+        renderizarTudo();
+        showNotification('Dobradas limpas');
+    }
+
+    function toggleSection(elemento) {
+        const section = elemento.closest('.section');
+        section.classList.toggle('collapsed');
+    }
+
+    function formatarData(dataString) {
+        if (!dataString) return '';
+        const data = new Date(dataString);
+        return data.toLocaleDateString('pt-BR', {
+            weekday: 'short',
+            day: '2-digit',
+            month: 'short'
+        });
+    }
+
+    function showNotification(mensagem) {
+        // Remover notificação anterior se existir
+        const notifAnterior = document.querySelector('.notification');
+        if (notifAnterior) notifAnterior.remove();
+        
+        // Criar nova notificação
+        const notificacao = document.createElement('div');
+        notificacao.className = 'notification';
+        notificacao.textContent = mensagem;
+        document.body.appendChild(notificacao);
+        
+        // Remover após 3 segundos
+        setTimeout(() => {
+            if (notificacao.parentNode) {
+                notificacao.style.opacity = '0';
+                notificacao.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    if (notificacao.parentNode) notificacao.remove();
+                }, 300);
+            }
+        }, 3000);
+    }
+
+    function showError(mensagem) {
+        const loadingText = document.getElementById('loading-text');
+        loadingText.innerHTML = `<div class="error">${mensagem}</div>`;
+    }
+
+    function submitConfig() {
+        const data = document.getElementById('input-data').value;
+        const hora = document.getElementById('input-hora').value;
+
+        // Validações
+        if (!data) {
+            tg.showAlert("Selecione a data de encerramento!");
+            return;
+        }
+
+        if (!hora) {
+            tg.showAlert("Selecione o horário de encerramento!");
+            return;
+        }
+
+        // Verificar se há jogos selecionados em alguma rodada
+        let rodadasComJogos = [];
+        for (const [rodadaNum, dados] of Object.entries(persistencia)) {
+            if (dados.games.size > 0) {
+                rodadasComJogos.push(rodadaNum);
+            }
+        }
+
+        if (rodadasComJogos.length === 0) {
+            tg.showAlert("Selecione pelo menos um jogo em qualquer rodada!");
+            return;
+        }
+
+        // Preparar dados para envio
+        const configFinal = {
+            config_multipla: {
+                data_hora_encerramento: `${data}T${hora}:00`,
+                rodadas: {}
+            }
+        };
+
+        // Processar cada rodada com jogos selecionados
+        rodadasComJogos.forEach(rodadaNum => {
+            const dados = persistencia[rodadaNum];
+            const jogosSelecionados = Array.from(dados.games);
+            
+            // Obter informações detalhadas dos jogos
+            const jogosDetalhes = jogosSelecionados.map(gameId => {
+                const jogo = todasRodadas[rodadaNum].find(j => j.id.toString() === gameId.toString());
+                return {
+                    id: jogo.id,
+                    home: jogo.home,
+                    away: jogo.away,
+                    data: jogo.data
+                };
+            });
+
+            configFinal.config_multipla.rodadas[rodadaNum] = {
+                jogos_ids: jogosSelecionados,
+                jogos_detalhes: jogosDetalhes,
+                trunfos_ids: Array.from(dados.trunfos).map(Number),
+                dobradas_ids: Array.from(dados.dobradas).map(Number),
+                total_jogos: jogosSelecionados.length
+            };
+        });
+
+        // Mostrar confirmação
+        const totalJogos = rodadasComJogos.reduce((total, rodada) => {
+            return total + persistencia[rodada].games.size;
+        }, 0);
+
+        const confirmMsg = `
+✅ CONFIGURAÇÃO PRONTA
+
+Rodadas: ${rodadasComJogos.join(', ')}
+Total de Jogos: ${totalJogos}
+Encerramento: ${data} às ${hora}
+
+Deseja publicar esta rodada?
+        `;
+
+        tg.showConfirm(confirmMsg.trim(), (confirmed) => {
+            if (confirmed) {
+                // Enviar dados para o bot
+                tg.sendData(JSON.stringify(configFinal));
+                
+                // Mostrar feedback
+                tg.MainButton.setText("ENVIANDO...");
+                tg.MainButton.showProgress();
+                
+                // Fechar após 2 segundos
+                setTimeout(() => {
+                    tg.close();
+                }, 2000);
+            }
+        });
+    }
+
+    // Inicializar quando a página carregar
+    document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
