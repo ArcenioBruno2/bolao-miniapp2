@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin - Bolão 42</title>
+    <title>Configurador de Rodada - Bolão Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Estilos mantidos iguais do seu arquivo anterior */
         :root {
             --tg-theme-bg-color: #ffffff;
             --tg-theme-text-color: #000000;
@@ -58,53 +60,15 @@
             transition: all 0.3s ease;
         }
         
-        .section.collapsed {
-            padding-bottom: 5px;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            margin-bottom: 12px;
-        }
-        
         .section-title {
             font-size: 14px;
             font-weight: 600;
             color: var(--tg-theme-hint-color);
+            margin-bottom: 12px;
             text-transform: uppercase;
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-        
-        .section-title i {
-            font-size: 16px;
-        }
-        
-        .collapse-btn {
-            background: none;
-            border: none;
-            color: var(--tg-theme-hint-color);
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.3s;
-        }
-        
-        .section.collapsed .collapse-btn {
-            transform: rotate(180deg);
-        }
-        
-        .section-content {
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .section.collapsed .section-content {
-            max-height: 0;
-            opacity: 0;
         }
         
         .game-item {
@@ -167,26 +131,31 @@
             color: var(--tg-theme-hint-color);
         }
         
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
         .input-field {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             border-radius: 10px;
             border: 2px solid var(--tg-theme-secondary-bg-color);
             background: var(--tg-theme-secondary-bg-color);
             color: var(--tg-theme-text-color);
             font-size: 16px;
+            margin-bottom: 10px;
             transition: border-color 0.3s;
         }
         
         .input-field:focus {
             outline: none;
             border-color: var(--tg-theme-button-color);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .input-group .input-field {
+            margin-bottom: 0;
         }
         
         .user-chips {
@@ -230,7 +199,7 @@
         .quick-actions {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-bottom: 15px;
         }
         
         .quick-btn {
@@ -355,7 +324,13 @@
             }
         }
         
-        /* Responsividade */
+        .help-text {
+            font-size: 12px;
+            color: var(--tg-theme-hint-color);
+            margin-top: 5px;
+            display: block;
+        }
+        
         @media (max-width: 480px) {
             .container {
                 padding: 10px;
@@ -385,88 +360,103 @@
 <body>
     <div id="loading" class="loading">
         <div class="spinner"></div>
-        <span id="loading-text">Carregando configuração...</span>
+        <span id="loading-text">Conectando com o bot...</span>
     </div>
     
     <div id="app" style="display: none;">
         <div class="header">
-            <h1>⚙️ Configurar Rodada</h1>
-            <small id="rodada-info">Rodada --</small>
+            <h1><i class="fas fa-cog"></i> Configurar Rodada</h1>
+            <small id="rodada-info">Selecione uma rodada para começar</small>
         </div>
         
         <div class="container">
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">🔄 Selecionar Rodada</div>
-                    <button class="collapse-btn">▼</button>
+                <div class="section-title">
+                    <i class="fas fa-sync-alt"></i> Selecionar Rodada
                 </div>
-                <div class="section-content">
-                    <select class="input-field" id="rodada-select" onchange="mudarRodada()"></select>
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="selecionarTodosJogos()">✓ Todos jogos</button>
-                        <button class="quick-btn" onclick="limparTodosJogos()">✗ Limpar jogos</button>
+                <select class="input-field" id="rodada-select" onchange="mudarRodada()">
+                    <option value="">Carregando rodadas...</option>
+                </select>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="selecionarTodosJogos()">
+                        <i class="fas fa-check-circle"></i> Todos jogos
+                    </button>
+                    <button class="quick-btn" onclick="limparTodosJogos()">
+                        <i class="fas fa-times-circle"></i> Limpar jogos
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">
+                    <i class="fas fa-list"></i> Jogos da Rodada
+                    <span id="jogos-count" class="info-badge">0</span>
+                </div>
+                <div id="games-list">
+                    <div style="text-align: center; padding: 20px; color: var(--tg-theme-hint-color);">
+                        <i class="fas fa-futbol fa-2x"></i>
+                        <p>Selecione uma rodada para ver os jogos</p>
                     </div>
                 </div>
             </div>
             
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">📋 Jogos da Rodada <span id="jogos-count" class="info-badge">0</span></div>
-                    <button class="collapse-btn">▼</button>
+                <div class="section-title">
+                    <i class="fas fa-clock"></i> Encerramento dos Palpites
                 </div>
-                <div class="section-content">
-                    <div id="games-list"></div>
+                <div class="input-group">
+                    <input type="date" class="input-field" id="input-data" min="">
+                    <input type="time" class="input-field" id="input-hora" value="16:00">
                 </div>
+                <span class="help-text">
+                    <i class="fas fa-info-circle"></i> Os palpites serão fechados automaticamente neste horário
+                </span>
             </div>
             
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">⏰ Encerramento</div>
-                    <button class="collapse-btn">▼</button>
+                <div class="section-title">
+                    <i class="fas fa-crown"></i> Trunfos
+                    <span id="trunfos-count" class="info-badge">0</span>
                 </div>
-                <div class="section-content">
-                    <div class="input-group">
-                        <input type="date" class="input-field" id="input-data" min="">
-                        <input type="time" class="input-field" id="input-hora" value="16:00">
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="selecionarTodosTrunfos()">
+                        <i class="fas fa-check-circle"></i> Todos trunfos
+                    </button>
+                    <button class="quick-btn" onclick="limparTodosTrunfos()">
+                        <i class="fas fa-times-circle"></i> Limpar trunfos
+                    </button>
+                </div>
+                <div class="user-chips" id="trunfo-list">
+                    <div style="text-align: center; padding: 10px; color: var(--tg-theme-hint-color);">
+                        Carregando usuários...
                     </div>
-                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 5px;">
-                        Os palpites serão fechados automaticamente neste horário
-                    </small>
                 </div>
+                <span class="help-text">
+                    <i class="fas fa-info-circle"></i> Trunfo: 30 minutos extras para enviar palpites
+                </span>
             </div>
             
             <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">🎖️ Trunfos <span id="trunfos-count" class="info-badge">0</span></div>
-                    <button class="collapse-btn">▼</button>
+                <div class="section-title">
+                    <i class="fas fa-star"></i> Pontuação Dobrada
+                    <span id="dobradas-count" class="info-badge">0</span>
                 </div>
-                <div class="section-content">
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="selecionarTodosTrunfos()">✓ Todos trunfos</button>
-                        <button class="quick-btn" onclick="limparTodosTrunfos()">✗ Limpar trunfos</button>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="selecionarTodasDobradas()">
+                        <i class="fas fa-check-circle"></i> Todas dobradas
+                    </button>
+                    <button class="quick-btn" onclick="limparTodasDobradas()">
+                        <i class="fas fa-times-circle"></i> Limpar dobradas
+                    </button>
+                </div>
+                <div class="user-chips" id="dobrada-list">
+                    <div style="text-align: center; padding: 10px; color: var(--tg-theme-hint-color);">
+                        Carregando usuários...
                     </div>
-                    <div class="user-chips" id="trunfo-list"></div>
-                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 10px;">
-                        Trunfo: 30 minutos extras para palpitar
-                    </small>
                 </div>
-            </div>
-            
-            <div class="section">
-                <div class="section-header" onclick="toggleSection(this)">
-                    <div class="section-title">⭐ Dobradas <span id="dobradas-count" class="info-badge">0</span></div>
-                    <button class="collapse-btn">▼</button>
-                </div>
-                <div class="section-content">
-                    <div class="quick-actions">
-                        <button class="quick-btn" onclick="selecionarTodasDobradas()">✓ Todas dobradas</button>
-                        <button class="quick-btn" onclick="limparTodasDobradas()">✗ Limpar dobradas</button>
-                    </div>
-                    <div class="user-chips" id="dobrada-list"></div>
-                    <small style="color: var(--tg-theme-hint-color); display: block; margin-top: 10px;">
-                        Dobrada: Pontuação em dobro nesta rodada
-                    </small>
-                </div>
+                <span class="help-text">
+                    <i class="fas fa-info-circle"></i> Dobrada: Pontos em dobro nesta rodada
+                </span>
             </div>
         </div>
         
@@ -489,80 +479,70 @@
     </div>
 
     <script>
-    // INICIALIZAÇÃO TELEGRAM
+    // INICIALIZAÇÃO TELEGRAM WEB APP
     const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-
-    // Configurar botão principal
-    tg.MainButton.setText("PUBLICAR RODADA");
-    tg.MainButton.setParams({color: "#28a745"}); // Verde para ação principal
-    tg.MainButton.show();
-    tg.MainButton.onClick(() => submitConfig());
-
+    
     // Variáveis globais
-    let rodadaAtual = 0;
+    let rodadaAtual = '';
     let todasRodadas = {};
     let usuariosData = [];
     let persistencia = {};
     
-    // Data mínima para hoje
-    document.getElementById('input-data').min = new Date().toISOString().split('T')[0];
-
-    function init() {
+    // Inicializar quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        tg.ready();
+        tg.expand();
+        
+        // Configurar data mínima para hoje
+        const hoje = new Date();
+        const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+        document.getElementById('input-data').min = hoje.toISOString().split('T')[0];
+        document.getElementById('input-data').value = amanha.toISOString().split('T')[0];
+        
+        // Configurar botão principal
+        tg.MainButton.setText("PUBLICAR RODADA");
+        tg.MainButton.setParams({color: "#28a745"});
+        tg.MainButton.disable(); // Inicialmente desabilitado
+        tg.MainButton.show();
+        tg.MainButton.onClick(submitConfig);
+        
+        // Processar dados da URL
+        processarDadosURL();
+    });
+    
+    function processarDadosURL() {
         try {
             const urlParams = new URLSearchParams(window.location.search);
-            const dataRaw = urlParams.get('data');
+            const dataBase64 = urlParams.get('data');
             
-            if (!dataRaw) {
-                throw new Error("Nenhum dado recebido");
+            if (!dataBase64) {
+                throw new Error("Nenhum dado recebido do bot");
             }
             
-            // Decodificação Base64 UTF-8
-            const decodedData = decodeData(dataRaw);
-            processarDados(decodedData);
+            // Decodificar Base64 URL-safe
+            const base64 = dataBase64.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonStr = atob(base64);
+            const dados = JSON.parse(jsonStr);
             
-            // Configurar data padrão para amanhã
-            const amanha = new Date();
-            amanha.setDate(amanha.getDate() + 1);
-            document.getElementById('input-data').value = amanha.toISOString().split('T')[0];
+            processarDados(dados);
             
         } catch (error) {
-            console.error('Erro na inicialização:', error);
-            showError("Erro ao carregar dados. Por favor, tente novamente.");
+            console.error('Erro ao processar dados:', error);
+            mostrarErro("Erro ao carregar dados. Verifique se abriu pelo bot.");
         }
     }
-
-    function decodeData(dataRaw) {
-        try {
-            // Converter Base64 para string
-            const base64 = dataRaw.replace(/-/g, '+').replace(/_/g, '/');
-            const binaryString = atob(base64);
-            const bytes = new Uint8Array(binaryString.length);
-            
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            
-            const text = new TextDecoder().decode(bytes);
-            return JSON.parse(text);
-            
-        } catch (error) {
-            console.error('Erro na decodificação:', error);
-            throw new Error('Dados inválidos');
+    
+    function processarDados(dados) {
+        // Validar dados
+        if (!dados.rodadas || !dados.usuarios) {
+            throw new Error("Dados incompletos recebidos");
         }
-    }
-
-    function processarDados(data) {
-        // Validar dados recebidos
-        if (!data.rodadas || !data.usuarios) {
-            throw new Error("Dados incompletos");
-        }
-
-        todasRodadas = data.rodadas;
-        usuariosData = data.usuarios;
-
-        // Inicializar persistência para cada rodada
+        
+        todasRodadas = dados.rodadas;
+        usuariosData = dados.usuarios;
+        
+        // Inicializar persistência
         Object.keys(todasRodadas).forEach(rodada => {
             persistencia[rodada] = {
                 games: new Set(),
@@ -570,44 +550,52 @@
                 dobradas: new Set()
             };
         });
-
-        // Selecionar primeira rodada por padrão
-        const rodadasDisponiveis = Object.keys(todasRodadas);
-        if (rodadasDisponiveis.length > 0) {
-            rodadaAtual = rodadasDisponiveis[0];
-            
-            // Preencher select de rodadas
-            const select = document.getElementById('rodada-select');
-            select.innerHTML = rodadasDisponiveis.map(r => 
-                `<option value="${r}">Rodada ${r} (${todasRodadas[r].length} jogos)</option>`
-            ).join('');
-            
-            // Mostrar interface
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Renderizar tudo
-            renderizarTudo();
-            
-            // Mostrar notificação de boas-vindas
-            showNotification(`Selecione os jogos da Rodada ${rodadaAtual}`);
-        } else {
-            throw new Error("Nenhuma rodada disponível");
+        
+        // Preencher select de rodadas
+        const select = document.getElementById('rodada-select');
+        const rodadasArray = Object.keys(todasRodadas).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        if (rodadasArray.length === 0) {
+            select.innerHTML = '<option value="">Nenhuma rodada disponível</option>';
+            mostrarErro("Não há rodadas disponíveis no momento.");
+            return;
         }
+        
+        select.innerHTML = rodadasArray.map(rodada => {
+            const numJogos = todasRodadas[rodada].length;
+            return `<option value="${rodada}">Rodada ${rodada} (${numJogos} jogos)</option>`;
+        }).join('');
+        
+        // Selecionar primeira rodada
+        rodadaAtual = rodadasArray[0];
+        
+        // Mostrar interface
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        
+        // Renderizar
+        renderizarTudo();
+        
+        // Mostrar notificação
+        mostrarNotificacao(`Rodada ${rodadaAtual} selecionada`);
     }
-
+    
     function renderizarTudo() {
-        const jogos = todasRodadas[rodadaAtual] || [];
+        if (!rodadaAtual || !todasRodadas[rodadaAtual]) return;
         
-        // Atualizar info da rodada
-        document.getElementById('rodada-info').innerText = `Rodada ${rodadaAtual} • ${jogos.length} jogos disponíveis`;
+        const jogos = todasRodadas[rodadaAtual];
         
-        // Renderizar lista de jogos
+        // Atualizar info
+        document.getElementById('rodada-info').textContent = 
+            `Rodada ${rodadaAtual} • ${jogos.length} jogos disponíveis`;
+        
+        // Renderizar jogos
         const gamesList = document.getElementById('games-list');
         gamesList.innerHTML = jogos.map(jogo => {
             const isSelected = persistencia[rodadaAtual].games.has(jogo.id.toString());
             return `
-                <div class="game-item ${isSelected ? 'selected' : ''}" onclick="toggleGame(this, '${jogo.id}')">
+                <div class="game-item ${isSelected ? 'selected' : ''}" 
+                     onclick="toggleGame(this, '${jogo.id}')">
                     <div class="game-checkbox"></div>
                     <div class="game-info">
                         <div class="game-teams">${jogo.home} x ${jogo.away}</div>
@@ -616,36 +604,37 @@
                 </div>
             `;
         }).join('');
-
+        
         // Atualizar contadores
         document.getElementById('jogos-count').textContent = persistencia[rodadaAtual].games.size;
         document.getElementById('trunfos-count').textContent = persistencia[rodadaAtual].trunfos.size;
         document.getElementById('dobradas-count').textContent = persistencia[rodadaAtual].dobradas.size;
-
-        // Renderizar usuários para trunfos e dobradas
-        renderizarUsuarios('trunfo', persistencia[rodadaAtual].trunfos);
-        renderizarUsuarios('dobrada', persistencia[rodadaAtual].dobradas);
         
-        // Atualizar resumo
+        // Renderizar usuários
+        renderizarUsuarios('trunfo');
+        renderizarUsuarios('dobrada');
+        
+        // Atualizar resumo e botão
         atualizarResumo();
-        
-        // Habilitar/desabilitar botão principal
         atualizarBotaoPrincipal();
     }
-
-    function renderizarUsuarios(tipo, setSelecionados) {
+    
+    function renderizarUsuarios(tipo) {
         const container = document.getElementById(`${tipo}-list`);
+        const setSelecionados = persistencia[rodadaAtual][tipo === 'trunfo' ? 'trunfos' : 'dobradas'];
+        
         container.innerHTML = usuariosData.map(usuario => {
             const isSelected = setSelecionados.has(usuario.id.toString());
+            const nomeExibicao = usuario.nome || `Usuário ${usuario.id}`;
             return `
                 <span class="user-chip ${tipo} ${isSelected ? 'selected' : ''}" 
                       onclick="toggleUsuario('${tipo}', ${usuario.id}, this)">
-                    ${usuario.nome}
+                    ${nomeExibicao}
                 </span>
             `;
         }).join('');
     }
-
+    
     function toggleGame(elemento, gameId) {
         const set = persistencia[rodadaAtual].games;
         
@@ -657,12 +646,11 @@
             elemento.classList.add('selected');
         }
         
-        // Atualizar contador
         document.getElementById('jogos-count').textContent = set.size;
         atualizarResumo();
         atualizarBotaoPrincipal();
     }
-
+    
     function toggleUsuario(tipo, usuarioId, elemento) {
         const set = persistencia[rodadaAtual][tipo === 'trunfo' ? 'trunfos' : 'dobradas'];
         
@@ -674,137 +662,149 @@
             elemento.classList.add('selected');
         }
         
-        // Atualizar contador
         document.getElementById(`${tipo === 'trunfo' ? 'trunfos' : 'dobradas'}-count`).textContent = set.size;
         atualizarResumo();
     }
-
+    
     function mudarRodada() {
-        rodadaAtual = document.getElementById('rodada-select').value;
-        renderizarTudo();
-        showNotification(`Rodada ${rodadaAtual} selecionada`);
-    }
-
-    function atualizarResumo() {
-        const p = persistencia[rodadaAtual];
+        const select = document.getElementById('rodada-select');
+        rodadaAtual = select.value;
         
+        if (rodadaAtual) {
+            renderizarTudo();
+            mostrarNotificacao(`Rodada ${rodadaAtual} selecionada`);
+        }
+    }
+    
+    function atualizarResumo() {
+        if (!rodadaAtual) return;
+        
+        const p = persistencia[rodadaAtual];
         document.getElementById('summary-jogos').textContent = p.games.size;
         document.getElementById('summary-trunfos').textContent = p.trunfos.size;
         document.getElementById('summary-dobradas').textContent = p.dobradas.size;
     }
-
+    
     function atualizarBotaoPrincipal() {
+        if (!rodadaAtual) {
+            tg.MainButton.disable();
+            return;
+        }
+        
         const temJogos = persistencia[rodadaAtual].games.size > 0;
         
         if (temJogos) {
             tg.MainButton.enable();
-            tg.MainButton.setParams({color: "#28a745"}); // Verde
+            tg.MainButton.setParams({color: "#28a745"});
         } else {
             tg.MainButton.disable();
-            tg.MainButton.setParams({color: "#cccccc"}); // Cinza
+            tg.MainButton.setParams({color: "#cccccc"});
         }
     }
-
-    // Funções de atalho
+    
+    // Funções auxiliares
     function selecionarTodosJogos() {
+        if (!rodadaAtual) return;
+        
         const jogos = todasRodadas[rodadaAtual] || [];
         const set = persistencia[rodadaAtual].games;
         
         jogos.forEach(jogo => set.add(jogo.id.toString()));
         renderizarTudo();
-        showNotification(`Todos os ${jogos.length} jogos selecionados`);
+        mostrarNotificacao(`Todos os ${jogos.length} jogos selecionados`);
     }
-
+    
     function limparTodosJogos() {
+        if (!rodadaAtual) return;
+        
         persistencia[rodadaAtual].games.clear();
         renderizarTudo();
-        showNotification('Jogos limpos');
+        mostrarNotificacao('Jogos limpos');
     }
-
+    
     function selecionarTodosTrunfos() {
+        if (!rodadaAtual) return;
+        
         const set = persistencia[rodadaAtual].trunfos;
         usuariosData.forEach(usuario => set.add(usuario.id.toString()));
         renderizarTudo();
-        showNotification('Todos os trunfos selecionados');
+        mostrarNotificacao('Todos os trunfos selecionados');
     }
-
+    
     function limparTodosTrunfos() {
+        if (!rodadaAtual) return;
+        
         persistencia[rodadaAtual].trunfos.clear();
         renderizarTudo();
-        showNotification('Trunfos limpos');
+        mostrarNotificacao('Trunfos limpos');
     }
-
+    
     function selecionarTodasDobradas() {
+        if (!rodadaAtual) return;
+        
         const set = persistencia[rodadaAtual].dobradas;
         usuariosData.forEach(usuario => set.add(usuario.id.toString()));
         renderizarTudo();
-        showNotification('Todas as dobradas selecionadas');
+        mostrarNotificacao('Todas as dobradas selecionadas');
     }
-
+    
     function limparTodasDobradas() {
+        if (!rodadaAtual) return;
+        
         persistencia[rodadaAtual].dobradas.clear();
         renderizarTudo();
-        showNotification('Dobradas limpas');
+        mostrarNotificacao('Dobradas limpas');
     }
-
-    function toggleSection(elemento) {
-        const section = elemento.closest('.section');
-        section.classList.toggle('collapsed');
-    }
-
+    
     function formatarData(dataString) {
-        if (!dataString) return '';
-        const data = new Date(dataString);
-        return data.toLocaleDateString('pt-BR', {
-            weekday: 'short',
-            day: '2-digit',
-            month: 'short'
-        });
-    }
-
-    function showNotification(mensagem) {
-        // Remover notificação anterior se existir
-        const notifAnterior = document.querySelector('.notification');
-        if (notifAnterior) notifAnterior.remove();
+        if (!dataString) return 'Data não definida';
         
-        // Criar nova notificação
-        const notificacao = document.createElement('div');
-        notificacao.className = 'notification';
-        notificacao.textContent = mensagem;
-        document.body.appendChild(notificacao);
-        
-        // Remover após 3 segundos
-        setTimeout(() => {
-            if (notificacao.parentNode) {
-                notificacao.style.opacity = '0';
-                notificacao.style.transition = 'opacity 0.3s';
-                setTimeout(() => {
-                    if (notificacao.parentNode) notificacao.remove();
-                }, 300);
+        try {
+            // Tentar diferentes formatos de data
+            let data = new Date(dataString);
+            if (isNaN(data.getTime())) {
+                // Se não for uma data válida, retornar o original
+                return dataString;
             }
-        }, 3000);
+            
+            return data.toLocaleDateString('pt-BR', {
+                weekday: 'short',
+                day: '2-digit',
+                month: 'short',
+                year: data.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+            });
+        } catch (e) {
+            return dataString;
+        }
     }
-
-    function showError(mensagem) {
+    
+    function mostrarNotificacao(mensagem) {
+        // Implementação simples de notificação
+        tg.showAlert(mensagem);
+    }
+    
+    function mostrarErro(mensagem) {
         const loadingText = document.getElementById('loading-text');
-        loadingText.innerHTML = `<div class="error">${mensagem}</div>`;
+        loadingText.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-circle"></i> ${mensagem}
+                <p style="margin-top: 10px; font-size: 14px;">
+                    Volte para o bot e tente novamente.
+                </p>
+            </div>
+        `;
     }
-
+    
     function submitConfig() {
+        // Validar data e hora
         const data = document.getElementById('input-data').value;
         const hora = document.getElementById('input-hora').value;
-
-        // Validações
-        if (!data) {
-            tg.showAlert("Selecione a data de encerramento!");
+        
+        if (!data || !hora) {
+            tg.showAlert("Preencha a data e hora de encerramento!");
             return;
         }
-
-        if (!hora) {
-            tg.showAlert("Selecione o horário de encerramento!");
-            return;
-        }
-
+        
         // Verificar se há jogos selecionados em alguma rodada
         let rodadasComJogos = [];
         for (const [rodadaNum, dados] of Object.entries(persistencia)) {
@@ -812,12 +812,12 @@
                 rodadasComJogos.push(rodadaNum);
             }
         }
-
+        
         if (rodadasComJogos.length === 0) {
-            tg.showAlert("Selecione pelo menos um jogo em qualquer rodada!");
+            tg.showAlert("Selecione pelo menos um jogo!");
             return;
         }
-
+        
         // Preparar dados para envio
         const configFinal = {
             config_multipla: {
@@ -825,66 +825,61 @@
                 rodadas: {}
             }
         };
-
-        // Processar cada rodada com jogos selecionados
+        
+        // Processar cada rodada
         rodadasComJogos.forEach(rodadaNum => {
             const dados = persistencia[rodadaNum];
             const jogosSelecionados = Array.from(dados.games);
             
-            // Obter informações detalhadas dos jogos
+            // Obter detalhes dos jogos
             const jogosDetalhes = jogosSelecionados.map(gameId => {
                 const jogo = todasRodadas[rodadaNum].find(j => j.id.toString() === gameId.toString());
-                return {
+                return jogo ? {
                     id: jogo.id,
                     home: jogo.home,
-                    away: jogo.away,
-                    data: jogo.data
-                };
-            });
-
+                    away: jogo.away
+                } : null;
+            }).filter(j => j !== null);
+            
             configFinal.config_multipla.rodadas[rodadaNum] = {
-                jogos_ids: jogosSelecionados,
+                jogos_ids: jogosSelecionados.map(id => parseInt(id)),
                 jogos_detalhes: jogosDetalhes,
-                trunfos_ids: Array.from(dados.trunfos).map(Number),
-                dobradas_ids: Array.from(dados.dobradas).map(Number),
-                total_jogos: jogosSelecionados.length
+                trunfos_ids: Array.from(dados.trunfos).map(id => parseInt(id)),
+                dobradas_ids: Array.from(dados.dobradas).map(id => parseInt(id))
             };
         });
-
+        
         // Mostrar confirmação
         const totalJogos = rodadasComJogos.reduce((total, rodada) => {
             return total + persistencia[rodada].games.size;
         }, 0);
-
+        
         const confirmMsg = `
 ✅ CONFIGURAÇÃO PRONTA
 
-Rodadas: ${rodadasComJogos.join(', ')}
-Total de Jogos: ${totalJogos}
-Encerramento: ${data} às ${hora}
+• Rodadas: ${rodadasComJogos.join(', ')}
+• Total de Jogos: ${totalJogos}
+• Encerramento: ${data} às ${hora}
 
-Deseja publicar esta rodada?
+Deseja publicar esta configuração?
         `;
-
-        tg.showConfirm(confirmMsg.trim(), (confirmed) => {
+        
+        tg.showConfirm(confirmMsg.trim(), function(confirmed) {
             if (confirmed) {
                 // Enviar dados para o bot
                 tg.sendData(JSON.stringify(configFinal));
                 
-                // Mostrar feedback
+                // Feedback visual
                 tg.MainButton.setText("ENVIANDO...");
                 tg.MainButton.showProgress();
                 
                 // Fechar após 2 segundos
-                setTimeout(() => {
+                setTimeout(function() {
                     tg.close();
                 }, 2000);
             }
         });
     }
-
-    // Inicializar quando a página carregar
-    document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
