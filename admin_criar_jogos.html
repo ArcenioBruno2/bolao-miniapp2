@@ -356,6 +356,7 @@
         if (!selecionouAlgo) return tg.showAlert("Selecione pelo menos um jogo!");
         
         tg.sendData(JSON.stringify(configFinal));
+        setTimeout(() => tg.close(), 500);
     }
 
     init();
