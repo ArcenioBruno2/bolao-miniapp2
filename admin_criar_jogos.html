@@ -25,6 +25,7 @@
             background-color: var(--tg-theme-bg-color);
             color: var(--tg-theme-text-color);
             min-height: 100vh;
+            overflow-x: hidden; /* Evita rolagem lateral no Android */
         }
         
         .header {
@@ -36,7 +37,7 @@
             z-index: 100;
         }
         
-        .container { padding: 15px; padding-bottom: 120px; }
+        .container { padding: 15px; padding-bottom: 140px; } /* Aumentado para não cobrir o summary-bar */
         
         .section {
             background: var(--tg-theme-bg-color);
@@ -63,7 +64,10 @@
             background: var(--tg-theme-secondary-bg-color);
             border-radius: 10px;
             cursor: pointer;
+            transition: transform 0.1s;
         }
+
+        .game-item:active { transform: scale(0.98); } /* Feedback visual ao clicar */
         
         .game-item.selected {
             background: rgba(40, 167, 69, 0.15);
@@ -74,10 +78,11 @@
             width: 24px; height: 24px; border-radius: 6px;
             border: 2px solid var(--tg-theme-hint-color);
             margin-right: 12px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
         
         .game-item.selected .game-checkbox { background: var(--success-color); border-color: var(--success-color); }
-        .game-item.selected .game-checkbox::after { content: '✓'; color: white; }
+        .game-item.selected .game-checkbox::after { content: '✓'; color: white; font-weight: bold; }
         
         .input-field {
             width: 100%; padding: 12px; border-radius: 10px;
@@ -85,6 +90,7 @@
             background: var(--tg-theme-secondary-bg-color);
             color: var(--tg-theme-text-color);
             font-size: 16px; margin-bottom: 10px;
+            -webkit-appearance: none; /* Melhora visual no iOS/Android */
         }
 
         .user-chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -102,7 +108,9 @@
         .summary-bar {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--tg-theme-secondary-bg-color);
-            padding: 12px 15px; border-top: 1px solid rgba(0,0,0,0.1);
+            padding: 15px; border-top: 1px solid rgba(0,0,0,0.1);
+            text-align: center; font-weight: bold;
+            z-index: 1000;
         }
         
         .loading {
@@ -120,6 +128,7 @@
 <body>
     <div id="loading" class="loading">
         <div class="spinner"></div>
+        <br>
         <span id="loading-text">Carregando configuração...</span>
     </div>
     
@@ -163,12 +172,22 @@
     </div>
 
     <script>
+    // INICIALIZAÇÃO DO TELEGRAM WEBAPP
     const tg = window.Telegram.WebApp;
+    
+    // Avisa ao Telegram que o app está pronto e força tela cheia
+    tg.ready();
     tg.expand();
+    
+    // Ativa confirmação para não fechar sem querer
+    tg.enableClosingConfirmation();
 
-    // Configuração do botão principal do Telegram
+    // Configuração do botão principal
     tg.MainButton.setText("PUBLICAR CONFIGURAÇÕES");
-    tg.MainButton.show();
+    tg.MainButton.setParams({
+        button_color: "#28a745", // Verde para destaque
+        button_text_color: "#ffffff"
+    });
     tg.MainButton.onClick(() => submit());
 
     let rodadaNum = 0;
@@ -182,7 +201,7 @@
             const dataRaw = urlParams.get('data');
             
             if (dataRaw) {
-                // DECODIFICAÇÃO ROBUSTA DE UTF-8 - EXATAMENTE COMO NO BOLAO4
+                // Decodificação robusta Base64 UTF-8
                 const binaryString = atob(dataRaw.replace(/-/g, '+').replace(/_/g, '/'));
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
@@ -190,10 +209,9 @@
                 }
                 const decodedData = JSON.parse(new TextDecoder().decode(bytes));
                 
-                console.log("Dados decodificados:", decodedData);
                 processarDados(decodedData);
                 
-                // CONFIGURAR DATA ATUAL AUTOMATICAMENTE
+                // Data de encerramento padrão
                 const inputData = document.getElementById('input-data');
                 if (!inputData.value) {
                     const hoje = new Date().toISOString().split('T')[0];
@@ -212,7 +230,6 @@
         todasRodadas = data.rodadas;
         usuariosData = data.usuarios;
 
-        // Inicializa o objeto de persistência para cada rodada
         const keys = Object.keys(todasRodadas);
         keys.forEach(r => {
             persistencia[r] = {
@@ -226,120 +243,9 @@
             rodadaNum = keys[0];
             preencherSelect(keys);
             
-            // Esconde o loading e mostra o app
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             
+            tg.MainButton.show(); // Mostra o botão apenas após carregar
             renderTudo();
         }
-    }
-
-    function preencherSelect(array) {
-        const sel = document.getElementById('rodada-select');
-        sel.innerHTML = array.map(r => `<option value="${r}">Rodada ${r}</option>`).join('');
-    }
-
-    function renderTudo() {
-        const jogos = todasRodadas[rodadaNum] || [];
-        document.getElementById('rodada-info').innerText = `Rodada ${rodadaNum} (${jogos.length} jogos)`;
-        
-        const gList = document.getElementById('games-list');
-        // O ID do jogo no seu Python é uma string (ex: "10-TimeA-TimeB")
-        gList.innerHTML = jogos.map((j) => {
-            const id = j.id;
-            const sel = persistencia[rodadaNum].games.has(id) ? 'selected' : '';
-            return `
-                <div class="game-item ${sel}" onclick="toggleGame(this, '${id}')">
-                    <div class="game-checkbox"></div>
-                    <div>
-                        <div>${j.home} x ${j.away}</div>
-                        <small style="color:gray">${j.data}</small>
-                    </div>
-                </div>`;
-        }).join('');
-
-        const tList = document.getElementById('trunfo-list');
-        const dList = document.getElementById('dobrada-list');
-        
-        const htmlUsers = (type) => usuariosData.map(u => {
-            const id = u.id;
-            const nome = u.nome;
-            const sel = persistencia[rodadaNum][type].has(id) ? 'selected' : '';
-            return `<span class="user-chip ${sel}" onclick="toggleUser(this, '${type}', ${id})">${nome}</span>`;
-        }).join('');
-
-        tList.innerHTML = htmlUsers('trunfos');
-        dList.innerHTML = htmlUsers('dobradas');
-        updateSummary();
-    }
-
-    function toggleGame(el, id) {
-        const set = persistencia[rodadaNum].games;
-        set.has(id) ? set.delete(id) : set.add(id);
-        el.classList.toggle('selected');
-        updateSummary();
-    }
-
-    function toggleUser(el, type, id) {
-        const set = persistencia[rodadaNum][type];
-        set.has(id) ? set.delete(id) : set.add(id);
-        el.classList.toggle('selected');
-        updateSummary();
-    }
-
-    function mudarRodada() {
-        rodadaNum = document.getElementById('rodada-select').value;
-        renderTudo();
-    }
-
-    function updateSummary() {
-        const p = persistencia[rodadaNum];
-        document.getElementById('summary-jogos').innerText = p.games.size;
-        document.getElementById('summary-trunfos').innerText = p.trunfos.size;
-        document.getElementById('summary-dobradas').innerText = p.dobradas.size;
-    }
-
-    function submit() {
-        const data = document.getElementById('input-data').value;
-        const hora = document.getElementById('input-hora').value;
-
-        if (!data) return tg.showAlert("Selecione a data de encerramento!");
-        
-        const configFinal = {
-            config_multipla: {
-                hora_encerramento: `${data} ${hora}`,
-                rodadas: {}
-            }
-        };
-
-        let selecionouAlgo = false;
-        for (let r in persistencia) {
-            if (persistencia[r].games.size > 0) {
-                selecionouAlgo = true;
-                const p = persistencia[r];
-                const nomes = [];
-                
-                // Busca os nomes dos jogos selecionados para a mensagem do Telegram
-                p.games.forEach(gid => {
-                    const jogoObj = todasRodadas[r].find(j => j.id === gid);
-                    if(jogoObj) nomes.push(`${jogoObj.home} x ${jogoObj.away}`);
-                });
-
-                configFinal.config_multipla.rodadas[r] = {
-                    jogos: Array.from(p.games),
-                    jogos_nomes: nomes,
-                    trunfos_ids: Array.from(p.trunfos),
-                    dobrada_used_ids: Array.from(p.dobradas)
-                };
-            }
-        }
-
-        if (!selecionouAlgo) return tg.showAlert("Selecione pelo menos um jogo!");
-        
-        tg.sendData(JSON.stringify(configFinal));
-    }
-
-    init();
-    </script>
-</body>
-</html>
