@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resultados - Bolão</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #efeff3;
+            --tg-theme-hint-color: #999999;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            user-select: none; 
+            overflow-x: hidden;
+        }
+        
+        .header {
+            padding: 15px; 
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-bottom: 1px solid rgba(0,0,0,0.1); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
+        
+        .header h1 { font-size: 18px; margin-bottom: 5px; }
+        .header small { opacity: 0.9; }
+        
+        .container { padding: 10px; padding-bottom: 100px; }
+        
+        .result-card {
+            background-color: var(--tg-theme-bg-color); 
+            border-radius: 12px;
+            padding: 15px; 
+            margin-bottom: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .result-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--tg-theme-text-color);
+        }
+        
+        .result-teams { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            gap: 10px;
+        }
+        
+        .team-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .team-name { 
+            font-size: 14px; 
+            font-weight: 500;
+        }
+        
+        .result-input {
+            width: 50px; 
+            height: 40px; 
+            border-radius: 8px;
+            border: 2px solid var(--tg-theme-secondary-bg-color);
+            background-color: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color); 
+            text-align: center;
+            font-size: 18px; 
+            font-weight: bold; 
+            outline: none;
+        }
+        
+        .result-input:focus {
+            border-color: var(--tg-theme-button-color);
+            background-color: rgba(36, 129, 204, 0.1);
+        }
+        
+        .vs-text {
+            font-weight: 600;
+            color: var(--tg-theme-hint-color);
+            padding: 0 5px;
+        }
+        
+        .loading {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center; 
+            height: 100vh;
+        }
+        
+        .spinner {
+            width: 40px; 
+            height: 40px; 
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--tg-theme-button-color);
+            border-radius: 50%; 
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .info-text {
+            background: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid var(--success-color);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--tg-theme-text-color);
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <span id="loading-text">Carregando resultados...</span>
+    </div>
+    
+    <div id="app" style="display: none;">
+        <div class="header">
+            <h1>📊 Inserir Resultados</h1>
+            <small id="rodada-info">Rodada --</small>
+        </div>
+        
+        <div class="container">
+            <div class="info-text">
+                ℹ️ Preencha os placares reais dos jogos abaixo
+            </div>
+            <div id="results-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let gamesData = [];
+        let rodadaNum = 0;
+
+        function init() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataRaw = urlParams.get('data');
+                if (!dataRaw) throw new Error("Sem dados");
+
+                let jsonString;
+                try {
+                    jsonString = atob(dataRaw.replace(/-/g, '+').replace(/_/g, '/'));
+                } catch (e) {
+                    jsonString = atob(dataRaw);
+                }
+                
+                const decodedData = JSON.parse(
+                    decodeURIComponent(
+                        Array.from(new TextEncoder().encode(jsonString))
+                            .map(b => '%' + b.toString(16).padStart(2, '0'))
+                            .join('')
+                    )
+                );
+                
+                rodadaNum = decodedData.r || decodedData.rodada;
+                gamesData = decodedData.j || decodedData.jogos;
+
+                document.getElementById('rodada-info').innerText = `Rodada ${rodadaNum} (${gamesData.length} jogos)`;
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                renderResults();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loading-text').innerText = "Erro: " + e.message;
+                document.getElementById('loading-text').style.color = "red";
+            }
+        }
+
+        function renderResults() {
+            const list = document.getElementById('results-list');
+            list.innerHTML = '';
+
+            gamesData.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                
+                const homeScore = game.resultado_casa !== undefined && game.resultado_casa !== null ? game.resultado_casa : '';
+                const awayScore = game.resultado_fora !== undefined && game.resultado_fora !== null ? game.resultado_fora : '';
+
+                card.innerHTML = `
+                    <div class="result-header">${index + 1}º Jogo</div>
+                    <div class="result-teams">
+                        <div class="team-section">
+                            <div class="team-name">${game.home}</div>
+                            <input type="number" class="result-input" id="h-${index}" inputmode="numeric" value="${homeScore}" min="0">
+                        </div>
+                        <div class="vs-text">×</div>
+                        <div class="team-section">
+                            <div class="team-name">${game.away}</div>
+                            <input type="number" class="result-input" id="a-${index}" inputmode="numeric" value="${awayScore}" min="0">
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            tg.MainButton.setText("SALVAR RESULTADOS").show().onClick(save);
+        }
+
+        function save() {
+            const resultados = {};
+            
+            for (let i = 0; i < gamesData.length; i++) {
+                const h = document.getElementById(`h-${i}`).value;
+                const a = document.getElementById(`a-${i}`).value;
+                
+                if (h === '' || a === '') {
+                    tg.showAlert("Preencha todos os placares!");
+                    return;
+                }
+                
+                resultados[gamesData[i].id] = {
+                    casa: parseInt(h),
+                    fora: parseInt(a)
+                };
+            }
+            
+            const dados = {
+                resultados: resultados,
+                rodada: rodadaNum
+            };
+            
+            tg.sendData(JSON.stringify(dados));
+            setTimeout(() => tg.close(), 200);
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Palpites - Bolão</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #efeff3;
+            --tg-theme-hint-color: #999999;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            user-select: none; 
+            overflow-x: hidden;
+        }
+        
+        .header {
+            padding: 15px; 
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-bottom: 1px solid rgba(0,0,0,0.1); 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
+        
+        .header h1 { font-size: 18px; margin-bottom: 8px; }
+        
+        .info-bar { 
+            font-size: 12px; 
+            color: var(--tg-theme-hint-color);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .container { padding: 10px; padding-bottom: 100px; }
+        
+        .game-card {
+            background-color: var(--tg-theme-bg-color); 
+            border-radius: 12px;
+            padding: 15px; 
+            margin-bottom: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .teams { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        
+        .team-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            gap: 10px; 
+        }
+        
+        .team-name { 
+            font-size: 15px; 
+            font-weight: 500; 
+            flex: 1; 
+        }
+        
+        .score-input {
+            width: 45px; 
+            height: 35px; 
+            border-radius: 8px;
+            border: 1px solid var(--tg-theme-hint-color);
+            background-color: var(--tg-theme-secondary-bg-color);
+            color: var(--tg-theme-text-color); 
+            text-align: center;
+            font-size: 18px; 
+            font-weight: bold; 
+            outline: none;
+        }
+        
+        .score-input:focus {
+            border-color: var(--tg-theme-button-color);
+            background-color: rgba(36, 129, 204, 0.1);
+        }
+        
+        .star-btn {
+            margin-left: 15px; 
+            font-size: 28px; 
+            cursor: pointer;
+            color: var(--tg-theme-hint-color); 
+            transition: transform 0.1s, color 0.2s;
+        }
+        
+        .star-btn:active { transform: scale(0.9); }
+        .star-btn.active { color: #FFD700; }
+        
+        .loading {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center; 
+            height: 100vh;
+        }
+        
+        .spinner {
+            width: 40px; 
+            height: 40px; 
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--tg-theme-button-color);
+            border-radius: 50%; 
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <span id="loading-text">Carregando palpites...</span>
+    </div>
+    
+    <div id="app" style="display: none;">
+        <div class="header">
+            <h1 id="rodada-title">Carregando...</h1>
+            <div class="info-bar">
+                <span id="info-horario"></span>
+                <span id="info-dobrada"></span>
+            </div>
+        </div>
+        <div class="container" id="games-list"></div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let gamesData = [];
+        let selectedStarIndex = -1;
+        let podeDobradaGlobal = false;
+        let tinhaEstrelaNoInicio = false;
+        let rodadaNum = 0;
+        let palpitesExistentes = {};
+
+        function init() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataRaw = urlParams.get('data');
+                if (!dataRaw) throw new Error("Sem dados");
+
+                let jsonString;
+                try {
+                    jsonString = atob(dataRaw.replace(/-/g, '+').replace(/_/g, '/'));
+                } catch (e) {
+                    jsonString = atob(dataRaw);
+                }
+                
+                const decodedData = JSON.parse(
+                    decodeURIComponent(
+                        Array.from(new TextEncoder().encode(jsonString))
+                            .map(b => '%' + b.toString(16).padStart(2, '0'))
+                            .join('')
+                    )
+                );
+                
+                rodadaNum = decodedData.r || decodedData.rodada;
+                const horario = decodedData.h || decodedData.horario;
+                podeDobradaGlobal = decodedData.d !== undefined ? decodedData.d : decodedData.pode_dobrada;
+                gamesData = decodedData.j || decodedData.jogos;
+                palpitesExistentes = decodedData.p || {};
+
+                // Verifica se já veio alguma estrela marcada originalmente
+                gamesData.forEach((game, index) => {
+                    if (game.is_pd || (palpitesExistentes && palpitesExistentes.dobrada === index)) {
+                        selectedStarIndex = index;
+                        tinhaEstrelaNoInicio = true;
+                    }
+                });
+
+                document.getElementById('rodada-title').innerText = `Rodada ${rodadaNum}`;
+                document.getElementById('info-horario').innerText = `⏰ Fecha às ${horario}`;
+                
+                const statusEstrela = (podeDobradaGlobal || tinhaEstrelaNoInicio) ? "⭐ Disponível" : "⭐ Indisponível";
+                document.getElementById('info-dobrada').innerText = statusEstrela;
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                
+                renderGames();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('loading-text').innerText = "Erro: " + e.message;
+                document.getElementById('loading-text').style.color = "red";
+            }
+        }
+
+        function renderGames() {
+            const list = document.getElementById('games-list');
+            list.innerHTML = '';
+
+            gamesData.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                const isStarActive = selectedStarIndex === index;
+                
+                // Recuperar palpites existentes
+                let homeScore = '';
+                let awayScore = '';
+                if (palpitesExistentes && palpitesExistentes[index]) {
+                    const palpite = palpitesExistentes[index];
+                    homeScore = palpite.home_score !== undefined ? palpite.home_score : '';
+                    awayScore = palpite.away_score !== undefined ? palpite.away_score : '';
+                }
+
+                card.innerHTML = `
+                    <div class="teams">
+                        <div class="team-row">
+                            <span class="team-name">${game.home}</span>
+                            <input type="number" class="score-input" id="h-${index}" inputmode="numeric" value="${homeScore}">
+                        </div>
+                        <div class="team-row">
+                            <span class="team-name">${game.away}</span>
+                            <input type="number" class="score-input" id="a-${index}" inputmode="numeric" value="${awayScore}">
+                        </div>
+                    </div>
+                    <div class="star-btn ${isStarActive ? 'active' : ''}" onclick="toggleStar(${index})">★</div>
+                `;
+                list.appendChild(card);
+            });
+
+            tg.MainButton.setText("ENVIAR PALPITES").show().onClick(send);
+        }
+
+        function toggleStar(index) {
+            if (!podeDobradaGlobal && !tinhaEstrelaNoInicio) {
+                tg.showAlert("Você não possui estrela disponível para esta rodada.");
+                return;
+            }
+
+            const stars = document.querySelectorAll('.star-btn');
+            
+            if (selectedStarIndex === index) {
+                selectedStarIndex = -1;
+                stars[index].classList.remove('active');
+            } else {
+                if (selectedStarIndex !== -1) {
+                    stars[selectedStarIndex].classList.remove('active');
+                }
+                selectedStarIndex = index;
+                stars[index].classList.add('active');
+            }
+        }
+
+        function send() {
+            const palpites = {};
+            let temDobrada = false;
+            
+            for (let i = 0; i < gamesData.length; i++) {
+                const h = document.getElementById(`h-${i}`).value;
+                const a = document.getElementById(`a-${i}`).value;
+                
+                if (h === '' || a === '') {
+                    tg.showAlert("Preencha todos os placares!");
+                    return;
+                }
+                
+                palpites[i] = {
+                    home_score: parseInt(h),
+                    away_score: parseInt(a)
+                };
+                
+                if (selectedStarIndex === i) {
+                    temDobrada = true;
+                }
+            }
+            
+            const dados = {
+                palpites: palpites,
+                rodada: rodadaNum,
+                dobrada: temDobrada ? selectedStarIndex : null
+            };
+            
+            tg.sendData(JSON.stringify(dados));
+        }
+
+        init();
+    </script>
+</body>
+</html>
