@@ -1,0 +1,1849 @@
+<!-- webapps/admin_ranking.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rankings e Estatísticas - Admin Bolão</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --secondary-dark: #059669;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gold: #fbbf24;
+            --silver: #9ca3af;
+            --bronze: #b45309;
+            --dark: #1f2937;
+            --light: #f8fafc;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 18px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tab:hover {
+            background: white;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .content {
+            padding: 0;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .filters-bar {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-label {
+            font-weight: 600;
+            color: var(--dark);
+            white-space: nowrap;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            background: white;
+            font-size: 14px;
+            min-width: 150px;
+            cursor: pointer;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .search-input {
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            min-width: 250px;
+            flex: 1;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+        
+        /* TAB 1: Ranking Geral */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .ranking-table th {
+            background: var(--light);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+        
+        .ranking-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s;
+        }
+        
+        .ranking-table tr:hover td {
+            background: #f9fafb;
+        }
+        
+        .posicao-cell {
+            width: 80px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .posicao-1 {
+            color: var(--gold);
+            background: linear-gradient(135deg, #fef3c7, #fef3c7);
+        }
+        
+        .posicao-2 {
+            color: var(--silver);
+            background: linear-gradient(135deg, #f3f4f6, #f3f4f6);
+        }
+        
+        .posicao-3 {
+            color: var(--bronze);
+            background: linear-gradient(135deg, #fef3c7, #fef3c7);
+        }
+        
+        .medalha {
+            font-size: 20px;
+        }
+        
+        .usuario-cell {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .usuario-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .usuario-info {
+            flex: 1;
+        }
+        
+        .usuario-nome {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .usuario-username {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        
+        .pontos-cell {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        
+        .stats-cell {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-mini {
+            text-align: center;
+            min-width: 60px;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--dark);
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tendencia {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 15px;
+        }
+        
+        .tendencia-up {
+            background: #d1fae5;
+            color: var(--secondary-dark);
+        }
+        
+        .tendencia-down {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .tendencia-stable {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        /* TAB 2: Ranking por Rodada */
+        .rodada-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .rodada-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .rodada-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .rodada-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* TAB 3: Estatísticas Detalhadas */
+        .estatisticas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .estatistica-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .estatistica-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .estatistica-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .estatistica-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .icon-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        
+        .icon-success {
+            background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+        }
+        
+        .icon-warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+        
+        .estatistica-valor {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .estatistica-desc {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--light);
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--secondary), var(--secondary-dark));
+            border-radius: 5px;
+            transition: width 1s ease-out;
+        }
+        
+        .comparativo-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .comparativo-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .comparativo-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* TAB 4: Gráficos */
+        .graficos-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .grafico-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .grafico-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .grafico-placeholder {
+            height: 300px;
+            background: var(--light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+        
+        /* Botões */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, var(--secondary), var(--secondary-dark));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--dark);
+            border: 2px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--light);
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .loading.show {
+            display: flex;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--secondary);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        .fullscreen-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+        
+        .fullscreen-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: var(--border);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        @media (max-width: 900px) {
+            .graficos-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .grafico-card {
+                min-width: auto;
+            }
+            
+            .estatisticas-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ranking-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input {
+                min-width: auto;
+            }
+            
+            .export-actions {
+                margin-left: 0;
+                justify-content: center;
+            }
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: var(--secondary-dark);
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de carregamento -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p id="loadingText">Carregando rankings...</p>
+    </div>
+    
+    <!-- Notificações -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Botão tela cheia -->
+    <div class="fullscreen-btn" onclick="toggleFullscreen()">
+        <i class="fas fa-expand"></i>
+    </div>
+    
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1><i class="fas fa-trophy"></i> Rankings e Estatísticas</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="voltarMenu()">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+                <button class="btn btn-primary" onclick="exportarDados()">
+                    <i class="fas fa-file-export"></i> Exportar
+                </button>
+            </div>
+        </div>
+        
+        <!-- Abas -->
+        <div class="tabs">
+            <div class="tab active" onclick="mudarAba(1)">
+                <i class="fas fa-trophy"></i> Ranking Geral
+            </div>
+            <div class="tab" onclick="mudarAba(2)">
+                <i class="fas fa-layer-group"></i> Por Rodada
+            </div>
+            <div class="tab" onclick="mudarAba(3)">
+                <i class="fas fa-chart-bar"></i> Estatísticas
+            </div>
+            <div class="tab" onclick="mudarAba(4)">
+                <i class="fas fa-chart-line"></i> Gráficos
+            </div>
+        </div>
+        
+        <!-- Conteúdo das abas -->
+        <div class="content">
+            <!-- ABA 1: Ranking Geral -->
+            <div class="tab-content active" id="tab1">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">Ordenar por:</span>
+                        <select class="filter-select" id="ordenarRanking" onchange="ordenarRankingGeral()">
+                            <option value="pontos">Pontos (maior primeiro)</option>
+                            <option value="acertos_exatos">Acertos Exatos</option>
+                            <option value="aproveitamento">% Aproveitamento</option>
+                        </select>
+                    </div>
+                    
+                    <input type="text" class="search-input" id="searchRanking" placeholder="Buscar usuário..." oninput="filtrarRanking()">
+                    
+                    <div class="export-actions">
+                        <button class="btn btn-secondary" onclick="imprimirRanking()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                        <button class="btn btn-primary" onclick="exportarCSV()">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="ranking-table" id="rankingGeral">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Posição</th>
+                                <th>Usuário</th>
+                                <th style="width: 120px;">Pontos</th>
+                                <th style="width: 300px;">Estatísticas</th>
+                                <th style="width: 100px;">Tendência</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingGeralBody">
+                            <!-- Ranking será carregado via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination" id="paginationRanking">
+                    <!-- Paginação será gerada via JavaScript -->
+                </div>
+            </div>
+            
+            <!-- ABA 2: Ranking por Rodada -->
+            <div class="tab-content" id="tab2">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">Selecione a rodada:</span>
+                        <select class="filter-select" id="selectRodadaRanking" onchange="carregarRankingRodada()">
+                            <option value="">Selecione uma rodada...</option>
+                            <!-- Rodadas serão carregadas via JS -->
+                        </select>
+                    </div>
+                    
+                    <div style="flex: 1;"></div>
+                    
+                    <div class="export-actions">
+                        <button class="btn btn-secondary" onclick="compararRodadas()">
+                            <i class="fas fa-exchange-alt"></i> Comparar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="rodada-selector" id="rodadaSelector">
+                    <!-- Botões de rodada serão gerados via JS -->
+                </div>
+                
+                <div id="rankingRodadaContainer">
+                    <!-- Conteúdo será carregado via JavaScript -->
+                    <div class="empty-state" id="emptyStateRodada">
+                        <i class="fas fa-layer-group"></i>
+                        <h3>Selecione uma rodada</h3>
+                        <p>Escolha uma rodada para ver o ranking específico.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ABA 3: Estatísticas -->
+            <div class="tab-content" id="tab3">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">Período:</span>
+                        <select class="filter-select" id="filterPeriodo">
+                            <option value="total">Total</option>
+                            <option value="ultimo_mes">Último mês</option>
+                            <option value="ultimas_rodadas">Últimas 5 rodadas</option>
+                        </select>
+                    </div>
+                    
+                    <div style="flex: 1;"></div>
+                    
+                    <div class="export-actions">
+                        <button class="btn btn-primary" onclick="gerarRelatorio()">
+                            <i class="fas fa-file-pdf"></i> Relatório PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="estatisticas-grid">
+                    <!-- Card 1: Participação -->
+                    <div class="estatistica-card">
+                        <div class="estatistica-header">
+                            <div class="estatistica-title">Participação</div>
+                            <div class="estatistica-icon icon-primary">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <div class="estatistica-valor" id="estatParticipantes">0</div>
+                        <div class="estatistica-desc">
+                            Total de usuários ativos no bolão
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressParticipacao" style="width: 75%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280;">
+                            <span>Participação média: <strong id="mediaParticipacao">0%</strong></span>
+                            <span>Ativos: <strong id="ativosCount">0</strong></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Card 2: Performance -->
+                    <div class="estatistica-card">
+                        <div class="estatistica-header">
+                            <div class="estatistica-title">Performance</div>
+                            <div class="estatistica-icon icon-success">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div class="estatistica-valor" id="estatMediaPontos">0</div>
+                        <div class="estatistica-desc">
+                            Pontuação média por rodada
+                        </div>
+                        <table class="comparativo-table">
+                            <tr>
+                                <td>Maior pontuação:</td>
+                                <td style="text-align: right; font-weight: 600;" id="maiorPontuacao">0</td>
+                            </tr>
+                            <tr>
+                                <td>Menor pontuação:</td>
+                                <td style="text-align: right; font-weight: 600;" id="menorPontuacao">0</td>
+                            </tr>
+                            <tr>
+                                <td>Desvio padrão:</td>
+                                <td style="text-align: right; font-weight: 600;" id="desvioPadrao">0</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Card 3: Acertos -->
+                    <div class="estatistica-card">
+                        <div class="estatistica-header">
+                            <div class="estatistica-title">Precisão</div>
+                            <div class="estatistica-icon icon-warning">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                        </div>
+                        <div class="estatistica-valor" id="estatAcertosExatos">0%</div>
+                        <div class="estatistica-desc">
+                            Taxa de acertos exatos (placar completo)
+                        </div>
+                        <table class="comparativo-table">
+                            <tr>
+                                <td>Acertos exatos:</td>
+                                <td style="text-align: right;">
+                                    <span id="totalAcertosExatos">0</span>
+                                    <span class="badge badge-success" id="badgeAcertosExatos">+0%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Acertos resultado:</td>
+                                <td style="text-align: right;">
+                                    <span id="totalAcertosResultado">0</span>
+                                    <span class="badge badge-warning" id="badgeAcertosResultado">+0%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Acertos parciais:</td>
+                                <td style="text-align: right;">
+                                    <span id="totalAcertosParciais">0</span>
+                                    <span class="badge" id="badgeAcertosParciais">+0%</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Card 4: Pontuação Dobrada -->
+                    <div class="estatistica-card">
+                        <div class="estatistica-header">
+                            <div class="estatistica-title">Pontuação Dobrada</div>
+                            <div class="estatistica-icon icon-primary">
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <div class="estatistica-valor" id="estatPDUsada">0%</div>
+                        <div class="estatistica-desc">
+                            Uso da Pontuação Dobrada
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressPD" style="width: 60%"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-top: 10px;">
+                            <span>Usada em: <strong id="pdUsadaCount">0</strong> rodadas</span>
+                            <span>Eficiência: <strong id="pdEficiencia">0%</strong></span>
+                        </div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 15px;">
+                            <i class="fas fa-info-circle"></i> Eficiência: acertos exatos em jogos com PD
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tabela de desempenho por usuário -->
+                <div style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 20px; color: var(--dark);">
+                        <i class="fas fa-user-chart"></i> Desempenho Individual
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Pontos/Rodada</th>
+                                    <th>Acertos Exatos</th>
+                                    <th>% Aproveitamento</th>
+                                    <th>PD Eficiente</th>
+                                    <th>Consistência</th>
+                                </tr>
+                            </thead>
+                            <tbody id="desempenhoIndividual">
+                                <!-- Dados serão carregados via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ABA 4: Gráficos -->
+            <div class="tab-content" id="tab4">
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <span class="filter-label">Tipo de gráfico:</span>
+                        <select class="filter-select" id="filterGrafico">
+                            <option value="evolucao">Evolução do Ranking</option>
+                            <option value="pontuacao">Distribuição de Pontuação</option>
+                            <option value="acertos">Tipos de Acertos</option>
+                            <option value="participacao">Participação por Rodada</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <span class="filter-label">Usuário:</span>
+                        <select class="filter-select" id="filterUsuarioGrafico">
+                            <option value="todos">Todos os usuários</option>
+                            <!-- Usuários serão carregados via JS -->
+                        </select>
+                    </div>
+                    
+                    <div style="flex: 1;"></div>
+                    
+                    <div class="export-actions">
+                        <button class="btn btn-primary" onclick="exportarGrafico()">
+                            <i class="fas fa-download"></i> Baixar Gráfico
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="graficos-container">
+                    <!-- Gráfico 1 -->
+                    <div class="grafico-card">
+                        <div class="grafico-title">
+                            <i class="fas fa-chart-line"></i> Evolução do Ranking
+                        </div>
+                        <div class="grafico-placeholder" id="graficoEvolucao">
+                            <div style="text-align: center;">
+                                <i class="fas fa-chart-line" style="font-size: 60px; margin-bottom: 15px;"></i>
+                                <p>Gráfico de evolução do ranking</p>
+                                <p style="font-size: 14px; margin-top: 10px;">(Implementação com Chart.js)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico 2 -->
+                    <div class="grafico-card">
+                        <div class="grafico-title">
+                            <i class="fas fa-chart-pie"></i> Distribuição de Acertos
+                        </div>
+                        <div class="grafico-placeholder" id="graficoAcertos">
+                            <div style="text-align: center;">
+                                <i class="fas fa-chart-pie" style="font-size: 60px; margin-bottom: 15px;"></i>
+                                <p>Gráfico de distribuição de acertos</p>
+                                <p style="font-size: 14px; margin-top: 10px;">(Implementação com Chart.js)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico 3 -->
+                    <div class="grafico-card">
+                        <div class="grafico-title">
+                            <i class="fas fa-chart-bar"></i> Pontuação por Rodada
+                        </div>
+                        <div class="grafico-placeholder" id="graficoPontuacao">
+                            <div style="text-align: center;">
+                                <i class="fas fa-chart-bar" style="font-size: 60px; margin-bottom: 15px;"></i>
+                                <p>Gráfico de pontuação por rodada</p>
+                                <p style="font-size: 14px; margin-top: 10px;">(Implementação com Chart.js)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico 4 -->
+                    <div class="grafico-card">
+                        <div class="grafico-title">
+                            <i class="fas fa-trend-up"></i> Tendências
+                        </div>
+                        <div class="grafico-placeholder" id="graficoTendencias">
+                            <div style="text-align: center;">
+                                <i class="fas fa-trend-up" style="font-size: 60px; margin-bottom: 15px;"></i>
+                                <p>Gráfico de tendências</p>
+                                <p style="font-size: 14px; margin-top: 10px;">(Implementação com Chart.js)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let rankingGeral = [];
+        let rankingFiltrado = [];
+        let rodadasDisponiveis = [];
+        let usuarios = [];
+        let estatisticas = {};
+        let abaAtual = 1;
+        let paginaAtual = 1;
+        const itensPorPagina = 15;
+        
+        // Inicializar quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            // Forçar tela cheia
+            requestFullscreen();
+            
+            // Carregar dados
+            carregarDados();
+            
+            // Configurar eventos
+            configurarEventos();
+        });
+        
+        // Funções de tela cheia
+        function requestFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+        
+        // Carregar dados
+        function carregarDados() {
+            showLoading(true, 'Carregando dados...');
+            
+            // Simular carregamento de dados
+            setTimeout(() => {
+                // Dados de exemplo - Ranking Geral
+                rankingGeral = gerarDadosRankingExemplo();
+                rankingFiltrado = [...rankingGeral];
+                
+                // Rodadas disponíveis
+                rodadasDisponiveis = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                
+                // Usuários para filtros
+                usuarios = rankingGeral.map(item => ({
+                    id: item.id,
+                    nome: item.nome,
+                    username: item.username
+                }));
+                
+                // Carregar aba inicial
+                carregarAbaAtual();
+                
+                showLoading(false);
+            }, 1500);
+        }
+        
+        function gerarDadosRankingExemplo() {
+            const nomes = [
+                "João Silva", "Maria Santos", "Pedro Costa", "Ana Oliveira", 
+                "Carlos Mendes", "Fernanda Lima", "Roberto Alves", "Juliana Pereira",
+                "Lucas Ferreira", "Mariana Rodrigues", "Rafael Souza", "Patrícia Gomes",
+                "Bruno Santos", "Camila Almeida", "Daniel Pereira", "Amanda Costa",
+                "Felipe Rodrigues", "Beatriz Martins", "Gabriel Silva", "Laura Ferreira"
+            ];
+            
+            const usernames = [
+                "@joaosilva", "@mariasantos", "@pedrocosta", "@anaoliveira",
+                "@carlosmendes", "@fernandalima", "@robertoalves", "@julianapereira",
+                "@lucasferreira", "@marianarodrigues", "@rafaelsouza", "@patriciagomes",
+                "@brunosantos", "@camilaalmeida", "@danielpereira", "@amandacosta",
+                "@feliprodrigues", "@beatrizmartins", "@gabrielsilva", "@lauraferreira"
+            ];
+            
+            const ranking = [];
+            
+            for (let i = 0; i < 20; i++) {
+                const pontos = 500 - (i * 20) + Math.floor(Math.random() * 30);
+                const acertosExatos = 15 - i + Math.floor(Math.random() * 5);
+                const acertosResultado = 25 - i + Math.floor(Math.random() * 8);
+                const totalJogos = 60;
+                const jogosPalpitados = totalJogos - Math.floor(Math.random() * 10);
+                const aproveitamento = (pontos / (jogosPalpitados * 14)) * 100;
+                
+                // Tendência (up, down, stable)
+                const tendencias = ['up', 'down', 'stable'];
+                const tendencia = tendencias[Math.floor(Math.random() * 3)];
+                
+                ranking.push({
+                    id: i + 1,
+                    posicao: i + 1,
+                    nome: nomes[i],
+                    username: usernames[i],
+                    pontos: pontos,
+                    acertos_exatos: acertosExatos,
+                    acertos_resultado: acertosResultado,
+                    total_jogos: totalJogos,
+                    jogos_palpitados: jogosPalpitados,
+                    aproveitamento: parseFloat(aproveitamento.toFixed(1)),
+                    tendencia: tendencia,
+                    variacao: tendencia === 'up' ? '+' + Math.floor(Math.random() * 3) : 
+                             tendencia === 'down' ? '-' + Math.floor(Math.random() * 3) : '0'
+                });
+            }
+            
+            return ranking;
+        }
+        
+        // Configurar eventos
+        function configurarEventos() {
+            // Filtro de período nas estatísticas
+            document.getElementById('filterPeriodo').addEventListener('change', atualizarEstatisticas);
+            
+            // Filtro de tipo de gráfico
+            document.getElementById('filterGrafico').addEventListener('change', atualizarGraficos);
+            
+            // Filtro de usuário para gráficos
+            document.getElementById('filterUsuarioGrafico').addEventListener('change', atualizarGraficos);
+        }
+        
+        // Navegação entre abas
+        function mudarAba(numeroAba) {
+            // Atualizar aba ativa
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.tab:nth-child(${numeroAba})`).classList.add('active');
+            document.getElementById(`tab${numeroAba}`).classList.add('active');
+            
+            abaAtual = numeroAba;
+            
+            // Carregar conteúdo da aba
+            carregarAbaAtual();
+        }
+        
+        function carregarAbaAtual() {
+            switch(abaAtual) {
+                case 1:
+                    renderizarRankingGeral();
+                    break;
+                case 2:
+                    carregarAbaRankingRodada();
+                    break;
+                case 3:
+                    carregarAbaEstatisticas();
+                    break;
+                case 4:
+                    carregarAbaGraficos();
+                    break;
+            }
+        }
+        
+        // ABA 1: Ranking Geral
+        function renderizarRankingGeral() {
+            const tbody = document.getElementById('rankingGeralBody');
+            const inicio = (paginaAtual - 1) * itensPorPagina;
+            const fim = inicio + itensPorPagina;
+            const rankingPagina = rankingFiltrado.slice(inicio, fim);
+            
+            tbody.innerHTML = '';
+            
+            rankingPagina.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Posição com medalhas para top 3
+                let posicaoHTML = '';
+                if (item.posicao <= 3) {
+                    const medalhas = ['🥇', '🥈', '🥉'];
+                    posicaoHTML = `
+                        <div class="posicao-${item.posicao}" style="padding: 10px; border-radius: 10px;">
+                            <span class="medalha">${medalhas[item.posicao - 1]}</span><br>
+                            <span>${item.posicao}º</span>
+                        </div>
+                    `;
+                } else {
+                    posicaoHTML = `<div style="font-weight: 700; color: #6b7280;">${item.posicao}º</div>`;
+                }
+                
+                // Estatísticas
+                const aproveitamentoFormatado = item.aproveitamento.toFixed(1);
+                
+                row.innerHTML = `
+                    <td class="posicao-cell">${posicaoHTML}</td>
+                    <td>
+                        <div class="usuario-cell">
+                            <div class="usuario-avatar">${item.nome.charAt(0)}</div>
+                            <div class="usuario-info">
+                                <div class="usuario-nome">${item.nome}</div>
+                                <div class="usuario-username">${item.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="pontos-cell">${item.pontos}</td>
+                    <td>
+                        <div class="stats-cell">
+                            <div class="stat-mini">
+                                <div class="stat-value">${item.acertos_exatos}</div>
+                                <div class="stat-label">Exatos</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-value">${item.acertos_resultado}</div>
+                                <div class="stat-label">Resultado</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-value">${aproveitamentoFormatado}%</div>
+                                <div class="stat-label">Aproveit.</div>
+                            </div>
+                            <div class="stat-mini">
+                                <div class="stat-value">${item.jogos_palpitados}</div>
+                                <div class="stat-label">Jogos</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tendencia tendencia-${item.tendencia}">
+                            <i class="fas fa-${item.tendencia === 'up' ? 'arrow-up' : item.tendencia === 'down' ? 'arrow-down' : 'minus'}"></i>
+                            ${item.variacao}
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Atualizar paginação
+            atualizarPaginacao();
+        }
+        
+        function ordenarRankingGeral() {
+            const criterio = document.getElementById('ordenarRanking').value;
+            
+            rankingFiltrado.sort((a, b) => {
+                switch(criterio) {
+                    case 'pontos':
+                        return b.pontos - a.pontos;
+                    case 'acertos_exatos':
+                        return b.acertos_exatos - a.acertos_exatos;
+                    case 'aproveitamento':
+                        return b.aproveitamento - a.aproveitamento;
+                    default:
+                        return b.pontos - a.pontos;
+                }
+            });
+            
+            // Reordenar posições
+            rankingFiltrado.forEach((item, index) => {
+                item.posicao = index + 1;
+            });
+            
+            renderizarRankingGeral();
+        }
+        
+        function filtrarRanking() {
+            const termo = document.getElementById('searchRanking').value.toLowerCase();
+            
+            if (!termo) {
+                rankingFiltrado = [...rankingGeral];
+            } else {
+                rankingFiltrado = rankingGeral.filter(item => 
+                    item.nome.toLowerCase().includes(termo) || 
+                    item.username.toLowerCase().includes(termo)
+                );
+            }
+            
+            paginaAtual = 1;
+            renderizarRankingGeral();
+        }
+        
+        function atualizarPaginacao() {
+            const totalPaginas = Math.ceil(rankingFiltrado.length / itensPorPagina);
+            const pagination = document.getElementById('paginationRanking');
+            
+            if (totalPaginas <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Botão anterior
+            html += `
+                <button class="page-btn" onclick="mudarPagina(${paginaAtual - 1})" ${paginaAtual === 1 ? 'disabled style="opacity: 0.5;"' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+            
+            // Páginas
+            const maxPaginasVisiveis = 5;
+            let inicio = Math.max(1, paginaAtual - Math.floor(maxPaginasVisiveis / 2));
+            let fim = Math.min(totalPaginas, inicio + maxPaginasVisiveis - 1);
+            
+            if (fim - inicio + 1 < maxPaginasVisiveis) {
+                inicio = Math.max(1, fim - maxPaginasVisiveis + 1);
+            }
+            
+            for (let i = inicio; i <= fim; i++) {
+                html += `
+                    <button class="page-btn ${i === paginaAtual ? 'active' : ''}" onclick="mudarPagina(${i})">
+                        ${i}
+                    </button>
+                `;
+            }
+            
+            // Botão próximo
+            html += `
+                <button class="page-btn" onclick="mudarPagina(${paginaAtual + 1})" ${paginaAtual === totalPaginas ? 'disabled style="opacity: 0.5;"' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+        
+        function mudarPagina(pagina) {
+            const totalPaginas = Math.ceil(rankingFiltrado.length / itensPorPagina);
+            
+            if (pagina >= 1 && pagina <= totalPaginas) {
+                paginaAtual = pagina;
+                renderizarRankingGeral();
+            }
+        }
+        
+        // ABA 2: Ranking por Rodada
+        function carregarAbaRankingRodada() {
+            // Popular select de rodadas
+            const select = document.getElementById('selectRodadaRanking');
+            select.innerHTML = '<option value="">Selecione uma rodada...</option>';
+            
+            rodadasDisponiveis.forEach(rodada => {
+                const option = document.createElement('option');
+                option.value = rodada;
+                option.textContent = `Rodada ${rodada}`;
+                select.appendChild(option);
+            });
+            
+            // Criar botões de rodada
+            const selector = document.getElementById('rodadaSelector');
+            selector.innerHTML = '';
+            
+            // Últimas 5 rodadas como botões rápidos
+            const ultimasRodadas = rodadasDisponiveis.slice(-5);
+            ultimasRodadas.forEach(rodada => {
+                const btn = document.createElement('div');
+                btn.className = 'rodada-btn';
+                btn.textContent = rodada;
+                btn.onclick = () => {
+                    // Ativar botão
+                    document.querySelectorAll('.rodada-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Atualizar select
+                    select.value = rodada;
+                    
+                    // Carregar ranking da rodada
+                    carregarRankingRodada(rodada);
+                };
+                selector.appendChild(btn);
+            });
+        }
+        
+        function carregarRankingRodada(rodadaNumero = null) {
+            const rodada = rodadaNumero || document.getElementById('selectRodadaRanking').value;
+            
+            if (!rodada) {
+                document.getElementById('rankingRodadaContainer').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-layer-group"></i>
+                        <h3>Selecione uma rodada</h3>
+                        <p>Escolha uma rodada para ver o ranking específico.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            showLoading(true, `Carregando ranking da rodada ${rodada}...`);
+            
+            // Simular carregamento
+            setTimeout(() => {
+                // Gerar dados de exemplo para a rodada
+                const rankingRodada = rankingGeral.slice(0, 10).map((item, index) => ({
+                    ...item,
+                    pontos: 40 - (index * 3) + Math.floor(Math.random() * 10),
+                    acertos_exatos: Math.floor(Math.random() * 4),
+                    acertos_resultado: Math.floor(Math.random() * 6)
+                }));
+                
+                // Ordenar por pontos da rodada
+                rankingRodada.sort((a, b) => b.pontos - a.pontos);
+                
+                // Renderizar tabela
+                const container = document.getElementById('rankingRodadaContainer');
+                let html = `
+                    <h3 style="margin-bottom: 20px; color: var(--dark);">
+                        <i class="fas fa-trophy"></i> Ranking - Rodada ${rodada}
+                    </h3>
+                    <div style="overflow-x: auto;">
+                        <table class="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Posição</th>
+                                    <th>Usuário</th>
+                                    <th style="width: 120px;">Pontos</th>
+                                    <th style="width: 200px;">Estatísticas</th>
+                                    <th style="width: 100px;">PD Usada</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                rankingRodada.forEach((item, index) => {
+                    const posicao = index + 1;
+                    const usouPD = Math.random() > 0.5;
+                    
+                    html += `
+                        <tr>
+                            <td class="posicao-cell">
+                                <div style="font-weight: 700; color: ${posicao <= 3 ? 'var(--primary)' : '#6b7280'}">
+                                    ${posicao}º
+                                </div>
+                            </td>
+                            <td>
+                                <div class="usuario-cell">
+                                    <div class="usuario-avatar">${item.nome.charAt(0)}</div>
+                                    <div class="usuario-info">
+                                        <div class="usuario-nome">${item.nome}</div>
+                                        <div class="usuario-username">${item.username}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="pontos-cell">${item.pontos}</td>
+                            <td>
+                                <div class="stats-cell">
+                                    <div class="stat-mini">
+                                        <div class="stat-value">${item.acertos_exatos}</div>
+                                        <div class="stat-label">Exatos</div>
+                                    </div>
+                                    <div class="stat-mini">
+                                        <div class="stat-value">${item.acertos_resultado}</div>
+                                        <div class="stat-label">Resultado</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                ${usouPD ? 
+                                    '<span class="badge badge-success"><i class="fas fa-star"></i> Sim</span>' : 
+                                    '<span class="badge">Não</span>'
+                                }
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                container.innerHTML = html;
+                showLoading(false);
+                
+            }, 1000);
+        }
+        
+        function compararRodadas() {
+            showNotification('Funcionalidade de comparação em desenvolvimento', 'warning');
+        }
+        
+        // ABA 3: Estatísticas
+        function carregarAbaEstatisticas() {
+            // Calcular estatísticas
+            calcularEstatisticas();
+            
+            // Renderizar estatísticas
+            atualizarEstatisticas();
+            
+            // Renderizar desempenho individual
+            renderizarDesempenhoIndividual();
+        }
+        
+        function calcularEstatisticas() {
+            const totalUsuarios = rankingGeral.length;
+            const totalPontos = rankingGeral.reduce((sum, item) => sum + item.pontos, 0);
+            const mediaPontos = totalPontos / totalUsuarios;
+            
+            const maiorPontuacao = Math.max(...rankingGeral.map(item => item.pontos));
+            const menorPontuacao = Math.min(...rankingGeral.map(item => item.pontos));
+            
+            // Calcular desvio padrão
+            const variacoes = rankingGeral.map(item => Math.pow(item.pontos - mediaPontos, 2));
+            const variancia = variacoes.reduce((sum, v) => sum + v, 0) / totalUsuarios;
+            const desvioPadrao = Math.sqrt(variancia);
+            
+            // Acertos
+            const totalAcertosExatos = rankingGeral.reduce((sum, item) => sum + item.acertos_exatos, 0);
+            const totalAcertosResultado = rankingGeral.reduce((sum, item) => sum + item.acertos_resultado, 0);
+            const totalAcertosParciais = totalAcertosExatos * 2; // Simulação
+            
+            // Jogos totais
+            const totalJogosPalpitados = rankingGeral.reduce((sum, item) => sum + item.jogos_palpitados, 0);
+            const totalJogosPossiveis = rankingGeral.reduce((sum, item) => sum + item.total_jogos, 0);
+            const participacaoMedia = (totalJogosPalpitados / totalJogosPossiveis) * 100;
+            
+            // PD (simulação)
+            const pdUsadaCount = Math.floor(totalUsuarios * 0.7); // 70% usaram PD
+            const pdEficiencia = 65; // 65% de eficiência
+            
+            estatisticas = {
+                totalUsuarios,
+                mediaPontos: parseFloat(mediaPontos.toFixed(1)),
+                maiorPontuacao,
+                menorPontuacao,
+                desvioPadrao: parseFloat(desvioPadrao.toFixed(1)),
+                totalAcertosExatos,
+                totalAcertosResultado,
+                totalAcertosParciais,
+                participacaoMedia: parseFloat(participacaoMedia.toFixed(1)),
+                pdUsadaCount,
+                pdEficiencia,
+                usuariosAtivos: Math.floor(totalUsuarios * 0.8) // 80% ativos
+            };
+        }
+        
+        function atualizarEstatisticas() {
+            // Atualizar valores na interface
+            document.getElementById('estatParticipantes').textContent = estatisticas.totalUsuarios;
+            document.getElementById('estatMediaPontos').textContent = estatisticas.mediaPontos;
+            document.getElementById('estatAcertosExatos').textContent = 
+                `${((estatisticas.totalAcertosExatos / (estatisticas.totalUsuarios * 10)) * 100).toFixed(1)}%`;
+            
+            document.getElementById('estatPDUsada').textContent = 
+                `${Math.round((estatisticas.pdUsadaCount / estatisticas.totalUsuarios) * 100)}%`;
+            
+            document.getElementById('maiorPontuacao').textContent = estatisticas.maiorPontuacao;
+            document.getElementById('menorPontuacao').textContent = estatisticas.menorPontuacao;
+            document.getElementById('desvioPadrao').textContent = estatisticas.desvioPadrao;
+            
+            document.getElementById('totalAcertosExatos').textContent = estatisticas.totalAcertosExatos;
+            document.getElementById('totalAcertosResultado').textContent = estatisticas.totalAcertosResultado;
+            document.getElementById('totalAcertosParciais').textContent = estatisticas.totalAcertosParciais;
+            
+            document.getElementById('mediaParticipacao').textContent = `${estatisticas.participacaoMedia.toFixed(1)}%`;
+            document.getElementById('ativosCount').textContent = estatisticas.usuariosAtivos;
+            
+            document.getElementById('pdUsadaCount').textContent = estatisticas.pdUsadaCount;
+            document.getElementById('pdEficiencia').textContent = `${estatisticas.pdEficiencia}%`;
+            
+            // Atualizar progress bars
+            document.getElementById('progressParticipacao').style.width = `${estatisticas.participacaoMedia}%`;
+            document.getElementById('progressPD').style.width = 
+                `${(estatisticas.pdUsadaCount / estatisticas.totalUsuarios) * 100}%`;
+        }
+        
+        function renderizarDesempenhoIndividual() {
+            const tbody = document.getElementById('desempenhoIndividual');
+            tbody.innerHTML = '';
+            
+            // Pegar top 10 para exemplo
+            const top10 = rankingGeral.slice(0, 10);
+            
+            top10.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Calcular métricas adicionais (simulação)
+                const pontosPorRodada = (item.pontos / 10).toFixed(1); // 10 rodadas
+                const pdEficiente = Math.random() > 0.5 ? 'Alta' : 'Média';
+                const consistencia = Math.floor(Math.random() * 20) + 80; // 80-100%
+                
+                row.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 35px; height: 35px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                ${item.nome.charAt(0)}
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">${item.nome}</div>
+                                <div style="font-size: 12px; color: #6b7280;">${item.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="font-weight: 600; color: var(--primary);">${pontosPorRodada}</td>
+                    <td>${item.acertos_exatos}</td>
+                    <td>${item.aproveitamento.toFixed(1)}%</td>
+                    <td>
+                        <span class="badge ${pdEficiente === 'Alta' ? 'badge-success' : 'badge-warning'}">
+                            ${pdEficiente}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="flex: 1; height: 8px; background: var(--light); border-radius: 4px; overflow: hidden;">
+                                <div style="width: ${consistencia}%; height: 100%; background: var(--secondary);"></div>
+                            </div>
+                            <span style="font-size: 12px; font-weight: 600;">${consistencia}%</span>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function gerarRelatorio() {
+            showLoading(true, 'Gerando relatório...');
+            
+            setTimeout(() => {
+                showLoading(false);
+                showNotification('Relatório PDF gerado com sucesso!', 'success');
+            }, 2000);
+        }
+        
+        // ABA 4: Gráficos
+        function carregarAbaGraficos() {
+            // Popular select de usuários
+            const select = document.getElementById('filterUsuarioGrafico');
+            select.innerHTML = '<option value="todos">Todos os usuários</option>';
+            
+            usuarios.forEach(usuario => {
+                const option = document.createElement('option');
+                option.value = usuario.id;
+                option.textContent = `${usuario.nome} (${usuario.username})`;
+                select.appendChild(option);
+            });
+            
+            // Atualizar gráficos
+            atualizarGraficos();
+        }
+        
+        function atualizarGraficos() {
+            // Em implementação real, aqui seria renderizado com Chart.js
+            // Por enquanto, apenas mostramos placeholders
+            console.log('Atualizando gráficos...');
+        }
+        
+        // Exportação
+        function exportarDados() {
+            showLoading(true, 'Preparando exportação...');
+            
+            setTimeout(() => {
+                showLoading(false);
+                
+                // Criar dados para exportação
+                const dados = {
+                    ranking: rankingGeral,
+                    estatisticas: estatisticas,
+                    data_exportacao: new Date().toISOString()
+                };
+                
+                // Criar e baixar arquivo JSON
+                const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ranking_bolao_${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Dados exportados com sucesso!', 'success');
+            }, 1500);
+        }
+        
+        function exportarCSV() {
+            // Converter ranking para CSV
+            const headers = ['Posição', 'Nome', 'Username', 'Pontos', 'Acertos Exatos', 'Acertos Resultado', '% Aproveitamento'];
+            const rows = rankingGeral.map(item => [
+                item.posicao,
+                `"${item.nome}"`,
+                item.username,
+                item.pontos,
+                item.acertos_exatos,
+                item.acertos_resultado,
+                item.aproveitamento.toFixed(1)
+            ]);
+            
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.join(','))
+            ].join('\n');
+            
+            // Baixar arquivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ranking_bolao_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('CSV exportado com sucesso!', 'success');
+        }
+        
+        function imprimirRanking() {
+            window.print();
+        }
+        
+        function exportarGrafico() {
+            showNotification('Exportação de gráfico em desenvolvimento', 'warning');
+        }
+        
+        // Navegação
+        function voltarMenu() {
+            if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                Telegram.WebApp.close();
+            } else {
+                showNotification('Voltando ao menu...', 'warning');
+                // Em desenvolvimento
+            }
+        }
+        
+        // Funções de UI
+        function showLoading(show, texto = 'Carregando...') {
+            const loading = document.getElementById('loading');
+            const loadingText = document.getElementById('loadingText');
+            
+            if (loadingText) {
+                loadingText.textContent = texto;
+            }
+            
+            loading.classList.toggle('show', show);
+        }
+        
+        function showNotification(mensagem, tipo = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = mensagem;
+            notification.className = `notification ${tipo}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Detectar se está no Telegram Web App
+        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            
+            // Configurar botão de fechar
+            Telegram.WebApp.MainButton.setText('FECHAR').show().onClick(function() {
+                Telegram.WebApp.close();
+            });
+        }
+    </script>
+</body>
+</html>
