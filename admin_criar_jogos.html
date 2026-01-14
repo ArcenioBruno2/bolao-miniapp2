@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Estilos mantidos iguais do seu arquivo anterior */
         :root {
             --tg-theme-bg-color: #ffffff;
             --tg-theme-text-color: #000000;
@@ -57,7 +56,6 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
         }
         
         .section-title {
@@ -154,10 +152,6 @@
             margin-bottom: 10px;
         }
         
-        .input-group .input-field {
-            margin-bottom: 0;
-        }
-        
         .user-chips {
             display: flex;
             flex-wrap: wrap;
@@ -230,7 +224,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
         }
         
         .summary-stats {
@@ -299,61 +292,11 @@
             vertical-align: middle;
         }
         
-        .notification {
-            position: fixed;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 20px;
-            border-radius: 10px;
-            background: var(--success-color);
-            color: white;
-            z-index: 1000;
-            animation: slideDown 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        @keyframes slideDown {
-            from {
-                transform: translate(-50%, -20px);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-        }
-        
         .help-text {
             font-size: 12px;
             color: var(--tg-theme-hint-color);
             margin-top: 5px;
             display: block;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-                padding-bottom: 100px;
-            }
-            
-            .section {
-                padding: 12px;
-                margin-bottom: 12px;
-            }
-            
-            .input-group {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .summary-stats {
-                gap: 10px;
-            }
-            
-            .summary-value {
-                font-size: 14px;
-            }
         }
     </style>
 </head>
@@ -503,7 +446,7 @@
         // Configurar botão principal
         tg.MainButton.setText("PUBLICAR RODADA");
         tg.MainButton.setParams({color: "#28a745"});
-        tg.MainButton.disable(); // Inicialmente desabilitado
+        tg.MainButton.disable();
         tg.MainButton.show();
         tg.MainButton.onClick(submitConfig);
         
@@ -575,9 +518,6 @@
         
         // Renderizar
         renderizarTudo();
-        
-        // Mostrar notificação
-        mostrarNotificacao(`Rodada ${rodadaAtual} selecionada`);
     }
     
     function renderizarTudo() {
@@ -672,7 +612,6 @@
         
         if (rodadaAtual) {
             renderizarTudo();
-            mostrarNotificacao(`Rodada ${rodadaAtual} selecionada`);
         }
     }
     
@@ -711,7 +650,7 @@
         
         jogos.forEach(jogo => set.add(jogo.id.toString()));
         renderizarTudo();
-        mostrarNotificacao(`Todos os ${jogos.length} jogos selecionados`);
+        tg.showAlert(`Todos os ${jogos.length} jogos selecionados`);
     }
     
     function limparTodosJogos() {
@@ -719,7 +658,7 @@
         
         persistencia[rodadaAtual].games.clear();
         renderizarTudo();
-        mostrarNotificacao('Jogos limpos');
+        tg.showAlert('Jogos limpos');
     }
     
     function selecionarTodosTrunfos() {
@@ -728,7 +667,7 @@
         const set = persistencia[rodadaAtual].trunfos;
         usuariosData.forEach(usuario => set.add(usuario.id.toString()));
         renderizarTudo();
-        mostrarNotificacao('Todos os trunfos selecionados');
+        tg.showAlert('Todos os trunfos selecionados');
     }
     
     function limparTodosTrunfos() {
@@ -736,7 +675,7 @@
         
         persistencia[rodadaAtual].trunfos.clear();
         renderizarTudo();
-        mostrarNotificacao('Trunfos limpos');
+        tg.showAlert('Trunfos limpos');
     }
     
     function selecionarTodasDobradas() {
@@ -745,7 +684,7 @@
         const set = persistencia[rodadaAtual].dobradas;
         usuariosData.forEach(usuario => set.add(usuario.id.toString()));
         renderizarTudo();
-        mostrarNotificacao('Todas as dobradas selecionadas');
+        tg.showAlert('Todas as dobradas selecionadas');
     }
     
     function limparTodasDobradas() {
@@ -753,34 +692,26 @@
         
         persistencia[rodadaAtual].dobradas.clear();
         renderizarTudo();
-        mostrarNotificacao('Dobradas limpas');
+        tg.showAlert('Dobradas limpas');
     }
     
     function formatarData(dataString) {
         if (!dataString) return 'Data não definida';
         
         try {
-            // Tentar diferentes formatos de data
             let data = new Date(dataString);
             if (isNaN(data.getTime())) {
-                // Se não for uma data válida, retornar o original
                 return dataString;
             }
             
             return data.toLocaleDateString('pt-BR', {
                 weekday: 'short',
                 day: '2-digit',
-                month: 'short',
-                year: data.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+                month: 'short'
             });
         } catch (e) {
             return dataString;
         }
-    }
-    
-    function mostrarNotificacao(mensagem) {
-        // Implementação simples de notificação
-        tg.showAlert(mensagem);
     }
     
     function mostrarErro(mensagem) {
