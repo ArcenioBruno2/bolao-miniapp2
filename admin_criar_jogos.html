@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin - Criar Rodada</title>
+    <title>Admin - Bolão 42</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -29,15 +29,12 @@
         
         .header {
             padding: 15px;
-            background: linear-gradient(135deg, #2481cc, #1a5fa0);
+            background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        
-        .header h1 { font-size: 20px; margin-bottom: 5px; }
-        .header small { opacity: 0.9; }
         
         .container { padding: 15px; padding-bottom: 120px; }
         
@@ -66,10 +63,7 @@
             background: var(--tg-theme-secondary-bg-color);
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        
-        .game-item:hover { background: rgba(36, 129, 204, 0.1); }
         
         .game-item.selected {
             background: rgba(40, 167, 69, 0.15);
@@ -80,18 +74,10 @@
             width: 24px; height: 24px; border-radius: 6px;
             border: 2px solid var(--tg-theme-hint-color);
             margin-right: 12px; display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
         }
         
-        .game-item.selected .game-checkbox { 
-            background: var(--success-color); 
-            border-color: var(--success-color); 
-        }
-        .game-item.selected .game-checkbox::after { content: '✓'; color: white; font-weight: bold; }
-        
-        .game-info { flex: 1; }
-        .game-teams { font-weight: 500; font-size: 14px; }
-        .game-time { font-size: 12px; color: var(--tg-theme-hint-color); margin-top: 3px; }
+        .game-item.selected .game-checkbox { background: var(--success-color); border-color: var(--success-color); }
+        .game-item.selected .game-checkbox::after { content: '✓'; color: white; }
         
         .input-field {
             width: 100%; padding: 12px; border-radius: 10px;
@@ -106,9 +92,7 @@
             padding: 8px 14px; border-radius: 20px;
             background: var(--tg-theme-secondary-bg-color);
             font-size: 13px; cursor: pointer; border: 2px solid transparent;
-            transition: all 0.2s;
         }
-        .user-chip:hover { background: rgba(36, 129, 204, 0.2); }
         .user-chip.selected {
             background: rgba(36, 129, 204, 0.15);
             border-color: var(--tg-theme-button-color);
@@ -119,12 +103,7 @@
             position: fixed; bottom: 0; left: 0; right: 0;
             background: var(--tg-theme-secondary-bg-color);
             padding: 12px 15px; border-top: 1px solid rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px;
         }
-        
-        .summary-item { margin-right: 20px; }
-        .summary-item strong { color: var(--tg-theme-button-color); }
         
         .loading {
             display: flex; flex-direction: column; align-items: center;
@@ -179,9 +158,7 @@
         </div>
         
         <div class="summary-bar">
-            <div class="summary-item">📋 Jogos: <strong id="summary-jogos">0</strong></div>
-            <div class="summary-item">🎖️ Trunfos: <strong id="summary-trunfos">0</strong></div>
-            <div class="summary-item">⭐ Dobradas: <strong id="summary-dobradas">0</strong></div>
+            <div>Jogos: <span id="summary-jogos">0</span> | Trunfos: <span id="summary-trunfos">0</span> | Dobradas: <span id="summary-dobradas">0</span></div>
         </div>
     </div>
 
@@ -189,6 +166,7 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
+    // Configuração do botão principal do Telegram
     tg.MainButton.setText("PUBLICAR CONFIGURAÇÕES");
     tg.MainButton.show();
     tg.MainButton.onClick(() => submit());
@@ -204,30 +182,29 @@
             const dataRaw = urlParams.get('data');
             
             if (dataRaw) {
-                let jsonString;
-                try {
-                    jsonString = atob(dataRaw.replace(/-/g, '+').replace(/_/g, '/'));
-                } catch (e) {
-                    jsonString = atob(dataRaw);
+                // DECODIFICAÇÃO ROBUSTA DE UTF-8 - EXATAMENTE COMO NO BOLAO4
+                const binaryString = atob(dataRaw.replace(/-/g, '+').replace(/_/g, '/'));
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
                 }
-                
-                const decodedData = JSON.parse(
-                    decodeURIComponent(
-                        Array.from(new TextEncoder().encode(jsonString))
-                            .map(b => '%' + b.toString(16).padStart(2, '0'))
-                            .join('')
-                    )
-                );
+                const decodedData = JSON.parse(new TextDecoder().decode(bytes));
                 
                 console.log("Dados decodificados:", decodedData);
                 processarDados(decodedData);
+                
+                // CONFIGURAR DATA ATUAL AUTOMATICAMENTE
+                const inputData = document.getElementById('input-data');
+                if (!inputData.value) {
+                    const hoje = new Date().toISOString().split('T')[0];
+                    inputData.value = hoje;
+                }
             } else {
-                throw new Error("Nenhum dado recebido na URL");
+                throw new Error("Nenhum dado recebido");
             }
         } catch (e) {
             console.error(e);
-            document.getElementById('loading-text').innerText = "Erro: " + e.message;
-            document.getElementById('loading-text').style.color = "red";
+            document.getElementById('loading-text').innerText = "Erro ao carregar dados.";
         }
     }
 
@@ -235,6 +212,7 @@
         todasRodadas = data.rodadas;
         usuariosData = data.usuarios;
 
+        // Inicializa o objeto de persistência para cada rodada
         const keys = Object.keys(todasRodadas);
         keys.forEach(r => {
             persistencia[r] = {
@@ -248,6 +226,7 @@
             rodadaNum = keys[0];
             preencherSelect(keys);
             
+            // Esconde o loading e mostra o app
             document.getElementById('loading').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             
@@ -265,15 +244,16 @@
         document.getElementById('rodada-info').innerText = `Rodada ${rodadaNum} (${jogos.length} jogos)`;
         
         const gList = document.getElementById('games-list');
+        // O ID do jogo no seu Python é uma string (ex: "10-TimeA-TimeB")
         gList.innerHTML = jogos.map((j) => {
             const id = j.id;
             const sel = persistencia[rodadaNum].games.has(id) ? 'selected' : '';
             return `
                 <div class="game-item ${sel}" onclick="toggleGame(this, '${id}')">
                     <div class="game-checkbox"></div>
-                    <div class="game-info">
-                        <div class="game-teams">${j.home} x ${j.away}</div>
-                        <div class="game-time">${j.data}</div>
+                    <div>
+                        <div>${j.home} x ${j.away}</div>
+                        <small style="color:gray">${j.data}</small>
                     </div>
                 </div>`;
         }).join('');
@@ -339,6 +319,7 @@
                 const p = persistencia[r];
                 const nomes = [];
                 
+                // Busca os nomes dos jogos selecionados para a mensagem do Telegram
                 p.games.forEach(gid => {
                     const jogoObj = todasRodadas[r].find(j => j.id === gid);
                     if(jogoObj) nomes.push(`${jogoObj.home} x ${jogoObj.away}`);
@@ -356,7 +337,6 @@
         if (!selecionouAlgo) return tg.showAlert("Selecione pelo menos um jogo!");
         
         tg.sendData(JSON.stringify(configFinal));
-        setTimeout(() => tg.close(), 500);
     }
 
     init();
