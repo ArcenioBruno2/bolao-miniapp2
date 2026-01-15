@@ -1,4 +1,3 @@
-<!-- webapps/admin_criar_rodada.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -98,82 +97,65 @@
         }
         
         .btn-secondary {
-            background: white;
-            color: var(--dark);
-            border: 2px solid var(--border);
+            background: var(--warning);
+            color: white;
         }
         
         .btn-secondary:hover {
-            background: var(--light);
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
         }
         
         .content {
+            padding: 30px;
             display: grid;
-            grid-template-columns: 300px 1fr;
-            min-height: 700px;
-        }
-        
-        .sidebar {
-            background: var(--light);
-            border-right: 1px solid var(--border);
-            padding: 25px;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-height: calc(100vh - 200px);
             overflow-y: auto;
-        }
-        
-        .main-content {
-            padding: 25px;
-            overflow-y: auto;
-            max-height: 700px;
         }
         
         .section {
-            margin-bottom: 30px;
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
         .section-title {
             font-size: 18px;
             font-weight: 600;
             color: var(--dark);
-            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        
-        .section-title i {
-            color: var(--primary);
-        }
-        
-        .rodadas-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 5px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
         }
         
         .rodada-btn {
-            padding: 10px 15px;
-            background: white;
+            padding: 12px 15px;
+            background: var(--light);
             border: 2px solid var(--border);
             border-radius: 10px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             transition: all 0.3s;
-            min-width: 60px;
             text-align: center;
         }
         
         .rodada-btn:hover {
             border-color: var(--primary);
-            color: var(--primary);
+            background: #eff6ff;
         }
         
         .rodada-btn.selected {
@@ -182,190 +164,187 @@
             border-color: var(--primary);
         }
         
-        .search-box {
-            margin-bottom: 20px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-        
-        .jogos-container {
+        #rodadasList {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-            padding: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
         }
         
         .jogo-card {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 12px;
             padding: 15px;
-            transition: all 0.3s;
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
             cursor: pointer;
+            transition: all 0.3s;
         }
         
         .jogo-card:hover {
             border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
         
         .jogo-card.selected {
-            border-color: var(--secondary);
-            background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+            background: #dbeafe;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
         }
         
         .jogo-times {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            gap: 10px;
             margin-bottom: 10px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .time {
-            font-weight: 600;
-            font-size: 16px;
-            text-align: center;
             flex: 1;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         
         .vs {
             color: var(--primary);
             font-weight: 700;
-            margin: 0 15px;
         }
         
         .jogo-info {
-            font-size: 12px;
-            color: #6b7280;
             display: flex;
             justify-content: space-between;
-            margin-top: 8px;
+            font-size: 11px;
+            color: #666;
         }
         
-        .horario-config {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         
-        .time-input {
-            width: 100%;
-            padding: 12px;
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
             border: 2px solid var(--border);
             border-radius: 10px;
-            font-size: 16px;
-            margin-top: 10px;
+            font-size: 14px;
         }
         
-        .usuarios-container {
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            background: var(--light);
-            border-radius: 10px;
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(37, 99, 235, 0.2);
+        }
+        
+        .counter {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .usuario-item {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid var(--border);
-            transition: all 0.3s;
+            gap: 10px;
+            padding: 10px;
+            background: var(--light);
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s;
         }
         
         .usuario-item:hover {
-            border-color: var(--primary);
+            background: #e5e7eb;
         }
         
         .usuario-item.selected {
-            border-color: var(--secondary);
-            background: #f0fdf4;
-        }
-        
-        .usuario-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 15px;
-        }
-        
-        .usuario-info {
-            flex: 1;
-        }
-        
-        .usuario-nome {
-            font-weight: 600;
-            margin-bottom: 3px;
-        }
-        
-        .usuario-username {
-            font-size: 12px;
-            color: #6b7280;
-        }
-        
-        .checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .checkbox.selected {
             background: var(--secondary);
-            border-color: var(--secondary);
             color: white;
+        }
+        
+        .usuario-item input[type="checkbox"] {
+            cursor: pointer;
+        }
+        
+        .config-section {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .config-item label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+        
+        .config-item input,
+        .config-item select {
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .config-item input:focus,
+        .config-item select:focus {
+            outline: none;
+            border-color: var(--primary);
         }
         
         .summary {
-            background: #f8fafc;
-            border-radius: 15px;
+            background: var(--light);
             padding: 20px;
-            margin-top: 20px;
-            border: 2px dashed var(--border);
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
         }
         
         .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid var(--border);
         }
         
-        .summary-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+        .summary-item .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .summary-item .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .footer {
+            background: var(--light);
+            padding: 20px 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            border-top: 2px solid var(--border);
         }
         
         .loading {
@@ -373,14 +352,12 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            color: white;
+            z-index: 1000;
         }
         
         .loading.show {
@@ -388,17 +365,17 @@
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
             border-radius: 50%;
-            border-top-color: white;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
-            margin-bottom: 20px;
         }
         
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .notification {
@@ -406,254 +383,194 @@
             top: 20px;
             right: 20px;
             padding: 15px 20px;
+            background: white;
             border-radius: 10px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-            transform: translateX(150%);
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease-out;
         }
         
         .notification.show {
-            transform: translateX(0);
+            display: block;
         }
         
         .notification.success {
-            background: var(--secondary);
+            border-left: 4px solid var(--secondary);
+            color: var(--secondary);
         }
         
         .notification.error {
-            background: var(--danger);
+            border-left: 4px solid var(--danger);
+            color: var(--danger);
         }
         
         .notification.warning {
-            background: var(--warning);
+            border-left: 4px solid var(--warning);
+            color: var(--warning);
         }
         
-        .selected-counter {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 10px;
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
         
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
             .content {
                 grid-template-columns: 1fr;
             }
-            
-            .sidebar {
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-            }
-            
-            .horario-config {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .fullscreen-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--primary);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            z-index: 999;
-            transition: all 0.3s;
-        }
-        
-        .fullscreen-btn:hover {
-            background: var(--primary-dark);
-            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
-    <!-- Tela de carregamento -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Carregando dados...</p>
-    </div>
-    
-    <!-- Notificações -->
-    <div class="notification" id="notification"></div>
-    
-    <!-- Botão tela cheia -->
-    <div class="fullscreen-btn" onclick="toggleFullscreen()">
-        <i class="fas fa-expand"></i>
-    </div>
-    
-    <!-- Container principal -->
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-plus-circle"></i> Criar Nova Rodada</h1>
+            <h1>🎯 Criar Rodada</h1>
             <div class="header-actions">
                 <button class="btn btn-secondary" onclick="voltarMenu()">
                     <i class="fas fa-arrow-left"></i> Voltar
-                </button>
-                <button class="btn btn-primary" onclick="enviarRodada()">
-                    <i class="fas fa-paper-plane"></i> Enviar Rodada
                 </button>
             </div>
         </div>
         
         <div class="content">
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <div class="section">
+            <!-- Seção Esquerda: Rodadas e Jogos -->
+            <div class="section">
+                <!-- Rodadas -->
+                <div>
                     <div class="section-title">
-                        <i class="fas fa-layer-group"></i> Rodadas Disponíveis
+                        <i class="fas fa-calendar"></i>
+                        Rodadas <span class="counter" id="counterRodadas">0</span>
                     </div>
                     <div class="search-box">
-                        <input type="text" class="search-input" placeholder="Buscar rodada..." id="searchRodada">
+                        <input type="text" id="searchRodada" placeholder="Buscar rodada...">
                     </div>
-                    <div class="rodadas-list" id="rodadasList">
-                        <!-- Rodadas carregadas via JavaScript -->
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">
-                            <input type="checkbox" id="toggleMultiplas" onchange="toggleModoMultiplas()">
-                            Modo Múltiplas Rodadas
-                        </label>
-                        <p style="font-size: 12px; color: #6b7280;">
-                            Selecione mais de uma rodada para criar rodada múltipla
-                        </p>
-                    </div>
+                    <div id="rodadasList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px;"></div>
                 </div>
                 
-                <div class="section">
+                <!-- Jogos -->
+                <div>
                     <div class="section-title">
-                        <i class="fas fa-info-circle"></i> Resumo
+                        <i class="fas fa-futbol"></i>
+                        Jogos <span class="counter" id="counterJogos">0</span>
                     </div>
-                    <div class="summary">
-                        <div class="summary-item">
-                            <span>Rodadas selecionadas:</span>
-                            <strong id="summaryRodadas">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Jogos selecionados:</span>
-                            <strong id="summaryJogos">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Trunfos:</span>
-                            <strong id="summaryTrunfos">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Pontuação Dobrada:</span>
-                            <strong id="summaryDobrada">0</strong>
-                        </div>
-                        <div class="summary-item">
-                            <span>Horário fechamento:</span>
-                            <strong id="summaryHorario">--:--</strong>
-                        </div>
+                    <div class="search-box">
+                        <input type="text" id="searchJogo" placeholder="Buscar jogo...">
                     </div>
+                    <div id="jogosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
                 </div>
             </div>
             
-            <!-- Conteúdo principal -->
-            <div class="main-content">
-                <!-- Seção 1: Jogos -->
-                <div class="section">
-                    <div class="section-title">
-                        <i class="fas fa-futbol"></i> Selecionar Jogos
-                        <span class="selected-counter" id="counterJogos">0</span>
+            <!-- Seção Direita: Configurações -->
+            <div class="section">
+                <!-- Configurações -->
+                <div class="config-section">
+                    <h3 style="color: var(--dark); margin-bottom: 10px;">⚙️ Configurações</h3>
+                    
+                    <div class="config-item">
+                        <label for="horarioFechamento">⏰ Horário de Fechamento</label>
+                        <input type="datetime-local" id="horarioFechamento">
                     </div>
-                    <div class="search-box">
-                        <input type="text" class="search-input" placeholder="Buscar jogo por time..." id="searchJogo">
+                    
+                    <div class="config-item">
+                        <label for="horarioTrunfo">⭐ Horário de Trunfo</label>
+                        <input type="time" id="horarioTrunfo" readonly>
                     </div>
-                    <div class="jogos-container" id="jogosContainer">
-                        <!-- Jogos carregados via JavaScript -->
-                    </div>
-                </div>
-                
-                <!-- Seção 2: Horário -->
-                <div class="section">
-                    <div class="section-title">
-                        <i class="fas fa-clock"></i> Definir Horário
-                    </div>
-                    <div class="horario-config">
-                        <div>
-                            <label style="font-weight: 500; display: block; margin-bottom: 10px;">
-                                Horário de Fechamento:
-                            </label>
-                            <input type="datetime-local" class="time-input" id="horarioFechamento">
-                        </div>
-                        <div>
-                            <label style="font-weight: 500; display: block; margin-bottom: 10px;">
-                                Horário Trunfo (automático):
-                            </label>
-                            <input type="text" class="time-input" id="horarioTrunfo" readonly style="background: #f3f4f6;">
-                        </div>
+                    
+                    <div class="config-item">
+                        <label>
+                            <input type="checkbox" id="toggleMultiplas">
+                            📊 Modo Múltiplas Rodadas
+                        </label>
                     </div>
                 </div>
                 
-                <!-- Seção 3: Trunfos -->
-                <div class="section">
+                <!-- Trunfos -->
+                <div>
                     <div class="section-title">
-                        <i class="fas fa-crown"></i> Selecionar Trunfos
-                        <span class="selected-counter" id="counterTrunfos">0</span>
+                        <i class="fas fa-star"></i>
+                        Trunfos <span class="counter" id="counterTrunfos">0</span>
                     </div>
-                    <p style="margin-bottom: 15px; color: #6b7280; font-size: 14px;">
-                        Trunfos têm 30 minutos extras para palpitar
-                    </p>
                     <div class="search-box">
-                        <input type="text" class="search-input" placeholder="Buscar usuário..." id="searchTrunfo">
+                        <input type="text" id="searchTrunfo" placeholder="Buscar usuário...">
                     </div>
-                    <div class="usuarios-container" id="trunfosContainer">
-                        <!-- Usuários carregados via JavaScript -->
-                    </div>
+                    <div id="trunfosContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;"></div>
                 </div>
                 
-                <!-- Seção 4: Pontuação Dobrada -->
-                <div class="section">
+                <!-- Pontuação Dobrada -->
+                <div>
                     <div class="section-title">
-                        <i class="fas fa-star"></i> Pontuação Dobrada
-                        <span class="selected-counter" id="counterDobrada">0</span>
+                        <i class="fas fa-times-circle"></i>
+                        Pontuação Dobrada <span class="counter" id="counterDobrada">0</span>
                     </div>
-                    <p style="margin-bottom: 15px; color: #6b7280; font-size: 14px;">
-                        Usuários selecionados poderão dobrar pontuação em 1 jogo por rodada
-                    </p>
                     <div class="search-box">
-                        <input type="text" class="search-input" placeholder="Buscar usuário..." id="searchDobrada">
+                        <input type="text" id="searchDobrada" placeholder="Buscar usuário...">
                     </div>
-                    <div class="usuarios-container" id="dobradaContainer">
-                        <!-- Usuários carregados via JavaScript -->
+                    <div id="dobradaContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;"></div>
+                </div>
+                
+                <!-- Resumo -->
+                <div class="summary">
+                    <div class="summary-item">
+                        <div class="number" id="summaryRodadas">0</div>
+                        <div class="label">Rodadas</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="summaryJogos">0</div>
+                        <div class="label">Jogos</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="summaryTrunfos">0</div>
+                        <div class="label">Trunfos</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="summaryDobrada">0</div>
+                        <div class="label">PD</div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <button class="btn btn-danger" onclick="resetarFormulario()">
+                <i class="fas fa-redo"></i> Resetar
+            </button>
+            <button class="btn btn-primary" onclick="enviarRodada()">
+                <i class="fas fa-check"></i> Criar Rodada
+            </button>
+        </div>
     </div>
-
+    
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+    
     <script>
         // Variáveis globais
         let rodadasDisponiveis = [];
-        let rodadasSelecionadas = new Set();
         let jogosDisponiveis = [];
-        let jogosSelecionados = new Set();
         let usuariosAtivos = [];
+        let rodadasSelecionadas = new Set();
+        let jogosSelecionados = new Set();
         let trunfosSelecionados = new Set();
         let dobradaSelecionados = new Set();
         let modoMultiplas = false;
         
-        // Inicializar quando a página carrega
+        // Inicializar quando o DOM estiver pronto
         document.addEventListener('DOMContentLoaded', function() {
-            // Forçar tela cheia
-            requestFullscreen();
-            
-            // Carregar dados
-            carregarDados();
+            // Carregar dados da URL
+            carregarDadosDaURL();
             
             // Configurar busca de rodadas
             document.getElementById('searchRodada').addEventListener('input', filtrarRodadas);
@@ -670,85 +587,53 @@
             // Atualizar horário trunfo quando mudar fechamento
             document.getElementById('horarioFechamento').addEventListener('change', atualizarHorarioTrunfo);
             
+            // Toggle modo múltiplas rodadas
+            document.getElementById('toggleMultiplas').addEventListener('change', toggleModoMultiplas);
+            
             // Configurar horário padrão (amanhã às 20:00)
             configurarHorarioPadrao();
         });
         
-        // Funções de tela cheia
-        function requestFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-        }
-        
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                requestFullscreen();
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-        
-        // Carregar dados do bot via Web App
-        function carregarDados() {
+        // Carregar dados da URL
+        function carregarDadosDaURL() {
             showLoading(true);
             
-            // Simular carregamento de dados (na implementação real, isso virá do bot)
-            setTimeout(() => {
-                // Dados de exemplo - na prática virão do bot
-                rodadasDisponiveis = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-                usuariosAtivos = [
-                    { id: 1, nome: "João Silva", username: "@joaosilva" },
-                    { id: 2, nome: "Maria Santos", username: "@mariasantos" },
-                    { id: 3, nome: "Pedro Costa", username: "@pedrocosta" },
-                    { id: 4, nome: "Ana Oliveira", username: "@anaoliveira" },
-                    { id: 5, nome: "Carlos Mendes", username: "@carlosmendes" },
-                    { id: 6, nome: "Fernanda Lima", username: "@fernandalima" },
-                    { id: 7, nome: "Roberto Alves", username: "@robertoalves" },
-                    { id: 8, nome: "Juliana Pereira", username: "@julianapereira" }
-                ];
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosEncoded = urlParams.get('dados');
                 
-                // Renderizar rodadas
+                if (!dadosEncoded) {
+                    showLoading(false);
+                    showNotification('❌ Nenhum dado de rodada encontrado na URL', 'error');
+                    return;
+                }
+                
+                // Decodificar dados
+                const dadosJSON = decodeURIComponent(dadosEncoded);
+                const dados = JSON.parse(dadosJSON);
+                
+                // Carregar rodadas
+                rodadasDisponiveis = dados.rodadas || [];
+                
+                // Carregar jogos
+                jogosDisponiveis = dados.jogos || [];
+                
+                // Carregar usuários
+                usuariosAtivos = dados.usuarios || [];
+                
+                // Renderizar tudo
                 renderizarRodadas();
-                
-                // Renderizar usuários para trunfos e pontuação dobrada
+                renderizarJogos();
                 renderizarUsuarios();
                 
-                // Carregar jogos da primeira rodada
-                if (rodadasDisponiveis.length > 0) {
-                    carregarJogosRodada(rodadasDisponiveis[0]);
-                }
-                
                 showLoading(false);
-                showNotification('Dados carregados com sucesso!', 'success');
-            }, 1500);
-        }
-        
-        function carregarJogosRodada(rodada) {
-            showLoading(true);
-            
-            // Simular carregamento de jogos
-            setTimeout(() => {
-                // Dados de exemplo - na prática virão do bot
-                jogosDisponiveis = [
-                    { id: 101, rodada: rodada, mandante: "São Paulo", visitante: "Corinthians", usado: false },
-                    { id: 102, rodada: rodada, mandante: "Palmeiras", visitante: "Santos", usado: false },
-                    { id: 103, rodada: rodada, mandante: "Flamengo", visitante: "Vasco", usado: false },
-                    { id: 104, rodada: rodada, mandante: "Grêmio", visitante: "Internacional", usado: false },
-                    { id: 105, rodada: rodada, mandante: "Atlético-MG", visitante: "Cruzeiro", usado: false },
-                    { id: 106, rodada: rodada, mandante: "Botafogo", visitante: "Fluminense", usado: false }
-                ];
+                showNotification(`✅ Dados carregados! ${rodadasDisponiveis.length} rodada(s), ${jogosDisponiveis.length} jogo(s)`, 'success');
                 
-                renderizarJogos();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
                 showLoading(false);
-            }, 800);
+                showNotification('❌ Erro ao decodificar dados da URL', 'error');
+            }
         }
         
         function renderizarRodadas() {
@@ -781,9 +666,9 @@
                 
                 card.innerHTML = `
                     <div class="jogo-times">
-                        <div class="time">${jogo.mandante}</div>
+                        <div class="time">${jogo.time_mandante || jogo.mandante}</div>
                         <div class="vs">VS</div>
-                        <div class="time">${jogo.visitante}</div>
+                        <div class="time">${jogo.time_visitante || jogo.visitante}</div>
                     </div>
                     <div class="jogo-info">
                         <span>Rodada ${jogo.rodada}</span>
@@ -799,68 +684,61 @@
         }
         
         function renderizarUsuarios() {
-            renderizarListaUsuarios('trunfosContainer', trunfosSelecionados, 'trunfo');
-            renderizarListaUsuarios('dobradaContainer', dobradaSelecionados, 'dobrada');
+            // Trunfos
+            const trunfosContainer = document.getElementById('trunfosContainer');
+            trunfosContainer.innerHTML = '';
             
-            document.getElementById('counterTrunfos').textContent = trunfosSelecionados.size;
-            document.getElementById('counterDobrada').textContent = dobradaSelecionados.size;
+            usuariosAtivos.forEach(usuario => {
+                const isSelected = trunfosSelecionados.has(usuario.id);
+                const item = document.createElement('div');
+                item.className = `usuario-item ${isSelected ? 'selected' : ''}`;
+                item.onclick = () => selecionarTrunfo(usuario.id);
+                
+                item.innerHTML = `
+                    <input type="checkbox" ${isSelected ? 'checked' : ''}>
+                    <span>${usuario.nome}</span>
+                `;
+                
+                trunfosContainer.appendChild(item);
+            });
+            
+            // Pontuação Dobrada
+            const dobradaContainer = document.getElementById('dobradaContainer');
+            dobradaContainer.innerHTML = '';
+            
+            usuariosAtivos.forEach(usuario => {
+                const isSelected = dobradaSelecionados.has(usuario.id);
+                const item = document.createElement('div');
+                item.className = `usuario-item ${isSelected ? 'selected' : ''}`;
+                item.onclick = () => selecionarDobrada(usuario.id);
+                
+                item.innerHTML = `
+                    <input type="checkbox" ${isSelected ? 'checked' : ''}>
+                    <span>${usuario.nome}</span>
+                `;
+                
+                dobradaContainer.appendChild(item);
+            });
+            
             atualizarResumo();
         }
         
-        function renderizarListaUsuarios(containerId, selecionadosSet, tipo) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            usuariosAtivos.forEach(usuario => {
-                const isSelected = selecionadosSet.has(usuario.id);
-                const item = document.createElement('div');
-                item.className = `usuario-item ${isSelected ? 'selected' : ''}`;
-                item.onclick = () => selecionarUsuario(usuario.id, tipo);
-                
-                // Primeira letra do nome para avatar
-                const primeiraLetra = usuario.nome.charAt(0).toUpperCase();
-                
-                item.innerHTML = `
-                    <div class="usuario-avatar">${primeiraLetra}</div>
-                    <div class="usuario-info">
-                        <div class="usuario-nome">${usuario.nome}</div>
-                        <div class="usuario-username">${usuario.username}</div>
-                    </div>
-                    <div class="checkbox ${isSelected ? 'selected' : ''}">
-                        ${isSelected ? '✓' : ''}
-                    </div>
-                `;
-                
-                container.appendChild(item);
-            });
-        }
-        
-        // Funções de seleção
         function selecionarRodada(rodada) {
-            if (modoMultiplas) {
-                // Modo múltiplas rodadas: toggle
-                if (rodadasSelecionadas.has(rodada)) {
-                    rodadasSelecionadas.delete(rodada);
-                } else {
-                    rodadasSelecionadas.add(rodada);
-                }
-                
-                // Se apenas uma rodada selecionada, carregar seus jogos
-                if (rodadasSelecionadas.size === 1) {
-                    const unicaRodada = Array.from(rodadasSelecionadas)[0];
-                    carregarJogosRodada(unicaRodada);
-                } else if (rodadasSelecionadas.size === 0) {
-                    jogosDisponiveis = [];
-                    renderizarJogos();
-                }
+            if (rodadasSelecionadas.has(rodada)) {
+                rodadasSelecionadas.delete(rodada);
             } else {
-                // Modo única rodada: selecionar apenas uma
-                rodadasSelecionadas.clear();
+                if (!modoMultiplas && rodadasSelecionadas.size > 0) {
+                    rodadasSelecionadas.clear();
+                }
                 rodadasSelecionadas.add(rodada);
-                carregarJogosRodada(rodada);
+                
+                // Carregar jogos da rodada selecionada
+                jogosDisponiveis = jogosDisponiveis.filter(j => rodadasSelecionadas.has(j.rodada));
+                jogosSelecionados.clear();
             }
             
             renderizarRodadas();
+            renderizarJogos();
         }
         
         function selecionarJogo(jogoId) {
@@ -869,35 +747,36 @@
             } else {
                 jogosSelecionados.add(jogoId);
             }
+            
             renderizarJogos();
         }
         
-        function selecionarUsuario(usuarioId, tipo) {
-            if (tipo === 'trunfo') {
-                if (trunfosSelecionados.has(usuarioId)) {
-                    trunfosSelecionados.delete(usuarioId);
-                } else {
-                    trunfosSelecionados.add(usuarioId);
-                }
-                renderizarListaUsuarios('trunfosContainer', trunfosSelecionados, 'trunfo');
+        function selecionarTrunfo(usuarioId) {
+            if (trunfosSelecionados.has(usuarioId)) {
+                trunfosSelecionados.delete(usuarioId);
             } else {
-                if (dobradaSelecionados.has(usuarioId)) {
-                    dobradaSelecionados.delete(usuarioId);
-                } else {
-                    dobradaSelecionados.add(usuarioId);
-                }
-                renderizarListaUsuarios('dobradaContainer', dobradaSelecionados, 'dobrada');
+                trunfosSelecionados.add(usuarioId);
             }
+            
+            renderizarUsuarios();
         }
         
-        // Funções de busca/filtro
+        function selecionarDobrada(usuarioId) {
+            if (dobradaSelecionados.has(usuarioId)) {
+                dobradaSelecionados.delete(usuarioId);
+            } else {
+                dobradaSelecionados.add(usuarioId);
+            }
+            
+            renderizarUsuarios();
+        }
+        
         function filtrarRodadas() {
             const termo = document.getElementById('searchRodada').value.toLowerCase();
-            const botoes = document.querySelectorAll('.rodada-btn');
+            const btns = document.querySelectorAll('#rodadasList .rodada-btn');
             
-            botoes.forEach(btn => {
-                const texto = btn.textContent;
-                btn.style.display = texto.includes(termo) ? 'block' : 'none';
+            btns.forEach(btn => {
+                btn.style.display = btn.textContent.includes(termo) ? 'block' : 'none';
             });
         }
         
@@ -978,9 +857,6 @@
                     rodadasSelecionadas.clear();
                     rodadasSelecionadas.add(primeira);
                     renderizarRodadas();
-                    
-                    // Carregar jogos da rodada selecionada
-                    carregarJogosRodada(primeira);
                 }
             }
         }
@@ -998,7 +874,6 @@
                 const horario = new Date(horarioInput);
                 const horas = String(horario.getHours()).padStart(2, '0');
                 const minutos = String(horario.getMinutes()).padStart(2, '0');
-                document.getElementById('summaryHorario').textContent = `${horas}:${minutos}`;
             }
         }
         
@@ -1006,25 +881,24 @@
         function enviarRodada() {
             // Validações
             if (rodadasSelecionadas.size === 0) {
-                showNotification('Selecione pelo menos uma rodada!', 'error');
+                showNotification('❌ Selecione pelo menos uma rodada!', 'error');
                 return;
             }
             
             if (jogosSelecionados.size === 0) {
-                showNotification('Selecione pelo menos um jogo!', 'error');
+                showNotification('❌ Selecione pelo menos um jogo!', 'error');
                 return;
             }
             
             const horarioInput = document.getElementById('horarioFechamento').value;
             if (!horarioInput) {
-                showNotification('Defina um horário de fechamento!', 'error');
+                showNotification('❌ Defina um horário de fechamento!', 'error');
                 return;
             }
             
             // Preparar dados
             const dados = {
                 action: 'create_round',
-                admin_id: getAdminIdFromURL(), // Obter do parâmetro da URL
                 rounds: Array.from(rodadasSelecionadas),
                 selected_games: Array.from(jogosSelecionados),
                 trunfo_users: Array.from(trunfosSelecionados),
@@ -1043,7 +917,7 @@
                 } else {
                     // Simulação para desenvolvimento
                     console.log('Dados enviados:', dados);
-                    showNotification('Rodada criada com sucesso!', 'success');
+                    showNotification('✅ Rodada criada com sucesso!', 'success');
                     
                     // Resetar após 2 segundos
                     setTimeout(() => {
@@ -1051,12 +925,7 @@
                         showLoading(false);
                     }, 2000);
                 }
-            }, 2000);
-        }
-        
-        function getAdminIdFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('admin_id') || '12345';
+            }, 1000);
         }
         
         function resetarFormulario() {
