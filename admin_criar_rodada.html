@@ -1,465 +1,383 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Rodada - Bolão</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .loading, .error {
-            text-align: center;
-            padding: 40px;
-            font-size: 16px;
-            color: #666;
-        }
-        .error {
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-            border-radius: 5px;
-            background: #fde8e8;
-        }
-        .success {
-            color: #27ae60;
-            background: #e8f8f0;
-            border: 1px solid #27ae60;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-        .section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .game-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .game-item:last-child {
-            border-bottom: none;
-        }
-        .checkbox {
-            margin-right: 10px;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        label {
-            display: block;
-            margin: 10px 0;
-            font-weight: bold;
-        }
-        input[type="datetime-local"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .user-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-        }
-    </style>
-</head>
-<body>
-    <h1>🎯 Criar Rodada</h1>
-    <div class="container">
-        <div id="loading" class="loading">
-            🔄 Carregando dados...
-        </div>
-        
-        <div id="error" class="error" style="display: none;"></div>
-        
-        <div id="app" style="display: none;">
-            <!-- Conteúdo será carregado dinamicamente -->
-        </div>
-    </div>
+<script>
+    // ========== VARIÁVEIS GLOBAIS ==========
+    let rodadasSelecionadas = [];
+    let modoUnica = false;
+    let adminId = null;
+    let originalMessageId = null;
+    let jogosDisponiveis = [];
+    let jogosSelecionados = new Set();
+    let trunfosSelecionados = new Set();
+    let pdSelecionados = new Set();
+    let usuariosAtivos = [];
 
-    <script>
-        // ========== CONFIGURAÇÃO ==========
-        const tg = window.Telegram.WebApp;
-        
-        // Obter parâmetros da URL
+    // ========== INICIALIZAÇÃO ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ler parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
-        const rodadasParam = urlParams.get('rodadas');
-        const rodadasSelecionadas = rodadasParam ? rodadasParam.split(',').map(Number) : [];
+        adminId = urlParams.get('admin_id');
+        const rodadaParam = urlParams.get('rodada'); // Para única: "5"
+        const rodadasParam = urlParams.get('rodadas'); // Para múltiplas: "5,6,7"
+        originalMessageId = urlParams.get('message_id');
+
+        // Determinar modo
+        if (rodadaParam) {
+            rodadasSelecionadas = [parseInt(rodadaParam)];
+            modoUnica = true;
+            atualizarTitulo(`Configurar Rodada ${rodadaParam}`);
+        } else if (rodadasParam) {
+            rodadasSelecionadas = rodadasParam.split(',').map(Number);
+            modoUnica = false;
+            atualizarTitulo(`Configurar Rodadas ${rodadasParam}`);
+        } else {
+            mostrarErro('Nenhuma rodada especificada na URL!');
+            return;
+        }
+
+        // Verificar se está no Telegram Web App
+        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            
+            // Configurar botão de fechar
+            Telegram.WebApp.MainButton.setText('FECHAR').show().onClick(function() {
+                Telegram.WebApp.close();
+            });
+        }
+
+        // Forçar tela cheia
+        requestFullscreen();
+
+        // Solicitar jogos ao bot
+        solicitarJogosAoBot();
         
-        // ========== VARIÁVEIS GLOBAIS ==========
-        let jogosDisponiveis = [];
-        let usuariosAtivos = [];
-        let dadosForm = {
+        // Configurar eventos
+        configurarEventos();
+    });
+
+    // ========== FUNÇÕES DE TELA CHEIA ==========
+    function requestFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    }
+
+    // ========== ATUALIZAR INTERFACE ==========
+    function atualizarTitulo(texto) {
+        const titleElement = document.querySelector('.header h1');
+        if (titleElement) {
+            titleElement.innerHTML = `<i class="fas fa-plus-circle"></i> ${texto}`;
+        }
+        document.title = texto;
+    }
+
+    function mostrarErro(mensagem) {
+        const container = document.getElementById('jogosContainer');
+        if (container) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #ef4444;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <h3>${mensagem}</h3>
+                    <p>Feche e tente novamente.</p>
+                </div>
+            `;
+        }
+    }
+
+    function mostrarLoading(mostrar, texto = 'Carregando...') {
+        const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        
+        if (loadingText) {
+            loadingText.textContent = texto;
+        }
+        
+        if (loading) {
+            loading.classList.toggle('show', mostrar);
+        }
+    }
+
+    function mostrarNotificacao(mensagem, tipo = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = mensagem;
+        notification.className = `notification ${tipo}`;
+        notification.classList.add('show');
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    // ========== COMUNICAÇÃO COM O BOT ==========
+    function solicitarJogosAoBot() {
+        mostrarLoading(true, 'Buscando jogos disponíveis...');
+        
+        // Simular requisição ao bot
+        setTimeout(() => {
+            // EM PRODUÇÃO: Aqui você faria uma requisição ao seu backend/bot
+            // Por enquanto, vamos mostrar mensagem informativa
+            
+            const container = document.getElementById('jogosContainer');
+            if (container) {
+                if (modoUnica) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-futbol" style="font-size: 48px; color: #3b82f6; margin-bottom: 20px;"></i>
+                            <h3>Rodada ${rodadasSelecionadas[0]} Selecionada</h3>
+                            <p>Esta rodada ainda não tem jogos cadastrados.</p>
+                            <p>Você pode:</p>
+                            <ol style="text-align: left; display: inline-block; margin-top: 15px;">
+                                <li>Adicionar jogos manualmente</li>
+                                <li>Importar de uma planilha</li>
+                                <li>Buscar automaticamente</li>
+                            </ol>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <i class="fas fa-layer-group" style="font-size: 48px; color: #3b82f6; margin-bottom: 20px;"></i>
+                            <h3>Múltiplas Rodadas Selecionadas</h3>
+                            <p>Rodadas: ${rodadasSelecionadas.join(', ')}</p>
+                            <p>Estas rodadas ainda não têm jogos cadastrados.</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Carregar usuários ativos (simulação)
+            carregarUsuariosSimulados();
+            
+            // Configurar horário padrão
+            configurarHorarioPadrao();
+            
+            mostrarLoading(false);
+            
+        }, 1500);
+    }
+
+    function carregarUsuariosSimulados() {
+        // EM PRODUÇÃO: Buscar usuários do bot
+        // Por enquanto, mensagem informativa
+        
+        const trunfosContainer = document.getElementById('trunfosContainer');
+        const dobradaContainer = document.getElementById('dobradaContainer');
+        
+        if (trunfosContainer) {
+            trunfosContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #6b7280;">
+                    <i class="fas fa-users" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    <p>Usuários serão carregados do banco de dados</p>
+                    <p style="font-size: 12px;">(Implementação em andamento)</p>
+                </div>
+            `;
+        }
+        
+        if (dobradaContainer) {
+            dobradaContainer.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #6b7280;">
+                    <i class="fas fa-star" style="font-size: 32px; margin-bottom: 10px;"></i>
+                    <p>Selecione usuários para Pontuação Dobrada</p>
+                    <p style="font-size: 12px;">(Lista de usuários em desenvolvimento)</p>
+                </div>
+            `;
+        }
+    }
+
+    // ========== CONFIGURAÇÕES DE HORÁRIO ==========
+    function configurarHorarioPadrao() {
+        // Amanhã às 20:00
+        const amanha = new Date();
+        amanha.setDate(amanha.getDate() + 1);
+        amanha.setHours(20, 0, 0, 0);
+        
+        // Formatar para input datetime-local
+        const ano = amanha.getFullYear();
+        const mes = String(amanha.getMonth() + 1).padStart(2, '0');
+        const dia = String(amanha.getDate()).padStart(2, '0');
+        const horas = String(amanha.getHours()).padStart(2, '0');
+        const minutos = String(amanha.getMinutes()).padStart(2, '0');
+        
+        const horarioFormatado = `${ano}-${mes}-${dia}T${horas}:${minutos}`;
+        
+        const horarioInput = document.getElementById('horarioFechamento');
+        if (horarioInput) {
+            horarioInput.value = horarioFormatado;
+            atualizarHorarioTrunfo();
+        }
+    }
+
+    function atualizarHorarioTrunfo() {
+        const horarioInput = document.getElementById('horarioFechamento');
+        const trunfoInput = document.getElementById('horarioTrunfo');
+        
+        if (horarioInput && trunfoInput && horarioInput.value) {
+            const horario = new Date(horarioInput.value);
+            horario.setMinutes(horario.getMinutes() + 30);
+            
+            const horas = String(horario.getHours()).padStart(2, '0');
+            const minutos = String(horario.getMinutes()).padStart(2, '0');
+            
+            trunfoInput.value = `${horas}:${minutos}`;
+        }
+        
+        atualizarResumo();
+    }
+
+    // ========== MANIPULAÇÃO DE DADOS ==========
+    function selecionarJogo(jogoId) {
+        if (jogosSelecionados.has(jogoId)) {
+            jogosSelecionados.delete(jogoId);
+        } else {
+            jogosSelecionados.add(jogoId);
+        }
+        atualizarResumo();
+    }
+
+    function selecionarUsuario(usuarioId, tipo) {
+        if (tipo === 'trunfo') {
+            if (trunfosSelecionados.has(usuarioId)) {
+                trunfosSelecionados.delete(usuarioId);
+            } else {
+                trunfosSelecionados.add(usuarioId);
+            }
+        } else if (tipo === 'dobrada') {
+            if (pdSelecionados.has(usuarioId)) {
+                pdSelecionados.delete(usuarioId);
+            } else {
+                pdSelecionados.add(usuarioId);
+            }
+        }
+        atualizarResumo();
+    }
+
+    // ========== RESUMO E VALIDAÇÃO ==========
+    function atualizarResumo() {
+        // Atualizar contadores
+        document.getElementById('summaryRodadas').textContent = rodadasSelecionadas.length;
+        document.getElementById('summaryJogos').textContent = jogosSelecionados.size;
+        document.getElementById('summaryTrunfos').textContent = trunfosSelecionados.size;
+        document.getElementById('summaryDobrada').textContent = pdSelecionados.size;
+        
+        // Atualizar horário
+        const horarioInput = document.getElementById('horarioFechamento');
+        if (horarioInput && horarioInput.value) {
+            const horario = new Date(horarioInput.value);
+            const horas = String(horario.getHours()).padStart(2, '0');
+            const minutos = String(horario.getMinutes()).padStart(2, '0');
+            document.getElementById('summaryHorario').textContent = `${horas}:${minutos}`;
+        }
+    }
+
+    function validarDados() {
+        const horarioInput = document.getElementById('horarioFechamento');
+        
+        if (!horarioInput || !horarioInput.value) {
+            mostrarNotificacao('Defina um horário de fechamento!', 'error');
+            return false;
+        }
+        
+        if (jogosSelecionados.size === 0) {
+            mostrarNotificacao('Selecione pelo menos um jogo!', 'error');
+            return false;
+        }
+        
+        return true;
+    }
+
+    // ========== ENVIAR DADOS PARA O BOT ==========
+    function enviarRodada() {
+        if (!validarDados()) {
+            return;
+        }
+        
+        const horarioInput = document.getElementById('horarioFechamento');
+        
+        const dados = {
+            action: 'create_round',
+            admin_id: adminId,
+            original_message_id: originalMessageId,
             rodadas: rodadasSelecionadas,
-            jogosSelecionados: [],
-            usuariosSelecionados: [],
-            horarioLimite: '',
-            temTrunfo: false
+            jogos_selecionados: Array.from(jogosSelecionados),
+            horario_fechamento: horarioInput.value,
+            trunfos: Array.from(trunfosSelecionados),
+            pd_usuarios: Array.from(pdSelecionados)
         };
         
-        // ========== INICIALIZAÇÃO ==========
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                tg.expand();
-                tg.ready();
-                
-                console.log('Rodadas recebidas:', rodadasSelecionadas);
-                
-                if (rodadasSelecionadas.length === 0) {
-                    showError('Nenhuma rodada selecionada. Volte ao bot e tente novamente.');
-                    return;
+        console.log('Dados a enviar:', dados);
+        
+        mostrarLoading(true, 'Enviando rodada...');
+        
+        // Enviar para o bot via Telegram Web App
+        if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+            Telegram.WebApp.sendData(JSON.stringify(dados));
+            
+            // Fechar após 2 segundos
+            setTimeout(() => {
+                Telegram.WebApp.close();
+            }, 2000);
+        } else {
+            // Modo desenvolvimento
+            mostrarNotificacao('Rodada enviada (modo desenvolvimento)', 'success');
+            setTimeout(() => {
+                mostrarLoading(false);
+            }, 2000);
+        }
+    }
+
+    // ========== CONFIGURAR EVENTOS ==========
+    function configurarEventos() {
+        // Horário de fechamento
+        const horarioInput = document.getElementById('horarioFechamento');
+        if (horarioInput) {
+            horarioInput.addEventListener('change', atualizarHorarioTrunfo);
+        }
+        
+        // Botão enviar
+        const btnEnviar = document.querySelector('.btn-primary');
+        if (btnEnviar) {
+            btnEnviar.addEventListener('click', enviarRodada);
+        }
+        
+        // Botão cancelar
+        const btnCancelar = document.querySelector('.btn-secondary');
+        if (btnCancelar) {
+            btnCancelar.addEventListener('click', function() {
+                if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                    Telegram.WebApp.close();
+                } else {
+                    mostrarNotificacao('Operação cancelada', 'warning');
                 }
-                
-                // Buscar dados do backend
-                await carregarDados();
-                
-                // Mostrar formulário
-                renderizarFormulario();
-                
-            } catch (error) {
-                showError('Erro ao inicializar: ' + error.message);
-            }
-        });
-        
-        // ========== FUNÇÕES PRINCIPAIS ==========
-        async function carregarDados() {
-            try {
-                // 1. Buscar jogos das rodadas selecionadas
-                // Simulação - no real, chamar API ou usar dados do bot
-                jogosDisponiveis = await buscarJogosRodadas(rodadasSelecionadas);
-                
-                // 2. Buscar usuários ativos
-                usuariosAtivos = await buscarUsuariosAtivos();
-                
-                // 3. Configurar horário padrão (amanhã 20:00)
-                const amanha = new Date();
-                amanha.setDate(amanha.getDate() + 1);
-                amanha.setHours(20, 0, 0, 0);
-                dadosForm.horarioLimite = amanha.toISOString().slice(0, 16);
-                
-                // Esconder loading
-                document.getElementById('loading').style.display = 'none';
-                
-            } catch (error) {
-                throw new Error('Falha ao carregar dados: ' + error.message);
-            }
-        }
-        
-        // ========== FUNÇÕES DE SIMULAÇÃO (SUBSTITUIR POR CHAMADAS REAIS) ==========
-        async function buscarJogosRodadas(rodadas) {
-            // SIMULAÇÃO - Substituir por chamada real ao bot
-            return [
-                { id: 1, rodada: rodadas[0], time_mandante: "Flamengo", time_visitante: "Vasco", data: "2024-03-20 16:00" },
-                { id: 2, rodada: rodadas[0], time_mandante: "Corinthians", time_visitante: "Palmeiras", data: "2024-03-20 19:00" },
-                { id: 3, rodada: rodadas[0], time_mandante: "São Paulo", time_visitante: "Santos", data: "2024-03-21 16:00" },
-                { id: 4, rodada: rodadas[0] || 1, time_mandante: "Grêmio", time_visitante: "Internacional", data: "2024-03-21 19:00" },
-                { id: 5, rodada: rodadas[0] || 1, time_mandante: "Cruzeiro", time_visitante: "Atlético-MG", data: "2024-03-22 16:00" }
-            ];
-        }
-        
-        async function buscarUsuariosAtivos() {
-            // SIMULAÇÃO - Substituir por chamada real ao bot
-            return [
-                { id: 1, nome: "João Silva", username: "joao_silva", telegram_id: 123456789 },
-                { id: 2, nome: "Maria Santos", username: "maria_santos", telegram_id: 987654321 },
-                { id: 3, nome: "Carlos Oliveira", username: "carlos_oliveira", telegram_id: 456123789 },
-                { id: 4, nome: "Ana Pereira", username: "ana_pereira", telegram_id: 789123456 }
-            ];
-        }
-        
-        // ========== RENDERIZAÇÃO ==========
-        function renderizarFormulario() {
-            const appDiv = document.getElementById('app');
-            appDiv.style.display = 'block';
-            
-            appDiv.innerHTML = `
-                <div class="success">
-                    ✅ Rodadas selecionadas: ${rodadasSelecionadas.join(', ')}
-                </div>
-                
-                <div class="section">
-                    <h3>⚽ Jogos Disponíveis</h3>
-                    <div id="jogos-list" class="user-list">
-                        ${renderizarListaJogos()}
-                    </div>
-                    <button onclick="selecionarTodosJogos()" style="margin-top: 10px; width: auto;">
-                        ✅ Selecionar Todos
-                    </button>
-                </div>
-                
-                <div class="section">
-                    <h3>👥 Participantes</h3>
-                    <div id="usuarios-list" class="user-list">
-                        ${renderizarListaUsuarios()}
-                    </div>
-                    <button onclick="selecionarTodosUsuarios()" style="margin-top: 10px; width: auto;">
-                        ✅ Selecionar Todos
-                    </button>
-                </div>
-                
-                <div class="section">
-                    <h3>⏰ Configurações</h3>
-                    <label for="horarioLimite">Horário Limite:</label>
-                    <input type="datetime-local" id="horarioLimite" value="${dadosForm.horarioLimite}">
-                    
-                    <label style="margin-top: 15px;">
-                        <input type="checkbox" id="temTrunfo" ${dadosForm.temTrunfo ? 'checked' : ''}>
-                        Permitir uso de Trunfo (30min extra)
-                    </label>
-                </div>
-                
-                <div id="status"></div>
-                
-                <button onclick="criarRodada()" id="btnCriar">
-                    🎯 Criar Rodada
-                </button>
-                
-                <button onclick="tg.close()" style="background-color: #95a5a6; margin-top: 10px;">
-                    ❌ Cancelar
-                </button>
-            `;
-            
-            // Adicionar listeners
-            document.getElementById('horarioLimite').addEventListener('change', (e) => {
-                dadosForm.horarioLimite = e.target.value;
-            });
-            
-            document.getElementById('temTrunfo').addEventListener('change', (e) => {
-                dadosForm.temTrunfo = e.target.checked;
             });
         }
         
-        function renderizarListaJogos() {
-            if (jogosDisponiveis.length === 0) {
-                return '<p>Nenhum jogo disponível para estas rodadas.</p>';
-            }
-            
-            return jogosDisponiveis.map(jogo => `
-                <div class="game-item">
-                    <label style="flex: 1;">
-                        <input type="checkbox" class="checkbox jogo-checkbox" 
-                               value="${jogo.id}" 
-                               onchange="toggleJogo(${jogo.id})"
-                               ${dadosForm.jogosSelecionados.includes(jogo.id) ? 'checked' : ''}>
-                        <b>Rodada ${jogo.rodada}:</b> ${jogo.time_mandante} vs ${jogo.time_visitante}
-                        <br><small>${jogo.data}</small>
-                    </label>
-                </div>
-            `).join('');
+        // Botão tela cheia
+        const fullscreenBtn = document.querySelector('.fullscreen-btn');
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
         }
-        
-        function renderizarListaUsuarios() {
-            if (usuariosAtivos.length === 0) {
-                return '<p>Nenhum usuário ativo encontrado.</p>';
-            }
-            
-            return usuariosAtivos.map(usuario => `
-                <div class="game-item">
-                    <label style="flex: 1;">
-                        <input type="checkbox" class="checkbox usuario-checkbox" 
-                               value="${usuario.id}" 
-                               onchange="toggleUsuario(${usuario.id})"
-                               ${dadosForm.usuariosSelecionados.includes(usuario.id) ? 'checked' : ''}>
-                        ${usuario.nome}
-                        ${usuario.username ? `<br><small>@${usuario.username}</small>` : ''}
-                    </label>
-                </div>
-            `).join('');
-        }
-        
-        // ========== FUNÇÕES DE SELEÇÃO ==========
-        function toggleJogo(jogoId) {
-            const index = dadosForm.jogosSelecionados.indexOf(jogoId);
-            if (index === -1) {
-                dadosForm.jogosSelecionados.push(jogoId);
-            } else {
-                dadosForm.jogosSelecionados.splice(index, 1);
-            }
-            atualizarStatus();
-        }
-        
-        function toggleUsuario(usuarioId) {
-            const index = dadosForm.usuariosSelecionados.indexOf(usuarioId);
-            if (index === -1) {
-                dadosForm.usuariosSelecionados.push(usuarioId);
-            } else {
-                dadosForm.usuariosSelecionados.splice(index, 1);
-            }
-            atualizarStatus();
-        }
-        
-        function selecionarTodosJogos() {
-            const checkboxes = document.querySelectorAll('.jogo-checkbox');
-            const todosIds = jogosDisponiveis.map(j => j.id);
-            
-            checkboxes.forEach(cb => {
-                cb.checked = true;
-            });
-            
-            dadosForm.jogosSelecionados = [...todosIds];
-            atualizarStatus();
-        }
-        
-        function selecionarTodosUsuarios() {
-            const checkboxes = document.querySelectorAll('.usuario-checkbox');
-            const todosIds = usuariosAtivos.map(u => u.id);
-            
-            checkboxes.forEach(cb => {
-                cb.checked = true;
-            });
-            
-            dadosForm.usuariosSelecionados = [...todosIds];
-            atualizarStatus();
-        }
-        
-        // ========== VALIDAÇÃO E ENVIO ==========
-        function atualizarStatus() {
-            const statusDiv = document.getElementById('status');
-            const btnCriar = document.getElementById('btnCriar');
-            
-            const jogosCount = dadosForm.jogosSelecionados.length;
-            const usuariosCount = dadosForm.usuariosSelecionados.length;
-            
-            let mensagens = [];
-            
-            if (jogosCount === 0) {
-                mensagens.push('⚠️ Selecione pelo menos 1 jogo');
-            }
-            
-            if (usuariosCount === 0) {
-                mensagens.push('⚠️ Selecione pelo menos 1 participante');
-            }
-            
-            if (!dadosForm.horarioLimite) {
-                mensagens.push('⚠️ Defina um horário limite');
-            }
-            
-            if (mensagens.length > 0) {
-                statusDiv.innerHTML = `
-                    <div class="error" style="margin: 10px 0;">
-                        ${mensagens.join('<br>')}
-                    </div>
-                `;
-                btnCriar.disabled = true;
-                btnCriar.innerHTML = '🎯 Preencha todos os campos';
-            } else {
-                statusDiv.innerHTML = `
-                    <div class="success" style="margin: 10px 0;">
-                        ✅ Tudo pronto!<br>
-                        ${jogosCount} jogos selecionados<br>
-                        ${usuariosCount} participantes convidados
-                    </div>
-                `;
-                btnCriar.disabled = false;
-                btnCriar.innerHTML = '🎯 Criar Rodada';
+    }
+
+    // ========== FUNÇÕES DE APOIO (para compatibilidade) ==========
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
             }
         }
-        
-        async function criarRodada() {
-            try {
-                const btnCriar = document.getElementById('btnCriar');
-                btnCriar.disabled = true;
-                btnCriar.innerHTML = '🔄 Criando...';
-                
-                // Validar dados
-                if (dadosForm.jogosSelecionados.length === 0) {
-                    throw new Error('Selecione pelo menos 1 jogo');
-                }
-                
-                if (dadosForm.usuariosSelecionados.length === 0) {
-                    throw new Error('Selecione pelo menos 1 participante');
-                }
-                
-                if (!dadosForm.horarioLimite) {
-                    throw new Error('Defina um horário limite');
-                }
-                
-                // Preparar dados para envio
-                const dadosEnvio = {
-                    action: 'create_round',
-                    rodadas: dadosForm.rodadas,
-                    jogos_selecionados: dadosForm.jogosSelecionados,
-                    usuarios_selecionados: dadosForm.usuariosSelecionados,
-                    horario_limite: dadosForm.horarioLimite,
-                    tem_trunfo: dadosForm.temTrunfo,
-                    admin_id: tg.initDataUnsafe.user?.id || 'unknown'
-                };
-                
-                console.log('Enviando dados:', dadosEnvio);
-                
-                // Enviar para o bot
-                tg.sendData(JSON.stringify(dadosEnvio));
-                
-                // Mostrar mensagem de sucesso
-                document.getElementById('status').innerHTML = `
-                    <div class="success">
-                        ✅ Rodada criada com sucesso!<br>
-                        Fechando em 3 segundos...
-                    </div>
-                `;
-                
-                // Fechar após 3 segundos
-                setTimeout(() => {
-                    tg.close();
-                }, 3000);
-                
-            } catch (error) {
-                showError('Erro ao criar rodada: ' + error.message);
-                document.getElementById('btnCriar').disabled = false;
-                document.getElementById('btnCriar').innerHTML = '🎯 Criar Rodada';
-            }
-        }
-        
-        // ========== FUNÇÕES AUXILIARES ==========
-        function showError(mensagem) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('error').innerHTML = mensagem;
-            console.error(mensagem);
-        }
-        
-        // Inicializar atualização de status
-        setTimeout(atualizarStatus, 100);
-    </script>
-</body>
-</html>
+    }
+
+    function showLoading(show, texto = 'Carregando...') {
+        mostrarLoading(show, texto);
+    }
+
+    function showNotification(mensagem, tipo = 'success') {
+        mostrarNotificacao(mensagem, tipo);
+    }
+</script>
