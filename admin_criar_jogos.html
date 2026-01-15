@@ -724,22 +724,35 @@
         }
         
         function selecionarRodada(rodada) {
-            if (rodadasSelecionadas.has(rodada)) {
-                rodadasSelecionadas.delete(rodada);
-            } else {
-                if (!modoMultiplas && rodadasSelecionadas.size > 0) {
-                    rodadasSelecionadas.clear();
-                }
-                rodadasSelecionadas.add(rodada);
-                
-                // Carregar jogos da rodada selecionada
-                jogosDisponiveis = jogosDisponiveis.filter(j => rodadasSelecionadas.has(j.rodada));
-                jogosSelecionados.clear();
-            }
+    if (modoMultiplas) {
+        // Modo múltiplas rodadas: Adiciona ou Remove do Set
+        if (rodadasSelecionadas.has(rodada)) {
+            rodadasSelecionadas.delete(rodada);
             
-            renderizarRodadas();
-            renderizarJogos();
+            // Se desmarcar, limpamos a visualização de jogos momentaneamente
+            // ou carregamos a última que sobrou (opcional, aqui vou limpar para simplificar)
+            if (rodadasSelecionadas.size === 0) {
+                jogosDisponiveis = [];
+                renderizarJogos();
+            } else {
+                 // Se ainda tem rodadas, carrega a primeira que encontrar para não ficar vazio
+                 const primeiraRestante = Array.from(rodadasSelecionadas)[0];
+                 carregarJogosRodada(primeiraRestante);
+            }
+        } else {
+            rodadasSelecionadas.add(rodada);
+            // CORREÇÃO: Sempre carrega os jogos da rodada que você acabou de clicar
+            carregarJogosRodada(rodada);
         }
+    } else {
+        // Modo única rodada: comportamento padrão
+        rodadasSelecionadas.clear();
+        rodadasSelecionadas.add(rodada);
+        carregarJogosRodada(rodada);
+    }
+    
+    renderizarRodadas();
+}
         
         function selecionarJogo(jogoId) {
             if (jogosSelecionados.has(jogoId)) {
