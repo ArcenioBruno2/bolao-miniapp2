@@ -671,7 +671,23 @@ function processarDadosRecebidos(dados) {
     todosUsuarios = [];
     
     // Processa jogos
-    if (dados.jogos && Array.isArray(dados.jogos)) {
+    if (dados.tipo === 'multipla' && dados.rodadas && Array.isArray(dados.rodadas)) {
+        // Múltiplas rodadas
+        dados.rodadas.forEach(rodada => {
+            if (rodada.jogos && Array.isArray(rodada.jogos)) {
+                rodada.jogos.forEach(jogo => {
+                    todosJogos.push({
+                        id: jogo.id,
+                        rodada: rodada.numero,
+                        mandante: jogo.mandante,
+                        visitante: jogo.visitante
+                    });
+                });
+            }
+        });
+        console.log(`✅ ${todosJogos.length} jogos carregados do banco (múltiplas rodadas)`);
+    } else if (dados.jogos && Array.isArray(dados.jogos)) {
+        // Rodada única
         dados.jogos.forEach(jogo => {
             todosJogos.push({
                 id: jogo.id,
@@ -680,14 +696,14 @@ function processarDadosRecebidos(dados) {
                 visitante: jogo.visitante
             });
         });
-        console.log(`✅ ${todosJogos.length} jogos carregados do banco`);
-        
-        // Mostra alguns exemplos
-        if (todosJogos.length > 0) {
-            console.log("📋 Exemplos de jogos:", todosJogos.slice(0, 3));
-        }
+        console.log(`✅ ${todosJogos.length} jogos carregados do banco (rodada única)`);
     } else {
         console.warn("⚠️ Nenhum jogo recebido ou formato inválido");
+    }
+    
+    // Mostra alguns exemplos
+    if (todosJogos.length > 0) {
+        console.log("📋 Exemplos de jogos:", todosJogos.slice(0, 3));
     }
     
     // Processa usuários
@@ -714,6 +730,9 @@ function processarDadosRecebidos(dados) {
         
         // Processa rodadas múltiplas
         if (dados.rodadas && Array.isArray(dados.rodadas)) {
+            // Limpa as rodadas selecionadas anteriores
+            rodadasSelecionadas = [];
+            
             dados.rodadas.forEach(rodada => {
                 rodadasSelecionadas.push(rodada.numero);
                 
@@ -729,6 +748,8 @@ function processarDadosRecebidos(dados) {
             
             rodadasSelecionadas = [...new Set(rodadasSelecionadas)].sort((a, b) => a - b);
             rodadaAtual = rodadasSelecionadas[0];
+            console.log('Rodadas carregadas: ' + rodadasSelecionadas.join(', '));
+            console.log('Rodada atual definida: ' + rodadaAtual);
         }
         
         document.getElementById('infoRodada').textContent = 
@@ -1222,6 +1243,11 @@ function processarDadosRecebidos(dados) {
                 });
                 
             } else {
+                if (!rodadasSelecionadas || rodadasSelecionadas.length === 0) {
+                    btnEnviar.disabled = true;
+                    console.log("Nenhuma rodada selecionada");
+                    return;
+                }
                 // Para múltiplas, verifica cada rodada
                 let todasValidas = true;
                 let detalhes = [];
