@@ -617,21 +617,141 @@
                 }
             }
         }
+        // ============================================
+// NOVAS FUNÇÕES PARA CARREGAR DADOS REAIS
+// ============================================
+
+function carregarDadosDaURL() {
+    console.log("🔍 Verificando dados na URL...");
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const dadosBase64 = urlParams.get('data');
+    
+    console.log("URL Params encontrados:", {
+        dadosBase64: dadosBase64 ? "Sim (tamanho: " + dadosBase64.length + ")" : "Não"
+    });
+    
+    if (dadosBase64) {
+        console.log("✅ Dados encontrados na URL! Processando...");
         
-        function carregarDadosIniciais() {
-            console.log("🚀 Iniciando carregamento de dados...");
+        try {
+            // Decodifica dados da URL (base64)
+            const dadosJson = atob(dadosBase64);
+            const dados = JSON.parse(dadosJson);
             
-            // Para desenvolvimento, usamos dados simulados
-            // Em produção, isso viria do bot via Telegram WebApp
+            console.log("📦 Dados decodificados com sucesso!");
+            console.log("Estrutura dos dados:", {
+                tipo: dados.tipo,
+                rodada: dados.rodada,
+                jogosCount: dados.jogos ? dados.jogos.length : 0,
+                usuariosCount: dados.usuarios ? dados.usuarios.length : 0
+            });
             
-            if (tipo === 'multipla') {
-                console.log("🔢 Modo: MÚLTIPLAS rodadas");
-                carregarDadosMultiplasRodadas();
-            } else {
-                console.log("1️⃣ Modo: Rodada ÚNICA");
-                carregarDadosRodadaUnica();
-            }
+            // Processa dados recebidos
+            processarDadosRecebidos(dados);
+            return true;
+            
+        } catch (e) {
+            console.error('❌ Erro ao decodificar dados:', e);
+            console.error("String base64:", dadosBase64 ? dadosBase64.substring(0, 100) + "..." : "vazia");
+            document.getElementById('infoRodada').textContent = 'Erro ao carregar dados da URL';
+            return false;
         }
+    }
+    
+    console.log("ℹ️ Nenhum dado na URL, usando modo simulação");
+    return false;
+}
+
+function processarDadosRecebidos(dados) {
+    console.log("🔄 Processando dados recebidos do bot...");
+    
+    // Limpa dados anteriores
+    todosJogos = [];
+    todosUsuarios = [];
+    
+    // Processa jogos
+    if (dados.jogos && Array.isArray(dados.jogos)) {
+        dados.jogos.forEach(jogo => {
+            todosJogos.push({
+                id: jogo.id,
+                rodada: dados.rodada,
+                mandante: jogo.mandante,
+                visitante: jogo.visitante
+            });
+        });
+        console.log(`✅ ${todosJogos.length} jogos carregados do banco`);
+        
+        // Mostra alguns exemplos
+        if (todosJogos.length > 0) {
+            console.log("📋 Exemplos de jogos:", todosJogos.slice(0, 3));
+        }
+    } else {
+        console.warn("⚠️ Nenhum jogo recebido ou formato inválido");
+    }
+    
+    // Processa usuários
+    if (dados.usuarios && Array.isArray(dados.usuarios)) {
+        dados.usuarios.forEach(usuario => {
+            todosUsuarios.push({
+                id: usuario.id,
+                nome: usuario.nome
+            });
+        });
+        console.log(`✅ ${todosUsuarios.length} usuários carregados do banco`);
+    } else {
+        console.warn("⚠️ Nenhum usuário recebido ou formato inválido");
+    }
+    
+    // Atualiza interface
+    if (dados.tipo === 'unica') {
+        document.getElementById('tipoRodada').textContent = 'Rodada Única';
+        document.getElementById('infoRodada').textContent = 
+            `Rodada ${dados.rodada} - ${todosJogos.length} jogos disponíveis`;
+    }
+    
+    console.log(`📊 Interface atualizada: Rodada ${dados.rodada}`);
+    
+    // Carrega interfaces
+    carregarJogos();
+    carregarUsuarios();
+    
+    // Configura horário padrão
+    const amanha = new Date();
+    amanha.setDate(amanha.getDate() + 1);
+    amanha.setHours(20, 0, 0, 0);
+    
+    const horarioInput = document.getElementById('horarioFechamento');
+    const offset = amanha.getTimezoneOffset() * 60000;
+    const localTime = new Date(amanha.getTime() - offset);
+    horarioInput.value = localTime.toISOString().slice(0, 16);
+    
+    console.log("⏰ Horário padrão configurado:", horarioInput.value);
+    
+    atualizarEstatisticas();
+    verificarBotaoEnviar();
+    
+    console.log("✅ Dados processados com sucesso!");
+}
+        function carregarDadosIniciais() {
+    console.log("🚀 INICIANDO CARREGAMENTO DE DADOS");
+    console.log("📊 Parâmetros URL:", { tipo, rodadaParam, rodadasParam });
+    
+    if (tipo === 'multipla') {
+        console.log("🔢 Modo MÚLTIPLAS rodadas");
+        carregarDadosMultiplasRodadas();
+    } else {
+        console.log("1️⃣ Modo Rodada ÚNICA");
+        
+        // Tenta carregar dados REAIS da URL primeiro
+        if (carregarDadosDaURL()) {
+            console.log("✅ Dados REAIS carregados da URL com sucesso!");
+        } else {
+            console.log("ℹ️ Usando dados simulados (modo desenvolvimento)");
+            carregarDadosRodadaUnica();
+        }
+    }
+}
         
         function carregarDadosRodadaUnica() {
             if (!rodadaAtual) {
