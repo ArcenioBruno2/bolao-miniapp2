@@ -708,11 +708,39 @@ function processarDadosRecebidos(dados) {
         document.getElementById('tipoRodada').textContent = 'Rodada Única';
         document.getElementById('infoRodada').textContent = 
             `Rodada ${dados.rodada} - ${todosJogos.length} jogos disponíveis`;
+        console.log(`📊 Interface atualizada: Rodada Única ${dados.rodada}`);
+    } else if (dados.tipo === 'multipla') {
+        document.getElementById('tipoRodada').textContent = 'Múltiplas Rodadas';
+        
+        // Processa rodadas múltiplas
+        if (dados.rodadas && Array.isArray(dados.rodadas)) {
+            dados.rodadas.forEach(rodada => {
+                rodadasSelecionadas.push(rodada.numero);
+                
+                if (!dadosPorRodada[rodada.numero]) {
+                    dadosPorRodada[rodada.numero] = {
+                        jogos: new Set(),
+                        horario: '',
+                        dobrada: new Set(),
+                        trunfo: new Set()
+                    };
+                }
+            });
+            
+            rodadasSelecionadas = [...new Set(rodadasSelecionadas)].sort((a, b) => a - b);
+            rodadaAtual = rodadasSelecionadas[0];
+        }
+        
+        document.getElementById('infoRodada').textContent = 
+            `${rodadasSelecionadas.length} rodadas - ${todosJogos.length} jogos totais`;
+        console.log(`📊 Interface atualizada: ${rodadasSelecionadas.length} rodadas`);
     }
     
-    console.log(`📊 Interface atualizada: Rodada ${dados.rodada}`);
-    
     // Carrega interfaces
+    if (dados.tipo === 'multipla') {
+        carregarRodadasDisponiveis();
+        atualizarTabsRodadas();
+    }
     carregarJogos();
     carregarUsuarios();
     
@@ -739,9 +767,16 @@ function processarDadosRecebidos(dados) {
     
     if (tipo === 'multipla') {
         console.log("🔢 Modo MÚLTIPLAS rodadas");
-        carregarDadosMultiplasRodadas();
+        
+        // Tenta carregar dados REAIS da URL primeiro
+        if (carregarDadosDaURL()) {
+            console.log("✅ Dados REAIS carregados da URL com sucesso!");
+        } else {
+            console.log("ℹ️ Usando dados simulados (modo desenvolvimento)");
+            carregarDadosMultiplasRodadas();
+        }
     } else {
-        console.log("1️⃣ Modo Rodada ÚNICA");
+        console.log("1️⃣ Modo Rodada Única");
         
         // Tenta carregar dados REAIS da URL primeiro
         if (carregarDadosDaURL()) {
