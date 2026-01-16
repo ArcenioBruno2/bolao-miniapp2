@@ -584,61 +584,103 @@
         }
         
         function carregarDadosIniciais() {
-            // Simula carregamento de dados
-            setTimeout(() => {
-                // Jogos de exemplo
-                todosJogos = [];
-                if (tipo === 'unica' && rodadaAtual) {
-                    // Para rodada única, cria 10 jogos
-                    for (let i = 1; i <= 10; i++) {
-                        todosJogos.push({
-                            id: rodadaAtual * 100 + i,
-                            rodada: rodadaAtual,
-                            mandante: `Time M${i}`,
-                            visitante: `Time V${i}`
-                        });
-                    }
-                } else if (tipo === 'multipla' && rodadasSelecionadas.length > 0) {
-                    // Para múltiplas rodadas, cria jogos para cada uma
-                    rodadasSelecionadas.forEach(rodada => {
-                        for (let i = 1; i <= 5; i++) {
-                            todosJogos.push({
-                                id: rodada * 100 + i,
-                                rodada: rodada,
-                                mandante: `Time ${rodada}M${i}`,
-                                visitante: `Time ${rodada}V${i}`
-                            });
-                        }
-                    });
-                }
-                
-                // Usuários de exemplo (apenas você)
-                todosUsuarios = [
-                    { id: 1, nome: "Bruno" }
-                ];
-                
-                // Atualiza interfaces
-                if (tipo === 'multipla') {
-                    carregarRodadasDisponiveis();
-                }
-                carregarJogos();
-                carregarUsuarios();
-                
-                // Configura horário padrão (amanhã às 20:00)
-                const amanha = new Date();
-                amanha.setDate(amanha.getDate() + 1);
-                amanha.setHours(20, 0, 0, 0);
-                
-                const horarioInput = document.getElementById('horarioFechamento');
-                const offset = amanha.getTimezoneOffset() * 60000;
-                const localTime = new Date(amanha.getTime() - offset);
-                horarioInput.value = localTime.toISOString().slice(0, 16);
-                
-                // Atualiza horário nas estatísticas
-                atualizarEstatisticas();
-                
-            }, 800);
+    const tipo = urlParams.get('tipo');
+    const rodadaParam = urlParams.get('rodada');
+    const rodadasParam = urlParams.get('rodadas');
+    
+    // Mostra loading
+    document.getElementById('listaJogos').innerHTML = '<div class="loading">Carregando jogos do banco de dados...</div>';
+    document.getElementById('usuariosDobrada').innerHTML = '<div class="loading">Carregando usuários...</div>';
+    document.getElementById('usuariosTrunfo').innerHTML = '<div class="loading">Carregando usuários...</div>';
+    
+    // Prepara dados para solicitação
+    const dadosSolicitacao = {
+        acao: 'carregar_dados',
+        tipo: tipo,
+        rodada: rodadaParam ? parseInt(rodadaParam) : null,
+        rodadas: rodadasParam ? rodadasParam.split(',').map(r => parseInt(r.trim())) : []
+    };
+    
+    // Envia solicitação para o bot
+    if (isTelegramWebApp) {
+        Telegram.WebApp.sendData(JSON.stringify(dadosSolicitacao));
+        
+        // Em produção, o bot responderia via HTTP
+        // Por enquanto, vamos usar uma simulação com delay
+        setTimeout(() => {
+            simularRespostaDoBot(dadosSolicitacao);
+        }, 1000);
+    } else {
+        // Modo desenvolvimento
+        setTimeout(() => {
+            simularRespostaDoBot(dadosSolicitacao);
+        }, 1000);
+    }
+}
+
+function simularRespostaDoBot(dadosSolicitacao) {
+    // SIMULAÇÃO - Em produção, isso viria do bot
+    
+    // 1. Simula jogos do banco
+    todosJogos = [];
+    
+    if (dadosSolicitacao.tipo === 'unica' && dadosSolicitacao.rodada) {
+        // Busca jogos REAIS desta rodada (simulação)
+        // Exemplo: se rodada=1, busca jogos da rodada 1
+        for (let i = 1; i <= 10; i++) {
+            todosJogos.push({
+                id: dadosSolicitacao.rodada * 100 + i,
+                rodada: dadosSolicitacao.rodada,
+                mandante: `Time Real ${dadosSolicitacao.rodada}A${i}`,
+                visitante: `Time Real ${dadosSolicitacao.rodada}B${i}`
+            });
         }
+    } else if (dadosSolicitacao.tipo === 'multipla' && dadosSolicitacao.rodadas.length > 0) {
+        dadosSolicitacao.rodadas.forEach(rodada => {
+            for (let i = 1; i <= 5; i++) {
+                todosJogos.push({
+                    id: rodada * 100 + i,
+                    rodada: rodada,
+                    mandante: `Time Real ${rodada}M${i}`,
+                    visitante: `Time Real ${rodada}V${i}`
+                });
+            }
+        });
+    }
+    
+    // 2. Simula usuários do banco (apenas você)
+    todosUsuarios = [
+        { id: 1, nome: "Bruno" }
+    ];
+    
+    // 3. Atualiza interfaces
+    if (dadosSolicitacao.tipo === 'multipla') {
+        carregarRodadasDisponiveis();
+    }
+    carregarJogos();
+    carregarUsuarios();
+    
+    // 4. Configura horário padrão
+    const amanha = new Date();
+    amanha.setDate(amanha.getDate() + 1);
+    amanha.setHours(20, 0, 0, 0);
+    
+    const horarioInput = document.getElementById('horarioFechamento');
+    const offset = amanha.getTimezoneOffset() * 60000;
+    const localTime = new Date(amanha.getTime() - offset);
+    horarioInput.value = localTime.toISOString().slice(0, 16);
+    
+    // 5. Atualiza estatísticas
+    atualizarEstatisticas();
+    
+    // 6. Atualiza info da rodada
+    const infoRodadaElement = document.getElementById('infoRodada');
+    if (dadosSolicitacao.tipo === 'unica') {
+        infoRodadaElement.textContent = `Rodada ${dadosSolicitacao.rodada} - ${todosJogos.length} jogos disponíveis`;
+    } else {
+        infoRodadaElement.textContent = `${dadosSolicitacao.rodadas.length} rodadas selecionadas`;
+    }
+}
         
         function carregarJogos() {
             const jogosList = document.getElementById('listaJogos');
