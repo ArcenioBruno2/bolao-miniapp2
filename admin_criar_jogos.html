@@ -1343,77 +1343,18 @@ function processarDadosRecebidos(dados) {
         }
         
         function enviarParaTelegram(dados) {
-            console.log("\n" + "=".repeat(60));
-            console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
-            console.log("=".repeat(60));
-            console.log("Dados completos:", JSON.stringify(dados, null, 2));
-            console.log("isTelegramWebApp:", isTelegramWebApp);
-            console.log("typeof Telegram:", typeof Telegram);
-            
-            // Verifica disponibilidade do Telegram
-            let telegramDisponivel = false;
-            try {
-                telegramDisponivel = typeof Telegram !== 'undefined' && Telegram && Telegram.WebApp && typeof Telegram.WebApp.sendData === 'function';
-                console.log("telegramDisponivel:", telegramDisponivel);
-            } catch (e) {
-                console.error("Erro ao verificar Telegram:", e);
-            }
-            
-            if (isTelegramWebApp && telegramDisponivel) {
-                try {
-                    const dadosString = JSON.stringify(dados);
-                    console.log("📦 Dados convertidos para string (tamanho:", dadosString.length, "bytes)");
-                    console.log("📦 Primeiros 200 caracteres:", dadosString.substring(0, 200));
-                    
-                    console.log("🚀 Chamando Telegram.WebApp.sendData()...");
-                    console.log("📨 Enviando:", dadosString);
-                    
-                    // Envia dados para o bot
-                    Telegram.WebApp.sendData(dadosString);
-                    
-                    console.log("✅ Dados enviados com sucesso para o bot!");
-                    
-                    // Mostra mensagem de sucesso
-                    try {
-                        Telegram.WebApp.showAlert('✅ Rodada enviada com sucesso! O bot já está processando.');
-                    } catch (e) {
-                        alert('✅ Dados enviados com sucesso!');
-                    }
-                    
-                    // Fecha o Web App após um breve delay
-                    setTimeout(() => {
-                        console.log("🔒 Fechando Web App...");
-                        try {
-                            Telegram.WebApp.close();
-                        } catch (e) {
-                            console.error("Erro ao fechar:", e);
-                        }
-                    }, 1500);
-                    
-                } catch (error) {
-                    console.error("❌ ERRO AO ENVIAR DADOS PARA TELEGRAM:", error);
-                    console.error("Stack trace:", error.stack);
-                    alert('Erro ao enviar dados para o bot.\n\nErro: ' + error.message + '\n\nVerifique o console (F12) para mais detalhes.');
-                }
-            } else {
-                // Modo de desenvolvimento - mostra os dados no console
-                console.log("🚧 MODO DESENVOLVIMENTO - Dados prontos para envio:");
-                console.log("=".repeat(60));
-                console.log(JSON.stringify(dados, null, 2));
-                console.log("=".repeat(60));
-                console.log("isTelegramWebApp:", isTelegramWebApp);
-                console.log("telegramDisponivel:", telegramDisponivel);
-                
-                // Simula envio bem-sucedido
-                alert('✅ MODO DESENVOLVIMENTO\n\nDados prontos para envio (verifique o console F12)');
-                
-                // Simula fechamento
-                setTimeout(() => {
-                    console.log("🔐 Fechando Web App...");
-                    window.close();
-                }, 1000);
-            }
-        }
+    console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
+    
+    // Certifique-se que está convertendo para string
+    const dadosString = JSON.stringify(dados);
+    console.log("Dados:", dadosString);
+    
+    if (Telegram.WebApp) {
+        Telegram.WebApp.sendData(dadosString);
+        Telegram.WebApp.showAlert('✅ Rodada enviada com sucesso!');
+        setTimeout(() => Telegram.WebApp.close(), 1500);
+    }
+}
         
         function voltar() {
             console.log("🔙 Voltando...");
