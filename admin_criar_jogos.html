@@ -1343,16 +1343,66 @@ function processarDadosRecebidos(dados) {
         }
         
         function enviarParaTelegram(dados) {
-    console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
+    console.log("🚀 ========== ENVIANDO PARA TELEGRAM ==========");
+    console.log("📦 Dados completos:", JSON.stringify(dados, null, 2));
+    console.log("📏 Tamanho dos dados:", JSON.stringify(dados).length, "bytes");
     
-    // Certifique-se que está convertendo para string
+    // Verifica se está no Telegram
+    if (typeof Telegram === 'undefined' || !Telegram.WebApp) {
+        console.error("❌ Telegram WebApp não detectado!");
+        alert("Erro: Não está executando no Telegram!");
+        return;
+    }
+    
+    console.log("✅ Telegram WebApp detectado");
+    console.log("📱 Telegram.WebApp.sendData disponível:", typeof Telegram.WebApp.sendData === 'function');
+    
+    // Converte para string
     const dadosString = JSON.stringify(dados);
-    console.log("Dados:", dadosString);
+    console.log("📄 Dados como string (primeiros 200 chars):", dadosString.substring(0, 200));
     
-    if (Telegram.WebApp) {
+    try {
+        // Envia os dados
+        console.log("📤 Chamando Telegram.WebApp.sendData()...");
         Telegram.WebApp.sendData(dadosString);
-        Telegram.WebApp.showAlert('✅ Rodada enviada com sucesso!');
-        setTimeout(() => Telegram.WebApp.close(), 1500);
+        console.log("✅ Dados enviados com sucesso!");
+        
+        // Feedback para o usuário
+        Telegram.WebApp.showAlert("✅ Rodada enviada com sucesso! O bot está processando...", function() {
+            console.log("🔒 Fechando Web App...");
+            Telegram.WebApp.close();
+        });
+        
+    } catch (error) {
+        console.error("❌ ERRO ao enviar:", error);
+        console.error("Stack trace:", error.stack);
+        
+        // Tenta uma abordagem alternativa
+        try {
+            console.log("🔄 Tentando abordagem alternativa...");
+            
+            // Cria um elemento oculto para os dados
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'web_app_data';
+            input.value = dadosString;
+            
+            // Envia via postMessage
+            if (window.parent) {
+                window.parent.postMessage({
+                    type: 'web_app_data',
+                    data: dadosString
+                }, '*');
+                console.log("✅ Dados enviados via postMessage");
+            }
+            
+            alert("Dados enviados (método alternativo). Verifique o bot.");
+            Telegram.WebApp.close();
+            
+        } catch (error2) {
+            console.error("❌ ERRO na abordagem alternativa:", error2);
+            alert("Erro crítico ao enviar dados. Verifique o console (F12).");
+        }
     }
 }
         
