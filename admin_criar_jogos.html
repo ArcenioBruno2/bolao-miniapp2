@@ -12,16 +12,16 @@
         }
         
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8f9fa;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: white;
+            color: #333;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             flex: 1;
@@ -29,112 +29,147 @@
         
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 25px;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 5px solid #4a6cf7;
         }
         
         h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: #2d3748;
+            font-weight: 600;
         }
         
         .tipo-rodada {
-            font-size: 18px;
-            opacity: 0.9;
+            font-size: 16px;
+            color: #4a5568;
             margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .info-rodada {
+            font-size: 14px;
+            color: #718096;
+            background: #f7fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 5px;
         }
         
         .main-content {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             margin-bottom: 20px;
         }
         
         .section {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
         }
         
         .section-title {
             font-size: 18px;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            color: #2d3748;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
         .section-title i {
+            color: #4a6cf7;
             font-size: 20px;
         }
         
         .jogos-list {
             display: grid;
-            gap: 10px;
-            max-height: 300px;
+            gap: 12px;
+            max-height: 350px;
             overflow-y: auto;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            background: #f8fafc;
             border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
         
         .jogo-item {
             display: flex;
             align-items: center;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: white;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border: 2px solid transparent;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .jogo-item:hover {
-            background: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #c3dafe;
         }
         
         .jogo-item.selected {
-            background: rgba(46, 204, 113, 0.3);
-            border-color: #2ecc71;
+            background: #ebf8ff;
+            border-color: #4299e1;
         }
         
         .jogo-times {
             flex: 1;
             text-align: center;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 16px;
+            color: #2d3748;
+        }
+        
+        .rodada-info {
+            font-size: 14px;
+            color: #718096;
+            background: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
         }
         
         .checkbox {
-            width: 24px;
-            height: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 4px;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #cbd5e0;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 15px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            background: white;
         }
         
         .checkbox.selected {
-            background: #2ecc71;
-            border-color: #2ecc71;
+            background: #4299e1;
+            border-color: #4299e1;
         }
         
         .checkbox.selected::after {
             content: "✓";
             color: white;
             font-weight: bold;
+            font-size: 14px;
         }
         
         .time-selector {
@@ -142,49 +177,65 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 15px;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            background: #f8fafc;
             border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
         
         input[type="datetime-local"] {
             flex: 1;
-            padding: 12px;
-            border: none;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
             border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             font-size: 16px;
-            color: #333;
+            color: #2d3748;
+            transition: border 0.2s ease;
+        }
+        
+        input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
         }
         
         .usuarios-list {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            max-height: 200px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            max-height: 220px;
             overflow-y: auto;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            background: #f8fafc;
             border-radius: 10px;
+            border: 1px solid #e2e8f0;
         }
         
         .usuario-item {
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            background: white;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border: 2px solid transparent;
             text-align: center;
+            font-weight: 500;
+            color: #4a5568;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .usuario-item:hover {
-            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #c3dafe;
         }
         
         .usuario-item.selected {
-            background: rgba(52, 152, 219, 0.3);
-            border-color: #3498db;
+            background: #ebf8ff;
+            border-color: #4299e1;
+            color: #2d3748;
+            font-weight: 600;
         }
         
         .actions {
@@ -197,44 +248,51 @@
             flex: 1;
             padding: 18px;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: bold;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         
         .btn-enviar {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
             color: white;
         }
         
         .btn-enviar:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(46, 204, 113, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 108, 247, 0.3);
+        }
+        
+        .btn-enviar:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .btn-voltar {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: white;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
         }
         
         .btn-voltar:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: #f7fafc;
+            border-color: #cbd5e0;
         }
         
         footer {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             font-size: 14px;
-            opacity: 0.8;
+            color: #718096;
             margin-top: 20px;
         }
         
-        /* Estilos para múltiplas rodadas */
         .rodada-tabs {
             display: flex;
             gap: 10px;
@@ -245,25 +303,82 @@
         
         .rodada-tab {
             padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
             border: 2px solid transparent;
+            font-weight: 500;
+            color: #4a5568;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .rodada-tab.active {
-            background: rgba(155, 89, 182, 0.4);
-            border-color: #9b59b6;
+            background: #4a6cf7;
+            color: white;
+            border-color: #4a6cf7;
         }
         
         .rodada-tab:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.2);
+            background: #f7fafc;
+            border-color: #cbd5e0;
         }
         
         .hidden {
             display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+            font-size: 16px;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 30px;
+            color: #e53e3e;
+            background: #fff5f5;
+            border-radius: 8px;
+            border: 1px solid #fed7d7;
+        }
+        
+        .success {
+            text-align: center;
+            padding: 30px;
+            color: #38a169;
+            background: #f0fff4;
+            border-radius: 8px;
+            border: 1px solid #c6f6d5;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4a6cf7;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         /* Scrollbar personalizada */
@@ -273,32 +388,49 @@
         }
         
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
+            background: #f1f1f1;
             border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: #c1c1c1;
             border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: #a8a8a8;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎯 CRIAR RODADA</h1>
+            <h1>⚽ CRIAR RODADA</h1>
             <div class="tipo-rodada" id="tipoRodada">Rodada Única</div>
-            <div id="infoMultipla" class="hidden">
-                <p>Selecione as rodadas abaixo:</p>
-            </div>
+            <div class="info-rodada" id="infoRodada">Carregando...</div>
         </header>
         
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="statJogos">0</div>
+                <div class="stat-label">Jogos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statDobrada">0</div>
+                <div class="stat-label">Dobrada</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statTrunfo">0</div>
+                <div class="stat-label">Trunfo</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statHorario">--:--</div>
+                <div class="stat-label">Horário</div>
+            </div>
+        </div>
+        
         <div class="main-content">
-            <!-- Tabs para múltiplas rodadas (visível apenas no modo múltipla) -->
+            <!-- Tabs para múltiplas rodadas -->
             <div id="rodadaTabs" class="rodada-tabs hidden"></div>
             
             <!-- Seleção de Rodada (apenas para múltipla) -->
@@ -307,7 +439,7 @@
                     <i>🔢</i> Selecionar Rodadas
                 </div>
                 <div id="listaRodadas" class="jogos-list">
-                    <!-- As rodadas serão carregadas aqui -->
+                    <div class="loading">Carregando rodadas disponíveis...</div>
                 </div>
             </div>
             
@@ -318,7 +450,7 @@
                 </div>
                 <div id="jogosContainer">
                     <div id="listaJogos" class="jogos-list">
-                        <!-- Os jogos serão carregados aqui -->
+                        <div class="loading">Carregando jogos disponíveis...</div>
                     </div>
                 </div>
             </div>
@@ -337,9 +469,12 @@
             <div class="section">
                 <div class="section-title">
                     <i>⭐</i> Pontuação Dobrada
+                    <span style="font-size: 14px; color: #718096; margin-left: auto;">
+                        (Selecione os usuários)
+                    </span>
                 </div>
                 <div id="usuariosDobrada" class="usuarios-list">
-                    <!-- Usuários serão carregados aqui -->
+                    <div class="loading">Carregando usuários...</div>
                 </div>
             </div>
             
@@ -347,400 +482,359 @@
             <div class="section">
                 <div class="section-title">
                     <i>🎴</i> Trunfo
+                    <span style="font-size: 14px; color: #718096; margin-left: auto;">
+                        (30 minutos extras)
+                    </span>
                 </div>
                 <div id="usuariosTrunfo" class="usuarios-list">
-                    <!-- Usuários serão carregados aqui -->
+                    <div class="loading">Carregando usuários...</div>
                 </div>
             </div>
         </div>
         
         <div class="actions">
             <button class="btn-voltar" onclick="voltar()">VOLTAR</button>
-            <button class="btn-enviar" onclick="enviarRodada()">ENVIAR RODADA</button>
+            <button class="btn-enviar" id="btnEnviar" onclick="enviarRodada()" disabled>ENVIAR RODADA</button>
         </div>
         
         <footer>
-            Bot Bolão - Administração
+            Bot Bolão - Sistema Administrativo
         </footer>
     </div>
 
     <script>
         // Verifica se estamos no Telegram Web App
-        if (window.Telegram && Telegram.WebApp) {
+        const isTelegramWebApp = window.Telegram && Telegram.WebApp;
+        
+        if (isTelegramWebApp) {
             Telegram.WebApp.expand();
             Telegram.WebApp.enableClosingConfirmation();
+            Telegram.WebApp.setHeaderColor('#4a6cf7');
+            Telegram.WebApp.setBackgroundColor('#f8f9fa');
         }
         
         // Obtém parâmetros da URL
         const urlParams = new URLSearchParams(window.location.search);
         const tipo = urlParams.get('tipo') || 'unica';
+        const rodadaParam = urlParams.get('rodada');
+        const rodadasParam = urlParams.get('rodadas');
         
         // Variáveis globais
-        let jogosSelecionados = {};
-        let usuariosDobrada = [];
-        let usuariosTrunfo = [];
+        let jogosSelecionados = new Set();
+        let usuariosDobrada = new Set();
+        let usuariosTrunfo = new Set();
         let rodadasSelecionadas = [];
-        let rodadaAtual = 1;
+        let rodadaAtual = null;
         let dadosPorRodada = {};
+        let todosJogos = [];
+        let todosUsuarios = [];
         
         // Inicializa a página
         document.addEventListener('DOMContentLoaded', function() {
+            atualizarInterfaceInicial();
+            carregarDadosIniciais();
+        });
+        
+        function atualizarInterfaceInicial() {
             const tipoRodadaElement = document.getElementById('tipoRodada');
-            const infoMultiplaElement = document.getElementById('infoMultipla');
+            const infoRodadaElement = document.getElementById('infoRodada');
             const rodadaTabsElement = document.getElementById('rodadaTabs');
             const selecaoRodadasElement = document.getElementById('selecaoRodadas');
             
             if (tipo === 'multipla') {
                 tipoRodadaElement.textContent = 'Múltiplas Rodadas';
-                infoMultiplaElement.classList.remove('hidden');
+                infoRodadaElement.textContent = 'Selecione as rodadas abaixo';
                 rodadaTabsElement.classList.remove('hidden');
                 selecaoRodadasElement.classList.remove('hidden');
                 
-                // Inicializa dados para múltiplas rodadas
-                inicializarModoMultipla();
+                // Processa rodadas da URL
+                if (rodadasParam) {
+                    rodadasSelecionadas = rodadasParam.split(',').map(r => parseInt(r.trim()));
+                    rodadasSelecionadas.forEach(numero => {
+                        if (!dadosPorRodada[numero]) {
+                            dadosPorRodada[numero] = {
+                                jogos: new Set(),
+                                horario: '',
+                                dobrada: new Set(),
+                                trunfo: new Set()
+                            };
+                        }
+                    });
+                    
+                    if (rodadasSelecionadas.length > 0) {
+                        rodadaAtual = rodadasSelecionadas[0];
+                        atualizarTabsRodadas();
+                    }
+                }
             } else {
                 tipoRodadaElement.textContent = 'Rodada Única';
-                dadosPorRodada[1] = {
-                    jogos: [],
-                    horario: '',
-                    dobrada: [],
-                    trunfo: []
-                };
-            }
-            
-            // Carrega dados iniciais
-            carregarJogos();
-            carregarUsuarios();
-            if (tipo === 'multipla') {
-                carregarRodadasDisponiveis();
-            }
-        });
-        
-        function inicializarModoMultipla() {
-            // Cria estrutura inicial para múltiplas rodadas
-            dadosPorRodada = {};
-            
-            // Adiciona listeners para alternar entre rodadas
-            document.getElementById('horarioFechamento').addEventListener('change', function() {
-                if (dadosPorRodada[rodadaAtual]) {
-                    dadosPorRodada[rodadaAtual].horario = this.value;
+                if (rodadaParam) {
+                    infoRodadaElement.textContent = `Rodada ${rodadaParam}`;
+                    rodadaAtual = parseInt(rodadaParam);
+                    if (!dadosPorRodada[rodadaAtual]) {
+                        dadosPorRodada[rodadaAtual] = {
+                            jogos: new Set(),
+                            horario: '',
+                            dobrada: new Set(),
+                            trunfo: new Set()
+                        };
+                    }
                 }
-            });
+            }
+        }
+        
+        function carregarDadosIniciais() {
+            // Simula carregamento de dados
+            setTimeout(() => {
+                // Jogos de exemplo
+                todosJogos = [];
+                if (tipo === 'unica' && rodadaAtual) {
+                    // Para rodada única, cria 10 jogos
+                    for (let i = 1; i <= 10; i++) {
+                        todosJogos.push({
+                            id: rodadaAtual * 100 + i,
+                            rodada: rodadaAtual,
+                            mandante: `Time M${i}`,
+                            visitante: `Time V${i}`
+                        });
+                    }
+                } else if (tipo === 'multipla' && rodadasSelecionadas.length > 0) {
+                    // Para múltiplas rodadas, cria jogos para cada uma
+                    rodadasSelecionadas.forEach(rodada => {
+                        for (let i = 1; i <= 5; i++) {
+                            todosJogos.push({
+                                id: rodada * 100 + i,
+                                rodada: rodada,
+                                mandante: `Time ${rodada}M${i}`,
+                                visitante: `Time ${rodada}V${i}`
+                            });
+                        }
+                    });
+                }
+                
+                // Usuários de exemplo (apenas você)
+                todosUsuarios = [
+                    { id: 1, nome: "Bruno" }
+                ];
+                
+                // Atualiza interfaces
+                if (tipo === 'multipla') {
+                    carregarRodadasDisponiveis();
+                }
+                carregarJogos();
+                carregarUsuarios();
+                
+                // Configura horário padrão (amanhã às 20:00)
+                const amanha = new Date();
+                amanha.setDate(amanha.getDate() + 1);
+                amanha.setHours(20, 0, 0, 0);
+                
+                const horarioInput = document.getElementById('horarioFechamento');
+                const offset = amanha.getTimezoneOffset() * 60000;
+                const localTime = new Date(amanha.getTime() - offset);
+                horarioInput.value = localTime.toISOString().slice(0, 16);
+                
+                // Atualiza horário nas estatísticas
+                atualizarEstatisticas();
+                
+            }, 800);
         }
         
         function carregarJogos() {
-    const jogosList = document.getElementById('listaJogos');
-    jogosList.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando jogos disponíveis...</div>';
-    
-    // Obtém a rodada da URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const tipo = urlParams.get('tipo');
-    const rodadaParam = urlParams.get('rodada');
-    const rodadasParam = urlParams.get('rodadas');
-    
-    let rodadas = [];
-    
-    if (tipo === 'unica' && rodadaParam) {
-        rodadas = [parseInt(rodadaParam)];
-    } else if (tipo === 'multipla' && rodadasParam) {
-        rodadas = rodadasParam.split(',').map(r => parseInt(r.trim()));
-    }
-    
-    // Envia requisição para API do bot (simulada)
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify({
-            acao: 'carregar_jogos',
-            tipo: tipo,
-            rodadas: rodadas
-        }));
-        
-        // Em produção, isso seria uma chamada HTTP real
-        // Por enquanto, usamos dados simulados
-        setTimeout(() => {
-            simularCarregamentoJogos(rodadas);
-        }, 500);
-    } else {
-        // Modo desenvolvimento
-        setTimeout(() => {
-            simularCarregamentoJogos(rodadas);
-        }, 500);
-    }
-}
-
-function simularCarregamentoJogos(rodadas) {
-    const jogosList = document.getElementById('listaJogos');
-    
-    // Simulação - em produção isso viria do bot
-    let jogosExemplo = [];
-    
-    // Para cada rodada, adiciona alguns jogos
-    rodadas.forEach(rodada => {
-        for (let i = 1; i <= 5; i++) { // 5 jogos por rodada
-            jogosExemplo.push({
-                id: rodada * 10 + i,
-                rodada: rodada,
-                mandante: `Time ${rodada}A${i}`,
-                visitante: `Time ${rodada}B${i}`
-            });
-        }
-    });
-    
-    if (jogosExemplo.length === 0) {
-        jogosList.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff6b6b;">Nenhum jogo disponível para estas rodadas.</div>';
-        return;
-    }
-    
-    jogosList.innerHTML = '';
-    
-    jogosExemplo.forEach(jogo => {
-        const jogoDiv = document.createElement('div');
-        jogoDiv.className = 'jogo-item';
-        jogoDiv.dataset.id = jogo.id;
-        jogoDiv.dataset.rodada = jogo.rodada;
-        
-        jogoDiv.innerHTML = `
-            <div class="checkbox"></div>
-            <div class="jogo-times">${jogo.mandante} x ${jogo.visitante} (R${jogo.rodada})</div>
-        `;
-        
-        jogoDiv.addEventListener('click', function() {
-            selecionarJogo(jogo.id, this);
-        });
-        
-        jogosList.appendChild(jogoDiv);
-    });
-}
-
-function carregarUsuarios() {
-    const usuariosDobradaList = document.getElementById('usuariosDobrada');
-    const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
-    
-    usuariosDobradaList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
-    usuariosTrunfoList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
-    
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify({
-            acao: 'carregar_usuarios'
-        }));
-        
-        setTimeout(() => {
-            simularCarregamentoUsuarios();
-        }, 500);
-    } else {
-        setTimeout(() => {
-            simularCarregamentoUsuarios();
-        }, 500);
-    }
-}
-
-function simularCarregamentoUsuarios() {
-    const usuariosDobradaList = document.getElementById('usuariosDobrada');
-    const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
-    
-    // Simulação - em produção isso viria do bot
-    const usuariosExemplo = [
-        { id: 1, nome: "Bruno" }  // Apenas você
-    ];
-    
-    // Preenche lista de Pontuação Dobrada
-    usuariosDobradaList.innerHTML = '';
-    usuariosExemplo.forEach(usuario => {
-        const usuarioDiv = document.createElement('div');
-        usuarioDiv.className = 'usuario-item';
-        usuarioDiv.dataset.id = usuario.id;
-        usuarioDiv.textContent = usuario.nome;
-        
-        usuarioDiv.addEventListener('click', function() {
-            selecionarUsuario(usuario.id, this, 'dobrada');
-        });
-        
-        usuariosDobradaList.appendChild(usuarioDiv);
-    });
-    
-    // Preenche lista de Trunfo
-    usuariosTrunfoList.innerHTML = '';
-    usuariosExemplo.forEach(usuario => {
-        const usuarioDiv = document.createElement('div');
-        usuarioDiv.className = 'usuario-item';
-        usuarioDiv.dataset.id = usuario.id;
-        usuarioDiv.textContent = usuario.nome;
-        
-        usuarioDiv.addEventListener('click', function() {
-            selecionarUsuario(usuario.id, this, 'trunfo');
-        });
-        
-        usuariosTrunfoList.appendChild(usuarioDiv);
-    });
-}
-        
-        function carregarRodadasDisponiveis() {
-            // Simulação de carregamento de rodadas disponíveis
-            const listaRodadasElement = document.getElementById('listaRodadas');
+            const jogosList = document.getElementById('listaJogos');
             
-            listaRodadasElement.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando rodadas...</div>';
+            if (todosJogos.length === 0) {
+                jogosList.innerHTML = '<div class="error">Nenhum jogo disponível</div>';
+                return;
+            }
             
-            setTimeout(() => {
-                const rodadasExemplo = [
-                    { numero: 1, jogos: 3 },
-                    { numero: 2, jogos: 2 },
-                    { numero: 3, jogos: 1 },
-                    { numero: 4, jogos: 4 },
-                    { numero: 5, jogos: 2 }
-                ];
+            // Filtra jogos por rodada atual
+            let jogosFiltrados = todosJogos;
+            if (tipo === 'unica' && rodadaAtual) {
+                jogosFiltrados = todosJogos.filter(jogo => jogo.rodada === rodadaAtual);
+            } else if (tipo === 'multipla' && rodadaAtual) {
+                jogosFiltrados = todosJogos.filter(jogo => jogo.rodada === rodadaAtual);
+            }
+            
+            if (jogosFiltrados.length === 0) {
+                jogosList.innerHTML = '<div class="error">Nenhum jogo disponível para esta rodada</div>';
+                atualizarEstatisticas();
+                return;
+            }
+            
+            jogosList.innerHTML = '';
+            
+            jogosFiltrados.forEach(jogo => {
+                const jogoDiv = document.createElement('div');
+                jogoDiv.className = 'jogo-item';
+                jogoDiv.dataset.id = jogo.id;
+                jogoDiv.dataset.rodada = jogo.rodada;
                 
-                listaRodadasElement.innerHTML = '';
+                const estaSelecionado = dadosPorRodada[jogo.rodada]?.jogos.has(jogo.id);
                 
-                rodadasExemplo.forEach(rodada => {
-                    const rodadaDiv = document.createElement('div');
-                    rodadaDiv.className = 'jogo-item';
-                    rodadaDiv.dataset.rodada = rodada.numero;
-                    
-                    rodadaDiv.innerHTML = `
-                        <div class="checkbox"></div>
-                        <div class="jogo-times">Rodada ${rodada.numero} (${rodada.jogos} jogos)</div>
-                    `;
-                    
-                    rodadaDiv.addEventListener('click', function() {
-                        selecionarRodada(rodada.numero, this);
-                    });
-                    
-                    listaRodadasElement.appendChild(rodadaDiv);
-                    
-                    // Marca como selecionado se já estiver na lista
-                    if (rodadasSelecionadas.includes(rodada.numero)) {
-                        rodadaDiv.classList.add('selected');
-                        rodadaDiv.querySelector('.checkbox').classList.add('selected');
-                    }
+                jogoDiv.innerHTML = `
+                    <div class="checkbox ${estaSelecionado ? 'selected' : ''}"></div>
+                    <div class="jogo-times">${jogo.mandante} x ${jogo.visitante}</div>
+                    ${tipo === 'multipla' ? `<div class="rodada-info">R${jogo.rodada}</div>` : ''}
+                `;
+                
+                jogoDiv.addEventListener('click', function() {
+                    selecionarJogo(jogo.id, jogo.rodada, this);
                 });
                 
-                // Cria as tabs para as rodadas selecionadas
-                atualizarTabsRodadas();
-            }, 500);
+                jogosList.appendChild(jogoDiv);
+            });
+            
+            atualizarEstatisticas();
         }
         
-        function selecionarJogo(jogoId, element) {
-            const tipo = urlParams.get('tipo');
+        function carregarUsuarios() {
+            const usuariosDobradaList = document.getElementById('usuariosDobrada');
+            const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
             
-            if (tipo === 'unica') {
-                // Modo única rodada
-                if (!dadosPorRodada[1]) {
-                    dadosPorRodada[1] = { jogos: [], horario: '', dobrada: [], trunfo: [] };
-                }
-                
-                const index = dadosPorRodada[1].jogos.indexOf(jogoId);
-                
-                if (index === -1) {
-                    dadosPorRodada[1].jogos.push(jogoId);
-                    element.classList.add('selected');
-                    element.querySelector('.checkbox').classList.add('selected');
-                } else {
-                    dadosPorRodada[1].jogos.splice(index, 1);
-                    element.classList.remove('selected');
-                    element.querySelector('.checkbox').classList.remove('selected');
-                }
-            } else {
-                // Modo múltiplas rodadas
-                if (!dadosPorRodada[rodadaAtual]) {
-                    dadosPorRodada[rodadaAtual] = { jogos: [], horario: '', dobrada: [], trunfo: [] };
-                }
-                
-                const index = dadosPorRodada[rodadaAtual].jogos.indexOf(jogoId);
-                
-                if (index === -1) {
-                    dadosPorRodada[rodadaAtual].jogos.push(jogoId);
-                    element.classList.add('selected');
-                    element.querySelector('.checkbox').classList.add('selected');
-                } else {
-                    dadosPorRodada[rodadaAtual].jogos.splice(index, 1);
-                    element.classList.remove('selected');
-                    element.querySelector('.checkbox').classList.remove('selected');
-                }
+            if (todosUsuarios.length === 0) {
+                usuariosDobradaList.innerHTML = '<div class="error">Nenhum usuário cadastrado</div>';
+                usuariosTrunfoList.innerHTML = '<div class="error">Nenhum usuário cadastrado</div>';
+                return;
             }
+            
+            // Preenche lista de Pontuação Dobrada
+            usuariosDobradaList.innerHTML = '';
+            todosUsuarios.forEach(usuario => {
+                const usuarioDiv = document.createElement('div');
+                usuarioDiv.className = 'usuario-item';
+                usuarioDiv.dataset.id = usuario.id;
+                usuarioDiv.textContent = usuario.nome;
+                
+                const estaSelecionado = dadosPorRodada[rodadaAtual]?.dobrada.has(usuario.id);
+                if (estaSelecionado) {
+                    usuarioDiv.classList.add('selected');
+                }
+                
+                usuarioDiv.addEventListener('click', function() {
+                    selecionarUsuario(usuario.id, this, 'dobrada');
+                });
+                
+                usuariosDobradaList.appendChild(usuarioDiv);
+            });
+            
+            // Preenche lista de Trunfo
+            usuariosTrunfoList.innerHTML = '';
+            todosUsuarios.forEach(usuario => {
+                const usuarioDiv = document.createElement('div');
+                usuarioDiv.className = 'usuario-item';
+                usuarioDiv.dataset.id = usuario.id;
+                usuarioDiv.textContent = usuario.nome;
+                
+                const estaSelecionado = dadosPorRodada[rodadaAtual]?.trunfo.has(usuario.id);
+                if (estaSelecionado) {
+                    usuarioDiv.classList.add('selected');
+                }
+                
+                usuarioDiv.addEventListener('click', function() {
+                    selecionarUsuario(usuario.id, this, 'trunfo');
+                });
+                
+                usuariosTrunfoList.appendChild(usuarioDiv);
+            });
+            
+            atualizarEstatisticas();
+        }
+        
+        function carregarRodadasDisponiveis() {
+            const listaRodadasElement = document.getElementById('listaRodadas');
+            
+            if (rodadasSelecionadas.length === 0) {
+                listaRodadasElement.innerHTML = '<div class="error">Nenhuma rodada disponível</div>';
+                return;
+            }
+            
+            listaRodadasElement.innerHTML = '';
+            
+            rodadasSelecionadas.forEach(rodada => {
+                const jogosDaRodada = todosJogos.filter(j => j.rodada === rodada).length;
+                
+                const rodadaDiv = document.createElement('div');
+                rodadaDiv.className = 'jogo-item';
+                rodadaDiv.dataset.rodada = rodada;
+                
+                const estaSelecionado = rodadasSelecionadas.includes(rodada);
+                
+                rodadaDiv.innerHTML = `
+                    <div class="checkbox ${estaSelecionado ? 'selected' : ''}"></div>
+                    <div class="jogo-times">Rodada ${rodada}</div>
+                    <div class="rodada-info">${jogosDaRodada} jogos</div>
+                `;
+                
+                rodadaDiv.addEventListener('click', function() {
+                    selecionarRodadaParaLista(rodada, this);
+                });
+                
+                listaRodadasElement.appendChild(rodadaDiv);
+            });
+        }
+        
+        function selecionarJogo(jogoId, rodada, element) {
+            if (!dadosPorRodada[rodada]) {
+                dadosPorRodada[rodada] = {
+                    jogos: new Set(),
+                    horario: '',
+                    dobrada: new Set(),
+                    trunfo: new Set()
+                };
+            }
+            
+            const checkbox = element.querySelector('.checkbox');
+            
+            if (dadosPorRodada[rodada].jogos.has(jogoId)) {
+                dadosPorRodada[rodada].jogos.delete(jogoId);
+                element.classList.remove('selected');
+                checkbox.classList.remove('selected');
+            } else {
+                dadosPorRodada[rodada].jogos.add(jogoId);
+                element.classList.add('selected');
+                checkbox.classList.add('selected');
+            }
+            
+            atualizarEstatisticas();
+            verificarBotaoEnviar();
         }
         
         function selecionarUsuario(usuarioId, element, tipoLista) {
-            const tipo = urlParams.get('tipo');
+            if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) return;
             
-            if (tipo === 'unica') {
-                // Modo única rodada
-                if (!dadosPorRodada[1]) {
-                    dadosPorRodada[1] = { jogos: [], horario: '', dobrada: [], trunfo: [] };
-                }
-                
-                const lista = tipoLista === 'dobrada' ? dadosPorRodada[1].dobrada : dadosPorRodada[1].trunfo;
-                const index = lista.indexOf(usuarioId);
-                
-                if (index === -1) {
-                    lista.push(usuarioId);
-                    element.classList.add('selected');
-                } else {
-                    lista.splice(index, 1);
+            if (tipoLista === 'dobrada') {
+                if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
+                    dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
                     element.classList.remove('selected');
-                }
-            } else {
-                // Modo múltiplas rodadas
-                if (!dadosPorRodada[rodadaAtual]) {
-                    dadosPorRodada[rodadaAtual] = { jogos: [], horario: '', dobrada: [], trunfo: [] };
-                }
-                
-                const lista = tipoLista === 'dobrada' ? dadosPorRodada[rodadaAtual].dobrada : dadosPorRodada[rodadaAtual].trunfo;
-                const index = lista.indexOf(usuarioId);
-                
-                if (index === -1) {
-                    lista.push(usuarioId);
-                    element.classList.add('selected');
                 } else {
-                    lista.splice(index, 1);
+                    dadosPorRodada[rodadaAtual].dobrada.add(usuarioId);
+                    element.classList.add('selected');
+                }
+            } else if (tipoLista === 'trunfo') {
+                if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
+                    dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
                     element.classList.remove('selected');
+                } else {
+                    dadosPorRodada[rodadaAtual].trunfo.add(usuarioId);
+                    element.classList.add('selected');
                 }
             }
+            
+            atualizarEstatisticas();
+            verificarBotaoEnviar();
         }
         
-        function selecionarRodada(numeroRodada, element) {
-            const index = rodadasSelecionadas.indexOf(numeroRodada);
-            
-            if (index === -1) {
-                rodadasSelecionadas.push(numeroRodada);
-                element.classList.add('selected');
-                element.querySelector('.checkbox').classList.add('selected');
-                
-                // Inicializa dados para esta rodada se não existir
-                if (!dadosPorRodada[numeroRodada]) {
-                    dadosPorRodada[numeroRodada] = { jogos: [], horario: '', dobrada: [], trunfo: [] };
-                }
-                
-                // Se for a primeira rodada selecionada, torna-a ativa
-                if (rodadasSelecionadas.length === 1) {
-                    rodadaAtual = numeroRodada;
-                    carregarDadosRodadaAtual();
-                }
-            } else {
-                rodadasSelecionadas.splice(index, 1);
-                element.classList.remove('selected');
-                element.querySelector('.checkbox').classList.remove('selected');
-                
-                // Se a rodada atual foi removida, seleciona outra
-                if (numeroRodada === rodadaAtual && rodadasSelecionadas.length > 0) {
-                    rodadaAtual = rodadasSelecionadas[0];
-                    carregarDadosRodadaAtual();
-                } else if (rodadasSelecionadas.length === 0) {
-                    // Se não há mais rodadas selecionadas, limpa a interface
-                    rodadaAtual = null;
-                    document.getElementById('listaJogos').innerHTML = '<div style="text-align: center; padding: 20px;">Selecione pelo menos uma rodada</div>';
-                    document.getElementById('horarioFechamento').value = '';
-                }
-            }
-            
-            atualizarTabsRodadas();
+        function selecionarRodadaParaLista(numeroRodada, element) {
+            // Esta função é apenas para seleção inicial de rodadas
+            // Não usada no fluxo atual
         }
         
         function atualizarTabsRodadas() {
             const rodadaTabsElement = document.getElementById('rodadaTabs');
             rodadaTabsElement.innerHTML = '';
             
-            rodadasSelecionadas.sort((a, b) => a - b);
-            
-            rodadasSelecionadas.forEach(numero => {
+            rodadasSelecionadas.sort((a, b) => a - b).forEach(numero => {
                 const tab = document.createElement('div');
                 tab.className = `rodada-tab ${numero === rodadaAtual ? 'active' : ''}`;
                 tab.textContent = `Rodada ${numero}`;
@@ -755,103 +849,130 @@ function simularCarregamentoUsuarios() {
         }
         
         function mudarRodadaAtual(novaRodada) {
-            // Salva dados da rodada atual
-            salvarDadosRodadaAtual();
+            // Salva horário da rodada atual
+            if (rodadaAtual && dadosPorRodada[rodadaAtual]) {
+                const horarioInput = document.getElementById('horarioFechamento');
+                dadosPorRodada[rodadaAtual].horario = horarioInput.value;
+            }
             
-            // Altera a rodada atual
+            // Muda para nova rodada
             rodadaAtual = novaRodada;
             
-            // Carrega dados da nova rodada
-            carregarDadosRodadaAtual();
+            // Carrega horário da nova rodada
+            const horarioInput = document.getElementById('horarioFechamento');
+            if (dadosPorRodada[rodadaAtual] && dadosPorRodada[rodadaAtual].horario) {
+                horarioInput.value = dadosPorRodada[rodadaAtual].horario;
+            }
             
-            // Atualiza as tabs
+            // Atualiza interfaces
             atualizarTabsRodadas();
+            carregarJogos();
+            carregarUsuarios();
+            atualizarEstatisticas();
         }
         
-        function salvarDadosRodadaAtual() {
+        function atualizarEstatisticas() {
             if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) return;
             
-            // Salva horário
-            const horarioInput = document.getElementById('horarioFechamento');
-            dadosPorRodada[rodadaAtual].horario = horarioInput.value;
+            const dados = dadosPorRodada[rodadaAtual];
             
-            // Nota: Os jogos e usuários já são salvos quando selecionados
+            // Atualiza estatísticas
+            document.getElementById('statJogos').textContent = dados.jogos.size;
+            document.getElementById('statDobrada').textContent = dados.dobrada.size;
+            document.getElementById('statTrunfo').textContent = dados.trunfo.size;
+            
+            // Atualiza horário
+            const horarioInput = document.getElementById('horarioFechamento');
+            if (horarioInput.value) {
+                const horarioDate = new Date(horarioInput.value);
+                document.getElementById('statHorario').textContent = 
+                    horarioDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            }
         }
         
-        function carregarDadosRodadaAtual() {
-            if (!rodadaAtual) return;
+        function verificarBotaoEnviar() {
+            const btnEnviar = document.getElementById('btnEnviar');
             
-            // Carrega horário
-            const horarioInput = document.getElementById('horarioFechamento');
-            horarioInput.value = dadosPorRodada[rodadaAtual]?.horario || '';
-            
-            // Recarrega jogos para mostrar os selecionados desta rodada
-            carregarJogos();
-            
-            // Recarrega usuários para mostrar os selecionados desta rodada
-            carregarUsuarios();
+            if (tipo === 'unica') {
+                const dados = dadosPorRodada[rodadaAtual];
+                const horarioValido = document.getElementById('horarioFechamento').value !== '';
+                const jogosValidos = dados && dados.jogos.size > 0;
+                
+                btnEnviar.disabled = !(horarioValido && jogosValidos);
+            } else {
+                // Para múltiplas, verifica cada rodada
+                let todasValidas = true;
+                rodadasSelecionadas.forEach(rodada => {
+                    const dados = dadosPorRodada[rodada];
+                    if (!dados || dados.jogos.size === 0) {
+                        todasValidas = false;
+                    }
+                });
+                
+                const horarioValido = document.getElementById('horarioFechamento').value !== '';
+                btnEnviar.disabled = !(horarioValido && todasValidas);
+            }
         }
         
         function enviarRodada() {
-            const tipo = urlParams.get('tipo');
+            // Salva horário atual
+            if (rodadaAtual && dadosPorRodada[rodadaAtual]) {
+                const horarioInput = document.getElementById('horarioFechamento');
+                dadosPorRodada[rodadaAtual].horario = horarioInput.value;
+            }
             
+            // Validação
             if (tipo === 'unica') {
-                // Validação para rodada única
-                if (!dadosPorRodada[1] || dadosPorRodada[1].jogos.length === 0) {
+                const dados = dadosPorRodada[rodadaAtual];
+                
+                if (!dados || dados.jogos.size === 0) {
                     alert('Selecione pelo menos um jogo!');
                     return;
                 }
                 
-                if (!document.getElementById('horarioFechamento').value) {
+                if (!dados.horario) {
                     alert('Defina um horário de fechamento!');
                     return;
                 }
                 
-                dadosPorRodada[1].horario = document.getElementById('horarioFechamento').value;
-                
                 const dadosEnvio = {
                     tipo: 'unica',
-                    rodada: 1,
-                    jogos: dadosPorRodada[1].jogos,
-                    horario: dadosPorRodada[1].horario,
-                    dobrada: dadosPorRodada[1].dobrada,
-                    trunfo: dadosPorRodada[1].trunfo
+                    rodada: rodadaAtual,
+                    jogos: Array.from(dados.jogos),
+                    horario: dados.horario,
+                    dobrada: Array.from(dados.dobrada),
+                    trunfo: Array.from(dados.trunfo)
                 };
                 
                 enviarParaTelegram(dadosEnvio);
                 
             } else {
                 // Validação para múltiplas rodadas
-                if (rodadasSelecionadas.length === 0) {
-                    alert('Selecione pelo menos uma rodada!');
+                const horarioInput = document.getElementById('horarioFechamento').value;
+                if (!horarioInput) {
+                    alert('Defina um horário de fechamento!');
                     return;
                 }
                 
-                // Salva dados da rodada atual antes de enviar
-                salvarDadosRodadaAtual();
-                
-                // Valida cada rodada
                 const rodadasValidas = [];
                 
                 rodadasSelecionadas.forEach(numero => {
                     const dados = dadosPorRodada[numero];
                     
-                    if (!dados || dados.jogos.length === 0) {
+                    if (!dados || dados.jogos.size === 0) {
                         alert(`Rodada ${numero} não tem jogos selecionados!`);
                         return;
                     }
                     
-                    if (!dados.horario) {
-                        alert(`Rodada ${numero} não tem horário definido!`);
-                        return;
-                    }
+                    // Usa o mesmo horário para todas as rodadas
+                    dados.horario = horarioInput;
                     
                     rodadasValidas.push({
                         rodada: numero,
-                        jogos: dados.jogos,
+                        jogos: Array.from(dados.jogos),
                         horario: dados.horario,
-                        dobrada: dados.dobrada,
-                        trunfo: dados.trunfo
+                        dobrada: Array.from(dados.dobrada),
+                        trunfo: Array.from(dados.trunfo)
                     });
                 });
                 
@@ -867,14 +988,22 @@ function simularCarregamentoUsuarios() {
         }
         
         function enviarParaTelegram(dados) {
-            if (window.Telegram && Telegram.WebApp) {
+            console.log('Dados a enviar:', dados);
+            
+            if (isTelegramWebApp) {
                 // Envia dados para o bot
                 Telegram.WebApp.sendData(JSON.stringify(dados));
-                Telegram.WebApp.close();
+                
+                // Mostra mensagem de sucesso
+                Telegram.WebApp.showAlert('✅ Rodada enviada com sucesso! O bot já está processando.');
+                
+                // Fecha o Web App após um breve delay
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 1500);
             } else {
                 // Modo de desenvolvimento
-                console.log('Dados a enviar:', dados);
-                alert('Dados prontos para enviar!\n(Em produção, isso seria enviado ao bot)');
+                alert('✅ Dados prontos para enviar!\n\n(Em produção, isso seria enviado ao bot)\n\nVeja o console para os dados.');
                 
                 // Simula envio
                 setTimeout(() => {
@@ -884,12 +1013,18 @@ function simularCarregamentoUsuarios() {
         }
         
         function voltar() {
-            if (window.Telegram && Telegram.WebApp) {
+            if (isTelegramWebApp) {
                 Telegram.WebApp.close();
             } else {
                 window.close();
             }
         }
+        
+        // Listeners
+        document.getElementById('horarioFechamento').addEventListener('change', function() {
+            atualizarEstatisticas();
+            verificarBotaoEnviar();
+        });
     </script>
 </body>
 </html>
