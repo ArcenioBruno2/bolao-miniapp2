@@ -429,127 +429,149 @@
         }
         
         function carregarJogos() {
-            // Simulação de carregamento de jogos
-            const jogosList = document.getElementById('listaJogos');
-            jogosList.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando jogos disponíveis...</div>';
-            
-            // Em produção, isso viria de uma API
-            setTimeout(() => {
-                const jogosExemplo = [
-                    { id: 1, rodada: 1, mandante: "Cruzeiro", visitante: "Mirassol" },
-                    { id: 2, rodada: 1, mandante: "Grêmio", visitante: "Atlético-MG" },
-                    { id: 3, rodada: 1, mandante: "Flamengo", visitante: "Palmeiras" },
-                    { id: 4, rodada: 2, mandante: "São Paulo", visitante: "Corinthians" },
-                    { id: 5, rodada: 2, mandante: "Santos", visitante: "Vasco" },
-                    { id: 6, rodada: 3, mandante: "Botafogo", visitante: "Fluminense" }
-                ];
-                
-                // Filtra jogos por rodada (para modo única)
-                const tipo = urlParams.get('tipo');
-                let jogosFiltrados = jogosExemplo;
-                
-                if (tipo === 'unica') {
-                    jogosFiltrados = jogosExemplo.filter(jogo => jogo.rodada === rodadaAtual);
-                }
-                
-                if (jogosFiltrados.length === 0) {
-                    jogosList.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff6b6b;">Nenhum jogo disponível para esta rodada.</div>';
-                    return;
-                }
-                
-                jogosList.innerHTML = '';
-                
-                jogosFiltrados.forEach(jogo => {
-                    const jogoDiv = document.createElement('div');
-                    jogoDiv.className = 'jogo-item';
-                    jogoDiv.dataset.id = jogo.id;
-                    
-                    jogoDiv.innerHTML = `
-                        <div class="checkbox"></div>
-                        <div class="jogo-times">${jogo.mandante} x ${jogo.visitante}</div>
-                    `;
-                    
-                    jogoDiv.addEventListener('click', function() {
-                        selecionarJogo(jogo.id, this);
-                    });
-                    
-                    jogosList.appendChild(jogoDiv);
-                    
-                    // Marca como selecionado se já estiver na memória
-                    if (tipo === 'unica' && dadosPorRodada[1]?.jogos.includes(jogo.id)) {
-                        jogoDiv.classList.add('selected');
-                        jogoDiv.querySelector('.checkbox').classList.add('selected');
-                    } else if (tipo === 'multipla' && dadosPorRodada[rodadaAtual]?.jogos.includes(jogo.id)) {
-                        jogoDiv.classList.add('selected');
-                        jogoDiv.querySelector('.checkbox').classList.add('selected');
-                    }
-                });
-            }, 500);
-        }
+    const jogosList = document.getElementById('listaJogos');
+    jogosList.innerHTML = '<div style="text-align: center; padding: 20px;">Carregando jogos disponíveis...</div>';
+    
+    // Obtém a rodada da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tipo = urlParams.get('tipo');
+    const rodadaParam = urlParams.get('rodada');
+    const rodadasParam = urlParams.get('rodadas');
+    
+    let rodadas = [];
+    
+    if (tipo === 'unica' && rodadaParam) {
+        rodadas = [parseInt(rodadaParam)];
+    } else if (tipo === 'multipla' && rodadasParam) {
+        rodadas = rodadasParam.split(',').map(r => parseInt(r.trim()));
+    }
+    
+    // Envia requisição para API do bot (simulada)
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify({
+            acao: 'carregar_jogos',
+            tipo: tipo,
+            rodadas: rodadas
+        }));
         
-        function carregarUsuarios() {
-            // Simulação de carregamento de usuários
-            const usuariosDobradaList = document.getElementById('usuariosDobrada');
-            const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
-            
-            usuariosDobradaList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
-            usuariosTrunfoList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
-            
-            // Em produção, isso viria de uma API
-            setTimeout(() => {
-                const usuariosExemplo = [
-                    { id: 1, nome: "Bruno" },
-                    { id: 2, nome: "Carlos" },
-                    { id: 3, nome: "Ana" },
-                    { id: 4, nome: "Pedro" },
-                    { id: 5, nome: "Maria" }
-                ];
-                
-                // Preenche lista de Pontuação Dobrada
-                usuariosDobradaList.innerHTML = '';
-                usuariosExemplo.forEach(usuario => {
-                    const usuarioDiv = document.createElement('div');
-                    usuarioDiv.className = 'usuario-item';
-                    usuarioDiv.dataset.id = usuario.id;
-                    usuarioDiv.textContent = usuario.nome;
-                    
-                    usuarioDiv.addEventListener('click', function() {
-                        selecionarUsuario(usuario.id, this, 'dobrada');
-                    });
-                    
-                    usuariosDobradaList.appendChild(usuarioDiv);
-                    
-                    // Marca como selecionado se já estiver na memória
-                    if (tipo === 'unica' && dadosPorRodada[1]?.dobrada.includes(usuario.id)) {
-                        usuarioDiv.classList.add('selected');
-                    } else if (tipo === 'multipla' && dadosPorRodada[rodadaAtual]?.dobrada.includes(usuario.id)) {
-                        usuarioDiv.classList.add('selected');
-                    }
-                });
-                
-                // Preenche lista de Trunfo
-                usuariosTrunfoList.innerHTML = '';
-                usuariosExemplo.forEach(usuario => {
-                    const usuarioDiv = document.createElement('div');
-                    usuarioDiv.className = 'usuario-item';
-                    usuarioDiv.dataset.id = usuario.id;
-                    usuarioDiv.textContent = usuario.nome;
-                    
-                    usuarioDiv.addEventListener('click', function() {
-                        selecionarUsuario(usuario.id, this, 'trunfo');
-                    });
-                    
-                    usuariosTrunfoList.appendChild(usuarioDiv);
-                    
-                    // Marca como selecionado se já estiver na memória
-                    if (tipo === 'unica' && dadosPorRodada[1]?.trunfo.includes(usuario.id)) {
-                        usuarioDiv.classList.add('selected');
-                    } else if (tipo === 'multipla' && dadosPorRodada[rodadaAtual]?.trunfo.includes(usuario.id)) {
-                        usuarioDiv.classList.add('selected');
-                    }
-                });
-            }, 500);
+        // Em produção, isso seria uma chamada HTTP real
+        // Por enquanto, usamos dados simulados
+        setTimeout(() => {
+            simularCarregamentoJogos(rodadas);
+        }, 500);
+    } else {
+        // Modo desenvolvimento
+        setTimeout(() => {
+            simularCarregamentoJogos(rodadas);
+        }, 500);
+    }
+}
+
+function simularCarregamentoJogos(rodadas) {
+    const jogosList = document.getElementById('listaJogos');
+    
+    // Simulação - em produção isso viria do bot
+    let jogosExemplo = [];
+    
+    // Para cada rodada, adiciona alguns jogos
+    rodadas.forEach(rodada => {
+        for (let i = 1; i <= 5; i++) { // 5 jogos por rodada
+            jogosExemplo.push({
+                id: rodada * 10 + i,
+                rodada: rodada,
+                mandante: `Time ${rodada}A${i}`,
+                visitante: `Time ${rodada}B${i}`
+            });
         }
+    });
+    
+    if (jogosExemplo.length === 0) {
+        jogosList.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff6b6b;">Nenhum jogo disponível para estas rodadas.</div>';
+        return;
+    }
+    
+    jogosList.innerHTML = '';
+    
+    jogosExemplo.forEach(jogo => {
+        const jogoDiv = document.createElement('div');
+        jogoDiv.className = 'jogo-item';
+        jogoDiv.dataset.id = jogo.id;
+        jogoDiv.dataset.rodada = jogo.rodada;
+        
+        jogoDiv.innerHTML = `
+            <div class="checkbox"></div>
+            <div class="jogo-times">${jogo.mandante} x ${jogo.visitante} (R${jogo.rodada})</div>
+        `;
+        
+        jogoDiv.addEventListener('click', function() {
+            selecionarJogo(jogo.id, this);
+        });
+        
+        jogosList.appendChild(jogoDiv);
+    });
+}
+
+function carregarUsuarios() {
+    const usuariosDobradaList = document.getElementById('usuariosDobrada');
+    const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
+    
+    usuariosDobradaList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
+    usuariosTrunfoList.innerHTML = '<div style="text-align: center; padding: 10px;">Carregando usuários...</div>';
+    
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.sendData(JSON.stringify({
+            acao: 'carregar_usuarios'
+        }));
+        
+        setTimeout(() => {
+            simularCarregamentoUsuarios();
+        }, 500);
+    } else {
+        setTimeout(() => {
+            simularCarregamentoUsuarios();
+        }, 500);
+    }
+}
+
+function simularCarregamentoUsuarios() {
+    const usuariosDobradaList = document.getElementById('usuariosDobrada');
+    const usuariosTrunfoList = document.getElementById('usuariosTrunfo');
+    
+    // Simulação - em produção isso viria do bot
+    const usuariosExemplo = [
+        { id: 1, nome: "Bruno" }  // Apenas você
+    ];
+    
+    // Preenche lista de Pontuação Dobrada
+    usuariosDobradaList.innerHTML = '';
+    usuariosExemplo.forEach(usuario => {
+        const usuarioDiv = document.createElement('div');
+        usuarioDiv.className = 'usuario-item';
+        usuarioDiv.dataset.id = usuario.id;
+        usuarioDiv.textContent = usuario.nome;
+        
+        usuarioDiv.addEventListener('click', function() {
+            selecionarUsuario(usuario.id, this, 'dobrada');
+        });
+        
+        usuariosDobradaList.appendChild(usuarioDiv);
+    });
+    
+    // Preenche lista de Trunfo
+    usuariosTrunfoList.innerHTML = '';
+    usuariosExemplo.forEach(usuario => {
+        const usuarioDiv = document.createElement('div');
+        usuarioDiv.className = 'usuario-item';
+        usuarioDiv.dataset.id = usuario.id;
+        usuarioDiv.textContent = usuario.nome;
+        
+        usuarioDiv.addEventListener('click', function() {
+            selecionarUsuario(usuario.id, this, 'trunfo');
+        });
+        
+        usuariosTrunfoList.appendChild(usuarioDiv);
+    });
+}
         
         function carregarRodadasDisponiveis() {
             // Simulação de carregamento de rodadas disponíveis
