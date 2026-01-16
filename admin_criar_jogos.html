@@ -295,7 +295,7 @@
         }
         
         .rodada-tabs {
-            display: flex;
+            display: flex;  /* VISÍVEL - Tabs de rodadas aparecem */
             gap: 10px;
             margin-bottom: 20px;
             overflow-x: auto;
@@ -432,7 +432,7 @@
         
         <div class="main-content">
             <!-- Tabs para múltiplas rodadas -->
-            <div id="rodadaTabs" class="rodada-tabs hidden"></div>
+            <div id="rodadaTabs" class="rodada-tabs"></div>
             
 
             <!-- Seleção de Jogos -->
@@ -547,14 +547,12 @@
             const tipoRodadaElement = document.getElementById('tipoRodada');
             const infoRodadaElement = document.getElementById('infoRodada');
             const rodadaTabsElement = document.getElementById('rodadaTabs');
-            const selecaoRodadasElement = document.getElementById('selecaoRodadas');
             
-            console.log("📊 Parâmetros URL:", { tipo, rodadaParam, rodadasParam });
+            console.log("📂 Parâmetros URL:", { tipo, rodadaParam, rodadasParam });
             
             if (tipo === 'multipla') {
                 tipoRodadaElement.textContent = 'Múltiplas Rodadas';
                 rodadaTabsElement.classList.remove('hidden');
-                selecaoRodadasElement.classList.remove('hidden');
                 
                 // Processa rodadas da URL
                 if (rodadasParam) {
@@ -589,6 +587,7 @@
                 }
             } else {
                 tipoRodadaElement.textContent = 'Rodada Única';
+                rodadaTabsElement.classList.add('hidden');
                 if (rodadaParam) {
                     rodadaAtual = parseInt(rodadaParam);
                     infoRodadaElement.textContent = `Rodada ${rodadaAtual}`;
@@ -1179,6 +1178,9 @@ function processarDadosRecebidos(dados) {
             const btnEnviar = document.getElementById('btnEnviar');
             
             console.log("🔍 Verificando botão enviar...");
+            console.log("   Tipo:", tipo);
+            console.log("   Rodada Atual:", rodadaAtual);
+            console.log("   Rodadas Selecionadas:", rodadasSelecionadas);
             
             if (tipo === 'unica') {
                 const dados = dadosPorRodada[rodadaAtual];
@@ -1194,12 +1196,16 @@ function processarDadosRecebidos(dados) {
                 });
                 
             } else {
+                // Para múltiplas rodadas
+                console.log("🔢 Validando múltiplas rodadas...");
+                
                 if (!rodadasSelecionadas || rodadasSelecionadas.length === 0) {
                     btnEnviar.disabled = true;
-                    console.log("Nenhuma rodada selecionada");
+                    console.log("❌ Nenhuma rodada selecionada");
                     return;
                 }
-                // Para múltiplas, verifica cada rodada
+                
+                // Verifica cada rodada
                 let todasValidas = true;
                 let detalhes = [];
                 
@@ -1213,10 +1219,13 @@ function processarDadosRecebidos(dados) {
                         jogos: dados?.jogos?.size || 0,
                         valida
                     });
+                    
+                    console.log(`   Rodada ${rodada}: ${dados?.jogos?.size || 0} jogos - ${valida ? '✅' : '❌'}`);
                 });
                 
                 const horarioValido = document.getElementById('horarioFechamento').value !== '';
-                btnEnviar.disabled = !(horarioValido && todasValidas);
+                const podeEnviar = horarioValido && todasValidas;
+                btnEnviar.disabled = !podeEnviar;
                 
                 console.log("📋 Validação múltiplas rodadas:", {
                     horarioValido,
@@ -1232,7 +1241,10 @@ function processarDadosRecebidos(dados) {
         // ============================================
         
         function enviarRodada() {
-            console.log("🚀 INICIANDO ENVIO DA RODADA");
+            console.log("🚀 ========== INICIANDO ENVIO DA RODADA ==========");
+            console.log("Tipo:", tipo);
+            console.log("Rodada Atual:", rodadaAtual);
+            console.log("Rodadas Selecionadas:", rodadasSelecionadas);
             
             // Salva horário atual
             if (rodadaAtual && dadosPorRodada[rodadaAtual]) {
@@ -1267,6 +1279,7 @@ function processarDadosRecebidos(dados) {
                 };
                 
                 console.log("📦 Dados para envio (única):", dadosEnvio);
+                console.log("🔄 Chamando enviarParaTelegram()...");
                 enviarParaTelegram(dadosEnvio);
                 
             } else {
@@ -1312,27 +1325,40 @@ function processarDadosRecebidos(dados) {
                 };
                 
                 console.log("📦 Dados para envio (múltipla):", dadosEnvio);
+                console.log("🔄 Chamando enviarParaTelegram()...");
                 enviarParaTelegram(dadosEnvio);
             }
         }
         
         function enviarParaTelegram(dados) {
-            console.log("📤 Enviando dados para o Telegram...");
+            console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
             console.log("Dados completos:", JSON.stringify(dados, null, 2));
+            console.log("isTelegramWebApp:", isTelegramWebApp);
+            console.log("Telegram.WebApp disponivel:", typeof Telegram !== 'undefined' && Telegram.WebApp);
             
             if (isTelegramWebApp) {
                 try {
-                    // Converte os dados para string JSON
+                    // Converte os dados para STRING SIMPLES (como no bolao42)
+                    // Formato: JSON em uma única linha
                     const dadosString = JSON.stringify(dados);
-                    console.log("📦 Dados convertidos para string:", dadosString);
+                    console.log("📦 Dados convertidos para string (tamanho:", dadosString.length, "bytes)");
+                    console.log("📦 Primeiros 200 caracteres:", dadosString.substring(0, 200));
                     
-                    // Envia dados para o bot via Telegram WebApp
+                    // Verifica se sendData existe
+                    if (!Telegram.WebApp.sendData) {
+                        throw new Error("Telegram.WebApp.sendData nao esta disponivel!");
+                    }
+                    
+                    console.log("🚀 Chamando Telegram.WebApp.sendData()...");
+                    console.log("📨 Enviando:", dadosString);
+                    
+                    // Envia dados para o bot via Telegram WebApp (como STRING simples)
                     Telegram.WebApp.sendData(dadosString);
+                    
+                    console.log("✅ Dados enviados com sucesso para o bot!");
                     
                     // Mostra mensagem de sucesso
                     Telegram.WebApp.showAlert('✅ Rodada enviada com sucesso! O bot já está processando.');
-                    
-                    console.log("✅ Dados enviados com sucesso para o bot!");
                     
                     // Fecha o Web App após um breve delay
                     setTimeout(() => {
@@ -1341,8 +1367,9 @@ function processarDadosRecebidos(dados) {
                     }, 1500);
                     
                 } catch (error) {
-                    console.error("❌ Erro ao enviar dados para Telegram:", error);
-                    alert('Erro ao enviar dados para o bot. Verifique o console.');
+                    console.error("❌ ERRO AO ENVIAR DADOS PARA TELEGRAM:", error);
+                    console.error("Stack trace:", error.stack);
+                    alert('Erro ao enviar dados para o bot.\n\nErro: ' + error.message + '\n\nVerifique o console (F12) para mais detalhes.');
                 }
             } else {
                 // Modo de desenvolvimento - mostra os dados no console
