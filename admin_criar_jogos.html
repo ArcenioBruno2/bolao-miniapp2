@@ -434,16 +434,7 @@
             <!-- Tabs para múltiplas rodadas -->
             <div id="rodadaTabs" class="rodada-tabs hidden"></div>
             
-            <!-- Seleção de Rodada (apenas para múltipla) -->
-            <div id="selecaoRodadas" class="section hidden">
-                <div class="section-title">
-                    <i>🔢</i> Selecionar Rodadas
-                </div>
-                <div id="listaRodadas" class="jogos-list">
-                    <div class="loading">Carregando rodadas disponíveis...</div>
-                </div>
-            </div>
-            
+
             <!-- Seleção de Jogos -->
             <div class="section">
                 <div class="section-title">
@@ -508,9 +499,24 @@
         // CONFIGURAÇÕES INICIAIS
         // ============================================
         
-        // Verifica se estamos no Telegram Web App
-        const isTelegramWebApp = window.Telegram && Telegram.WebApp;
+        // Variáveis globais
+        let isTelegramWebApp = window.Telegram && Telegram.WebApp;
+        let jogosSelecionados = new Set();
+        let usuariosDobrada = new Set();
+        let usuariosTrunfo = new Set();
+        let rodadasSelecionadas = [];
+        let rodadaAtual = null;
+        let dadosPorRodada = {};
+        let todosJogos = [];
+        let todosUsuarios = [];
         
+        // Obtém parâmetros da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tipo = urlParams.get('tipo') || 'unica';
+        const rodadaParam = urlParams.get('rodada');
+        const rodadasParam = urlParams.get('rodadas');
+        
+        // Configura Telegram Web App
         if (isTelegramWebApp) {
             Telegram.WebApp.expand();
             Telegram.WebApp.enableClosingConfirmation();
@@ -520,22 +526,6 @@
         } else {
             console.log("ℹ️ Modo de desenvolvimento (fora do Telegram)");
         }
-        
-        // Obtém parâmetros da URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const tipo = urlParams.get('tipo') || 'unica';
-        const rodadaParam = urlParams.get('rodada');
-        const rodadasParam = urlParams.get('rodadas');
-        
-        // Variáveis globais
-        let jogosSelecionados = new Set();
-        let usuariosDobrada = new Set();
-        let usuariosTrunfo = new Set();
-        let rodadasSelecionadas = [];
-        let rodadaAtual = null;
-        let dadosPorRodada = {};
-        let todosJogos = [];
-        let todosUsuarios = [];
         
         // ============================================
         // INICIALIZAÇÃO DA PÁGINA
@@ -759,7 +749,6 @@ function processarDadosRecebidos(dados) {
     
     // Carrega interfaces
     if (dados.tipo === 'multipla') {
-        carregarRodadasDisponiveis();
         atualizarTabsRodadas();
     }
     carregarJogos();
@@ -901,7 +890,6 @@ function processarDadosRecebidos(dados) {
                 `${rodadasSelecionadas.length} rodadas - ${todosJogos.length} jogos totais`;
             
             // Carrega as interfaces
-            carregarRodadasDisponiveis();
             atualizarTabsRodadas();
             carregarJogos();
             carregarUsuarios();
@@ -1033,44 +1021,7 @@ function processarDadosRecebidos(dados) {
             console.log(`✅ ${todosUsuarios.length} usuários carregados!`);
         }
         
-        function carregarRodadasDisponiveis() {
-            console.log("📋 Carregando lista de rodadas...");
-            
-            const listaRodadasElement = document.getElementById('listaRodadas');
-            
-            if (!rodadasSelecionadas || rodadasSelecionadas.length === 0) {
-                listaRodadasElement.innerHTML = '<div class="error">Nenhuma rodada selecionada</div>';
-                return;
-            }
-            
-            console.log(`📊 Exibindo ${rodadasSelecionadas.length} rodadas`);
-            
-            listaRodadasElement.innerHTML = '';
-            
-            rodadasSelecionadas.forEach(rodada => {
-                const jogosDaRodada = todosJogos.filter(j => j.rodada === rodada).length;
-                
-                const rodadaDiv = document.createElement('div');
-                rodadaDiv.className = 'jogo-item';
-                rodadaDiv.dataset.rodada = rodada;
-                
-                rodadaDiv.innerHTML = `
-                    <div class="checkbox"></div>
-                    <div class="jogo-times">Rodada ${rodada}</div>
-                    <div class="rodada-info">${jogosDaRodada} jogos</div>
-                `;
-                
-                rodadaDiv.addEventListener('click', function() {
-                    console.log("Clicou na rodada:", rodada);
-                    // Esta seção é apenas para visualização
-                    // A navegação real é feita pelas tabs
-                });
-                
-                listaRodadasElement.appendChild(rodadaDiv);
-            });
-            
-            console.log("✅ Lista de rodadas carregada!");
-        }
+
         
         // ============================================
         // FUNÇÕES DE INTERAÇÃO
@@ -1401,12 +1352,12 @@ function processarDadosRecebidos(dados) {
                 console.log("==========================================");
                 
                 // Simula envio bem-sucedido
-                alert('✅ Dados prontos para enviar!\n\n(Em produção, isso seria enviado ao bot)\n\nVeja o console para os dados.');
+                alert('✅ Dados enviados com sucesso!\n\nO bot já está processando as rodadas.');
                 
                 // Simula fechamento
                 setTimeout(() => {
-                    console.log("🔒 Simulando fechamento do Web App...");
-                    // window.close(); // Comentado para facilitar testes
+                    console.log("🔐 Fechando Web App...");
+                    window.close();
                 }, 1000);
             }
         }
