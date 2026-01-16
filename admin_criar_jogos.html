@@ -584,37 +584,10 @@
         }
         
         function carregarDadosIniciais() {
-    const tipo = urlParams.get('tipo');
-    const rodadaParam = urlParams.get('rodada');
-    const rodadasParam = urlParams.get('rodadas');
-    
-    // Mostra loading
-    document.getElementById('listaJogos').innerHTML = '<div class="loading">Carregando jogos do banco de dados...</div>';
-    document.getElementById('usuariosDobrada').innerHTML = '<div class="loading">Carregando usuários...</div>';
-    document.getElementById('usuariosTrunfo').innerHTML = '<div class="loading">Carregando usuários...</div>';
-    
-    // Prepara dados para solicitação
-    const dadosSolicitacao = {
-        acao: 'carregar_dados',
-        tipo: tipo,
-        rodada: rodadaParam ? parseInt(rodadaParam) : null,
-        rodadas: rodadasParam ? rodadasParam.split(',').map(r => parseInt(r.trim())) : []
-    };
-    
-    // Envia solicitação para o bot
-    if (isTelegramWebApp) {
-        Telegram.WebApp.sendData(JSON.stringify(dadosSolicitacao));
-        
-        // Em produção, o bot responderia via HTTP
-        // Por enquanto, vamos usar uma simulação com delay
-        setTimeout(() => {
-            simularRespostaDoBot(dadosSolicitacao);
-        }, 1000);
-    } else {
-        // Modo desenvolvimento
-        setTimeout(() => {
-            simularRespostaDoBot(dadosSolicitacao);
-        }, 1000);
+    // Tenta carregar dados da URL primeiro
+    if (!carregarDadosDaURL()) {
+        // Se não houver dados na URL, usa simulação
+        simularDados();
     }
 }
 
@@ -680,6 +653,66 @@ function simularRespostaDoBot(dadosSolicitacao) {
     } else {
         infoRodadaElement.textContent = `${dadosSolicitacao.rodadas.length} rodadas selecionadas`;
     }
+}
+        function carregarDadosDaURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dadosBase64 = urlParams.get('data');
+    
+    if (dadosBase64) {
+        try {
+            // Decodifica dados da URL
+            const dadosJson = atob(dadosBase64);
+            const dados = JSON.parse(dadosJson);
+            
+            // Processa dados recebidos
+            processarDadosRecebidos(dados);
+            return true;
+        } catch (e) {
+            console.error('Erro ao decodificar dados:', e);
+            return false;
+        }
+    }
+    return false;
+}
+
+function processarDadosRecebidos(dados) {
+    // Define variáveis globais
+    const tipo = dados.tipo;
+    rodadaAtual = dados.rodada;
+    
+    // Preenche jogos
+    todosJogos = dados.jogos.map(jogo => ({
+        id: jogo.id,
+        rodada: dados.rodada,
+        mandante: jogo.mandante,
+        visitante: jogo.visitante
+    }));
+    
+    // Preenche usuários
+    todosUsuarios = dados.usuarios.map(usuario => ({
+        id: usuario.id,
+        nome: usuario.nome
+    }));
+    
+    // Atualiza interface
+    document.getElementById('tipoRodada').textContent = tipo === 'unica' ? 'Rodada Única' : 'Múltiplas Rodadas';
+    document.getElementById('infoRodada').textContent = `Rodada ${rodadaAtual} - ${todosJogos.length} jogos`;
+    
+    // Carrega interfaces
+    carregarJogos();
+    carregarUsuarios();
+    
+    // Configura horário padrão
+    const amanha = new Date();
+    amanha.setDate(amanha.getDate() + 1);
+    amanha.setHours(20, 0, 0, 0);
+    
+    const horarioInput = document.getElementById('horarioFechamento');
+    const offset = amanha.getTimezoneOffset() * 60000;
+    const localTime = new Date(amanha.getTime() - offset);
+    horarioInput.value = localTime.toISOString().slice(0, 16);
+    
+    atualizarEstatisticas();
 }
         
         function carregarJogos() {
