@@ -154,6 +154,28 @@
         };
 
         document.getElementById('btn-sair').onclick = () => tg.close();
-    </script>
+    document.getElementById('btn-confirmar').onclick = () => {
+        // Preparar dados no formato esperado pelo bot
+        const dataToBot = {
+            tipo: 'enviar_palpites',
+            usuario: {
+                id: dadosOriginais.usuario.id,
+                nome: dadosOriginais.usuario.nome,
+                telegram_id: dadosOriginais.usuario.telegram_id
+            },
+            rodada: {
+                id: dadosOriginais.rodada.id,
+                numero: dadosOriginais.rodada.numero,
+                horario_fechamento: dadosOriginais.rodada.horario_fechamento
+            },
+            palpites: palpites,
+            pd_jogo_id: pdSelecionado
+        };
+        
+        console.log("Enviando dados:", dataToBot);
+        tg.sendData(JSON.stringify(dataToBot));
+        tg.close();
+    };
+</script>
 </body>
 </html>
