@@ -31,36 +31,45 @@
         .footer-btns { display: flex; gap: 10px; margin-top: 25px; }
         .btn { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
         .btn-send { background: #4CAF50; color: white; }
+        .btn-send:disabled { background: #cccccc; color: #666; cursor: not-allowed; }
         .btn-cancel { background: #f44336; color: white; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:active { opacity: 0.8; }
         
         .error-msg { background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
         
         .info-pd { background: #fff8e1; border: 1px solid #ffd54f; border-radius: 8px; padding: 10px; margin-bottom: 15px; font-size: 13px; color: #5d4037; }
+        
+        .loading { text-align: center; padding: 20px; color: #666; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h3>Rodada <span id="rodada-num">--</span></h3>
+        <div id="loading" class="loading">
+            ⏳ Carregando rodada...
         </div>
+        
+        <div id="content" style="display: none;">
+            <div class="header">
+                <h3>Rodada <span id="rodada-num">--</span></h3>
+            </div>
 
-        <div id="error-box" class="error-msg"></div>
+            <div id="error-box" class="error-msg"></div>
 
-        <div class="status-card">
-            <div id="txt-horario">⏰ Carregando horário...</div>
-            <div id="txt-trunfo">🃏 Verificando trunfo...</div>
-        </div>
+            <div class="status-card">
+                <div id="txt-horario">⏰ Carregando horário...</div>
+                <div id="txt-trunfo">🃏 Verificando trunfo...</div>
+            </div>
 
-        <div id="info-pd-usada" class="info-pd" style="display: none;">
-            ⭐ <strong>PD já usada</strong> em: <span id="pd-jogo-info"></span>
-        </div>
+            <div id="info-pd-usada" class="info-pd" style="display: none;">
+                ⭐ <strong>PD já usada</strong> em: <span id="pd-jogo-info"></span>
+            </div>
 
-        <div id="lista-jogos"></div>
+            <div id="lista-jogos"></div>
 
-        <div class="footer-btns">
-            <button class="btn btn-cancel" id="btn-sair">Sair</button>
-            <button class="btn btn-send" id="btn-confirmar">Enviar Palpites</button>
+            <div class="footer-btns">
+                <button class="btn btn-cancel" id="btn-sair">Sair</button>
+                <button class="btn btn-send" id="btn-confirmar">Enviar Palpites</button>
+            </div>
         </div>
     </div>
 
@@ -70,6 +79,7 @@
         let dadosOriginais = {};
         let pdSelecionado = null;
         let palpites = {};
+        let totalJogos = 0;
 
         // Função para parsear datas do Brasil
         function parseDataBrasilia(str) {
@@ -117,6 +127,7 @@
                 }
             }
             render();
+            verificarEAtualizar();
         }
 
         function salvarPlacar(jogoId, time, valor) {
@@ -124,22 +135,32 @@
                 palpites[jogoId] = { m: '', v: '' };
             }
             
+            // Remove caracteres não numéricos
+            valor = valor.replace(/\D/g, '');
+            
             // Limita a 2 dígitos
             valor = valor.slice(0, 2);
             
             // Converte para número inteiro
-            valor = valor === '' ? '' : parseInt(valor) || 0;
+            const valorNum = valor === '' ? '' : parseInt(valor) || 0;
             
             // Valida se é número válido
-            if (valor !== '' && (valor < 0 || valor > 99)) {
+            if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
                 valor = '';
+                palpites[jogoId][time] = '';
+            } else {
+                palpites[jogoId][time] = valorNum;
             }
             
-            // Salva o palpite
-            palpites[jogoId][time] = valor;
-            
             // Atualiza o input
-            render();
+            const inputs = document.querySelectorAll(`.input-placar[oninput*="${jogoId}"]`);
+            inputs.forEach(input => {
+                if (input.oninput.toString().includes(`'${time}'`)) {
+                    input.value = valor;
+                }
+            });
+            
+            verificarEAtualizar();
         }
 
         function render() {
@@ -175,13 +196,13 @@
                     </div>
                     <div class="placar-container">
                         <input type="number" min="0" max="99" class="input-placar" 
-                               value="${palpiteAtual.m}" 
+                               value="${palpiteAtual.m === '' ? '' : palpiteAtual.m}" 
                                oninput="salvarPlacar(${jogo.id}, 'm', this.value)" 
                                placeholder="0"
                                ${pdJaUsadaNesteJogo && !palpiteAtual.m ? 'required' : ''}>
                         <span class="vs-text">X</span>
                         <input type="number" min="0" max="99" class="input-placar" 
-                               value="${palpiteAtual.v}" 
+                               value="${palpiteAtual.v === '' ? '' : palpiteAtual.v}" 
                                oninput="salvarPlacar(${jogo.id}, 'v', this.value)" 
                                placeholder="0"
                                ${pdJaUsadaNesteJogo && !palpiteAtual.v ? 'required' : ''}>
@@ -193,7 +214,6 @@
         }
 
         function verificarPalpitesCompletos() {
-            let totalJogos = dadosOriginais.jogos.length;
             let preenchidos = 0;
             
             for (const jogoId in palpites) {
@@ -203,12 +223,30 @@
                 }
             }
             
+            console.log(`Palpites: ${preenchidos}/${totalJogos} preenchidos`);
             return preenchidos === totalJogos;
+        }
+
+        function verificarEAtualizar() {
+            const completo = verificarPalpitesCompletos();
+            const btnConfirmar = document.getElementById('btn-confirmar');
+            
+            console.log(`Botão confirmar: ${completo ? 'HABILITADO' : 'DESABILITADO'}`);
+            btnConfirmar.disabled = !completo;
+            
+            // Se está completo, rola para o botão
+            if (completo) {
+                setTimeout(() => {
+                    btnConfirmar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             tg.ready();
             tg.expand();
+            
+            console.log("Iniciando carregamento do web app...");
 
             try {
                 // Pega dados da URL
@@ -240,12 +278,18 @@
                     }
                 }
                 
+                // Inicializa palpites
+                palpites = {};
+                totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
+                
                 // Restaura palpites existentes
-                if (dadosOriginais.palpites) {
+                if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
+                    console.log("Restaurando palpites existentes:", dadosOriginais.palpites);
+                    
                     for (const [jogoId, palpite] of Object.entries(dadosOriginais.palpites)) {
                         palpites[jogoId] = {
-                            m: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante.toString() : '',
-                            v: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante.toString() : ''
+                            m: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
+                            v: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : ''
                         };
                     }
                 }
@@ -263,13 +307,15 @@
                     
                     // Calcula quanto tempo falta
                     const diffMs = limite - agora;
-                    const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    if (diffHoras > 0) {
-                        document.getElementById('txt-horario').textContent += ` | Faltam ${diffHoras}h${diffMinutos}m`;
-                    } else if (diffMinutos > 0) {
-                        document.getElementById('txt-horario').textContent += ` | Faltam ${diffMinutos} minutos`;
+                    if (diffMs > 0) {
+                        const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+                        const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                        
+                        if (diffHoras > 0) {
+                            document.getElementById('txt-horario').textContent += ` | Faltam ${diffHoras}h${diffMinutos}m`;
+                        } else if (diffMinutos > 0) {
+                            document.getElementById('txt-horario').textContent += ` | Faltam ${diffMinutos} minutos`;
+                        }
                     }
                 }
                 
@@ -283,32 +329,34 @@
                     err.style.display = 'block';
                     err.textContent = "⚠️ HORÁRIO DE PALPITES ENCERRADO!";
                     document.getElementById('btn-confirmar').disabled = true;
+                    document.getElementById('btn-confirmar').textContent = "Horário Encerrado";
                 }
+                
+                // Mostra conteúdo e esconde loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
                 
                 // Renderiza jogos
                 render();
                 
-                // Habilita/desabilita botão de envio
-                document.getElementById('btn-confirmar').disabled = !verificarPalpitesCompletos();
+                // Verifica se já tem palpites completos
+                setTimeout(() => {
+                    verificarEAtualizar();
+                }, 500);
                 
             } catch (e) {
                 console.error("Erro ao carregar dados", e);
-                document.getElementById('error-box').style.display = 'block';
-                document.getElementById('error-box').textContent = "❌ Erro ao carregar dados da rodada.";
-                document.getElementById('btn-confirmar').disabled = true;
+                document.getElementById('loading').innerHTML = 
+                    '<div style="color: #d32f2f; text-align: center; padding: 20px;">❌ Erro ao carregar dados da rodada.<br><br>' + e.message + '</div>';
             }
         });
 
-        // Atualiza verificação de palpites completos ao digitar
-        function verificarEAtualizar() {
-            const completo = verificarPalpitesCompletos();
-            document.getElementById('btn-confirmar').disabled = !completo;
-        }
-
         document.getElementById('btn-confirmar').onclick = () => {
+            console.log("Botão 'Enviar Palpites' clicado");
+            
             // Verifica se todos os jogos foram preenchidos
             if (!verificarPalpitesCompletos()) {
-                alert("⚠️ Preencha todos os palpites antes de enviar!");
+                alert("⚠️ Preencha todos os palpites antes de enviar!\n\nClique em cada jogo e digite os placares.");
                 return;
             }
             
@@ -357,10 +405,14 @@
                 return;
             }
             
+            // Mostra feedback
+            document.getElementById('btn-confirmar').textContent = "⏳ Enviando...";
+            document.getElementById('btn-confirmar').disabled = true;
+            
             // Envia para o bot
             tg.sendData(JSON.stringify(dataToBot));
             
-            // Fecha o web app
+            // Fecha o web app após 1 segundo
             setTimeout(() => {
                 tg.close();
             }, 1000);
