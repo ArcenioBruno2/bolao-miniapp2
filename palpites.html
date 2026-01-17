@@ -35,6 +35,8 @@
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .error-msg { background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 15px; display: none; text-align: center; font-weight: bold; }
+        
+        .info-pd { background: #fff8e1; border: 1px solid #ffd54f; border-radius: 8px; padding: 10px; margin-bottom: 15px; font-size: 13px; color: #5d4037; }
     </style>
 </head>
 <body>
@@ -46,8 +48,12 @@
         <div id="error-box" class="error-msg"></div>
 
         <div class="status-card">
-            <div id="txt-horario">⏰ Carregando horário de Brasília...</div>
+            <div id="txt-horario">⏰ Carregando horário...</div>
             <div id="txt-trunfo">🃏 Verificando trunfo...</div>
+        </div>
+
+        <div id="info-pd-usada" class="info-pd" style="display: none;">
+            ⭐ <strong>PD já usada</strong> em: <span id="pd-jogo-info"></span>
         </div>
 
         <div id="lista-jogos"></div>
@@ -65,7 +71,7 @@
         let pdSelecionado = null;
         let palpites = {};
 
-        // Função corrigida para parse de datas
+        // Função para parsear datas do Brasil
         function parseDataBrasilia(str) {
             if (!str) return null;
             
@@ -100,7 +106,14 @@
                         pdSelecionado = jogoId;
                     }
                 } else {
-                    pdSelecionado = jogoId;
+                    // Se PD já foi usada, pergunta se quer mudar
+                    if (dadosOriginais.pd_jogo_id && dadosOriginais.pd_jogo_id !== jogoId) {
+                        if (confirm("Você já usou PD em outro jogo. Deseja mudar?")) {
+                            pdSelecionado = jogoId;
+                        }
+                    } else {
+                        pdSelecionado = jogoId;
+                    }
                 }
             }
             render();
@@ -111,20 +124,22 @@
                 palpites[jogoId] = { m: '', v: '' };
             }
             
+            // Limita a 2 dígitos
+            valor = valor.slice(0, 2);
+            
             // Converte para número inteiro
             valor = valor === '' ? '' : parseInt(valor) || 0;
+            
+            // Valida se é número válido
+            if (valor !== '' && (valor < 0 || valor > 99)) {
+                valor = '';
+            }
             
             // Salva o palpite
             palpites[jogoId][time] = valor;
             
-            // Se ambos os placares estão preenchidos, verifica se é o jogo da PD
-            if (palpites[jogoId].m !== '' && palpites[jogoId].v !== '') {
-                // Se este jogo não é a PD, remove a PD se estava nele
-                if (pdSelecionado === jogoId && !confirm("Deseja usar a Pontuação Dobrada neste jogo?")) {
-                    pdSelecionado = null;
-                    render();
-                }
-            }
+            // Atualiza o input
+            render();
         }
 
         function render() {
@@ -140,27 +155,38 @@
                 const palpiteAtual = palpites[jogo.id] || { m: '', v: '' };
                 const isPD = pdSelecionado == jogo.id;
                 
+                // Verifica se PD já foi usada neste jogo
+                const pdJaUsadaNesteJogo = dadosOriginais.pd_jogo_id == jogo.id;
+                
                 const div = document.createElement('div');
                 div.className = 'jogo-card';
                 div.innerHTML = `
                     <div class="jogo-header">
                         <div class="times-nomes">${jogo.mandante} x ${jogo.visitante}</div>
-                        <div class="pd-wrapper" onclick="togglePD(${jogo.id})">
-                            <span class="star-icon ${isPD ? 'active' : ''}">⭐</span>
-                            <span class="pd-label">${isPD ? 'PD ATIVO' : 'DOBRAR'}</span>
+                        <div class="pd-wrapper" onclick="${pdJaUsadaNesteJogo ? '' : `togglePD(${jogo.id})`}">
+                            <span class="star-icon ${isPD || pdJaUsadaNesteJogo ? 'active' : ''}" 
+                                  style="${pdJaUsadaNesteJogo ? 'cursor: not-allowed; opacity: 0.7;' : ''}">
+                                ⭐
+                            </span>
+                            <span class="pd-label">
+                                ${pdJaUsadaNesteJogo ? 'PD USADA' : (isPD ? 'PD ATIVO' : 'DOBRAR')}
+                            </span>
                         </div>
                     </div>
                     <div class="placar-container">
-                        <input type="number" min="0" max="20" class="input-placar" 
+                        <input type="number" min="0" max="99" class="input-placar" 
                                value="${palpiteAtual.m}" 
                                oninput="salvarPlacar(${jogo.id}, 'm', this.value)" 
-                               placeholder="0">
+                               placeholder="0"
+                               ${pdJaUsadaNesteJogo && !palpiteAtual.m ? 'required' : ''}>
                         <span class="vs-text">X</span>
-                        <input type="number" min="0" max="20" class="input-placar" 
+                        <input type="number" min="0" max="99" class="input-placar" 
                                value="${palpiteAtual.v}" 
                                oninput="salvarPlacar(${jogo.id}, 'v', this.value)" 
-                               placeholder="0">
+                               placeholder="0"
+                               ${pdJaUsadaNesteJogo && !palpiteAtual.v ? 'required' : ''}>
                     </div>
+                    ${pdJaUsadaNesteJogo ? '<div style="text-align: center; font-size: 11px; color: #ff9800; margin-top: 5px;">⭐ PD já usada neste jogo</div>' : ''}
                 `;
                 container.appendChild(div);
             });
@@ -197,19 +223,31 @@
                 const dadosJson = atob(dadosBase64);
                 dadosOriginais = JSON.parse(dadosJson);
                 
-                console.log("Dados recebidos:", dadosOriginais);
+                console.log("Dados recebidos do bot:", dadosOriginais);
                 
                 // Atualiza interface
                 document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
                 
-                // Restaura PD selecionada se existir
+                // Configura PD
                 if (dadosOriginais.pd_jogo_id) {
                     pdSelecionado = dadosOriginais.pd_jogo_id;
+                    
+                    // Mostra info da PD já usada
+                    if (dadosOriginais.pd_jogo_info) {
+                        document.getElementById('info-pd-usada').style.display = 'block';
+                        document.getElementById('pd-jogo-info').textContent = 
+                            `${dadosOriginais.pd_jogo_info.mandante} x ${dadosOriginais.pd_jogo_info.visitante}`;
+                    }
                 }
                 
                 // Restaura palpites existentes
                 if (dadosOriginais.palpites) {
-                    palpites = dadosOriginais.palpites;
+                    for (const [jogoId, palpite] of Object.entries(dadosOriginais.palpites)) {
+                        palpites[jogoId] = {
+                            m: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante.toString() : '',
+                            v: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante.toString() : ''
+                        };
+                    }
                 }
                 
                 // Formata horário
@@ -217,13 +255,27 @@
                 const agora = new Date();
                 
                 if (limite) {
+                    const formatoData = limite.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                    const formatoHora = limite.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    
                     document.getElementById('txt-horario').textContent = 
-                        "⏰ Fecha (Brasília): " + limite.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}) + 
-                        " - " + limite.toLocaleDateString('pt-BR');
+                        `⏰ Fecha: ${formatoData} às ${formatoHora} (Brasília)`;
+                    
+                    // Calcula quanto tempo falta
+                    const diffMs = limite - agora;
+                    const diffHoras = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffMinutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    if (diffHoras > 0) {
+                        document.getElementById('txt-horario').textContent += ` | Faltam ${diffHoras}h${diffMinutos}m`;
+                    } else if (diffMinutos > 0) {
+                        document.getElementById('txt-horario').textContent += ` | Faltam ${diffMinutos} minutos`;
+                    }
                 }
                 
+                // Configura trunfo
                 document.getElementById('txt-trunfo').textContent = 
-                    dadosOriginais.trunfo ? "🃏 Trunfo: ATIVADO" : "🃏 Trunfo: Não disponível";
+                    dadosOriginais.trunfo ? "🃏 TRUNFO: ATIVADO (pode palpitar após o horário)" : "🃏 TRUNFO: Não disponível";
                 
                 // Verifica horário limite
                 if (limite && agora > limite && !dadosOriginais.trunfo) {
@@ -236,12 +288,22 @@
                 // Renderiza jogos
                 render();
                 
+                // Habilita/desabilita botão de envio
+                document.getElementById('btn-confirmar').disabled = !verificarPalpitesCompletos();
+                
             } catch (e) {
                 console.error("Erro ao carregar dados", e);
                 document.getElementById('error-box').style.display = 'block';
                 document.getElementById('error-box').textContent = "❌ Erro ao carregar dados da rodada.";
+                document.getElementById('btn-confirmar').disabled = true;
             }
         });
+
+        // Atualiza verificação de palpites completos ao digitar
+        function verificarEAtualizar() {
+            const completo = verificarPalpitesCompletos();
+            document.getElementById('btn-confirmar').disabled = !completo;
+        }
 
         document.getElementById('btn-confirmar').onclick = () => {
             // Verifica se todos os jogos foram preenchidos
@@ -250,9 +312,18 @@
                 return;
             }
             
-            // Prepara dados para enviar
+            // Verifica horário limite novamente
+            const limite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
+            const agora = new Date();
+            
+            if (limite && agora > limite && !dadosOriginais.trunfo) {
+                alert("❌ Horário limite expirado! Você não pode mais enviar palpites.");
+                return;
+            }
+            
+            // Prepara dados para enviar - FORMATO CORRETO para o bot
             const dataToBot = {
-                tipo: 'enviar_palpites',
+                tipo: 'enviar_palpites',  // Isso diferencia do web app de criação de rodada
                 usuario: {
                     id: dadosOriginais.usuario.id,
                     nome: dadosOriginais.usuario.nome,
@@ -271,22 +342,32 @@
                 const palpite = palpites[jogoId];
                 if (palpite.m !== '' && palpite.v !== '') {
                     dataToBot.palpites[jogoId] = {
-                        mandante: parseInt(palpite.m),
-                        visitante: parseInt(palpite.v),
+                        mandante: parseInt(palpite.m) || 0,
+                        visitante: parseInt(palpite.v) || 0,
                         pd: pdSelecionado == jogoId
                     };
                 }
             }
             
-            console.log("Enviando dados:", dataToBot);
+            console.log("Enviando dados para o bot:", dataToBot);
+            
+            // Verifica se há palpites para enviar
+            if (Object.keys(dataToBot.palpites).length === 0) {
+                alert("❌ Nenhum palpite preenchido!");
+                return;
+            }
             
             // Envia para o bot
             tg.sendData(JSON.stringify(dataToBot));
-            tg.close();
+            
+            // Fecha o web app
+            setTimeout(() => {
+                tg.close();
+            }, 1000);
         };
 
         document.getElementById('btn-sair').onclick = () => {
-            if (Object.keys(palpites).length > 0) {
+            if (Object.keys(palpites).length > 0 && !verificarPalpitesCompletos()) {
                 if (confirm("Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
                     tg.close();
                 }
