@@ -215,6 +215,11 @@
             background: #219653;
         }
         
+        .btn-enviar:disabled {
+            background: #BDC3C7;
+            cursor: not-allowed;
+        }
+        
         .btn-cancelar {
             background: #E74C3C;
             color: white;
@@ -313,7 +318,7 @@
         </div>
         
         <div class="btn-acoes">
-            <button class="btn btn-enviar" id="btn-enviar">✅ Enviar Palpites</button>
+            <button class="btn btn-enviar" id="btn-enviar">✅ Confirmar Palpites</button>
             <button class="btn btn-cancelar" id="btn-cancelar">❌ Cancelar</button>
         </div>
         
@@ -341,7 +346,7 @@
             usuario: null,
             trunfo: false,
             pdDisponivel: false,
-            pdJogoId: null, // ID do jogo onde usou PD (se já usou)
+            pdJogoId: null,
             jogos: [],
             palpites: {},
             carregando: true
@@ -359,7 +364,7 @@
         // Inicialização
         document.addEventListener('DOMContentLoaded', async () => {
             if (!rodadaId || !usuarioId || !token) {
-                mostrarErro('Parâmetros inválidos na URL');
+                mostrarErro('❌ Parâmetros inválidos na URL. Tente abrir a rodada novamente.');
                 return;
             }
             
@@ -367,7 +372,7 @@
             renderizarJogos();
         });
         
-        // Função para carregar dados da rodada
+        // Função para carregar dados da rodada do backend
         async function carregarDados() {
             try {
                 // Aqui você faria uma requisição para o backend
@@ -375,44 +380,35 @@
                 
                 // Simulação: carrega dados da rodada
                 estado.rodada = {
-                    id: rodadaId,
-                    numero: rodadaId,
+                    id: parseInt(rodadaId),
+                    numero: parseInt(rodadaId),
                     horario_fechamento: '2024-12-25 20:00:00'
                 };
                 
                 // Simulação: verifica trunfo
-                estado.trunfo = Math.random() > 0.5; // Simulação
+                estado.trunfo = false;
                 
                 // Simulação: verifica PD disponível
-                estado.pdDisponivel = Math.random() > 0.3; // Simulação
+                estado.pdDisponivel = true;
                 
-                // Simulação: carrega jogos
+                // Simulação: carrega jogos (apenas futuros)
                 estado.jogos = [
-                    { id: 1, mandante: 'Time A', visitante: 'Time B' },
-                    { id: 2, mandante: 'Time C', visitante: 'Time D' },
-                    { id: 3, mandante: 'Time E', visitante: 'Time F' }
+                    { id: 1, mandante: 'Cruzeiro', visitante: 'Mirassol' },
+                    { id: 2, mandante: 'Atlético-MG', visitante: 'Cebolinha' },
+                    { id: 3, mandante: 'Botafogo', visitante: 'Flamengo' }
                 ];
                 
                 // Simulação: carrega palpites anteriores (se existirem)
-                estado.palpites = {
-                    1: { mandante: 2, visitante: 1, pd: false },
-                    2: { mandante: 0, visitante: 0, pd: true },
-                    3: { mandante: 1, visitante: 1, pd: false }
-                };
-                
-                // Verifica qual jogo tem PD
-                for (const [jogoId, palpite] of Object.entries(estado.palpites)) {
-                    if (palpite.pd) {
-                        estado.pdJogoId = parseInt(jogoId);
-                        break;
-                    }
-                }
+                estado.palpites = {};
+                estado.jogos.forEach(jogo => {
+                    estado.palpites[jogo.id] = { mandante: '', visitante: '', pd: false };
+                });
                 
                 atualizarStatus();
                 estado.carregando = false;
                 
             } catch (error) {
-                mostrarErro('Erro ao carregar dados: ' + error.message);
+                mostrarErro('❌ Erro ao carregar dados: ' + error.message);
             }
         }
         
@@ -510,18 +506,15 @@
         
         // Funções para manipular palpites
         window.selecionarPlacar = function(jogoId, tipo, valor) {
-            // Remove seleção anterior para este tipo
             const jogoElement = document.querySelector(`[data-jogo-id="${jogoId}"]`);
             const botoes = jogoElement.querySelectorAll(`.btn-numero`);
             botoes.forEach(btn => btn.classList.remove('btn-numero-selected'));
             
-            // Adiciona seleção ao botão clicado
             const btnClicado = jogoElement.querySelector(`.btn-numero[onclick*="'${tipo}', ${valor}"]`);
             if (btnClicado) {
                 btnClicado.classList.add('btn-numero-selected');
             }
             
-            // Atualiza input
             const input = jogoElement.querySelector(`.input-placar.${tipo}`);
             input.value = valor;
             
@@ -535,7 +528,6 @@
             
             estado.palpites[jogoId][tipo] = valor === '' ? '' : parseInt(valor);
             
-            // Atualiza botão selecionado
             if (valor !== '') {
                 const jogoElement = document.querySelector(`[data-jogo-id="${jogoId}"]`);
                 const botoes = jogoElement.querySelectorAll(`.btn-numero`);
@@ -589,7 +581,7 @@
                 for (const jogo of estado.jogos) {
                     const palpite = estado.palpites[jogo.id];
                     if (!palpite || palpite.mandante === '' || palpite.visitante === '') {
-                        mostrarErro(`Preencha o placar completo para: ${jogo.mandante} x ${jogo.visitante}`);
+                        mostrarErro(`❌ Preencha o placar completo para: ${jogo.mandante} x ${jogo.visitante}`);
                         return;
                     }
                 }
@@ -597,33 +589,36 @@
                 btnEnviar.disabled = true;
                 btnEnviar.innerHTML = '⏳ Enviando...';
                 
-                // Aqui você enviaria os dados para o backend
+                // Prepara dados para enviar ao bot
                 const dados = {
                     rodada_id: estado.rodada.id,
                     usuario_id: usuarioId,
                     token: token,
-                    palpites: estado.palpites,
-                    pd_jogo_id: estado.pdJogoId
+                    palpites: estado.palpites
                 };
                 
                 console.log('Dados a enviar:', dados);
                 
-                // Simulação de envio bem-sucedido
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
-                mostrarSucesso('✅ Palpites enviados com sucesso!');
-                
-                // Fecha o Web App após 2 segundos
-                setTimeout(() => {
-                    if (window.Telegram && window.Telegram.WebApp) {
+                // Envia dados ao bot via Telegram Web App
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.sendData(JSON.stringify(dados));
+                    
+                    // Aguarda um pouco e fecha
+                    setTimeout(() => {
                         window.Telegram.WebApp.close();
-                    }
-                }, 2000);
+                    }, 1500);
+                } else {
+                    // Fallback se não estiver no Telegram
+                    mostrarSucesso('✅ Palpites confirmados! Feche a janela.');
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                }
                 
             } catch (error) {
-                mostrarErro('Erro ao enviar palpites: ' + error.message);
+                mostrarErro('❌ Erro ao enviar palpites: ' + error.message);
                 btnEnviar.disabled = false;
-                btnEnviar.innerHTML = '✅ Enviar Palpites';
+                btnEnviar.innerHTML = '✅ Confirmar Palpites';
             }
         });
         
@@ -632,7 +627,7 @@
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.close();
             } else {
-                mostrarErro('Feche a janela manualmente');
+                window.close();
             }
         });
         
