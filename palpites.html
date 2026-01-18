@@ -31,20 +31,21 @@
         }
         
         body { 
-            background: white;
+            background: #f0f2f5; /* Cor de fundo leve para parecer app */
             color: var(--dark);
             min-height: 100vh;
-            padding: 10px;
+            padding: 0; /* Removido padding para preencher bordas */
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start; /* Garante que comece do topo */
             align-items: center;
         }
-        
-        /* ===== CONTAINER PRINCIPAL ===== */
+
         .app-container {
             width: 100%;
             max-width: 500px;
-            margin: 0 auto;
+            margin: 0;
+            padding: 10px; /* Padding move-se para o container */
         }
         
         .main-card {
