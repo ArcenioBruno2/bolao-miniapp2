@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Criar Rodada - Bolão</title>
     <style>
         * {
@@ -12,13 +12,20 @@
             box-sizing: border-box;
         }
         
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             background: #f8f9fa;
+            color: #333;
             min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
             flex-direction: column;
-            color: #333;
         }
         
         .container {
@@ -26,6 +33,8 @@
             margin: 0 auto;
             padding: 20px;
             flex: 1;
+            width: 100%;
+            height: 100%;
         }
         
         header {
@@ -68,6 +77,8 @@
             padding: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             margin-bottom: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 300px);
         }
         
         .section {
@@ -243,6 +254,7 @@
             display: flex;
             gap: 15px;
             margin-top: 30px;
+            padding-bottom: 20px;
         }
         
         button {
@@ -291,7 +303,7 @@
             padding: 20px;
             font-size: 14px;
             color: #718096;
-            margin-top: 20px;
+            margin-top: auto;
         }
         
         .rodada-tabs {
@@ -428,12 +440,26 @@
             color: #92400e;
             border: 1px solid #fde68a;
         }
+        
+        /* Fix para tela cheia no Telegram */
+        .telegram-fix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
     </style>
     
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <!-- Fix para garantir tela cheia -->
+    <div class="telegram-fix"></div>
+    
     <div class="container">
         <div id="statusMessage" class="status-message hidden"></div>
         
@@ -533,6 +559,7 @@
         // Variáveis globais
         let isTelegramWebApp = false;
         let telegramInitialized = false;
+        let telegramWebApp = null;
         let jogosSelecionados = new Set();
         let usuariosDobrada = new Set();
         let usuariosTrunfo = new Set();
@@ -550,74 +577,210 @@
         const dataParam = urlParams.get('data');
         
         // ============================================
-        // INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA
+        // INICIALIZAÇÃO DO TELEGRAM WEB APP - VERSÃO CORRIGIDA
         // ============================================
         
         function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP - VERSÃO CORRIGIDA");
             
+            // 🔥 DETECÇÃO MELHORADA DO TELEGRAM
             let telegramObj = null;
             
-            // Verifica múltiplas formas de acessar o objeto Telegram
-            if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
-                telegramObj = window.Telegram;
-                console.log("✅ Telegram encontrado via window.Telegram");
-            } else if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                telegramObj = Telegram;
-                console.log("✅ Telegram encontrado via global Telegram");
-            } else if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp) {
-                telegramObj = window.parent.Telegram;
-                console.log("✅ Telegram encontrado via window.parent.Telegram");
-            } else if (window.external && window.external.Telegram && window.external.Telegram.WebApp) {
-                telegramObj = window.external.Telegram;
-                console.log("✅ Telegram encontrado via window.external.Telegram");
+            // Tenta todas as formas possíveis de acessar o Telegram
+            const possiblePaths = [
+                () => window.Telegram?.WebApp,
+                () => Telegram?.WebApp, // Objeto global
+                () => window.parent?.Telegram?.WebApp,
+                () => window.top?.Telegram?.WebApp,
+                () => window.opener?.Telegram?.WebApp,
+                () => window.tgWebApp, // Algumas versões usam isso
+                () => window.TelegramWebApp, // Outra forma comum
+                () => {
+                    // Tenta criar se não encontrar
+                    if (typeof window.Telegram === 'undefined') {
+                        window.Telegram = {};
+                    }
+                    return window.Telegram.WebApp;
+                }
+            ];
+            
+            for (const getWebApp of possiblePaths) {
+                try {
+                    const webApp = getWebApp();
+                    if (webApp) {
+                        telegramObj = webApp;
+                        console.log("✅ Telegram WebApp encontrado!");
+                        break;
+                    }
+                } catch (e) {
+                    // Continua tentando
+                }
             }
             
-            if (telegramObj && telegramObj.WebApp) {
-                try {
-                    // 🔥 CORREÇÃO: Expande para tela cheia IMEDIATAMENTE
-                    telegramObj.WebApp.ready();
-                    telegramObj.WebApp.expand(); // Expande para tela cheia
-                    telegramObj.WebApp.enableClosingConfirmation();
+            // Verifica se estamos em ambiente Telegram
+            const isTelegramEnv = 
+                window.location.search.includes('tgWebApp') ||
+                window.location.hash.includes('tgWebApp') ||
+                /Telegram|WebApp/i.test(navigator.userAgent) ||
+                document.referrer.includes('telegram') ||
+                window.name.includes('telegram');
+            
+            if (isTelegramEnv) {
+                console.log("🌍 Ambiente Telegram detectado:", {
+                    hasSearchParam: window.location.search.includes('tgWebApp'),
+                    hasHashParam: window.location.hash.includes('tgWebApp'),
+                    userAgent: /Telegram|WebApp/i.test(navigator.userAgent),
+                    referrer: document.referrer.includes('telegram'),
+                    windowName: window.name.includes('telegram')
+                });
+                
+                if (!telegramObj) {
+                    console.log("⚠️ Telegram objeto não encontrado, criando simulação...");
                     
-                    // Define cores do tema
-                    telegramObj.WebApp.setHeaderColor('#4a6cf7');
-                    telegramObj.WebApp.setBackgroundColor('#f8f9fa');
-                    
-                    // Força a barra de navegação superior a expandir
-                    telegramObj.WebApp.viewportStableHeight = true;
-                    
-                    // 🔥 NOVA: Verifica se realmente expandiu
-                    setTimeout(() => {
-                        if (!telegramObj.WebApp.isExpanded) {
-                            console.log("⚠️ WebApp não expandiu automaticamente, tentando novamente...");
-                            telegramObj.WebApp.expand();
+                    // Cria objeto Telegram simulado
+                    window.Telegram = {
+                        WebApp: {
+                            ready: function() {
+                                console.log("✅ [SIMULADO] WebApp ready");
+                                return this;
+                            },
+                            expand: function() {
+                                console.log("📱 [SIMULADO] Expandindo para tela cheia");
+                                // Força tela cheia via CSS
+                                document.documentElement.style.height = '100vh';
+                                document.body.style.height = '100vh';
+                                document.body.style.overflow = 'hidden';
+                                return this;
+                            },
+                            enableClosingConfirmation: function() {
+                                console.log("⚠️ [SIMULADO] Confirmação de fechamento ativada");
+                                return this;
+                            },
+                            setHeaderColor: function(color) {
+                                console.log("🎨 [SIMULADO] Header color:", color);
+                                document.querySelector('header').style.backgroundColor = color;
+                                return this;
+                            },
+                            setBackgroundColor: function(color) {
+                                console.log("🎨 [SIMULADO] Background color:", color);
+                                document.body.style.backgroundColor = color;
+                                return this;
+                            },
+                            sendData: function(data) {
+                                console.log("📤 [SIMULADO] Enviando dados:", typeof data === 'string' ? data.substring(0, 100) + "..." : data);
+                                alert("✅ Dados enviados com sucesso (modo simulação)");
+                                return true;
+                            },
+                            showAlert: function(msg, callback) {
+                                alert(msg);
+                                if (callback) callback();
+                            },
+                            showConfirm: function(msg, callback) {
+                                const result = confirm(msg);
+                                if (callback) callback(result);
+                            },
+                            close: function() {
+                                console.log("🔒 [SIMULADO] Fechando WebApp");
+                                window.history.back();
+                            },
+                            initData: window.location.search,
+                            initDataUnsafe: {},
+                            version: '7.0',
+                            platform: 'web',
+                            isExpanded: true,
+                            viewportHeight: window.innerHeight
                         }
-                    }, 500);
+                    };
                     
-                    isTelegramWebApp = true;
-                    telegramInitialized = true;
+                    telegramObj = window.Telegram.WebApp;
+                }
+            }
+            
+            if (telegramObj) {
+                try {
+                    console.log("⚙️ Configurando Telegram WebApp...");
                     
-                    console.log("✅ Telegram WebApp configurado com sucesso!");
-                    console.log("📱 Plataforma:", telegramObj.WebApp.platform);
-                    console.log("🔍 Parâmetros initData:", telegramObj.WebApp.initData);
+                    // 🔥 SEQUÊNCIA CRÍTICA PARA TELA CHEIA
+                    // 1. Sempre chamar ready() primeiro
+                    telegramObj.ready();
+                    console.log("✅ ready() executado");
                     
-                    // Mostra informações do usuário se disponível
-                    if (telegramObj.WebApp.initDataUnsafe && telegramObj.WebApp.initDataUnsafe.user) {
-                        const user = telegramObj.WebApp.initDataUnsafe.user;
-                        console.log("👤 Usuário conectado:", user.first_name, user.last_name || '', `(@${user.username || 'sem username'})`);
-                    }
+                    // 2. Expandir IMEDIATAMENTE para tela cheia
+                    telegramObj.expand();
+                    console.log("✅ expand() executado - TELA CHEIA");
                     
-                    // 🔥 NOVA: Manipula eventos do WebApp
-                    telegramObj.WebApp.onEvent('viewportChanged', function(e) {
-                        console.log("🔄 Viewport changed:", e);
-                        if (!telegramObj.WebApp.isExpanded) {
-                            telegramObj.WebApp.expand();
+                    // 3. Configurar confirmação de fechamento
+                    telegramObj.enableClosingConfirmation();
+                    console.log("✅ enableClosingConfirmation() executado");
+                    
+                    // 4. Configurar cores
+                    telegramObj.setHeaderColor('#4a6cf7');
+                    telegramObj.setBackgroundColor('#f8f9fa');
+                    console.log("✅ Cores configuradas");
+                    
+                    // 🔥 GARANTIR QUE ESTÁ EM TELA CHEIA
+                    // Força tela cheia via CSS também
+                    document.documentElement.style.height = '100vh';
+                    document.body.style.height = '100vh';
+                    document.body.style.overflow = 'auto';
+                    document.querySelector('.container').style.minHeight = '100vh';
+                    
+                    // 🔥 VERIFICAÇÃO PERIÓDICA DE TELA CHEIA
+                    let expansionAttempts = 0;
+                    const maxExpansionAttempts = 5;
+                    
+                    const checkAndExpand = () => {
+                        if (expansionAttempts < maxExpansionAttempts) {
+                            expansionAttempts++;
+                            console.log(`🔄 Tentativa ${expansionAttempts} de expansão...`);
+                            
+                            // Verifica se precisa expandir
+                            if (telegramObj && (!telegramObj.isExpanded || window.innerHeight < 500)) {
+                                telegramObj.expand();
+                                console.log("✅ Expandido novamente");
+                            }
+                            
+                            // Força CSS também
+                            document.documentElement.style.height = '100vh';
+                            document.body.style.height = '100vh';
+                            
+                            // Agenda próxima verificação
+                            setTimeout(checkAndExpand, 1000);
+                        }
+                    };
+                    
+                    // Inicia verificações periódicas
+                    setTimeout(checkAndExpand, 500);
+                    
+                    // 🔥 EVENTO DE REDIMENSIONAMENTO
+                    window.addEventListener('resize', () => {
+                        console.log("📐 Janela redimensionada:", window.innerWidth, "x", window.innerHeight);
+                        if (telegramObj && !telegramObj.isExpanded) {
+                            telegramObj.expand();
                         }
                     });
                     
-                    showStatus("✅ Conectado ao Telegram WebApp", "success");
+                    // 🔥 CLIQUE PARA EXPANSÃO
+                    document.addEventListener('click', () => {
+                        if (telegramObj && !telegramObj.isExpanded) {
+                            telegramObj.expand();
+                            console.log("✅ Expandido por clique");
+                        }
+                    });
                     
+                    telegramWebApp = telegramObj;
+                    isTelegramWebApp = true;
+                    telegramInitialized = true;
+                    
+                    console.log("🎉 Telegram WebApp configurado com sucesso!");
+                    console.log("📊 Status:", {
+                        isExpanded: telegramObj.isExpanded,
+                        viewportHeight: telegramObj.viewportHeight,
+                        platform: telegramObj.platform,
+                        version: telegramObj.version
+                    });
+                    
+                    showStatus("✅ Conectado ao Telegram", "success");
                     return true;
                     
                 } catch (error) {
@@ -626,190 +789,14 @@
                     return false;
                 }
             } else {
-                console.log("❌ Telegram WebApp não detectado");
+                console.log("🌐 Executando fora do Telegram (modo desenvolvimento)");
+                showStatus("⚠️ Modo desenvolvimento - Dados locais", "warning");
                 
-                // Verifica se estamos em ambiente similar ao Telegram
-                const userAgent = navigator.userAgent.toLowerCase();
-                const isInWebView = userAgent.includes('telegram') || 
-                                   window.location.search.includes('tgWebApp') ||
-                                   window.name.includes('telegram') ||
-                                   document.referrer.includes('telegram');
+                // Garante layout adequado mesmo fora do Telegram
+                document.documentElement.style.height = '100%';
+                document.body.style.height = '100%';
                 
-                if (isInWebView) {
-                    console.log("ℹ️ Detectado ambiente tipo Telegram WebApp");
-                    
-                    // Cria objeto Telegram simulado mais completo
-                    window.Telegram = {
-                        WebApp: {
-                            // Métodos principais
-                            ready: function() {
-                                console.log("✅ [SIMULADO] WebApp ready");
-                                return true;
-                            },
-                            
-                            expand: function() {
-                                console.log("📱 [SIMULADO] Expandindo para tela cheia");
-                                // Tenta forçar expansão via CSS
-                                document.documentElement.style.height = '100%';
-                                document.body.style.height = '100%';
-                                document.body.style.minHeight = '100vh';
-                                document.querySelector('.container').style.minHeight = '100vh';
-                                return true;
-                            },
-                            
-                            enableClosingConfirmation: function() {
-                                console.log("⚠️ [SIMULADO] Confirmação de fechamento habilitada");
-                                return true;
-                            },
-                            
-                            setHeaderColor: function(color) {
-                                console.log("🎨 [SIMULADO] Cor do header:", color);
-                                // Simula mudança de cor
-                                document.querySelector('header').style.backgroundColor = color;
-                                return true;
-                            },
-                            
-                            setBackgroundColor: function(color) {
-                                console.log("🎨 [SIMULADO] Cor do background:", color);
-                                document.body.style.backgroundColor = color;
-                                return true;
-                            },
-                            
-                            sendData: function(data) {
-                                console.log("📤 [SIMULADO] Enviando dados para o bot...");
-                                console.log("Dados:", typeof data === 'string' ? data.substring(0, 200) + "..." : data);
-                                
-                                // Tenta múltiplas formas de enviar dados
-                                let enviado = false;
-                                
-                                // Método 1: postMessage
-                                try {
-                                    if (window.parent && window.parent !== window) {
-                                        window.parent.postMessage({
-                                            type: 'web_app_data',
-                                            data: data
-                                        }, '*');
-                                        console.log("✅ Dados enviados via postMessage");
-                                        enviado = true;
-                                    }
-                                } catch(e) {
-                                    console.error("❌ Erro no postMessage:", e);
-                                }
-                                
-                                // Método 2: localStorage para simulação
-                                if (!enviado) {
-                                    try {
-                                        localStorage.setItem('telegram_webapp_last_data', data);
-                                        localStorage.setItem('telegram_webapp_last_sent', new Date().toISOString());
-                                        console.log("💾 Dados salvos no localStorage para simulação");
-                                        enviado = true;
-                                    } catch(e) {
-                                        console.error("❌ Erro no localStorage:", e);
-                                    }
-                                }
-                                
-                                // Mostra alerta de sucesso
-                                if (enviado) {
-                                    this.showAlert('✅ Dados enviados com sucesso! (Modo Simulação)', function() {
-                                        console.log("🔒 Fechando WebApp simulado...");
-                                        // Tenta fechar
-                                        if (window.parent && window.parent !== window) {
-                                            window.parent.postMessage({ type: 'web_app_close' }, '*');
-                                        }
-                                    });
-                                }
-                                
-                                return enviado;
-                            },
-                            
-                            showAlert: function(message, callback) {
-                                console.log("💬 [SIMULADO] Alert:", message);
-                                alert(message);
-                                if (callback && typeof callback === 'function') {
-                                    setTimeout(callback, 100);
-                                }
-                            },
-                            
-                            showConfirm: function(message, callback) {
-                                console.log("💬 [SIMULADO] Confirm:", message);
-                                const result = confirm(message);
-                                if (callback && typeof callback === 'function') {
-                                    setTimeout(() => callback(result), 100);
-                                }
-                            },
-                            
-                            close: function() {
-                                console.log("🔒 [SIMULADO] Fechando WebApp");
-                                try {
-                                    if (window.parent && window.parent !== window) {
-                                        window.parent.postMessage({
-                                            type: 'web_app_close'
-                                        }, '*');
-                                    } else {
-                                        // Fallback para desenvolvimento
-                                        window.history.back();
-                                    }
-                                } catch(e) {
-                                    console.log("Não foi possível fechar, tentando history.back()");
-                                    window.history.back();
-                                }
-                            },
-                            
-                            // Propriedades
-                            initData: window.location.search,
-                            initDataUnsafe: {},
-                            version: '7.0',
-                            platform: 'web',
-                            isExpanded: true,
-                            viewportHeight: window.innerHeight,
-                            viewportStableHeight: window.innerHeight,
-                            
-                            // Eventos
-                            onEvent: function(eventType, callback) {
-                                console.log(`[SIMULADO] Evento registrado: ${eventType}`);
-                                if (eventType === 'viewportChanged' && callback) {
-                                    // Simula viewport change
-                                    window.addEventListener('resize', function() {
-                                        callback({ height: window.innerHeight });
-                                    });
-                                }
-                            },
-                            
-                            offEvent: function(eventType, callback) {
-                                console.log(`[SIMULADO] Evento removido: ${eventType}`);
-                            }
-                        }
-                    };
-                    
-                    // Inicializa o WebApp simulado
-                    try {
-                        window.Telegram.WebApp.ready();
-                        window.Telegram.WebApp.expand();
-                        window.Telegram.WebApp.enableClosingConfirmation();
-                        
-                        isTelegramWebApp = true;
-                        telegramInitialized = true;
-                        
-                        console.log("✅ Telegram WebApp simulado inicializado");
-                        showStatus("✅ Modo simulação ativado", "success");
-                        
-                        // Força expansão da interface
-                        setTimeout(() => {
-                            document.documentElement.style.height = '100%';
-                            document.body.style.height = '100%';
-                            document.querySelector('.container').style.minHeight = '100vh';
-                        }, 300);
-                        
-                    } catch(error) {
-                        console.error("❌ Erro ao inicializar WebApp simulado:", error);
-                    }
-                    
-                    return true;
-                } else {
-                    console.log("🌐 Executando fora do Telegram (modo desenvolvimento)");
-                    showStatus("⚠️ Modo desenvolvimento - Dados locais", "warning");
-                    return false;
-                }
+                return false;
             }
         }
         
@@ -855,28 +842,29 @@
                 dataParam: dataParam ? "Sim (" + dataParam.length + " chars)" : "Não"
             });
             
-            // 🔥 NOVA: Garante que a tela esteja em modo tela cheia
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
-            document.body.style.minHeight = '100vh';
-            document.querySelector('.container').style.minHeight = '100vh';
+            // 🔥 GARANTIR LAYOUT INICIAL CORRETO
+            document.documentElement.style.height = '100vh';
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
             
             // Inicializa Telegram WebApp
-            initTelegramWebApp();
-            
-            // Atualiza interface inicial
-            atualizarInterfaceInicial();
-            
-            // Carrega dados
-            carregarDadosIniciais();
-            
-            // 🔥 NOVA: Força expansão após 1 segundo
             setTimeout(() => {
-                if (window.Telegram && window.Telegram.WebApp && !window.Telegram.WebApp.isExpanded) {
-                    console.log("🔄 Forçando expansão tardia...");
-                    window.Telegram.WebApp.expand();
-                }
-            }, 1000);
+                initTelegramWebApp();
+                
+                // Atualiza interface inicial
+                atualizarInterfaceInicial();
+                
+                // Carrega dados
+                carregarDadosIniciais();
+                
+                // 🔥 VERIFICAÇÃO FINAL DE TELA CHEIA
+                setTimeout(() => {
+                    if (telegramWebApp && !telegramWebApp.isExpanded) {
+                        console.log("🔄 Verificação final: expandindo...");
+                        telegramWebApp.expand();
+                    }
+                }, 1000);
+            }, 100);
         });
         
         // ============================================
@@ -953,69 +941,33 @@
         function carregarDadosDaURL() {
             console.log("🔍 Verificando dados na URL...");
             
-            // Verifica múltiplos parâmetros possíveis
-            const possibleDataParams = ['data', 'dados', 'payload', 'load'];
-            let dataString = null;
-            
-            for (const param of possibleDataParams) {
-                const value = urlParams.get(param);
-                if (value) {
-                    dataString = value;
-                    console.log(`✅ Dados encontrados no parâmetro: ${param}`);
-                    break;
-                }
-            }
-            
-            if (!dataString) {
-                console.log("ℹ️ Nenhum parâmetro de dados encontrado na URL");
+            if (!dataParam) {
+                console.log("ℹ️ Nenhum parâmetro 'data' na URL");
                 return false;
             }
             
-            console.log("📦 Processando dados da URL...");
+            console.log("✅ Dados encontrados na URL! Processando...");
             
             try {
-                // Tenta decodificar base64
-                let dados;
+                // Decodifica dados da URL (base64)
+                const dadosJson = atob(dataParam);
+                const dados = JSON.parse(dadosJson);
                 
-                if (dataString.startsWith('{') || dataString.startsWith('[')) {
-                    // Já é JSON
-                    dados = JSON.parse(dataString);
-                    console.log("✅ Dados recebidos como JSON direto");
-                } else {
-                    // Tenta base64
-                    try {
-                        const dadosJson = atob(dataString);
-                        dados = JSON.parse(dadosJson);
-                        console.log("✅ Dados decodificados de base64");
-                    } catch(e) {
-                        // Tenta decodeURIComponent
-                        try {
-                            const decoded = decodeURIComponent(dataString);
-                            dados = JSON.parse(decoded);
-                            console.log("✅ Dados decodificados de URI");
-                        } catch(e2) {
-                            console.error("❌ Não foi possível decodificar os dados");
-                            return false;
-                        }
-                    }
-                }
-                
-                console.log("📊 Dados recebidos:", {
-                    tipo: dados.tipo || 'unica',
-                    rodada: dados.rodada || dados.rodadas || 'não especificado',
-                    jogosCount: dados.jogos ? dados.jogos.length : (dados.rodadas ? dados.rodadas.reduce((acc, r) => acc + (r.jogos ? r.jogos.length : 0), 0) : 0),
+                console.log("📦 Dados decodificados com sucesso!");
+                console.log("Estrutura dos dados:", {
+                    tipo: dados.tipo,
+                    rodada: dados.rodada,
+                    jogosCount: dados.jogos ? dados.jogos.length : 0,
                     usuariosCount: dados.usuarios ? dados.usuarios.length : 0
                 });
                 
-                // Processa os dados
+                // Processa dados recebidos
                 processarDadosRecebidos(dados);
                 return true;
                 
             } catch (e) {
                 console.error('❌ Erro ao decodificar dados:', e);
-                if (dataString) {
-                    console.error("Primeiros 100 caracteres:", dataString.substring(0, 100) + "...");
-                }
+                console.error("String base64:", dataParam.substring(0, 100) + "...");
                 document.getElementById('infoRodada').textContent = 'Erro ao carregar dados da URL';
                 showError('Erro ao carregar dados do servidor');
                 return false;
@@ -1679,21 +1631,8 @@
             console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
             console.log("Dados completos:", JSON.stringify(dados, null, 2));
             
-            // Verifica múltiplas formas de Telegram
-            let telegramObj = null;
-            
-            if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
-                telegramObj = window.Telegram;
-                console.log("✅ Usando window.Telegram");
-            } else if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
-                telegramObj = Telegram;
-                console.log("✅ Usando Telegram global");
-            } else if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp) {
-                telegramObj = window.parent.Telegram;
-                console.log("✅ Usando window.parent.Telegram");
-            }
-            
-            if (!telegramObj || !telegramObj.WebApp) {
+            // Verifica se o Telegram WebApp está disponível
+            if (!telegramWebApp) {
                 console.error("❌ Telegram WebApp não disponível");
                 showError("Erro: Não está executando no Telegram Web App");
                 
@@ -1705,15 +1644,7 @@
                 // Modo desenvolvimento - mostra dados
                 console.log("🚧 MODO DESENVOLVIMENTO - Dados prontos para envio:");
                 console.log(JSON.stringify(dados, null, 2));
-                
-                // Salva no localStorage para simulação
-                try {
-                    localStorage.setItem('bolao_rodada_data', JSON.stringify(dados));
-                    localStorage.setItem('bolao_rodada_envio', new Date().toISOString());
-                    alert("✅ Dados prontos (modo desenvolvimento)\n\nDados salvos no localStorage.\nVerifique o console (F12) para ver os dados.");
-                } catch(e) {
-                    alert("✅ Dados prontos (modo desenvolvimento)\n\nVerifique o console (F12) para ver os dados.");
-                }
+                alert("✅ Dados prontos (modo desenvolvimento)\n\nVerifique o console (F12) para ver os dados.");
                 return;
             }
             
@@ -1725,16 +1656,16 @@
                 
                 // Envia dados para o bot
                 console.log("🚀 Chamando Telegram.WebApp.sendData()...");
-                const resultado = telegramObj.WebApp.sendData(dadosString);
+                telegramWebApp.sendData(dadosString);
                 
-                console.log("✅ Dados enviados com sucesso para o bot! Resultado:", resultado);
+                console.log("✅ Dados enviados com sucesso para o bot!");
                 showSuccess("Rodada enviada com sucesso!");
                 
-                // 🔥 NOVA: Feedback melhorado
-                telegramObj.WebApp.showAlert('✅ Rodada enviada com sucesso! O bot já está processando.', function() {
+                // Feedback para o usuário
+                telegramWebApp.showAlert('✅ Rodada enviada com sucesso! O bot já está processando.', function() {
                     console.log("🔒 Fechando Web App...");
                     setTimeout(() => {
-                        telegramObj.WebApp.close();
+                        telegramWebApp.close();
                     }, 500);
                 });
                 
@@ -1761,25 +1692,14 @@
                         console.log("✅ Dados enviados via postMessage");
                         showSuccess("Dados enviados (método alternativo)");
                         
-                        // Mostra confirmação
-                        if (telegramObj && telegramObj.WebApp && telegramObj.WebApp.showAlert) {
-                            telegramObj.WebApp.showAlert('✅ Dados enviados via método alternativo', function() {
-                                telegramObj.WebApp.close();
-                            });
-                        } else {
-                            alert('✅ Dados enviados via método alternativo');
-                            setTimeout(() => {
-                                if (telegramObj && telegramObj.WebApp && telegramObj.WebApp.close) {
-                                    telegramObj.WebApp.close();
-                                }
-                            }, 2000);
-                        }
-                    } else {
-                        throw new Error("Não há window.parent disponível");
+                        setTimeout(() => {
+                            if (telegramWebApp) {
+                                telegramWebApp.close();
+                            }
+                        }, 2000);
                     }
                 } catch (error2) {
                     console.error("❌ ERRO na abordagem alternativa:", error2);
-                    alert("❌ Não foi possível enviar os dados. Erro: " + error2.message);
                 }
             }
         }
@@ -1788,12 +1708,12 @@
             console.log("🔙 Voltando...");
             
             // Tenta fechar via Telegram WebApp
-            if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+            if (telegramWebApp) {
+                telegramWebApp.close();
+            } else if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.close();
             } else if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 Telegram.WebApp.close();
-            } else if (window.parent && window.parent.Telegram && window.parent.Telegram.WebApp) {
-                window.parent.Telegram.WebApp.close();
             } else {
                 // Tenta fechar via postMessage
                 try {
@@ -1847,19 +1767,17 @@
             }
         }
         
-        // 🔥 NOVA: Força expansão ao interagir com a página
-        document.addEventListener('click', function() {
-            if (window.Telegram && window.Telegram.WebApp && !window.Telegram.WebApp.isExpanded) {
-                console.log("🔄 Interação detectada, expandindo WebApp...");
-                window.Telegram.WebApp.expand();
+        // 🔥 FORÇA EXPANSÃO NO PRIMEIRO CLIQUE
+        document.addEventListener('click', function firstClick() {
+            console.log("🖱️ Primeiro clique detectado, verificando expansão...");
+            
+            if (telegramWebApp && !telegramWebApp.isExpanded) {
+                console.log("🔄 Expandindo no primeiro clique...");
+                telegramWebApp.expand();
             }
-        });
-        
-        // 🔥 NOVA: Ajusta altura ao redimensionar
-        window.addEventListener('resize', function() {
-            console.log("📐 Janela redimensionada:", window.innerWidth, "x", window.innerHeight);
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
+            
+            // Remove o listener após o primeiro clique
+            document.removeEventListener('click', firstClick);
         });
     </script>
 </body>
