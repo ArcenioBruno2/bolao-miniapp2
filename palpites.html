@@ -208,6 +208,11 @@
             color: var(--danger);
         }
         
+        .status-badge.blocked {
+            background: rgba(108, 117, 125, 0.2);
+            color: var(--gray);
+        }
+        
         /* ===== ALERTA DE PD JÁ USADA ===== */
         .pd-used-alert {
             background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
@@ -283,6 +288,9 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
         
         .game-card:hover {
@@ -290,111 +298,63 @@
             box-shadow: 0 10px 25px rgba(67, 97, 238, 0.1);
         }
         
+        .game-card.pd-blocked {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+            border-color: rgba(108, 117, 125, 0.2);
+        }
+        
         .game-card.pd-used {
             background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
             border-color: rgba(247, 37, 133, 0.2);
         }
         
-        .game-header {
+        /* ===== LAYOUT VERTICAL DOS TIMES ===== */
+        .teams-vertical {
+            text-align: center;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 8px;
         }
         
-        .teams-names {
+        .team-name {
             font-size: 18px;
             font-weight: 700;
-            color: var(--dark);
-            flex-grow: 1;
+            padding: 8px 16px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 280px;
         }
         
         .team-home {
+            background: rgba(67, 97, 238, 0.1);
             color: var(--primary);
         }
         
         .team-away {
+            background: rgba(58, 12, 163, 0.1);
             color: var(--secondary);
         }
         
-        /* ===== ESTRELA PD ===== */
-        .pd-selector {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            min-width: 80px;
-            transition: var(--transition);
-            position: relative;
-            z-index: 2;
+        .vs-symbol {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--gray);
+            margin: 5px 0;
         }
         
-        .pd-selector.disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-        
-        .pd-star {
-            font-size: 36px;
-            color: #e0e0e0;
-            transition: var(--transition);
-            filter: grayscale(1);
-            position: relative;
-        }
-        
-        .pd-star.active {
-            color: #ffd700;
-            filter: grayscale(0);
-            transform: scale(1.2);
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-        }
-        
-        .pd-star.used {
-            color: var(--danger);
-            filter: grayscale(0);
-        }
-        
-        .pd-label {
-            font-size: 11px;
-            font-weight: 700;
-            margin-top: 5px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: var(--transition);
-        }
-        
-        .pd-star.active + .pd-label {
-            color: #ffd700;
-        }
-        
-        .pd-star.used + .pd-label {
-            color: var(--danger);
-        }
-        
-        .pd-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--danger);
-            color: white;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 50px;
-            font-weight: 700;
-        }
-        
-        /* ===== PLACAR INPUT ===== */
-        .score-container {
+        /* ===== PLACARES ===== */
+        .score-row {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 20px;
+            margin-top: 10px;
         }
         
         .score-input-container {
             position: relative;
-            width: 80px;
+            width: 100px;
         }
         
         .score-input {
@@ -422,12 +382,108 @@
             font-weight: 400;
         }
         
-        .vs-text {
+        .score-input:disabled {
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .vs-small {
             font-size: 20px;
             font-weight: 800;
             color: var(--gray);
             min-width: 40px;
             text-align: center;
+        }
+        
+        /* ===== ESTRELA PD (LATERAL DIREITA) ===== */
+        .pd-side-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .pd-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            padding: 10px;
+            border-radius: 12px;
+            min-width: 80px;
+        }
+        
+        .pd-selector.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .pd-selector.clickable:hover {
+            background: rgba(255, 215, 0, 0.05);
+            transform: translateY(-3px);
+        }
+        
+        .pd-star {
+            font-size: 36px;
+            color: #e0e0e0;
+            transition: var(--transition);
+            filter: grayscale(1);
+            position: relative;
+        }
+        
+        .pd-star.active {
+            color: #ffd700;
+            filter: grayscale(0);
+            transform: scale(1.2);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        
+        .pd-star.used {
+            color: var(--danger);
+            filter: grayscale(0);
+        }
+        
+        .pd-star.blocked {
+            color: #cccccc;
+            filter: grayscale(1);
+        }
+        
+        .pd-label {
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 5px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        
+        .pd-star.active + .pd-label {
+            color: #ffd700;
+        }
+        
+        .pd-star.used + .pd-label {
+            color: var(--danger);
+        }
+        
+        .pd-star.blocked + .pd-label {
+            color: #cccccc;
+        }
+        
+        .pd-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-weight: 700;
         }
         
         /* ===== FOOTER BOTÕES ===== */
@@ -553,8 +609,9 @@
                 padding: 20px;
             }
             
-            .teams-names {
+            .team-name {
                 font-size: 16px;
+                padding: 6px 12px;
             }
             
             .score-input {
@@ -562,8 +619,16 @@
                 font-size: 28px;
             }
             
+            .score-input-container {
+                width: 80px;
+            }
+            
             .footer-buttons {
                 grid-template-columns: 1fr;
+            }
+            
+            .pd-star {
+                font-size: 32px;
             }
         }
     </style>
@@ -618,9 +683,7 @@
                         <div class="status-content" id="txt-trunfo">
                             Verificando trunfo...
                         </div>
-                        <div id="trunfo-badge" class="status-badge inactive" style="display: none;">
-                            Não disponível
-                        </div>
+                        <div id="trunfo-badge" class="status-badge inactive" style="display: none;"></div>
                     </div>
                     
                     <div class="status-card dobrada">
@@ -633,9 +696,7 @@
                         <div class="status-content" id="txt-dobrada">
                             Verificando status...
                         </div>
-                        <div id="pd-badge" class="status-badge inactive" style="display: none;">
-                            Disponível
-                        </div>
+                        <div id="pd-badge" class="status-badge inactive" style="display: none;"></div>
                     </div>
                 </div>
                 
@@ -678,48 +739,89 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // ===== VARIÁVEIS GLOBAIS =====
-        let tg = window.Telegram.WebApp;
+        let tg = null;
         let dadosOriginais = {};
-        let pdSelecionado = null;  // Armazena ID do jogo com PD selecionada
-        let palpites = {};
+        let pdSelecionado = null;
+        let palpites = new Map(); // Usar Map para manter ordem de inserção
         let totalJogos = 0;
         let horarioLimite = null;
-        let pdJaUsada = false;  // Flag para controle de PD já usada
+        let pdJaUsada = false;
+        let pdBloqueada = false; // Quando ADM marca que não pode usar
+        let ordemOriginalJogos = []; // Array para manter ordem original
 
-        // ===== INICIALIZAÇÃO DO WEB APP =====
-        document.addEventListener('DOMContentLoaded', () => {
-            // FORÇAR TELA CHEIA IMEDIATAMENTE
-            tg.ready();
-            tg.expand();
-            tg.enableClosingConfirmation(); // Confirma antes de fechar
-            
-            console.log("🚀 Web App inicializado em tela cheia");
-            
-            // Carregar dados da URL
-            carregarDadosRodada();
-        });
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
+        function initTelegramWebApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                
+                // 1. Primeiro ready()
+                tg.ready();
+                
+                // 2. Pequena pausa para estabilizar
+                setTimeout(() => {
+                    // 3. Expandir para tela cheia (GARANTIDO)
+                    tg.expand();
+                    
+                    // 4. Habilitar confirmação de saída
+                    tg.enableClosingConfirmation();
+                    
+                    console.log("✅ Web App inicializado em tela cheia");
+                    
+                    // 5. Carregar dados
+                    carregarDadosRodada();
+                    
+                }, 100);
+            } else {
+                console.error("Telegram Web App não disponível");
+                // Fallback: carregar dados mesmo sem Telegram
+                setTimeout(carregarDadosRodada, 500);
+            }
+        }
 
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
             
             try {
-                // Se já é uma string ISO com timezone
-                if (str.includes('T') && (str.includes('+') || str.includes('Z'))) {
-                    return new Date(str);
+                // Se for null/undefined, retorna null
+                if (str === null || str === undefined || str === 'null' || str === 'undefined') {
+                    return null;
                 }
                 
-                // Se é uma string sem timezone, adiciona -03:00 (Brasília)
-                if (str.includes('T')) {
-                    return new Date(str + '-03:00');
+                // Se já for objeto Date
+                if (str instanceof Date) return str;
+                
+                // Converter para string e limpar
+                const dateStr = String(str).trim();
+                
+                // Se string vazia
+                if (!dateStr) return null;
+                
+                console.log("📅 Parseando data:", dateStr);
+                
+                // Formato do seu banco: "2026-01-18 23:00:00" ou "2026-01-18 23:00:00-03:00"
+                // Remover o -03:00 se existir
+                let cleanedStr = dateStr;
+                if (dateStr.endsWith('-03:00')) {
+                    cleanedStr = dateStr.slice(0, -6);
                 }
                 
-                // Se é uma string no formato do banco (YYYY-MM-DD HH:MM:SS)
-                const cleanedStr = str.replace(' ', 'T');
-                return new Date(cleanedStr + '-03:00');
+                // Substituir espaço por T para ISO format
+                const isoStr = cleanedStr.replace(' ', 'T') + '-03:00';
+                
+                const dt = new Date(isoStr);
+                
+                // Validar se é uma data válida
+                if (isNaN(dt.getTime())) {
+                    console.error('❌ Data inválida após conversão:', dateStr, '->', isoStr);
+                    return null;
+                }
+                
+                console.log("✅ Data parseada com sucesso:", dt);
+                return dt;
                 
             } catch (e) {
-                console.error('Erro ao parsear data:', str, e);
+                console.error('❌ Erro ao parsear data:', str, e);
                 return null;
             }
         }
@@ -728,7 +830,7 @@
             if (!data) return 'Não definido';
             
             const dt = parseDataBrasilia(data);
-            if (!dt) return 'Data inválida';
+            if (!dt) return 'Horário não definido';
             
             const dia = dt.getDate().toString().padStart(2, '0');
             const mes = (dt.getMonth() + 1).toString().padStart(2, '0');
@@ -776,11 +878,14 @@
                 
                 console.log("📊 Dados recebidos:", dadosOriginais);
                 
+                // Inicializar ordem original dos jogos
+                ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
+                
                 // Atualizar interface
                 atualizarInterface();
                 
             } catch (e) {
-                console.error("Erro ao carregar dados", e);
+                console.error("❌ Erro ao carregar dados", e);
                 mostrarErro("Erro ao carregar dados da rodada: " + e.message);
             }
         }
@@ -824,14 +929,24 @@
                 trunfoBadge.style.display = 'inline-block';
             }
             
-            // 4. Pontuação Dobrada
+            // 4. Pontuação Dobrada - LÓGICA CRÍTICA CORRIGIDA
             const dobradaElem = document.getElementById('txt-dobrada');
             const pdBadge = document.getElementById('pd-badge');
-            const pdUsada = dadosOriginais.pd_jogo_id !== null && dadosOriginais.pd_jogo_id !== undefined;
             
-            if (pdUsada) {
-                // PD JÁ FOI USADA
-                pdJaUsada = true;
+            // Verificar se PD já foi usada (pd_jogo_id existe)
+            const pdJaUsadaFlag = dadosOriginais.pd_jogo_id !== null && dadosOriginais.pd_jogo_id !== undefined;
+            
+            // Verificar se PD está disponível (pd_disponivel do bot)
+            const pdDisponivel = dadosOriginais.pd_disponivel !== false;
+            
+            // ATUALIZAR VARIÁVEIS GLOBAIS
+            pdJaUsada = pdJaUsadaFlag;
+            pdBloqueada = !pdDisponivel; // Se pd_disponivel === false, ADM bloqueou
+            
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, Disponivel=${pdDisponivel}, Bloqueada=${pdBloqueada}`);
+            
+            if (pdJaUsada) {
+                // PD JÁ FOI USADA PELO USUÁRIO
                 pdSelecionado = dadosOriginais.pd_jogo_id;
                 
                 dobradaElem.textContent = "⭐ Você já utilizou sua pontuação dobrada nesta rodada.";
@@ -842,38 +957,42 @@
                 // Mostrar alerta com info do jogo
                 mostrarAlertaPDUsada();
                 
+            } else if (pdBloqueada) {
+                // ADM BLOQUEOU PD PARA ESTE USUÁRIO
+                dobradaElem.textContent = "⭐ Pontuação dobrada NÃO DISPONÍVEL para você nesta rodada.";
+                pdBadge.className = 'status-badge blocked';
+                pdBadge.textContent = 'BLOQUEADA';
+                pdBadge.style.display = 'inline-block';
+                
             } else {
                 // PD DISPONÍVEL
-                pdJaUsada = false;
-                
-                if (dadosOriginais.pd_disponivel === false) {
-                    dobradaElem.textContent = "⭐ Pontuação dobrada não disponível para você nesta rodada.";
-                    pdBadge.className = 'status-badge inactive';
-                    pdBadge.textContent = 'Indisponível';
-                } else {
-                    dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
-                    pdBadge.className = 'status-badge active';
-                    pdBadge.textContent = 'Disponível';
-                }
+                dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
+                pdBadge.className = 'status-badge active';
+                pdBadge.textContent = 'DISPONÍVEL';
                 pdBadge.style.display = 'inline-block';
             }
             
-            // 5. Inicializar palpites
-            palpites = {};
+            // 5. Inicializar palpites com Map (mantém ordem)
+            palpites = new Map();
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
             if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
                 console.log("🔄 Restaurando palpites existentes:", dadosOriginais.palpites);
                 
-                for (const [jogoId, palpite] of Object.entries(dadosOriginais.palpites)) {
-                    palpites[jogoId] = {
-                        m: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
-                        v: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : ''
-                    };
-                }
+                // Restaurar na ordem original dos jogos
+                ordemOriginalJogos.forEach(jogoId => {
+                    const jogoIdStr = String(jogoId);
+                    if (dadosOriginais.palpites[jogoIdStr]) {
+                        const palpite = dadosOriginais.palpites[jogoIdStr];
+                        palpites.set(jogoId, {
+                            m: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
+                            v: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : ''
+                        });
+                    }
+                });
             }
             
-            // 6. Renderizar jogos
+            // 6. Renderizar jogos (manter ordem original)
             renderizarJogos();
             
             // 7. Verificar horário limite
@@ -909,7 +1028,7 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS =====
+        // ===== RENDERIZAÇÃO DOS JOGOS (MANTENDO ORDEM) =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -926,46 +1045,61 @@
                 return;
             }
             
+            // Renderizar na ORDEM ORIGINAL que chegou do bot
             dadosOriginais.jogos.forEach(jogo => {
-                const palpiteAtual = palpites[jogo.id] || { m: '', v: '' };
+                const palpiteAtual = palpites.get(jogo.id) || { m: '', v: '' };
                 const isPDSelecionada = pdSelecionado == jogo.id;
                 const isPDJaUsada = dadosOriginais.pd_jogo_id == jogo.id;
                 
-                // Criar card do jogo
-                const div = document.createElement('div');
-                div.className = `game-card ${isPDJaUsada ? 'pd-used' : ''}`;
-                
-                // Determinar status da estrela
+                // Determinar classes CSS
+                let cardClass = 'game-card';
                 let starClass = 'pd-star';
                 let pdLabel = 'DOBRAR';
+                let isClickable = false;
+                let isDisabled = false;
                 
                 if (isPDJaUsada) {
+                    // PD já foi usada neste jogo específico
+                    cardClass += ' pd-used';
                     starClass += ' used';
                     pdLabel = 'UTILIZADA';
+                    isDisabled = true;
+                } else if (pdJaUsada) {
+                    // PD já foi usada em outro jogo desta rodada
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'INDISPONÍVEL';
+                    isDisabled = true;
+                } else if (pdBloqueada) {
+                    // ADM bloqueou PD para este usuário
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'BLOQUEADA';
+                    isDisabled = true;
                 } else if (isPDSelecionada) {
+                    // PD selecionada neste jogo
                     starClass += ' active';
                     pdLabel = 'SELECIONADA';
+                    isClickable = true;
+                } else {
+                    // PD disponível para seleção
+                    isClickable = true;
                 }
                 
+                // Criar card do jogo
+                const div = document.createElement('div');
+                div.className = cardClass;
+                
                 div.innerHTML = `
-                    <div class="game-header">
-                        <div class="teams-names">
-                            <span class="team-home">${jogo.mandante}</span>
-                            <span style="margin: 0 10px; color: var(--gray);">x</span>
-                            <span class="team-away">${jogo.visitante}</span>
-                        </div>
-                        
-                        <div class="pd-selector ${isPDJaUsada || pdJaUsada ? 'disabled' : ''}" 
-                             onclick="${isPDJaUsada || pdJaUsada ? '' : `togglePD(${jogo.id})`}">
-                            <div class="${starClass}">
-                                ⭐
-                                ${isPDJaUsada ? '<div class="pd-badge">JÁ USOU</div>' : ''}
-                            </div>
-                            <div class="pd-label">${pdLabel}</div>
-                        </div>
+                    <!-- TIMES CENTRALIZADOS VERTICALMENTE -->
+                    <div class="teams-vertical">
+                        <div class="team-name team-home">${jogo.mandante}</div>
+                        <div class="vs-symbol">X</div>
+                        <div class="team-name team-away">${jogo.visitante}</div>
                     </div>
                     
-                    <div class="score-container">
+                    <!-- PLACARES EM LINHA -->
+                    <div class="score-row">
                         <div class="score-input-container">
                             <input type="number" min="0" max="99" class="score-input" 
                                    value="${palpiteAtual.m === '' ? '' : palpiteAtual.m}" 
@@ -974,7 +1108,7 @@
                                    ${isPDJaUsada && !palpiteAtual.m ? 'required' : ''}>
                         </div>
                         
-                        <div class="vs-text">X</div>
+                        <div class="vs-small">X</div>
                         
                         <div class="score-input-container">
                             <input type="number" min="0" max="99" class="score-input" 
@@ -982,6 +1116,18 @@
                                    oninput="salvarPlacar(${jogo.id}, 'v', this.value)" 
                                    placeholder="0"
                                    ${isPDJaUsada && !palpiteAtual.v ? 'required' : ''}>
+                        </div>
+                    </div>
+                    
+                    <!-- ESTRELA PD CENTRALIZADA -->
+                    <div class="pd-side-container">
+                        <div class="pd-selector ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
+                             onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                            <div class="${starClass}">
+                                ⭐
+                                ${isPDJaUsada ? '<div class="pd-badge">USADA</div>' : ''}
+                            </div>
+                            <div class="pd-label">${pdLabel}</div>
                         </div>
                     </div>
                     
@@ -997,15 +1143,23 @@
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
         function togglePD(jogoId) {
-            // Se PD já foi usada na rodada, não permite trocar
+            console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+            
+            // VERIFICAÇÕES DE BLOQUEIO
             if (pdJaUsada) {
-                mostrarErro("Você já utilizou a pontuação dobrada nesta rodada e não pode alterar.");
+                mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
+                return;
+            }
+            
+            if (pdBloqueada) {
+                mostrarErro("❌ Pontuação dobrada não disponível para você nesta rodada!");
                 return;
             }
             
             // Se clicar na mesma estrela, desseleciona
             if (pdSelecionado === jogoId) {
                 pdSelecionado = null;
+                console.log("⭐ PD desselecionada");
             } else {
                 // Se já tem uma estrela selecionada, pergunta se quer trocar
                 if (pdSelecionado !== null) {
@@ -1018,7 +1172,7 @@
                 }
             }
             
-            // Renderiza novamente (isso fará a estrela anterior "sumir")
+            // Renderiza novamente (faz a estrela anterior "sumir")
             renderizarJogos();
             verificarEAtualizar();
             
@@ -1026,17 +1180,12 @@
             if (pdSelecionado !== null) {
                 const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
                 if (jogoSelecionado) {
-                    const msg = `⭐ Pontuação dobrada selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`;
-                    console.log(msg);
+                    console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
                 }
             }
         }
 
         function salvarPlacar(jogoId, time, valor) {
-            if (!palpites[jogoId]) {
-                palpites[jogoId] = { m: '', v: '' };
-            }
-            
             // Remove caracteres não numéricos
             valor = valor.replace(/\D/g, '');
             
@@ -1049,9 +1198,10 @@
             // Valida se é número válido
             if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
                 valor = '';
-                palpites[jogoId][time] = '';
+                palpites.set(jogoId, { ...(palpites.get(jogoId) || { m: '', v: '' }), [time]: '' });
             } else {
-                palpites[jogoId][time] = valorNum;
+                const palpiteAtual = palpites.get(jogoId) || { m: '', v: '' };
+                palpites.set(jogoId, { ...palpiteAtual, [time]: valorNum });
             }
             
             // Atualiza o input
@@ -1069,14 +1219,13 @@
         function verificarPalpitesCompletos() {
             let preenchidos = 0;
             
-            for (const jogoId in palpites) {
-                const palpite = palpites[jogoId];
+            for (const [jogoId, palpite] of palpites) {
                 if (palpite.m !== '' && palpite.v !== '') {
                     preenchidos++;
                 }
             }
             
-            console.log(`Palpites preenchidos: ${preenchidos}/${totalJogos}`);
+            console.log(`📋 Palpites preenchidos: ${preenchidos}/${totalJogos}`);
             return preenchidos === totalJogos;
         }
 
@@ -1130,7 +1279,7 @@
             }, 5000);
         }
 
-        // ===== EVENT HANDLERS =====
+        // ===== ENVIO DE PALPITES (MANTENDO ORDEM) =====
         document.getElementById('btn-confirmar').onclick = () => {
             console.log("📤 Enviando palpites...");
             
@@ -1163,19 +1312,21 @@
                 pd_jogo_id: pdSelecionado
             };
             
-            // Converter palpites para o formato correto
-            for (const jogoId in palpites) {
-                const palpite = palpites[jogoId];
-                if (palpite.m !== '' && palpite.v !== '') {
-                    dataToBot.palpites[jogoId] = {
+            // CONVERTER PALPITES NA ORDEM ORIGINAL DOS JOGOS
+            // Isso garante que cheguem ao bot na mesma ordem
+            ordemOriginalJogos.forEach(jogoId => {
+                const palpite = palpites.get(jogoId);
+                if (palpite && palpite.m !== '' && palpite.v !== '') {
+                    // Usar String(jogoId) como chave para manter compatibilidade
+                    dataToBot.palpites[String(jogoId)] = {
                         mandante: parseInt(palpite.m) || 0,
                         visitante: parseInt(palpite.v) || 0,
                         pd: pdSelecionado == jogoId
                     };
                 }
-            }
+            });
             
-            console.log("📦 Dados enviados:", dataToBot);
+            console.log("📦 Dados enviados (ORDEM MANTIDA):", dataToBot);
             
             // Verificar se há palpites para enviar
             if (Object.keys(dataToBot.palpites).length === 0) {
@@ -1189,23 +1340,36 @@
             btnConfirmar.disabled = true;
             
             // Enviar para o bot
-            tg.sendData(JSON.stringify(dataToBot));
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify(dataToBot));
+            } else {
+                console.log("📤 Dados simulados (Telegram não disponível):", dataToBot);
+            }
             
             // Fechar o web app após 1.5 segundos
             setTimeout(() => {
-                tg.close();
+                if (tg && tg.close) {
+                    tg.close();
+                }
             }, 1500);
         };
 
         document.getElementById('btn-sair').onclick = () => {
-            if (Object.keys(palpites).length > 0 && !verificarPalpitesCompletos()) {
+            if (palpites.size > 0 && !verificarPalpitesCompletos()) {
                 if (confirm("⚠️ Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
-                    tg.close();
+                    if (tg && tg.close) {
+                        tg.close();
+                    }
                 }
             } else {
-                tg.close();
+                if (tg && tg.close) {
+                    tg.close();
+                }
             }
         };
+
+        // ===== INICIALIZAÇÃO =====
+        document.addEventListener('DOMContentLoaded', initTelegramWebApp);
     </script>
 </body>
 </html>
