@@ -43,7 +43,7 @@
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 500px;
             margin: 0 auto;
         }
         
@@ -280,7 +280,6 @@
             color: var(--primary);
         }
         
-        /* ===== LAYOUT HORIZONTAL OTIMIZADO ===== */
         .game-card {
             background: white;
             border-radius: 16px;
@@ -311,12 +310,12 @@
             border-color: rgba(247, 37, 133, 0.2);
         }
         
-        /* ===== TIMES COM MAIS ESPAÇO ===== */
+        /* ===== LAYOUT HORIZONTAL COMPACTO ===== */
         .teams-container {
             flex: 1;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             min-width: 0;
         }
         
@@ -356,8 +355,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            margin: 0 8px;
-            flex-shrink: 0;
+            margin: 0 10px;
         }
         
         .score-input-container {
@@ -412,7 +410,6 @@
             padding: 5px;
             border-radius: 10px;
             margin-left: auto;
-            flex-shrink: 0;
         }
         
         .pd-container.disabled {
@@ -590,10 +587,6 @@
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 480px) {
-            .app-container {
-                max-width: 500px;
-            }
-            
             .main-card {
                 padding: 15px;
                 border-radius: 16px;
@@ -610,12 +603,11 @@
             .game-card {
                 padding: 12px;
                 gap: 8px;
-                flex-wrap: nowrap;
             }
             
             .team-name {
-                font-size: 13px;
-                padding: 5px 8px;
+                font-size: 12px;
+                padding: 4px 8px;
             }
             
             .score-input {
@@ -927,11 +919,6 @@
                 dadosOriginais = JSON.parse(dadosJson);
                 
                 console.log("📊 Dados recebidos:", dadosOriginais);
-                console.log("🔍 PD Status recebido:", {
-                    pd_ja_usada: dadosOriginais.pd_ja_usada,
-                    pd_bloqueada_adm: dadosOriginais.pd_bloqueada_adm,
-                    pd_jogo_id: dadosOriginais.pd_jogo_id
-                });
                 
                 // Inicializar ordem original dos jogos (como vieram do bot)
                 ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
@@ -992,7 +979,7 @@
             pdJaUsada = dadosOriginais.pd_ja_usada || false;
             pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
             
-            console.log(`🔒 PD Status recebido: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
             
             if (pdJaUsada) {
                 // PD JÁ FOI USADA PELO USUÁRIO
