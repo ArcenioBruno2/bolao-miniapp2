@@ -286,6 +286,34 @@
             font-weight: 600;
         }
         
+        .pd-admin-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            background: #4a6cf7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .pd-admin-badge::after {
+            content: "👑";
+        }
+        
+        .pd-admin-text {
+            font-size: 10px;
+            color: #4a6cf7;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        
         .actions {
             display: flex;
             gap: 12px;
@@ -504,6 +532,10 @@
             background: #ffd700;
         }
         
+        .legend-color.pd-admin {
+            background: #4a6cf7;
+        }
+        
         .legend-color.disabled {
             background: #e0e0e0;
         }
@@ -527,6 +559,18 @@
             white-space: nowrap;
             z-index: 1000;
             margin-bottom: 5px;
+        }
+        
+        /* Notificação de PD Administrativa */
+        .pd-admin-notice {
+            font-size: 12px;
+            color: #4a6cf7;
+            background: #edf2f7;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            text-align: center;
+            border-left: 4px solid #4a6cf7;
         }
     </style>
     
@@ -569,9 +613,18 @@
                 <span>PD já utilizada</span>
             </div>
             <div class="legend-item">
+                <div class="legend-color pd-admin"></div>
+                <span>PD administrativa (sem direito)</span>
+            </div>
+            <div class="legend-item">
                 <div class="legend-color disabled"></div>
                 <span>Desabilitado</span>
             </div>
+        </div>
+        
+        <!-- NOTIFICAÇÃO DE PD ADMINISTRATIVA -->
+        <div id="pdAdminNotice" class="pd-admin-notice hidden">
+            ⚠️ Usuários com PD administrativa NÃO PODEM escolher jogos para pontuação dobrada
         </div>
         
         <div class="main-content">
@@ -690,9 +743,8 @@
             
             if (telegramObj) {
                 try {
-                    // ⭐⭐ EXPANDE TELA IMEDIATAMENTE ⭐⭐
                     telegramObj.WebApp.ready();
-                    telegramObj.WebApp.expand(); // Tela cheia
+                    telegramObj.WebApp.expand();
                     telegramObj.WebApp.enableClosingConfirmation();
                     telegramObj.WebApp.setHeaderColor('#4a6cf7');
                     telegramObj.WebApp.setBackgroundColor('#ffffff');
@@ -709,7 +761,6 @@
                     showStatus("⚠️ Telegram detectado, mas com erro de configuração", "warning");
                 }
             } else {
-                // Modo desenvolvimento
                 console.log("❌ Telegram WebApp não detectado");
                 showStatus("⚠️ Executando fora do Telegram (modo desenvolvimento)", "warning");
             }
@@ -758,13 +809,8 @@
                 dataParam: dataParam ? "Sim (" + dataParam.length + " chars)" : "Não"
             });
             
-            // Inicializa Telegram WebApp
             initTelegramWebApp();
-            
-            // Atualiza interface inicial
             atualizarInterfaceInicial();
-            
-            // Carrega dados
             carregarDadosIniciais();
         });
         
@@ -906,25 +952,45 @@
                 showError("Nenhum jogo disponível para esta rodada");
             }
             
-            // ⭐⭐ PROCESSA USUÁRIOS COM INFO DE PD ⭐⭐
+            // ⭐⭐ PROCESSAMENTO ESPECIAL DE USUÁRIOS COM PD ⭐⭐
             if (dados.usuarios && Array.isArray(dados.usuarios)) {
+                let usuariosComPDJaUsada = 0;
+                let usuariosComPDAdministrativa = 0;
+                
                 dados.usuarios.forEach(usuario => {
+                    // ⭐⭐ VERIFICA SE TEM PD ADMINISTRATIVA (sem direito)
+                    const temPDAdministrativa = usuario.pd_administrativa || usuario.pd_bloqueada_adm;
+                    
+                    // ⭐⭐ VERIFICA SE JÁ USOU PD NESTA RODADA
+                    const pdJaUsada = usuario.pd_ja_usada || false;
+                    const pdJogoId = usuario.pd_jogo_id || null;
+                    
+                    // Para múltiplas rodadas, verifica se tem info por rodada
+                    const pdInfoPorRodada = usuario.pd_info_por_rodada || {};
+                    
                     todosUsuarios.push({
                         id: usuario.id,
                         nome: usuario.nome,
                         username: usuario.username || null,
-                        pd_ja_usada: usuario.pd_ja_usada || false, // ⭐⭐ NOVO CAMPO
-                        pd_jogo_id: usuario.pd_jogo_id || null,    // ⭐⭐ NOVO CAMPO
-                        pd_info_por_rodada: usuario.pd_info_por_rodada || {} // ⭐⭐ Para múltiplas rodadas
+                        pd_ja_usada: pdJaUsada,
+                        pd_jogo_id: pdJogoId,
+                        pd_administrativa: temPDAdministrativa, // ⭐⭐ NOVO: PD ADMINISTRATIVA
+                        pd_info_por_rodada: pdInfoPorRodada
                     });
+                    
+                    if (pdJaUsada) usuariosComPDJaUsada++;
+                    if (temPDAdministrativa) usuariosComPDAdministrativa++;
                 });
-                console.log(`✅ ${todosUsuarios.length} usuários carregados do banco`);
                 
-                // Log de usuários com PD já usada
-                const usuariosComPD = todosUsuarios.filter(u => u.pd_ja_usada);
-                if (usuariosComPD.length > 0) {
-                    console.log("📊 Usuários que já usaram PD:", usuariosComPD.map(u => u.nome));
+                console.log(`✅ ${todosUsuarios.length} usuários carregados do banco`);
+                console.log(`📊 PD já usada: ${usuariosComPDJaUsada} usuários`);
+                console.log(`📊 PD administrativa: ${usuariosComPDAdministrativa} usuários`);
+                
+                // Mostra notificação se houver usuários com PD administrativa
+                if (usuariosComPDAdministrativa > 0) {
+                    document.getElementById('pdAdminNotice').classList.remove('hidden');
                 }
+                
             } else {
                 console.warn("⚠️ Nenhum usuário recebido ou formato inválido");
                 showError("Nenhum usuário cadastrado");
@@ -973,7 +1039,7 @@
             carregarJogos();
             carregarUsuarios();
             
-            // ⭐⭐ CONFIGURA DATA ATUAL COMO PADRÃO ⭐⭐
+            // Configura data atual como padrão
             const agora = new Date();
             const amanha = new Date(agora);
             amanha.setDate(amanha.getDate() + 1);
@@ -1028,13 +1094,48 @@
                     });
                 }
                 
-                // Usuários simulados COM INFO DE PD
+                // ⭐⭐ USUÁRIOS SIMULADOS COM DIFERENTES STATUS DE PD ⭐⭐
                 todosUsuarios = [
-                    { id: 1, nome: "Bruno Vieira", username: "brunovieira", pd_ja_usada: true, pd_jogo_id: 101 },
-                    { id: 2, nome: "João Silva", username: "joaosilva", pd_ja_usada: false, pd_jogo_id: null },
-                    { id: 3, nome: "Maria Santos", username: null, pd_ja_usada: false, pd_jogo_id: null },
-                    { id: 4, nome: "Carlos Oliveira", username: "carlosoliveira", pd_ja_usada: true, pd_jogo_id: 102 },
-                    { id: 5, nome: "Ana Costa", username: "anacosta", pd_ja_usada: false, pd_jogo_id: null }
+                    { 
+                        id: 1, 
+                        nome: "Bruno Vieira", 
+                        username: "brunovieira", 
+                        pd_ja_usada: true, // Já usou PD
+                        pd_jogo_id: 101,
+                        pd_administrativa: false
+                    },
+                    { 
+                        id: 2, 
+                        nome: "João Silva", 
+                        username: "joaosilva", 
+                        pd_ja_usada: false, // Pode usar PD
+                        pd_jogo_id: null,
+                        pd_administrativa: false
+                    },
+                    { 
+                        id: 3, 
+                        nome: "Maria Santos", 
+                        username: null, 
+                        pd_ja_usada: false, // Pode usar PD
+                        pd_jogo_id: null,
+                        pd_administrativa: false
+                    },
+                    { 
+                        id: 4, 
+                        nome: "Carlos Oliveira", 
+                        username: "carlosoliveira", 
+                        pd_ja_usada: false, // NÃO PODE usar PD (administrativa)
+                        pd_jogo_id: null,
+                        pd_administrativa: true // ⭐⭐ PD ADMINISTRATIVA ⭐⭐
+                    },
+                    { 
+                        id: 5, 
+                        nome: "Ana Costa", 
+                        username: "anacosta", 
+                        pd_ja_usada: true, // Já usou PD
+                        pd_jogo_id: 102,
+                        pd_administrativa: false
+                    }
                 ];
                 
                 document.getElementById('infoRodada').textContent = 
@@ -1063,8 +1164,8 @@
                         nome: "Bruno Vieira", 
                         username: "brunovieira", 
                         pd_info_por_rodada: {
-                            1: { ja_usada: true, jogo_id: 101 },
-                            2: { ja_usada: false, jogo_id: null }
+                            1: { ja_usada: true, jogo_id: 101, administrativa: false },
+                            2: { ja_usada: false, jogo_id: null, administrativa: false }
                         }
                     },
                     { 
@@ -1072,8 +1173,8 @@
                         nome: "João Silva", 
                         username: "joaosilva", 
                         pd_info_por_rodada: {
-                            1: { ja_usada: false, jogo_id: null },
-                            2: { ja_usada: false, jogo_id: null }
+                            1: { ja_usada: false, jogo_id: null, administrativa: true }, // ⭐⭐ PD ADMINISTRATIVA
+                            2: { ja_usada: false, jogo_id: null, administrativa: false }
                         }
                     }
                 ];
@@ -1163,7 +1264,7 @@
                 return;
             }
             
-            // ⭐⭐ PREENCHE LISTA DE PONTUAÇÃO DOBRADA ⭐⭐
+            // ⭐⭐ PREENCHE LISTA DE PONTUAÇÃO DOBRADA COM VERIFICAÇÃO DE PD ⭐⭐
             usuariosDobradaList.innerHTML = '';
             todosUsuarios.forEach(usuario => {
                 const usuarioDiv = document.createElement('div');
@@ -1171,28 +1272,56 @@
                 usuarioDiv.dataset.id = usuario.id;
                 usuarioDiv.innerHTML = `<span>${usuario.nome}</span>`;
                 
-                // ⭐⭐ VERIFICA SE JÁ USOU PD ⭐⭐
+                // ⭐⭐ DETERMINA STATUS DE PD ⭐⭐
                 let pdJaUsada = false;
+                let pdAdministrativa = false;
                 let tooltipText = "";
                 
                 if (tipo === 'multipla') {
                     // Para múltiplas rodadas, verifica na rodada atual
                     if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
                         pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+                        pdAdministrativa = usuario.pd_info_por_rodada[rodadaAtual].administrativa;
+                        
                         if (pdJaUsada) {
                             tooltipText = `PD já usada na Rodada ${rodadaAtual}`;
+                        } else if (pdAdministrativa) {
+                            tooltipText = `PD administrativa - Sem direito a escolher`;
                         }
                     }
                 } else {
                     // Para rodada única
                     pdJaUsada = usuario.pd_ja_usada || false;
+                    pdAdministrativa = usuario.pd_administrativa || false;
+                    
                     if (pdJaUsada) {
                         tooltipText = "PD já utilizada nesta rodada";
+                    } else if (pdAdministrativa) {
+                        tooltipText = "PD administrativa - Sem direito a escolher";
                     }
                 }
                 
-                // Se já usou PD, desabilita e mostra badge
-                if (pdJaUsada) {
+                // ⭐⭐ APLICA ESTILO CONFORME STATUS ⭐⭐
+                if (pdAdministrativa) {
+                    // ⭐⭐ PD ADMINISTRATIVA - SEM DIREITO A PD ⭐⭐
+                    usuarioDiv.classList.add('disabled');
+                    usuarioDiv.title = tooltipText;
+                    usuarioDiv.setAttribute('data-tooltip', tooltipText);
+                    
+                    // Adiciona badge de PD administrativa
+                    const pdBadge = document.createElement('div');
+                    pdBadge.className = 'pd-admin-badge';
+                    pdBadge.title = tooltipText;
+                    usuarioDiv.appendChild(pdBadge);
+                    
+                    // Adiciona texto informativo
+                    const pdInfo = document.createElement('div');
+                    pdInfo.className = 'pd-admin-text';
+                    pdInfo.textContent = 'PD ADM';
+                    usuarioDiv.appendChild(pdInfo);
+                    
+                } else if (pdJaUsada) {
+                    // ⭐⭐ PD JÁ USADA - NÃO PODE USAR NOVAMENTE ⭐⭐
                     usuarioDiv.classList.add('disabled');
                     usuarioDiv.title = tooltipText;
                     usuarioDiv.setAttribute('data-tooltip', tooltipText);
@@ -1208,14 +1337,14 @@
                     pdInfo.className = 'pd-info-text';
                     pdInfo.textContent = 'PD USADA';
                     usuarioDiv.appendChild(pdInfo);
-                }
-                
-                const estaSelecionado = dadosPorRodada[rodadaAtual]?.dobrada.has(usuario.id);
-                if (estaSelecionado && !pdJaUsada) {
-                    usuarioDiv.classList.add('selected');
-                }
-                
-                if (!pdJaUsada) {
+                    
+                } else {
+                    // ⭐⭐ PODE USAR PD - HABILITADO ⭐⭐
+                    const estaSelecionado = dadosPorRodada[rodadaAtual]?.dobrada.has(usuario.id);
+                    if (estaSelecionado) {
+                        usuarioDiv.classList.add('selected');
+                    }
+                    
                     usuarioDiv.addEventListener('click', function() {
                         selecionarUsuario(usuario.id, this, 'dobrada');
                     });
@@ -1224,7 +1353,7 @@
                 usuariosDobradaList.appendChild(usuarioDiv);
             });
             
-            // ⭐⭐ PREENCHE LISTA DE TRUNFO ⭐⭐
+            // ⭐⭐ PREENCHE LISTA DE TRUNFO (NORMAL) ⭐⭐
             usuariosTrunfoList.innerHTML = '';
             todosUsuarios.forEach(usuario => {
                 const usuarioDiv = document.createElement('div');
@@ -1289,28 +1418,37 @@
                 return;
             }
             
-            // ⭐⭐ VERIFICA SE USUÁRIO JÁ USOU PD (PARA DOBRADA) ⭐⭐
+            console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
+            
             if (tipoLista === 'dobrada') {
                 const usuario = todosUsuarios.find(u => u.id === usuarioId);
                 let pdJaUsada = false;
+                let pdAdministrativa = false;
                 
+                // ⭐⭐ VERIFICA STATUS DE PD ⭐⭐
                 if (tipo === 'multipla') {
                     if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
                         pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+                        pdAdministrativa = usuario.pd_info_por_rodada[rodadaAtual].administrativa;
                     }
                 } else {
                     pdJaUsada = usuario.pd_ja_usada || false;
+                    pdAdministrativa = usuario.pd_administrativa || false;
                 }
                 
+                // ⭐⭐ BLOQUEIO: USUÁRIO COM PD ADMINISTRATIVA ⭐⭐
+                if (pdAdministrativa) {
+                    showError("❌ Este usuário tem PD administrativa (sem direito a escolher)!");
+                    return;
+                }
+                
+                // ⭐⭐ BLOQUEIO: PD JÁ USADA ⭐⭐
                 if (pdJaUsada) {
                     showError("❌ Este usuário já usou a pontuação dobrada nesta rodada!");
                     return;
                 }
-            }
-            
-            console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
-            
-            if (tipoLista === 'dobrada') {
+                
+                // ⭐⭐ SELEÇÃO PERMITIDA ⭐⭐
                 if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
                     dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
                     element.classList.remove('selected');
@@ -1321,6 +1459,7 @@
                     console.log(`✅ Usuário ${usuarioId} adicionado à dobrada`);
                 }
             } else if (tipoLista === 'trunfo') {
+                // Trunfo não tem restrições de PD
                 if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
                     dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
                     element.classList.remove('selected');
