@@ -807,30 +807,36 @@
         let pdBloqueadaAdm = false; // Quando ADM marca que não pode usar
 
         // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // ⭐⭐ TELA CHEIA IMEDIATA (CORREÇÃO ANDROID) ⭐⭐
-                try {
-                    tg.ready();
-                    tg.expand(); // ⭐⭐ EXPANDE IMEDIATAMENTE ⭐⭐
-                    tg.enableClosingConfirmation();
-                    
-                    console.log("✅ Web App expandido em tela cheia");
-                    
-                } catch (error) {
-                    console.error("❌ Erro ao expandir Web App:", error);
-                }
+                // Informa o Telegram que a app está pronta
+                tg.ready();
                 
-                // Carregar dados
+                // Força a expansão para ecrã total imediatamente
+                tg.expand();
+                
+                // Configurações adicionais de UX
+                tg.enableClosingConfirmation(); // Evita fechar sem querer
+                
+                // Mudar a cor do cabeçalho para combinar com a app (opcional)
+                if (tg.setHeaderColor) {
+                    tg.setHeaderColor('#4361ee'); 
+                }
+
+                console.log("✅ Web App configurado e expandido");
+                
+                // Carregar os dados após a expansão
                 carregarDadosRodada();
                 
             } else {
-                console.error("Telegram Web App não disponível");
-                setTimeout(carregarDadosRodada, 500);
+                console.error("Telegram Web App não disponível - Verifique se está a abrir via Bot");
+                // Fallback para testes fora do Telegram
+                carregarDadosRodada();
             }
         }
 
