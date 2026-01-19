@@ -1008,12 +1008,15 @@ body {
                 // Mostrar alerta com info do jogo
                 mostrarAlertaPDUsada();
                 
-            } else if (pdBloqueadaAdm) {
-                // ADM BLOQUEOU PD PARA ESTE USUÁRIO
-                dobradaElem.textContent = "⭐ Pontuação dobrada atribuída pelo ADM - não pode selecionar.";
-                pdBadge.className = 'status-badge blocked';
-                pdBadge.textContent = 'BLOQUEADA';
-                pdBadge.style.display = 'inline-block';
+                            } else if (pdBloqueadaAdm) {
+                    // ⭐⭐ PD BLOQUEADA ADMINISTRATIVAMENTE ⭐⭐
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'BLOQUEADA (ADM)';
+                    isDisabled = true;
+                    
+                    // Adiciona tooltip informativo
+                    div.title = "Pontuação dobrada bloqueada administrativamente";
                 
             } else {
                 // PD DISPONÍVEL
