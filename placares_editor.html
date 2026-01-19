@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 Editor de Resultados</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1; --primary-dark: #4f46e5; --success: #10b981; --danger: #ef4444;
+            --gray-100: #f3f4f6; --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-700: #374151; --gray-900: #111827;
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px; --transition: all 0.3s ease;
+        }
+        body { font-family: system-ui, sans-serif; background: var(--gray-100); color: var(--gray-900); margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: var(--radius); padding: 25px; margin-bottom: 20px; box-shadow: var(--shadow-lg); }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 1.8rem; color: var(--primary); }
+        .jogo-item { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 15px 0; border-bottom: 1px solid var(--gray-200); }
+        .jogo-item:last-child { border-bottom: none; }
+        .time { font-weight: 600; text-align: center; }
+        .placar-input { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .placar-input input { width: 50px; text-align: center; font-size: 1.2rem; padding: 8px; border: 2px solid var(--gray-300); border-radius: 8px; transition: var(--transition); }
+        .placar-input input:focus { border-color: var(--primary); outline: none; }
+        .info-jogo { text-align: center; font-size: 0.8rem; color: var(--gray-700); grid-column: 1 / -1; margin-top: 5px; }
+        .btn { width: 100%; padding: 18px; border: none; border-radius: var(--radius); font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: var(--transition); background: var(--primary); color: white; }
+        .btn:hover { background: var(--primary-dark); }
+        .btn:disabled { background: var(--gray-300); cursor: not-allowed; }
+        .loading, .error { text-align: center; padding: 40px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="tela-editor">
+            <div class="card">
+                <div class="header">
+                    <h1 id="titulo-rodada">Rodada</h1>
+                </div>
+                <div id="lista-jogos"></div>
+            </div>
+            <button id="btn-salvar" class="btn" onclick="salvarResultados()">
+                <i class="fas fa-save"></i> Salvar Resultados
+            </button>
+        </div>
+
+        <div id="tela-carregando" class="loading">
+            <p>Carregando...</p>
+        </div>
+        <div id="tela-erro" class="error hidden">
+            <p id="erro-mensagem"></p>
+        </div>
+    </div>
+
+    <script>
+        let TelegramWebApp = window.Telegram.WebApp;
+        let rodadaData = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            TelegramWebApp.ready();
+            TelegramWebApp.expand();
+            TelegramWebApp.MainButton.setText('Salvar Resultados').onClick(salvarResultados).show();
+            TelegramWebApp.enableClosingConfirmation();
+
+            carregarDadosDaUrl();
+        });
+
+        function mostrarTela(tela) {
+            ['editor', 'carregando', 'erro'].forEach(id => document.getElementById(`tela-${id}`).classList.add('hidden'));
+            document.getElementById(`tela-${tela}`).classList.remove('hidden');
+        }
+
+        function carregarDadosDaUrl() {
+            mostrarTela('carregando');
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataParam = urlParams.get('data');
+                if (!dataParam) throw new Error('Dados da rodada não encontrados na URL.');
+
+                const dadosJson = atob(dataParam);
+                rodadaData = JSON.parse(dadosJson);
+
+                if (rodadaData.tipo !== 'dados_rodada') throw new Error('Tipo de dados inválido.');
+
+                popularEditor();
+                mostrarTela('editor');
+            } catch (error) {
+                document.getElementById('erro-mensagem').textContent = `Erro: ${error.message}`;
+                mostrarTela('erro');
+                TelegramWebApp.MainButton.hide();
+            }
+        }
+
+        function popularEditor() {
+            document.getElementById('titulo-rodada').textContent = `Resultados da ${rodadaData.rodada.numero}ª Rodada`;
+            const listaJogos = document.getElementById('lista-jogos');
+            listaJogos.innerHTML = '';
+
+            rodadaData.jogos.forEach(jogo => {
+                const item = document.createElement('div');
+                item.className = 'jogo-item';
+                item.innerHTML = `
+                    <div class="time">${jogo.mandante}</div>
+                    <div class="placar-input">
+                        <input type="number" id="gm-${jogo.id}" value="${jogo.gol_m !== null ? jogo.gol_m : ''}" placeholder="-" min="0">
+                        <span>X</span>
+                        <input type="number" id="gv-${jogo.id}" value="${jogo.gol_v !== null ? jogo.gol_v : ''}" placeholder="-" min="0">
+                    </div>
+                    <div class="time">${jogo.visitante}</div>
+                    <div class="info-jogo">ID: ${jogo.id}</div>
+                `;
+                listaJogos.appendChild(item);
+            });
+        }
+
+        function salvarResultados() {
+            TelegramWebApp.MainButton.showProgress();
+            document.getElementById('btn-salvar').disabled = true;
+
+            const resultados = {};
+            rodadaData.jogos.forEach(jogo => {
+                const gol_m = document.getElementById(`gm-${jogo.id}`).value;
+                const gol_v = document.getElementById(`gv-${jogo.id}`).value;
+                resultados[jogo.id] = { 
+                    gol_m: gol_m === '' ? null : parseInt(gol_m),
+                    gol_v: gol_v === '' ? null : parseInt(gol_v)
+                };
+            });
+
+            const dadosParaBot = {
+                tipo: 'salvar_resultados',
+                rodada_id: rodadaData.rodada.id,
+                resultados: resultados
+            };
+
+            TelegramWebApp.sendData(JSON.stringify(dadosParaBot));
+            // O bot irá processar e fechar o web app
+        }
+    </script>
+</body>
+</html>
