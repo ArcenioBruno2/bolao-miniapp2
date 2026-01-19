@@ -1260,24 +1260,20 @@ function togglePD(jogoId) {
     
     // ⭐⭐ VERIFICAÇÃO IMPORTANTE: Se PD foi bloqueada administrativamente, NÃO PERMITE ALTERAR ⭐⭐
     if (pdBloqueadaAdm) {
-        // Verifica se este jogo específico já tinha PD do ADM
+        // ⭐⭐ CORREÇÃO CRÍTICA: Verifica se há algum jogo com PD atribuída pelo ADM
         const jogoComPDAdm = dadosOriginais.jogos.find(j => {
-            const palpiteExistente = dadosOriginais.palpites_existentes && 
-                                     dadosOriginais.palpites_existentes[`${j.id}`];
-            return palpiteExistente && palpiteExistente.pd === true;
+            // Verifica se este jogo já tinha PD atribuída anteriormente
+            if (dadosOriginais.palpites) {
+                const palpiteExistente = dadosOriginais.palpites[`${j.id}`];
+                return palpiteExistente && palpiteExistente.pd === true;
+            }
+            return false;
         });
         
-        // Se está tentando desselecionar a PD que foi atribuída pelo ADM
-        if (jogoComPDAdm && jogoComPDAdm.id == jogoId && pdSelecionado === jogoId) {
-            mostrarErro("❌ PD atribuída pelo ADM - não pode alterar!");
-            return;
-        }
-        
-        // Se está tentando selecionar outra PD enquanto bloqueado
-        if (!jogoComPDAdm || jogoComPDAdm.id != jogoId) {
-            mostrarErro("❌ PD atribuída pelo ADM - não pode selecionar outra!");
-            return;
-        }
+        // ⭐⭐ NOVA REGRA: Se está bloqueado pelo ADM, NUNCA pode alterar a PD ⭐⭐
+        // Mesmo durante edição, se foi bloqueado pelo ADM, deve permanecer bloqueado
+        mostrarErro("❌ PD atribuída administrativamente - não pode alterar!");
+        return;
     }
     
     // VERIFICAÇÕES DE BLOQUEIO POR USO ANTERIOR
