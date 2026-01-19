@@ -1283,112 +1283,58 @@
         }
         
         function selecionarUsuario(usuarioId, element, tipoLista) {
-    if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) {
-        console.error("❌ Rodada atual não definida");
-        showError("Rodada atual não definida");
-        return;
-    }
-    
-    // ⭐⭐ VERIFICA SE USUÁRIO JÁ USOU PD (PARA DOBRADA) ⭐⭐
-    if (tipoLista === 'dobrada') {
-        const usuario = todosUsuarios.find(u => u.id === usuarioId);
-        let pdJaUsada = false;
-        let pdBloqueadaAdm = false;
-        
-        if (tipo === 'multipla') {
-            if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
-                pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
-                pdBloqueadaAdm = usuario.pd_info_por_rodada[rodadaAtual].bloqueada_adm;
+            if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) {
+                console.error("❌ Rodada atual não definida");
+                showError("Rodada atual não definida");
+                return;
             }
-        } else {
-            pdJaUsada = usuario.pd_ja_usada || false;
-            pdBloqueadaAdm = usuario.pd_bloqueada_adm || false;
-        }
-        
-        // ⭐⭐ SE JÁ USOU PD → NÃO PERMITE ALTERAR ⭐⭐
-        if (pdJaUsada) {
-            showError("❌ Este usuário já usou a pontuação dobrada nesta rodada!");
-            return;
-        }
-        
-        // ⭐⭐ SE TEM PD BLOQUEADA PELO ADM → PERMITE DESBLOQUEAR ⭐⭐
-        if (pdBloqueadaAdm) {
-            // Se clicar em usuário com PD bloqueada, pergunta se quer desbloquear
-            if (confirm(`⚠️ ${usuario.nome} tem PD BLOQUEADA administrativamente.\n\nDeseja LIBERAR a PD para este usuário?`)) {
-                // Remove a classe disabled e permite seleção
-                element.classList.remove('disabled');
+            
+            // ⭐⭐ VERIFICA SE USUÁRIO JÁ USOU PD (PARA DOBRADA) ⭐⭐
+            if (tipoLista === 'dobrada') {
+                const usuario = todosUsuarios.find(u => u.id === usuarioId);
+                let pdJaUsada = false;
                 
-                // Remove badge de PD usada se existir
-                const pdBadge = element.querySelector('.pd-used-badge');
-                if (pdBadge) {
-                    pdBadge.remove();
+                if (tipo === 'multipla') {
+                    if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
+                        pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+                    }
+                } else {
+                    pdJaUsada = usuario.pd_ja_usada || false;
                 }
                 
-                // Remove texto informativo
-                const pdInfo = element.querySelector('.pd-info-text');
-                if (pdInfo) {
-                    pdInfo.remove();
+                if (pdJaUsada) {
+                    showError("❌ Este usuário já usou a pontuação dobrada nesta rodada!");
+                    return;
                 }
-                
-                // Remove tooltip
-                element.removeAttribute('title');
-                element.removeAttribute('data-tooltip');
-                
-                // Agora permite seleção normal
-                console.log(`✅ PD desbloqueada administrativamente para ${usuario.nome}`);
-                showSuccess(`PD liberada para ${usuario.nome}`);
-                
-                // Continua com a lógica normal de seleção abaixo
-            } else {
-                return; // Usuário cancelou
             }
-        }
-    }
-    
-    console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
-    
-    if (tipoLista === 'dobrada') {
-        if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
-            dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
-            element.classList.remove('selected');
-            console.log(`❌ Usuário ${usuarioId} removido da dobrada`);
             
-            // ⭐⭐ SE REMOVEU DE DOBRADA E USUÁRIO NÃO TEM PD JÁ USADA → PODE SER BLOQUEIO ADMINISTRATIVO
-            const usuario = todosUsuarios.find(u => u.id === usuarioId);
-            let pdJaUsada = false;
+            console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
             
-            if (tipo === 'multipla') {
-                if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
-                    pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+            if (tipoLista === 'dobrada') {
+                if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
+                    dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
+                    element.classList.remove('selected');
+                    console.log(`❌ Usuário ${usuarioId} removido da dobrada`);
+                } else {
+                    dadosPorRodada[rodadaAtual].dobrada.add(usuarioId);
+                    element.classList.add('selected');
+                    console.log(`✅ Usuário ${usuarioId} adicionado à dobrada`);
                 }
-            } else {
-                pdJaUsada = usuario.pd_ja_usada || false;
+            } else if (tipoLista === 'trunfo') {
+                if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
+                    dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
+                    element.classList.remove('selected');
+                    console.log(`❌ Usuário ${usuarioId} removido do trunfo`);
+                } else {
+                    dadosPorRodada[rodadaAtual].trunfo.add(usuarioId);
+                    element.classList.add('selected');
+                    console.log(`✅ Usuário ${usuarioId} adicionado ao trunfo`);
+                }
             }
             
-            if (!pdJaUsada) {
-                console.log(`⚠️ Usuário ${usuarioId} removido da dobrada - PD NÃO BLOQUEADA, apenas não selecionada`);
-            }
-            
-        } else {
-            dadosPorRodada[rodadaAtual].dobrada.add(usuarioId);
-            element.classList.add('selected');
-            console.log(`✅ Usuário ${usuarioId} adicionado à dobrada`);
+            atualizarEstatisticas();
+            verificarBotaoEnviar();
         }
-    } else if (tipoLista === 'trunfo') {
-        if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
-            dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
-            element.classList.remove('selected');
-            console.log(`❌ Usuário ${usuarioId} removido do trunfo`);
-        } else {
-            dadosPorRodada[rodadaAtual].trunfo.add(usuarioId);
-            element.classList.add('selected');
-            console.log(`✅ Usuário ${usuarioId} adicionado ao trunfo`);
-        }
-    }
-    
-    atualizarEstatisticas();
-    verificarBotaoEnviar();
-}
         
         function atualizarTabsRodadas() {
             console.log("🔢 Atualizando tabs de rodadas...");
@@ -1572,8 +1518,7 @@
                     horario: dados.horario,
                     dobrada: Array.from(dados.dobrada),
                     trunfo: Array.from(dados.trunfo)
-                    pd_administrativa: true  // ⭐⭐ MARCA QUE É ESCOLHA ADMINISTRATIVA ⭐⭐
-};
+                };
                 
                 console.log("📦 Dados para envio (única):", dadosEnvio);
                 enviarParaTelegram(dadosEnvio);
