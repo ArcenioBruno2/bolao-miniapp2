@@ -508,6 +508,26 @@
             document.getElementById('erro-mensagem').textContent = mensagem;
             mostrarTela('erro');
         }
+
+// DEBUG: Mostra o que está na URL
+console.log("=== DEBUG PLACARES.HTML ===");
+const urlParamsDebug = new URLSearchParams(window.location.search);
+console.log("URL completa:", window.location.href);
+console.log("Tem parâmetro 'data'?", urlParamsDebug.has('data'));
+if (urlParamsDebug.has('data')) {
+    const dataParam = urlParamsDebug.get('data');
+    console.log("Tamanho do data:", dataParam.length);
+    console.log("Primeiros 50 chars:", dataParam.substring(0, 50));
+    console.log("Últimos 50 chars:", dataParam.substring(dataParam.length - 50));
+    
+    // Tenta decodificar
+    try {
+        const decoded = atob(dataParam);
+        console.log("Decodificado (primeiros 200 chars):", decoded.substring(0, 200));
+    } catch (e) {
+        console.error("Erro ao decodificar Base64:", e.message);
+    }
+}
         
         // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosIniciais() {
