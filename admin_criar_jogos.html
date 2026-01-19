@@ -899,18 +899,22 @@ function atualizarTituloRodada() {
     if (dados.tipo === 'multipla' && dados.rodadas && Array.isArray(dados.rodadas)) {
         console.log("📦 Processando múltiplas rodadas...");
         
-        dados.rodadas.forEach((rodada, index) => {
-            console.log(`📊 Rodada ${index + 1}:`, rodada);
+        dados.rodadas.forEach((rodadaItem, index) => {
+            console.log(`📊 Rodada ${index + 1}:`, rodadaItem);
             
-            if (rodada.jogos && Array.isArray(rodada.jogos)) {
-                console.log(`   ✅ ${rodada.jogos.length} jogos encontrados`);
+            // VERIFICA QUAL É O NOME CORRETO DA PROPRIEDADE
+            const numeroRodada = rodadaItem.numero || rodadaItem.rodada;
+            console.log(`   Número da rodada: ${numeroRodada}`);
+            
+            if (rodadaItem.jogos && Array.isArray(rodadaItem.jogos)) {
+                console.log(`   ✅ ${rodadaItem.jogos.length} jogos encontrados`);
                 
-                rodada.jogos.forEach((jogo, jogoIndex) => {
-                    console.log(`   ⚽ Jogo ${jogoIndex + 1}: ID=${jogo.id}, Mandante=${jogo.mandante}, Visitante=${jogo.visitante}, Rodada=${rodada.rodada}`);
+                rodadaItem.jogos.forEach((jogo, jogoIndex) => {
+                    console.log(`   ⚽ Jogo ${jogoIndex + 1}: ID=${jogo.id}, Mandante=${jogo.mandante}, Visitante=${jogo.visitante}`);
                     
                     todosJogos.push({
                         id: jogo.id,
-                        rodada: rodada.rodada, // ⭐⭐ CORREÇÃO: rodada.rodada ⭐⭐
+                        rodada: numeroRodada,  // ⭐⭐ CORREÇÃO: USANDO A VARIÁVEL CORRETA ⭐⭐
                         mandante: jogo.mandante,
                         visitante: jogo.visitante
                     });
@@ -1025,10 +1029,10 @@ function atualizarTituloRodada() {
             console.log(`📋 Processando ${dados.rodadas.length} rodadas recebidas`);
             
             // Processa cada rodada recebida
-            dados.rodadas.forEach((rodada, index) => {
-                console.log(`   📊 Rodada ${index + 1}: número=${rodada.rodada}, jogos=${rodada.jogos?.length || 0}`);
-                
-                const numeroRodada = rodada.rodada;
+            dados.rodadas.forEach((rodadaItem, index) => {
+                // CORREÇÃO: Usa a variável correta para o número da rodada
+                const numeroRodada = rodadaItem.numero || rodadaItem.rodada;
+                console.log(`   📊 Rodada ${index + 1}: número=${numeroRodada}, jogos=${rodadaItem.jogos?.length || 0}`);
                 
                 // Adiciona à lista de rodadas selecionadas
                 if (!rodadasSelecionadas.includes(numeroRodada)) {
