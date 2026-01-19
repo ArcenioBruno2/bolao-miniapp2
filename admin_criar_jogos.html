@@ -883,7 +883,7 @@
                         rodada.jogos.forEach(jogo => {
                             todosJogos.push({
                                 id: jogo.id,
-                                rodada: rodada.numero,
+                                rodada: rodada.rodada,
                                 mandante: jogo.mandante,
                                 visitante: jogo.visitante
                             });
@@ -943,10 +943,10 @@
                     rodadasSelecionadas = [];
                     
                     dados.rodadas.forEach(rodada => {
-                        rodadasSelecionadas.push(rodada.numero);
+                        rodadasSelecionadas.push(rodada.rodada);
                         
-                        if (!dadosPorRodada[rodada.numero]) {
-                            dadosPorRodada[rodada.numero] = {
+                        if (!dadosPorRodada[rodada.rodada]) {
+                            dadosPorRodada[rodada.rodada] = {
                                 jogos: new Set(),
                                 horario: '',
                                 dobrada: new Set(),
