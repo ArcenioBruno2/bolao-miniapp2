@@ -971,42 +971,42 @@
                 trunfoBadge.style.display = 'inline-block';
             }
             
-            // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
-            const dobradaElem = document.getElementById('txt-dobrada');
-            const pdBadge = document.getElementById('pd-badge');
-            
-            // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
-            pdJaUsada = dadosOriginais.pd_ja_usada || false;
-            pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
-            
-            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
-            
-            if (pdJaUsada) {
-                // PD JÁ FOI USADA PELO USUÁRIO
-                pdSelecionado = dadosOriginais.pd_jogo_id;
-                
-                dobradaElem.textContent = "⭐ Você já utilizou sua pontuação dobrada nesta rodada.";
-                pdBadge.className = 'status-badge used';
-                pdBadge.textContent = 'UTILIZADA';
-                pdBadge.style.display = 'inline-block';
-                
-                // Mostrar alerta com info do jogo
-                mostrarAlertaPDUsada();
-                
-            } else if (pdBloqueadaAdm) {
-                // ADM BLOQUEOU PD PARA ESTE USUÁRIO
-                dobradaElem.textContent = "⭐ Pontuação dobrada atribuída pelo ADM - não pode selecionar.";
-                pdBadge.className = 'status-badge blocked';
-                pdBadge.textContent = 'BLOQUEADA';
-                pdBadge.style.display = 'inline-block';
-                
-            } else {
-                // PD DISPONÍVEL
-                dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
-                pdBadge.className = 'status-badge active';
-                pdBadge.textContent = 'DISPONÍVEL';
-                pdBadge.style.display = 'inline-block';
-            }
+           // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
+    const dobradaElem = document.getElementById('txt-dobrada');
+    const pdBadge = document.getElementById('pd-badge');
+    
+    // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
+    pdJaUsada = dadosOriginais.pd_ja_usada || false;
+    pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
+    
+    console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
+    
+    if (pdJaUsada) {
+        // PD JÁ FOI USADA PELO USUÁRIO EM RODADA ANTERIOR COM MESMO NÚMERO
+        pdSelecionado = dadosOriginais.pd_jogo_id;
+        
+        dobradaElem.textContent = "⭐ Você já utilizou sua pontuação dobrada nesta rodada em um dia anterior.";
+        pdBadge.className = 'status-badge used';
+        pdBadge.textContent = 'JÁ USOU';
+        pdBadge.style.display = 'inline-block';
+        
+        // Mostrar alerta com info do jogo
+        mostrarAlertaPDUsada();
+        
+    } else if (pdBloqueadaAdm) {
+        // ADM BLOQUEOU PD PARA ESTE USUÁRIO
+        dobradaElem.textContent = "⭐ Pontuação dobrada atribuída administrativamente - não pode selecionar.";
+        pdBadge.className = 'status-badge blocked';
+        pdBadge.textContent = 'BLOQUEADA ADM';
+        pdBadge.style.display = 'inline-block';
+        
+    } else {
+        // PD DISPONÍVEL
+        dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
+        pdBadge.className = 'status-badge active';
+        pdBadge.textContent = 'DISPONÍVEL';
+        pdBadge.style.display = 'inline-block';
+    }
             
             // 5. Inicializar palpites como ARRAY vazio
             palpites = [];
@@ -1180,19 +1180,18 @@
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
-        function togglePD(jogoId) {
-            console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
-            
-            // VERIFICAÇÕES DE BLOQUEIO
-            if (pdJaUsada) {
-                mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
-                return;
-            }
-            
-            if (pdBloqueadaAdm) {
-                mostrarErro("❌ Pontuação dobrada atribuída pelo ADM - não pode selecionar!");
-                return;
-            }
+           console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+    
+    // ⭐⭐ VERIFICAÇÕES DE BLOQUEIO ATUALIZADAS ⭐⭐
+    if (pdJaUsada) {
+        mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada em um dia anterior!");
+        return;
+    }
+    
+    if (pdBloqueadaAdm) {
+        mostrarErro("❌ Pontuação dobrada atribuída administrativamente - não pode selecionar!");
+        return;
+    }
             
             // Se clicar na mesma estrela, desseleciona
             if (pdSelecionado === jogoId) {
