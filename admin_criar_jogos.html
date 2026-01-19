@@ -772,70 +772,87 @@
         // FUNÇÕES PRINCIPAIS
         // ============================================
         
-        function atualizarInterfaceInicial() {
-            console.log("🔄 Atualizando interface inicial...");
+       function atualizarInterfaceInicial() {
+    console.log("🔄 Atualizando interface inicial...");
+    
+    const tipoRodadaElement = document.getElementById('tipoRodada');
+    const infoRodadaElement = document.getElementById('infoRodada');
+    const rodadaTabsElement = document.getElementById('rodadaTabs');
+    
+    if (tipo === 'multipla') {
+        tipoRodadaElement.textContent = 'Múltiplas Rodadas';
+        
+        if (rodadasParam) {
+            rodadasSelecionadas = rodadasParam.split(',').map(r => parseInt(r.trim()));
+            console.log("📋 Rodadas processadas:", rodadasSelecionadas);
             
-            const tipoRodadaElement = document.getElementById('tipoRodada');
-            const infoRodadaElement = document.getElementById('infoRodada');
-            const rodadaTabsElement = document.getElementById('rodadaTabs');
-            
-            if (tipo === 'multipla') {
-                tipoRodadaElement.textContent = 'Múltiplas Rodadas';
-                
-                if (rodadasParam) {
-                    rodadasSelecionadas = rodadasParam.split(',').map(r => parseInt(r.trim()));
-                    console.log("📋 Rodadas processadas:", rodadasSelecionadas);
-                    
-                    if (rodadasSelecionadas.length === 0) {
-                        infoRodadaElement.textContent = 'Erro: Nenhuma rodada especificada';
-                        console.error("❌ Nenhuma rodada válida na URL");
-                        return;
-                    }
-                    
-                    rodadasSelecionadas.forEach(numero => {
-                        if (!dadosPorRodada[numero]) {
-                            dadosPorRodada[numero] = {
-                                jogos: new Set(),
-                                horario: '',
-                                dobrada: new Set(),
-                                trunfo: new Set()
-                            };
-                        }
-                    });
-                    
-                    if (rodadasSelecionadas.length > 0) {
-                        rodadaAtual = rodadasSelecionadas[0];
-                        infoRodadaElement.textContent = `${rodadasSelecionadas.length} rodadas selecionadas`;
-                        console.log("🎯 Rodada atual definida:", rodadaAtual);
-                        
-                        rodadaTabsElement.classList.remove('hidden');
-                    }
-                } else {
-                    infoRodadaElement.textContent = 'Erro: Nenhuma rodada especificada';
-                    console.error("❌ Parâmetro 'rodadas' não encontrado na URL");
-                }
-            } else {
-                tipoRodadaElement.textContent = 'Rodada Única';
-                rodadaTabsElement.classList.add('hidden');
-                
-                if (rodadaParam) {
-                    rodadaAtual = parseInt(rodadaParam);
-                    infoRodadaElement.textContent = `Rodada ${rodadaAtual}`;
-                    console.log("🎯 Rodada única definida:", rodadaAtual);
-                    
-                    if (!dadosPorRodada[rodadaAtual]) {
-                        dadosPorRodada[rodadaAtual] = {
-                            jogos: new Set(),
-                            horario: '',
-                            dobrada: new Set(),
-                            trunfo: new Set()
-                        };
-                    }
-                } else {
-                    infoRodadaElement.textContent = 'Carregando...';
-                }
+            if (rodadasSelecionadas.length === 0) {
+                infoRodadaElement.textContent = 'Erro: Nenhuma rodada especificada';
+                console.error("❌ Nenhuma rodada válida na URL");
+                return;
             }
+            
+            // ⭐⭐ CORREÇÃO: Inicializa dadosPorRodada para cada rodada ⭐⭐
+            rodadasSelecionadas.forEach(numero => {
+                if (!dadosPorRodada[numero]) {
+                    dadosPorRodada[numero] = {
+                        jogos: new Set(),
+                        horario: '',
+                        dobrada: new Set(),
+                        trunfo: new Set()
+                    };
+                }
+            });
+            
+            if (rodadasSelecionadas.length > 0) {
+                rodadaAtual = rodadasSelecionadas[0];
+                infoRodadaElement.textContent = `${rodadasSelecionadas.length} rodadas selecionadas`;
+                console.log("🎯 Rodada atual definida:", rodadaAtual);
+                
+                rodadaTabsElement.classList.remove('hidden');
+                // ⭐⭐ CHAMA PARA ATUALIZAR AS TABS AGORA ⭐⭐
+                atualizarTabsRodadas();
+            }
+        } else {
+            infoRodadaElement.textContent = 'Erro: Nenhuma rodada especificada';
+            console.error("❌ Parâmetro 'rodadas' não encontrado na URL");
         }
+    } else {
+        tipoRodadaElement.textContent = 'Rodada Única';
+        rodadaTabsElement.classList.add('hidden');
+        
+        if (rodadaParam) {
+            rodadaAtual = parseInt(rodadaParam);
+            infoRodadaElement.textContent = `Rodada ${rodadaAtual}`;
+            console.log("🎯 Rodada única definida:", rodadaAtual);
+            
+            if (!dadosPorRodada[rodadaAtual]) {
+                dadosPorRodada[rodadaAtual] = {
+                    jogos: new Set(),
+                    horario: '',
+                    dobrada: new Set(),
+                    trunfo: new Set()
+                };
+            }
+        } else {
+            infoRodadaElement.textContent = 'Carregando...';
+        }
+    }
+    
+    // ⭐⭐ ATUALIZA O TÍTULO FINAL ⭐⭐
+    atualizarTituloRodada();
+}
+
+// ⭐⭐ NOVA FUNÇÃO PARA ATUALIZAR TÍTULO ⭐⭐
+function atualizarTituloRodada() {
+    const infoRodadaElement = document.getElementById('infoRodada');
+    
+    if (tipo === 'unica' && rodadaAtual) {
+        infoRodadaElement.textContent = `Rodada ${rodadaAtual}`;
+    } else if (tipo === 'multipla' && rodadasSelecionadas.length > 0) {
+        infoRodadaElement.textContent = `${rodadasSelecionadas.length} rodadas selecionadas`;
+    }
+}
         
         function carregarDadosDaURL() {
             console.log("🔍 Verificando dados na URL...");
@@ -871,127 +888,237 @@
         }
         
         function processarDadosRecebidos(dados) {
-            console.log("🔄 Processando dados recebidos do bot...");
+    console.log("🔄 Processando dados recebidos do bot...");
+    console.log("Estrutura completa dos dados:", dados);
+    
+    // Limpa arrays globais
+    todosJogos = [];
+    todosUsuarios = [];
+    
+    // Processa jogos
+    if (dados.tipo === 'multipla' && dados.rodadas && Array.isArray(dados.rodadas)) {
+        console.log("📦 Processando múltiplas rodadas...");
+        
+        dados.rodadas.forEach((rodada, index) => {
+            console.log(`📊 Rodada ${index + 1}:`, rodada);
             
-            todosJogos = [];
-            todosUsuarios = [];
-            
-            // Processa jogos
-            if (dados.tipo === 'multipla' && dados.rodadas && Array.isArray(dados.rodadas)) {
-                dados.rodadas.forEach(rodada => {
-                    if (rodada.jogos && Array.isArray(rodada.jogos)) {
-                        rodada.jogos.forEach(jogo => {
-                            todosJogos.push({
-                                id: jogo.id,
-                                rodada: rodada.rodada,
-                                mandante: jogo.mandante,
-                                visitante: jogo.visitante
-                            });
-                        });
-                    }
-                });
-                console.log(`✅ ${todosJogos.length} jogos carregados do banco (múltiplas rodadas)`);
-            } else if (dados.jogos && Array.isArray(dados.jogos)) {
-                dados.jogos.forEach(jogo => {
+            if (rodada.jogos && Array.isArray(rodada.jogos)) {
+                console.log(`   ✅ ${rodada.jogos.length} jogos encontrados`);
+                
+                rodada.jogos.forEach((jogo, jogoIndex) => {
+                    console.log(`   ⚽ Jogo ${jogoIndex + 1}: ID=${jogo.id}, Mandante=${jogo.mandante}, Visitante=${jogo.visitante}, Rodada=${rodada.rodada}`);
+                    
                     todosJogos.push({
                         id: jogo.id,
-                        rodada: dados.rodada,
+                        rodada: rodada.rodada, // ⭐⭐ CORREÇÃO: rodada.rodada ⭐⭐
                         mandante: jogo.mandante,
                         visitante: jogo.visitante
                     });
                 });
-                console.log(`✅ ${todosJogos.length} jogos carregados do banco (rodada única)`);
             } else {
-                console.warn("⚠️ Nenhum jogo recebido ou formato inválido");
-                showError("Nenhum jogo disponível para esta rodada");
+                console.log(`   ❌ Rodada sem jogos ou formato inválido`);
             }
+        });
+        
+        console.log(`✅ ${todosJogos.length} jogos carregados do banco (múltiplas rodadas)`);
+        
+    } else if (dados.jogos && Array.isArray(dados.jogos)) {
+        console.log("📦 Processando rodada única...");
+        
+        dados.jogos.forEach((jogo, index) => {
+            console.log(`⚽ Jogo ${index + 1}: ID=${jogo.id}, Mandante=${jogo.mandante}, Visitante=${jogo.visitante}, Rodada=${dados.rodada}`);
             
-            // ⭐⭐ PROCESSA USUÁRIOS COM INFO DE PD ⭐⭐
-            if (dados.usuarios && Array.isArray(dados.usuarios)) {
-                dados.usuarios.forEach(usuario => {
-                    todosUsuarios.push({
-                        id: usuario.id,
-                        nome: usuario.nome,
-                        username: usuario.username || null,
-                        pd_ja_usada: usuario.pd_ja_usada || false, // ⭐⭐ NOVO CAMPO
-                        pd_jogo_id: usuario.pd_jogo_id || null,    // ⭐⭐ NOVO CAMPO
-                        pd_info_por_rodada: usuario.pd_info_por_rodada || {} // ⭐⭐ Para múltiplas rodadas
-                    });
-                });
-                console.log(`✅ ${todosUsuarios.length} usuários carregados do banco`);
-                
-                // Log de usuários com PD já usada
-                const usuariosComPD = todosUsuarios.filter(u => u.pd_ja_usada);
-                if (usuariosComPD.length > 0) {
-                    console.log("📊 Usuários que já usaram PD:", usuariosComPD.map(u => u.nome));
-                }
-            } else {
-                console.warn("⚠️ Nenhum usuário recebido ou formato inválido");
-                showError("Nenhum usuário cadastrado");
-            }
+            todosJogos.push({
+                id: jogo.id,
+                rodada: dados.rodada,
+                mandante: jogo.mandante,
+                visitante: jogo.visitante
+            });
+        });
+        
+        console.log(`✅ ${todosJogos.length} jogos carregados do banco (rodada única)`);
+        
+    } else {
+        console.warn("⚠️ Nenhum jogo recebido ou formato inválido");
+        console.warn("Estrutura de jogos recebida:", dados.jogos);
+        showError("Nenhum jogo disponível para esta rodada");
+    }
+    
+    // ⭐⭐ PROCESSA USUÁRIOS COM INFO DE PD ⭐⭐
+    if (dados.usuarios && Array.isArray(dados.usuarios)) {
+        console.log("👥 Processando usuários...");
+        
+        dados.usuarios.forEach((usuario, index) => {
+            console.log(`👤 Usuário ${index + 1}:`, {
+                id: usuario.id,
+                nome: usuario.nome,
+                pd_ja_usada: usuario.pd_ja_usada,
+                pd_jogo_id: usuario.pd_jogo_id,
+                pd_info_por_rodada: usuario.pd_info_por_rodada ? `Sim (${Object.keys(usuario.pd_info_por_rodada).length} rodadas)` : "Não"
+            });
             
-            // Atualiza interface
-            if (dados.tipo === 'unica') {
-                document.getElementById('tipoRodada').textContent = 'Rodada Única';
-                document.getElementById('infoRodada').textContent = 
-                    `Rodada ${dados.rodada} - ${todosJogos.length} jogos disponíveis`;
-                console.log(`📊 Interface atualizada: Rodada Única ${dados.rodada}`);
-            } else if (dados.tipo === 'multipla') {
-                document.getElementById('tipoRodada').textContent = 'Múltiplas Rodadas';
-                
-                if (dados.rodadas && Array.isArray(dados.rodadas)) {
-                    rodadasSelecionadas = [];
-                    
-                    dados.rodadas.forEach(rodada => {
-                        rodadasSelecionadas.push(rodada.rodada);
-                        
-                        if (!dadosPorRodada[rodada.rodada]) {
-                            dadosPorRodada[rodada.rodada] = {
-                                jogos: new Set(),
-                                horario: '',
-                                dobrada: new Set(),
-                                trunfo: new Set()
-                            };
-                        }
-                    });
-                    
-                    rodadasSelecionadas = [...new Set(rodadasSelecionadas)].sort((a, b) => a - b);
-                    rodadaAtual = rodadasSelecionadas[0];
-                    console.log('✅ Rodadas carregadas: ' + rodadasSelecionadas.join(', '));
-                    console.log('🎯 Rodada atual definida: ' + rodadaAtual);
-                }
-                
-                document.getElementById('infoRodada').textContent = 
-                    `${rodadasSelecionadas.length} rodadas - ${todosJogos.length} jogos totais`;
-                console.log(`📊 Interface atualizada: ${rodadasSelecionadas.length} rodadas`);
-            }
-            
-            // Carrega interfaces
-            if (dados.tipo === 'multipla') {
-                atualizarTabsRodadas();
-            }
-            carregarJogos();
-            carregarUsuarios();
-            
-            // ⭐⭐ CONFIGURA DATA ATUAL COMO PADRÃO ⭐⭐
-            const agora = new Date();
-            const amanha = new Date(agora);
-            amanha.setDate(amanha.getDate() + 1);
-            amanha.setHours(20, 0, 0, 0);
-            
-            const horarioInput = document.getElementById('horarioFechamento');
-            const offset = amanha.getTimezoneOffset() * 60000;
-            const localTime = new Date(amanha.getTime() - offset);
-            horarioInput.value = localTime.toISOString().slice(0, 16);
-            
-            console.log("⏰ Horário padrão configurado:", horarioInput.value);
-            
-            atualizarEstatisticas();
-            verificarBotaoEnviar();
-            
-            console.log("✅ Dados processados com sucesso!");
-            showSuccess("Dados carregados com sucesso!");
+            todosUsuarios.push({
+                id: usuario.id,
+                nome: usuario.nome,
+                username: usuario.username || null,
+                pd_ja_usada: usuario.pd_ja_usada || false, // ⭐⭐ NOVO CAMPO
+                pd_jogo_id: usuario.pd_jogo_id || null,    // ⭐⭐ NOVO CAMPO
+                pd_bloqueada_adm: usuario.pd_bloqueada_adm || false, // ⭐⭐ NOVO CAMPO
+                pd_info_por_rodada: usuario.pd_info_por_rodada || {} // ⭐⭐ Para múltiplas rodadas
+            });
+        });
+        
+        console.log(`✅ ${todosUsuarios.length} usuários carregados do banco`);
+        
+        // Log de usuários com PD já usada
+        const usuariosComPD = todosUsuarios.filter(u => u.pd_ja_usada);
+        if (usuariosComPD.length > 0) {
+            console.log("📊 Usuários que já usaram PD:", usuariosComPD.map(u => `${u.nome} (ID: ${u.id})`));
         }
+        
+        // Log de usuários bloqueados administrativamente
+        const usuariosBloqueados = todosUsuarios.filter(u => u.pd_bloqueada_adm);
+        if (usuariosBloqueados.length > 0) {
+            console.log("🔒 Usuários com PD bloqueada administrativamente:", usuariosBloqueados.map(u => `${u.nome} (ID: ${u.id})`));
+        }
+        
+    } else {
+        console.warn("⚠️ Nenhum usuário recebido ou formato inválido");
+        console.warn("Estrutura de usuários recebida:", dados.usuarios);
+        showError("Nenhum usuário cadastrado");
+    }
+    
+    // Atualiza interface baseada no tipo
+    if (dados.tipo === 'unica') {
+        console.log("🎯 Configurando interface para RODADA ÚNICA");
+        document.getElementById('tipoRodada').textContent = 'Rodada Única';
+        
+        // Define rodada atual
+        rodadaAtual = dados.rodada;
+        console.log(`🎯 Rodada única definida: ${rodadaAtual}`);
+        
+        // Inicializa dados para esta rodada
+        if (!dadosPorRodada[rodadaAtual]) {
+            dadosPorRodada[rodadaAtual] = {
+                jogos: new Set(),
+                horario: '',
+                dobrada: new Set(),
+                trunfo: new Set()
+            };
+        }
+        
+        // Atualiza título
+        const infoRodadaElement = document.getElementById('infoRodada');
+        infoRodadaElement.textContent = `Rodada ${rodadaAtual} - ${todosJogos.length} jogos disponíveis`;
+        
+        console.log(`📊 Interface atualizada: Rodada Única ${rodadaAtual} com ${todosJogos.length} jogos`);
+        
+    } else if (dados.tipo === 'multipla') {
+        console.log("🎯 Configurando interface para MÚLTIPLAS RODADAS");
+        document.getElementById('tipoRodada').textContent = 'Múltiplas Rodadas';
+        
+        if (dados.rodadas && Array.isArray(dados.rodadas)) {
+            // Limpa rodadas anteriores
+            rodadasSelecionadas = [];
+            dadosPorRodada = {};
+            
+            console.log(`📋 Processando ${dados.rodadas.length} rodadas recebidas`);
+            
+            // Processa cada rodada recebida
+            dados.rodadas.forEach((rodada, index) => {
+                console.log(`   📊 Rodada ${index + 1}: número=${rodada.rodada}, jogos=${rodada.jogos?.length || 0}`);
+                
+                const numeroRodada = rodada.rodada;
+                
+                // Adiciona à lista de rodadas selecionadas
+                if (!rodadasSelecionadas.includes(numeroRodada)) {
+                    rodadasSelecionadas.push(numeroRodada);
+                }
+                
+                // Inicializa dados para esta rodada
+                if (!dadosPorRodada[numeroRodada]) {
+                    dadosPorRodada[numeroRodada] = {
+                        jogos: new Set(),
+                        horario: '',
+                        dobrada: new Set(),
+                        trunfo: new Set()
+                    };
+                }
+                
+                console.log(`   ✅ Rodada ${numeroRodada} inicializada`);
+            });
+            
+            // Ordena as rodadas
+            rodadasSelecionadas.sort((a, b) => a - b);
+            
+            // Define a primeira rodada como atual
+            if (rodadasSelecionadas.length > 0) {
+                rodadaAtual = rodadasSelecionadas[0];
+                console.log(`🎯 Rodada atual definida: ${rodadaAtual}`);
+                console.log(`📋 Todas as rodadas: ${rodadasSelecionadas.join(', ')}`);
+            } else {
+                console.error("❌ Nenhuma rodada válida encontrada");
+                showError("Nenhuma rodada válida encontrada");
+                return;
+            }
+            
+            // Atualiza título
+            const infoRodadaElement = document.getElementById('infoRodada');
+            infoRodadaElement.textContent = `${rodadasSelecionadas.length} rodadas - ${todosJogos.length} jogos totais`;
+            
+            console.log(`📊 Interface atualizada: ${rodadasSelecionadas.length} rodadas com ${todosJogos.length} jogos totais`);
+            
+        } else {
+            console.error("❌ Estrutura de rodadas inválida para múltiplas");
+            showError("Erro: Estrutura de rodadas inválida");
+            return;
+        }
+    }
+    
+    // ⭐⭐ MOSTRA AS TABS APENAS PARA MÚLTIPLAS RODADAS ⭐⭐
+    if (dados.tipo === 'multipla') {
+        const rodadaTabsElement = document.getElementById('rodadaTabs');
+        rodadaTabsElement.classList.remove('hidden');
+        atualizarTabsRodadas();
+    } else {
+        const rodadaTabsElement = document.getElementById('rodadaTabs');
+        rodadaTabsElement.classList.add('hidden');
+    }
+    
+    // Carrega os dados nas interfaces
+    console.log("🔄 Carregando jogos e usuários nas interfaces...");
+    carregarJogos();
+    carregarUsuarios();
+    
+    // ⭐⭐ CONFIGURA DATA ATUAL COMO PADRÃO ⭐⭐
+    const agora = new Date();
+    const amanha = new Date(agora);
+    amanha.setDate(amanha.getDate() + 1);
+    amanha.setHours(20, 0, 0, 0);
+    
+    const horarioInput = document.getElementById('horarioFechamento');
+    const offset = amanha.getTimezoneOffset() * 60000;
+    const localTime = new Date(amanha.getTime() - offset);
+    horarioInput.value = localTime.toISOString().slice(0, 16);
+    
+    console.log("⏰ Horário padrão configurado:", horarioInput.value);
+    
+    // Atualiza estatísticas e verifica botão
+    atualizarEstatisticas();
+    verificarBotaoEnviar();
+    
+    console.log("✅ Dados processados com sucesso!");
+    console.log("📊 Resumo final:", {
+        tipo: dados.tipo,
+        rodadaAtual: rodadaAtual,
+        rodadasSelecionadas: rodadasSelecionadas,
+        totalJogos: todosJogos.length,
+        totalUsuarios: todosUsuarios.length,
+        dadosPorRodada: Object.keys(dadosPorRodada)
+    });
+    
+    showSuccess("Dados carregados com sucesso!");
+}
         
         function carregarDadosIniciais() {
             console.log("🚀 INICIANDO CARREGAMENTO DE DADOS");
@@ -1381,27 +1508,34 @@ todosUsuarios.forEach(usuario => {
 }
         
         function atualizarTabsRodadas() {
-            console.log("🔢 Atualizando tabs de rodadas...");
-            
-            const rodadaTabsElement = document.getElementById('rodadaTabs');
-            rodadaTabsElement.innerHTML = '';
-            
-            rodadasSelecionadas.sort((a, b) => a - b).forEach(numero => {
-                const tab = document.createElement('div');
-                tab.className = `rodada-tab ${numero === rodadaAtual ? 'active' : ''}`;
-                tab.textContent = `Rodada ${numero}`;
-                tab.dataset.rodada = numero;
-                
-                tab.addEventListener('click', function() {
-                    console.log(`🔄 Mudando para rodada ${numero}`);
-                    mudarRodadaAtual(numero);
-                });
-                
-                rodadaTabsElement.appendChild(tab);
-            });
-            
-            console.log(`✅ ${rodadasSelecionadas.length} tabs criadas`);
-        }
+    console.log("🔢 Atualizando tabs de rodadas...");
+    console.log("Rodadas selecionadas:", rodadasSelecionadas);
+    console.log("Rodada atual:", rodadaAtual);
+    
+    const rodadaTabsElement = document.getElementById('rodadaTabs');
+    rodadaTabsElement.innerHTML = '';
+    
+    if (!rodadasSelecionadas || rodadasSelecionadas.length === 0) {
+        console.warn("⚠️ Nenhuma rodada selecionada para criar tabs");
+        return;
+    }
+    
+    rodadasSelecionadas.sort((a, b) => a - b).forEach(rodadaNum => {
+        const tab = document.createElement('div');
+        tab.className = `rodada-tab ${rodadaNum === rodadaAtual ? 'active' : ''}`;
+        tab.textContent = `Rodada ${rodadaNum}`;
+        tab.dataset.rodada = rodadaNum;
+        
+        tab.addEventListener('click', function() {
+            console.log(`🔄 Mudando para rodada ${rodadaNum}`);
+            mudarRodadaAtual(rodadaNum);
+        });
+        
+        rodadaTabsElement.appendChild(tab);
+    });
+    
+    console.log(`✅ ${rodadasSelecionadas.length} tabs criadas`);
+}
         
         function mudarRodadaAtual(novaRodada) {
             console.log(`🔄 Mudando rodada: ${rodadaAtual} → ${novaRodada}`);
