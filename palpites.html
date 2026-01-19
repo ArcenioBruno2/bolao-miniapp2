@@ -981,15 +981,20 @@ body {
                 trunfoBadge.style.display = 'inline-block';
             }
             
-            // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
-            const dobradaElem = document.getElementById('txt-dobrada');
-            const pdBadge = document.getElementById('pd-badge');
-            
-            // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
-            pdJaUsada = dadosOriginais.pd_ja_usada || false;
-            pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
-            
-            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
+                    // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
+        const dobradaElem = document.getElementById('txt-dobrada');
+        const pdBadge = document.getElementById('pd-badge');
+        
+        // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
+        pdJaUsada = dadosOriginais.pd_ja_usada || false;
+        pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
+        
+        console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
+        
+        // ⭐⭐ SE PD JÁ USADA, BUSCA INFO DO JOGO ⭐⭐
+        if (pdJaUsada && dadosOriginais.pd_jogo_info) {
+            console.log(`⭐ PD usada no jogo: ${dadosOriginais.pd_jogo_info.mandante} x ${dadosOriginais.pd_jogo_info.visitante}`);
+        }
             
             if (pdJaUsada) {
                 // PD JÁ FOI USADA PELO USUÁRIO
