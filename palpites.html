@@ -771,6 +771,17 @@ body {
                         </div>
                     </div>
                 </div>
+                                <!-- ALERTA DE MODO EDIÇÃO -->
+                <div id="edicao-alert" class="pd-used-alert" style="display: none; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-color: rgba(33, 150, 243, 0.2);">
+                    <i class="fas fa-edit pd-used-icon" style="color: #2196f3;"></i>
+                    <div class="pd-used-text">
+                        <div class="pd-used-title" style="color: #1976d2;">📝 MODO EDIÇÃO ATIVADO</div>
+                        <div class="pd-used-info">
+                            Você está editando seus palpites. 
+                            <span id="edicao-pd-status" class="pd-used-game"></span>
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- LISTA DE JOGOS -->
                 <div class="games-section">
@@ -988,7 +999,24 @@ body {
         // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
         pdJaUsada = dadosOriginais.pd_ja_usada || false;
         pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
+
+                // ⭐⭐ VERIFICA SE É EDIÇÃO E SE PODE MUDAR PD ⭐⭐
+        const ehEdicao = dadosOriginais.eh_edicao || false;
         
+        if (ehEdicao) {
+            console.log("📝 MODO EDIÇÃO ATIVADO");
+            
+            // Se é edição e PD já foi usada, NÃO pode mudar
+            if (pdJaUsada) {
+                console.log("🔒 Edição: PD já usada → NÃO pode mudar");
+            } else if (pdBloqueadaAdm) {
+                console.log("🔒 Edição: PD bloqueada pelo ADM → NÃO pode mudar");
+            } else {
+                console.log("🔓 Edição: PD disponível → PODE trocar escolha");
+                // PD disponível para troca (lógica normal)
+            }
+        }
+            
         console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
         
         // ⭐⭐ SE PD JÁ USADA, BUSCA INFO DO JOGO ⭐⭐
@@ -1064,7 +1092,105 @@ body {
                 verificarEAtualizar();
             }, 500);
         }
+            // 8. Esconder loading e mostrar conteúdo
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+                // Verificar se já tem palpites completos
+                verificarEAtualizar();
+                
+                // ⭐⭐ MOSTRAR ALERTA DE EDIÇÃO SE FOR O CASO ⭐⭐
+                if (dadosOriginais.eh_edicao) {
+                    mostrarAlertaEdicao();
+                }
+            }, 500);
+        
+                function mostrarAlertaEdicao() {
+            const alerta = document.getElementById('edicao-alert');
+            const statusElem = document.getElementById('edicao-pd-status');
+            
+            if (dadosOriginais.eh_edicao) {
+                let statusText = "";
+                
+                if (pdJaUsada) {
+                    statusText = "PD já utilizada → <strong>NÃO pode alterar</strong>";
+                } else if (pdBloqueadaAdm) {
+                    statusText = "PD bloqueada pelo ADM → <strong>NÃO pode usar</strong>";
+                } else {
+                    statusText = "PD disponível → <strong>PODE transferir ou remover</strong>";
+                }
+                
+                statusElem.innerHTML = statusText;
+                alerta.style.display = 'flex';
+                
+                // Esconde após 10 segundos
+                setTimeout(() => {
+                    alerta.style.display = 'none';
+                }, 10000);
+            }
+        }
 
+                function validarEnvioFinal() {
+            // 1. Verifica se todos os palpites estão preenchidos
+            if (!verificarPalpitesCompletos()) {
+                mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
+                return false;
+            }
+            
+            // 2. Verifica horário limite
+            const agora = new Date();
+            if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
+                mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
+                return false;
+            }
+            
+            // 3. Verifica se usuário com trunfo ainda está no horário
+            if (dadosOriginais.trunfo && horarioLimite) {
+                const horarioTrunfo = new Date(horarioLimite.getTime() + 30 * 60000);
+                if (agora > horarioTrunfo) {
+                    mostrarErro("❌ Horário do trunfo expirado! Você não pode mais enviar palpites.");
+                    return false;
+                }
+            }
+            
+            // 4. Verifica consistência da PD
+            if (pdSelecionado !== null) {
+                // Verifica se o jogo da PD existe
+                const jogoPD = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+                if (!jogoPD) {
+                    mostrarErro("❌ Erro: Jogo selecionado para PD não encontrado!");
+                    return false;
+                }
+                
+                // Verifica se o palpite da PD está preenchido
+                const palpitePD = palpites.find(p => p.jogo_id == pdSelecionado);
+                if (!palpitePD || palpitePD.mandante === '' || palpitePD.visitante === '') {
+                    mostrarErro("❌ Preencha o placar do jogo com pontuação dobrada!");
+                    return false;
+                }
+            }
+            
+            // 5. Verifica se é edição e PD está sendo alterada
+            if (dadosOriginais.eh_edicao && pdSelecionado !== null) {
+                const pdOriginal = dadosOriginais.pd_jogo_id;
+                
+                if (pdOriginal !== null && pdSelecionado !== pdOriginal) {
+                    // PD está sendo alterada - confirmação extra
+                    const jogoOriginal = dadosOriginais.jogos.find(j => j.id == pdOriginal);
+                    const jogoNovo = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+                    
+                    if (jogoOriginal && jogoNovo) {
+                        if (!confirm(`⚠️ **CONFIRMAR ALTERAÇÃO DE PD**\n\nVocê está transferindo a pontuação dobrada de:\n"${jogoOriginal.mandante} x ${jogoOriginal.visitante}"\n\nPara:\n"${jogoNovo.mandante} x ${jogoNovo.visitante}"\n\nTem certeza?`)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
         function mostrarAlertaPDUsada() {
             const alerta = document.getElementById('pd-used-alert');
             const infoElem = document.getElementById('pd-game-info');
@@ -1142,12 +1268,16 @@ body {
                 } else if (isPDSelecionada) {
                     // PD selecionada neste jogo
                     starClass += ' active';
-                    pdLabel = 'SELECIONADA';
+                    // ⭐⭐ SE FOR EDIÇÃO, MOSTRA "SELECIONADA (EDITANDO)" ⭐⭐
+                    if (dadosOriginais.eh_edicao) {
+                        pdLabel = 'SELECIONADA';
+                        // Adiciona tooltip informativo
+                        div.title = "Clique para transferir ou remover PD";
+                    } else {
+                        pdLabel = 'SELECIONADA';
+                    }
+                    
                     isClickable = true;
-                } else {
-                    // PD disponível para seleção
-                    isClickable = true;
-                }
                 
                 // Criar card do jogo
                 const div = document.createElement('div');
@@ -1198,10 +1328,35 @@ body {
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
-        function togglePD(jogoId) {
+                function togglePD(jogoId) {
             console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
             
-            // VERIFICAÇÕES DE BLOQUEIO
+            // ⭐⭐ VERIFICA SE É EDIÇÃO ⭐⭐
+            const ehEdicao = dadosOriginais.eh_edicao || false;
+            
+            if (ehEdicao) {
+                console.log("📝 Modo edição ativo");
+                
+                // ⭐⭐ VERIFICA SE AINDA ESTÁ NO HORÁRIO ⭐⭐
+                const agora = new Date();
+                const horarioLimiteObj = horarioLimite;
+                
+                if (horarioLimiteObj && agora > horarioLimiteObj && !dadosOriginais.trunfo) {
+                    mostrarErro("❌ Horário limite expirado! Não pode mais alterar PD.");
+                    return;
+                }
+                
+                // ⭐⭐ SE TEM TRUNFO, VERIFICA HORÁRIO TRUNFO ⭐⭐
+                if (dadosOriginais.trunfo && horarioLimiteObj) {
+                    const horarioTrunfo = new Date(horarioLimiteObj.getTime() + 30 * 60000); // +30min
+                    if (agora > horarioTrunfo) {
+                        mostrarErro("❌ Horário do trunfo expirado! Não pode mais alterar PD.");
+                        return;
+                    }
+                }
+            }
+            
+            // VERIFICAÇÕES DE BLOQUEIO (independente de ser edição)
             if (pdJaUsada) {
                 mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
                 return;
@@ -1212,19 +1367,43 @@ body {
                 return;
             }
             
+            // ⭐⭐ LÓGICA DE SELEÇÃO/DESSELEÇÃO ⭐⭐
             // Se clicar na mesma estrela, desseleciona
             if (pdSelecionado === jogoId) {
                 pdSelecionado = null;
                 console.log("⭐ PD desselecionada");
+                
+                // Se for edição, informa que PD foi removida
+                if (ehEdicao) {
+                    console.log("📝 Edição: PD removida do jogo");
+                }
             } else {
-                // Se já tem uma estrela selecionada, pergunta se quer trocar
+                // Se já tem uma estrela selecionada
                 if (pdSelecionado !== null) {
                     if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
+                        const jogoAnterior = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+                        const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
+                        
                         pdSelecionado = jogoId;
+                        console.log(`⭐ PD transferida de jogo ${pdSelecionado} para ${jogoId}`);
+                        
+                        if (ehEdicao && jogoAnterior && jogoNovo) {
+                            console.log(`📝 Edição: PD transferida de "${jogoAnterior.mandante} x ${jogoAnterior.visitante}" para "${jogoNovo.mandante} x ${jogoNovo.visitante}"`);
+                        }
+                    } else {
+                        return; // Usuário cancelou
                     }
                 } else {
                     // Seleciona nova estrela
                     pdSelecionado = jogoId;
+                    console.log(`⭐ PD selecionada para jogo ${jogoId}`);
+                    
+                    if (ehEdicao) {
+                        const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == jogoId);
+                        if (jogoSelecionado) {
+                            console.log(`📝 Edição: PD atribuída a "${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}"`);
+                        }
+                    }
                 }
             }
             
@@ -1235,11 +1414,11 @@ body {
             renderizarJogos();
             verificarEAtualizar();
             
-            // Feedback
-            if (pdSelecionado !== null) {
+            // Feedback visual para edição
+            if (ehEdicao && pdSelecionado !== null) {
                 const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
                 if (jogoSelecionado) {
-                    console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
+                    console.log(`📝 Edição confirmada: PD em "${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}"`);
                 }
             }
         }
@@ -1376,19 +1555,12 @@ body {
         document.getElementById('btn-confirmar').onclick = () => {
             console.log("📤 Enviando palpites...");
             
-            // Verificar se todos os palpites foram preenchidos
-            if (!verificarPalpitesCompletos()) {
-                mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
+            // ⭐⭐ VALIDAÇÃO FINAL ⭐⭐
+            if (!validarEnvioFinal()) {
                 return;
             }
             
-            // Verificar horário limite novamente
-            const agora = new Date();
-            if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
-                mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
-                return;
-            }
-            
+            // Resto do código permanece igual...
             // ⭐⭐ PREPARAR DADOS COMO ARRAY ORDENADO ⭐⭐
             const dataToBot = {
                 tipo: 'enviar_palpites',
