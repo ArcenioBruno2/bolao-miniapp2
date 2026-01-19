@@ -1180,7 +1180,8 @@
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
-           console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+function togglePD(jogoId) {
+    console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
     
     // ⭐⭐ VERIFICAÇÕES DE BLOQUEIO ATUALIZADAS ⭐⭐
     if (pdJaUsada) {
@@ -1192,38 +1193,38 @@
         mostrarErro("❌ Pontuação dobrada atribuída administrativamente - não pode selecionar!");
         return;
     }
-            
-            // Se clicar na mesma estrela, desseleciona
-            if (pdSelecionado === jogoId) {
-                pdSelecionado = null;
-                console.log("⭐ PD desselecionada");
-            } else {
-                // Se já tem uma estrela selecionada, pergunta se quer trocar
-                if (pdSelecionado !== null) {
-                    if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
-                        pdSelecionado = jogoId;
-                    }
-                } else {
-                    // Seleciona nova estrela
-                    pdSelecionado = jogoId;
-                }
+    
+    // Se clicar na mesma estrela, desseleciona
+    if (pdSelecionado === jogoId) {
+        pdSelecionado = null;
+        console.log("⭐ PD desselecionada");
+    } else {
+        // Se já tem uma estrela selecionada, pergunta se quer trocar
+        if (pdSelecionado !== null) {
+            if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
+                pdSelecionado = jogoId;
             }
-            
-            // Atualiza array de palpites
-            atualizarPDNoArray();
-            
-            // Renderiza novamente
-            renderizarJogos();
-            verificarEAtualizar();
-            
-            // Feedback
-            if (pdSelecionado !== null) {
-                const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-                if (jogoSelecionado) {
-                    console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
-                }
-            }
+        } else {
+            // Seleciona nova estrela
+            pdSelecionado = jogoId;
         }
+    }
+    
+    // Atualiza array de palpites
+    atualizarPDNoArray();
+    
+    // Renderiza novamente
+    renderizarJogos();
+    verificarEAtualizar();
+    
+    // Feedback
+    if (pdSelecionado !== null) {
+        const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+        if (jogoSelecionado) {
+            console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
+        }
+    }
+}
 
         function atualizarPDNoArray() {
             // Remove PD de todos os palpites
