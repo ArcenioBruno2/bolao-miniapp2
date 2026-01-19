@@ -1253,50 +1253,77 @@
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
+// No arquivo palpites.html, atualize a função togglePD:
+
 function togglePD(jogoId) {
     console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
     
-    // VERIFICAÇÕES DE BLOQUEIO
-    if (pdJaUsada) {
-        mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
-        return;
-    }
-    
+    // ⭐⭐ VERIFICAÇÃO IMPORTANTE: Se PD foi bloqueada administrativamente, NÃO PERMITE ALTERAR ⭐⭐
     if (pdBloqueadaAdm) {
-        mostrarErro("❌ Pontuação dobrada atribuída pelo ADM - não pode selecionar!");
-        return;
-    }
-    
-    // ⭐⭐ NOVA VERIFICAÇÃO: Se é edição E já tinha PD bloqueada pelo ADM, bloqueia ⭐⭐
-    // Verifica se o usuário já tinha um palpite com PD atribuída pelo ADM
-    if (dadosOriginais.pd_bloqueada_adm) {
-        // Procura pelo palpite anterior que tinha PD
-        const palpiteComPD = dadosOriginais.jogos.find(j => {
-            const palpiteAntigo = dadosOriginais.palpites_existentes && 
-                                 dadosOriginais.palpites_existentes[`${j.id}`];
-            return palpiteAntigo && palpiteAntigo.pd === true;
+        // Verifica se este jogo específico já tinha PD do ADM
+        const jogoComPDAdm = dadosOriginais.jogos.find(j => {
+            const palpiteExistente = dadosOriginais.palpites_existentes && 
+                                     dadosOriginais.palpites_existentes[`${j.id}`];
+            return palpiteExistente && palpiteExistente.pd === true;
         });
         
-        if (palpiteComPD && palpiteComPD.id == jogoId) {
-            // Se está tentando desselecionar a PD que foi atribuída pelo ADM
+        // Se está tentando desselecionar a PD que foi atribuída pelo ADM
+        if (jogoComPDAdm && jogoComPDAdm.id == jogoId && pdSelecionado === jogoId) {
             mostrarErro("❌ PD atribuída pelo ADM - não pode alterar!");
+            return;
+        }
+        
+        // Se está tentando selecionar outra PD enquanto bloqueado
+        if (!jogoComPDAdm || jogoComPDAdm.id != jogoId) {
+            mostrarErro("❌ PD atribuída pelo ADM - não pode selecionar outra!");
             return;
         }
     }
     
-    // Se clicar na mesma estrela, desseleciona
-    if (pdSelecionado === jogoId) {
-        pdSelecionado = null;
-        console.log("⭐ PD desselecionada");
-    } else {
-        // Se já tem uma estrela selecionada, pergunta se quer trocar
-        if (pdSelecionado !== null) {
-            if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
-                pdSelecionado = jogoId;
+    // VERIFICAÇÕES DE BLOQUEIO POR USO ANTERIOR
+    if (pdJaUsouAnteriormente) {
+        mostrarErro("❌ Você já utilizou PD em rodada anterior - BLOQUEADO PERMANENTEMENTE!");
+        return;
+    }
+    
+    // ⭐⭐ NOVA REGRA: Se já usou PD nesta rodada específica e NÃO É EDIÇÃO, não pode alterar ⭐⭐
+    if (pdJaUsada && !ehEdicao) {
+        mostrarErro("❌ Você já utilizou sua pontuação dobrada nesta rodada!");
+        return;
+    }
+    
+    // ⭐⭐ REGRA DE EDIÇÃO: Se está editando e já usou PD, pode apenas trocar ⭐⭐
+    if (ehEdicao && pdJaUsada) {
+        // Verifica se está tentando desselecionar a PD atual
+        if (pdSelecionado === jogoId) {
+            if (confirm("⚠️ Você está removendo a pontuação dobrada. Tem certeza?")) {
+                pdSelecionado = null;
+            } else {
+                return;
             }
         } else {
-            // Seleciona nova estrela
-            pdSelecionado = jogoId;
+            // Pergunta se quer transferir a PD
+            if (confirm("⚠️ Transferir pontuação dobrada para este jogo?")) {
+                pdSelecionado = jogoId;
+            }
+        }
+    } 
+    // ⭐⭐ CASO NORMAL: PD disponível ⭐⭐
+    else {
+        // Se clicar na mesma estrela, desseleciona
+        if (pdSelecionado === jogoId) {
+            pdSelecionado = null;
+            console.log("⭐ PD desselecionada");
+        } else {
+            // Se já tem uma estrela selecionada, pergunta se quer trocar
+            if (pdSelecionado !== null) {
+                if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
+                    pdSelecionado = jogoId;
+                }
+            } else {
+                // Seleciona nova estrela
+                pdSelecionado = jogoId;
+            }
         }
     }
     
