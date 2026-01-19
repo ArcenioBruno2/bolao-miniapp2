@@ -34,17 +34,19 @@
             background: white;
             color: var(--dark);
             min-height: 100vh;
-            padding: 10px;
+            width: 100%;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            overflow-x: hidden;
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0;
+            padding: 10px;
         }
         
         .main-card {
@@ -55,6 +57,7 @@
             position: relative;
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
+            width: 100%;
         }
         
         .main-card::before {
@@ -82,7 +85,7 @@
         }
         
         .rodada-number {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -96,7 +99,7 @@
         }
         
         .rodada-icon {
-            font-size: 22px;
+            font-size: 24px;
         }
         
         /* ===== STATUS INFORMAÇÕES ===== */
@@ -293,6 +296,7 @@
             align-items: center;
             gap: 12px;
             min-height: 70px;
+            width: 100%;
         }
         
         .game-card:hover {
@@ -503,6 +507,7 @@
             gap: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            width: 100%;
         }
         
         .action-btn:active {
@@ -535,6 +540,7 @@
         .loading-container {
             text-align: center;
             padding: 40px 15px;
+            width: 100%;
         }
         
         .loading-spinner {
@@ -565,6 +571,7 @@
             align-items: center;
             gap: 12px;
             animation: shake 0.5s ease-in-out;
+            width: 100%;
         }
         
         @keyframes shake {
@@ -587,6 +594,10 @@
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 480px) {
+            .app-container {
+                padding: 8px;
+            }
+            
             .main-card {
                 padding: 15px;
                 border-radius: 16px;
@@ -597,12 +608,13 @@
             }
             
             .rodada-number {
-                font-size: 22px;
+                font-size: 24px;
             }
             
             .game-card {
                 padding: 12px;
                 gap: 8px;
+                flex-wrap: wrap;
             }
             
             .team-name {
@@ -622,6 +634,8 @@
             .pd-container {
                 width: 45px;
                 height: 45px;
+                margin-left: 0;
+                margin-top: 5px;
             }
             
             .pd-star {
@@ -640,13 +654,8 @@
         
         @media (max-width: 380px) {
             .game-card {
-                flex-wrap: wrap;
+                flex-direction: column;
                 gap: 8px;
-            }
-            
-            .pd-container {
-                margin-left: 0;
-                margin-top: 5px;
             }
             
             .teams-container {
@@ -662,6 +671,10 @@
             .pd-container {
                 order: 3;
                 margin: 0 auto;
+            }
+            
+            .team-name {
+                font-size: 11px;
             }
         }
         
@@ -686,6 +699,21 @@
         
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
+        }
+        
+        /* ===== 100% WIDTH ADJUSTMENTS ===== */
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        #content {
+            width: 100%;
+        }
+        
+        #lista-jogos {
+            width: 100%;
         }
     </style>
 </head>
@@ -798,12 +826,14 @@
         let tg = null;
         let dadosOriginais = {};
         let pdSelecionado = null;
-        let palpites = []; // ⭐⭐ AGORA É ARRAY ORDENADO ⭐⭐
-        let ordemOriginalJogos = []; // Para manter ordem original
+        let palpites = [];
+        let ordemOriginalJogos = [];
         let totalJogos = 0;
         let horarioLimite = null;
         let pdJaUsada = false;
-        let pdBloqueadaAdm = false; // Quando ADM marca que não pode usar
+        let pdBloqueadaAdm = false;
+        let pdJaUsouAnteriormente = false;
+        let ehEdicao = false;
 
         // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
         function initTelegramWebApp() {
@@ -812,13 +842,17 @@
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // ⭐⭐ TELA CHEIA IMEDIATA (CORREÇÃO ANDROID) ⭐⭐
+                // ⭐⭐ TELA CHEIA IMEDIATA (100% WIDTH) ⭐⭐
                 try {
                     tg.ready();
-                    tg.expand(); // ⭐⭐ EXPANDE IMEDIATAMENTE ⭐⭐
+                    tg.expand(); // Expande para tela cheia
                     tg.enableClosingConfirmation();
                     
-                    console.log("✅ Web App expandido em tela cheia");
+                    // Configura para usar 100% da tela
+                    tg.setHeaderColor('#4a6cf7');
+                    tg.setBackgroundColor('#ffffff');
+                    
+                    console.log("✅ Web App expandido em tela cheia (100%)");
                     
                 } catch (error) {
                     console.error("❌ Erro ao expandir Web App:", error);
@@ -828,7 +862,7 @@
                 carregarDadosRodada();
                 
             } else {
-                console.error("Telegram Web App não disponível");
+                console.error("Telegram Web App não disponível - modo desenvolvimento");
                 setTimeout(carregarDadosRodada, 500);
             }
         }
@@ -920,7 +954,7 @@
                 
                 console.log("📊 Dados recebidos:", dadosOriginais);
                 
-                // Inicializar ordem original dos jogos (como vieram do bot)
+                // Inicializar ordem original dos jogos
                 ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                 
                 // Atualizar interface
@@ -971,52 +1005,76 @@
                 trunfoBadge.style.display = 'inline-block';
             }
             
-           // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
-    const dobradaElem = document.getElementById('txt-dobrada');
-    const pdBadge = document.getElementById('pd-badge');
-    
-    // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
-    pdJaUsada = dadosOriginais.pd_ja_usada || false;
-    pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
-    
-    console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
-    
-    if (pdJaUsada) {
-        // PD JÁ FOI USADA PELO USUÁRIO EM RODADA ANTERIOR COM MESMO NÚMERO
-        pdSelecionado = dadosOriginais.pd_jogo_id;
-        
-        dobradaElem.textContent = "⭐ Você já utilizou sua pontuação dobrada nesta rodada em um dia anterior.";
-        pdBadge.className = 'status-badge used';
-        pdBadge.textContent = 'JÁ USOU';
-        pdBadge.style.display = 'inline-block';
-        
-        // Mostrar alerta com info do jogo
-        mostrarAlertaPDUsada();
-        
-    } else if (pdBloqueadaAdm) {
-        // ADM BLOQUEOU PD PARA ESTE USUÁRIO
-        dobradaElem.textContent = "⭐ Pontuação dobrada atribuída administrativamente - não pode selecionar.";
-        pdBadge.className = 'status-badge blocked';
-        pdBadge.textContent = 'BLOQUEADA ADM';
-        pdBadge.style.display = 'inline-block';
-        
-    } else {
-        // PD DISPONÍVEL
-        dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
-        pdBadge.className = 'status-badge active';
-        pdBadge.textContent = 'DISPONÍVEL';
-        pdBadge.style.display = 'inline-block';
-    }
+            // ⭐⭐ 4. Pontuação Dobrada - LÓGICA COMPLETA ⭐⭐
+            const dobradaElem = document.getElementById('txt-dobrada');
+            const pdBadge = document.getElementById('pd-badge');
             
-            // 5. Inicializar palpites como ARRAY vazio
+            // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
+            pdJaUsada = dadosOriginais.pd_ja_usada || false;
+            pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
+            pdJaUsouAnteriormente = dadosOriginais.pd_ja_usou_anteriormente || false;
+            ehEdicao = dadosOriginais.eh_edicao || false;
+            
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, JaUsouAnteriormente=${pdJaUsouAnteriormente}, EhEdicao=${ehEdicao}`);
+            
+            // ⭐⭐ REGRA 1: Se já usou PD em rodada anterior (mesmo número) ⭐⭐
+            if (pdJaUsouAnteriormente) {
+                pdSelecionado = dadosOriginais.pd_jogo_id;
+                
+                dobradaElem.textContent = "🚫 Você já utilizou sua pontuação dobrada nesta rodada em um dia anterior!";
+                pdBadge.className = 'status-badge used';
+                pdBadge.textContent = 'BLOQUEADO';
+                pdBadge.style.display = 'inline-block';
+                
+                mostrarAlertaPDUsada();
+                
+            } 
+            // ⭐⭐ REGRA 2: Se está bloqueado administrativamente ⭐⭐
+            else if (pdBloqueadaAdm) {
+                dobradaElem.textContent = "🔒 Pontuação dobrada atribuída administrativamente - não pode selecionar.";
+                pdBadge.className = 'status-badge blocked';
+                pdBadge.textContent = 'BLOQUEADA ADM';
+                pdBadge.style.display = 'inline-block';
+                
+            } 
+            // ⭐⭐ REGRA 3: Se já usou PD nesta rodada específica, mas é edição ⭐⭐
+            else if (pdJaUsada && ehEdicao) {
+                pdSelecionado = dadosOriginais.pd_jogo_id;
+                
+                dobradaElem.textContent = "🔄 Editando palpites - Você pode TROCAR a pontuação dobrada para outro jogo.";
+                pdBadge.className = 'status-badge active';
+                pdBadge.textContent = 'EDITÁVEL';
+                pdBadge.style.display = 'inline-block';
+                
+            } 
+            // ⭐⭐ REGRA 4: Se já usou PD nesta rodada e não é edição ⭐⭐
+            else if (pdJaUsada) {
+                pdSelecionado = dadosOriginais.pd_jogo_id;
+                
+                dobradaElem.textContent = "⭐ Você já utilizou sua pontuação dobrada nesta rodada.";
+                pdBadge.className = 'status-badge used';
+                pdBadge.textContent = 'UTILIZADA';
+                pdBadge.style.display = 'inline-block';
+                
+                mostrarAlertaPDUsada();
+                
+            } 
+            // ⭐⭐ REGRA 5: PD disponível ⭐⭐
+            else {
+                dobradaElem.textContent = "⭐ Você pode dobrar a pontuação de UM jogo (clique na estrela).";
+                pdBadge.className = 'status-badge active';
+                pdBadge.textContent = 'DISPONÍVEL';
+                pdBadge.style.display = 'inline-block';
+            }
+            
+            // 5. Inicializar palpites
             palpites = [];
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
-            // Restaurar palpites existentes na ORDEM ORIGINAL
+            // Restaurar palpites existentes
             if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
                 console.log("🔄 Restaurando palpites existentes");
                 
-                // Percorre jogos na ordem original
                 ordemOriginalJogos.forEach(jogoId => {
                     const jogoIdStr = String(jogoId);
                     if (dadosOriginais.palpites[jogoIdStr]) {
@@ -1031,7 +1089,7 @@
                 });
             }
             
-            // 6. Renderizar jogos (manter ordem original)
+            // 6. Renderizar jogos
             renderizarJogos();
             
             // 7. Verificar horário limite
@@ -1042,7 +1100,6 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
                 
-                // Verificar se já tem palpites completos
                 verificarEAtualizar();
             }, 500);
         }
@@ -1055,7 +1112,6 @@
                 const info = dadosOriginais.pd_jogo_info;
                 infoElem.textContent = `${info.mandante} x ${info.visitante}`;
             } else {
-                // Buscar info do jogo na lista
                 const jogoComPD = dadosOriginais.jogos.find(j => j.id == dadosOriginais.pd_jogo_id);
                 if (jogoComPD) {
                     infoElem.textContent = `${jogoComPD.mandante} x ${jogoComPD.visitante}`;
@@ -1067,7 +1123,7 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS (MANTENDO ORDEM) =====
+        // ===== RENDERIZAÇÃO DOS JOGOS =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1075,7 +1131,7 @@
             if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
                 container.innerHTML = `
                     <div class="game-card">
-                        <div style="text-align: center; padding: 20px; color: var(--gray);">
+                        <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
                             <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 10px; color: var(--warning);"></i>
                             <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
                         </div>
@@ -1084,9 +1140,8 @@
                 return;
             }
             
-            // Renderizar na ORDEM ORIGINAL que chegou do bot
+            // Renderizar na ORDEM ORIGINAL
             dadosOriginais.jogos.forEach(jogo => {
-                // Busca palpite atual (se existir)
                 const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
                     mandante: '', 
                     visitante: '', 
@@ -1096,54 +1151,73 @@
                 const isPDSelecionada = pdSelecionado == jogo.id;
                 const isPDJaUsada = dadosOriginais.pd_jogo_id == jogo.id;
                 
-                // Determinar classes CSS
+                // ⭐⭐ DETERMINAR STATUS DA PD ⭐⭐
                 let cardClass = 'game-card';
                 let starClass = 'pd-star';
                 let pdLabel = 'DOBRAR';
                 let isClickable = false;
                 let isDisabled = false;
                 
-                if (isPDJaUsada) {
-                    // PD já foi usada neste jogo específico
-                    cardClass += ' pd-used';
-                    starClass += ' used';
-                    pdLabel = 'UTILIZADA';
-                    isDisabled = true;
-                } else if (pdJaUsada) {
-                    // PD já foi usada em outro jogo desta rodada
+                // REGRA 1: PD já usada em rodada anterior
+                if (pdJaUsouAnteriormente) {
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
-                    pdLabel = 'INDISPONÍVEL';
+                    pdLabel = 'BLOQUEADO';
                     isDisabled = true;
-                } else if (pdBloqueadaAdm) {
-                    // ADM bloqueou PD para este usuário
+                } 
+                // REGRA 2: PD bloqueada administrativamente
+                else if (pdBloqueadaAdm) {
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADA';
                     isDisabled = true;
-                } else if (isPDSelecionada) {
-                    // PD selecionada neste jogo
+                } 
+                // REGRA 3: PD já usada neste jogo
+                else if (isPDJaUsada) {
+                    cardClass += ' pd-used';
+                    starClass += ' used';
+                    pdLabel = 'UTILIZADA';
+                    isDisabled = true;
+                } 
+                // REGRA 4: PD já usada em outro jogo, mas é edição
+                else if (pdJaUsada && ehEdicao) {
+                    if (isPDSelecionada) {
+                        starClass += ' active';
+                        pdLabel = 'SELECIONADA';
+                        isClickable = true;
+                    } else {
+                        isClickable = true;
+                    }
+                } 
+                // REGRA 5: PD já usada em outro jogo
+                else if (pdJaUsada) {
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'INDISPONÍVEL';
+                    isDisabled = true;
+                } 
+                // REGRA 6: PD selecionada
+                else if (isPDSelecionada) {
                     starClass += ' active';
                     pdLabel = 'SELECIONADA';
                     isClickable = true;
-                } else {
-                    // PD disponível para seleção
+                } 
+                // REGRA 7: PD disponível
+                else {
                     isClickable = true;
                 }
                 
-                // Criar card do jogo
                 const div = document.createElement('div');
                 div.className = cardClass;
+                div.style.width = '100%';
                 
                 div.innerHTML = `
-                    <!-- TIMES E PLACAR EM LINHA HORIZONTAL -->
                     <div class="teams-container">
                         <div class="team-name team-home">${jogo.mandante}</div>
                         <div class="vs-symbol">X</div>
                         <div class="team-name team-away">${jogo.visitante}</div>
                     </div>
                     
-                    <!-- PLACARES -->
                     <div class="score-container">
                         <div class="score-input-container">
                             <input type="number" min="0" max="99" class="score-input" 
@@ -1164,7 +1238,6 @@
                         </div>
                     </div>
                     
-                    <!-- ESTRELA PD NA LATERAL DIREITA -->
                     <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
                          onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
                         <div class="${starClass}">
@@ -1180,51 +1253,57 @@
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
-function togglePD(jogoId) {
-    console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
-    
-    // ⭐⭐ VERIFICAÇÕES DE BLOQUEIO ATUALIZADAS ⭐⭐
-    if (pdJaUsada) {
-        mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada em um dia anterior!");
-        return;
-    }
-    
-    if (pdBloqueadaAdm) {
-        mostrarErro("❌ Pontuação dobrada atribuída administrativamente - não pode selecionar!");
-        return;
-    }
-    
-    // Se clicar na mesma estrela, desseleciona
-    if (pdSelecionado === jogoId) {
-        pdSelecionado = null;
-        console.log("⭐ PD desselecionada");
-    } else {
-        // Se já tem uma estrela selecionada, pergunta se quer trocar
-        if (pdSelecionado !== null) {
-            if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
-                pdSelecionado = jogoId;
+        function togglePD(jogoId) {
+            console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+            
+            // ⭐⭐ VERIFICAÇÕES DE BLOQUEIO ⭐⭐
+            if (pdJaUsouAnteriormente) {
+                mostrarErro("🚫 Você já utilizou PD nesta rodada em dia anterior - BLOQUEADO PERMANENTEMENTE!");
+                return;
             }
-        } else {
-            // Seleciona nova estrela
-            pdSelecionado = jogoId;
+            
+            if (pdBloqueadaAdm) {
+                mostrarErro("🔒 Pontuação dobrada atribuída administrativamente - não pode selecionar!");
+                return;
+            }
+            
+            // Se já usou PD e não é edição, bloqueia
+            if (pdJaUsada && !ehEdicao) {
+                mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
+                return;
+            }
+            
+            // Se clicar na mesma estrela, desseleciona
+            if (pdSelecionado === jogoId) {
+                pdSelecionado = null;
+                console.log("⭐ PD desselecionada");
+            } else {
+                // Se já tem uma estrela selecionada, pergunta se quer trocar
+                if (pdSelecionado !== null) {
+                    if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
+                        pdSelecionado = jogoId;
+                    }
+                } else {
+                    // Seleciona nova estrela
+                    pdSelecionado = jogoId;
+                }
+            }
+            
+            // Atualiza array de palpites
+            atualizarPDNoArray();
+            
+            // Renderiza novamente
+            renderizarJogos();
+            verificarEAtualizar();
+            
+            // Feedback
+            if (pdSelecionado !== null) {
+                const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+                if (jogoSelecionado) {
+                    console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
+                }
+            }
         }
-    }
-    
-    // Atualiza array de palpites
-    atualizarPDNoArray();
-    
-    // Renderiza novamente
-    renderizarJogos();
-    verificarEAtualizar();
-    
-    // Feedback
-    if (pdSelecionado !== null) {
-        const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-        if (jogoSelecionado) {
-            console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
-        }
-    }
-}
 
         function atualizarPDNoArray() {
             // Remove PD de todos os palpites
@@ -1242,26 +1321,17 @@ function togglePD(jogoId) {
         }
 
         function salvarPlacar(jogoId, time, valor) {
-            // Remove caracteres não numéricos
             valor = valor.replace(/\D/g, '');
-            
-            // Limita a 2 dígitos
             valor = valor.slice(0, 2);
-            
-            // Converte para número inteiro
             const valorNum = valor === '' ? '' : parseInt(valor) || 0;
             
-            // Valida se é número válido
             if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
                 valor = '';
-                valorNum = '';
             }
             
-            // Encontra ou cria palpite para este jogo
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
             
             if (palpiteIndex === -1) {
-                // Cria novo palpite
                 palpites.push({
                     jogo_id: jogoId,
                     mandante: '',
@@ -1271,15 +1341,12 @@ function togglePD(jogoId) {
                 palpiteIndex = palpites.length - 1;
             }
             
-            // Atualiza o palpite
             palpites[palpiteIndex][time] = valorNum;
             
-            // Atualiza PD se necessário
             if (pdSelecionado === jogoId) {
                 palpites[palpiteIndex].pd = true;
             }
             
-            // Atualiza o input
             const inputs = document.querySelectorAll(`.score-input[oninput*="${jogoId}"]`);
             inputs.forEach(input => {
                 if (input.oninput.toString().includes(`'${time}'`)) {
@@ -1316,7 +1383,6 @@ function togglePD(jogoId) {
                 btnConfirmar.disabled = true;
                 btnConfirmar.innerHTML = '<i class="fas fa-ban btn-icon"></i> Horário Encerrado';
                 
-                // Desabilitar inputs
                 document.querySelectorAll('.score-input').forEach(input => {
                     input.disabled = true;
                     input.style.opacity = '0.6';
@@ -1333,7 +1399,6 @@ function togglePD(jogoId) {
                 '<i class="fas fa-paper-plane btn-icon"></i> Enviar Palpites' :
                 '<i class="fas fa-lock btn-icon"></i> Preencha todos os palpites';
             
-            // Se está completo, rola para o botão
             if (completo) {
                 setTimeout(() => {
                     btnConfirmar.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1354,24 +1419,21 @@ function togglePD(jogoId) {
             }, 5000);
         }
 
-        // ===== ENVIO DE PALPITES (ARRAY ORDENADO) =====
+        // ===== ENVIO DE PALPITES =====
         document.getElementById('btn-confirmar').onclick = () => {
             console.log("📤 Enviando palpites...");
             
-            // Verificar se todos os palpites foram preenchidos
             if (!verificarPalpitesCompletos()) {
                 mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
                 return;
             }
             
-            // Verificar horário limite novamente
             const agora = new Date();
             if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
                 mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
                 return;
             }
             
-            // ⭐⭐ PREPARAR DADOS COMO ARRAY ORDENADO ⭐⭐
             const dataToBot = {
                 tipo: 'enviar_palpites',
                 usuario: {
@@ -1383,11 +1445,10 @@ function togglePD(jogoId) {
                     id: dadosOriginais.rodada.id,
                     numero: dadosOriginais.rodada.numero
                 },
-                palpites: [], // ⭐⭐ AGORA É ARRAY, NÃO DICIONÁRIO ⭐⭐
+                palpites: [],
                 pd_jogo_id: pdSelecionado
             };
             
-            // ⭐⭐ MONTAR ARRAY ORDENADO PELA ORDEM ORIGINAL DOS JOGOS ⭐⭐
             ordemOriginalJogos.forEach(jogoId => {
                 const palpite = palpites.find(p => p.jogo_id == jogoId);
                 if (palpite && palpite.mandante !== '' && palpite.visitante !== '') {
@@ -1400,21 +1461,18 @@ function togglePD(jogoId) {
                 }
             });
             
-            console.log("📦 Dados enviados (ARRAY ORDENADO):", dataToBot);
+            console.log("📦 Dados enviados:", dataToBot);
             console.log(`📊 Total de palpites: ${dataToBot.palpites.length}`);
             
-            // Verificar se há palpites para enviar
             if (dataToBot.palpites.length === 0) {
                 mostrarErro("❌ Nenhum palpite preenchido!");
                 return;
             }
             
-            // Feedback visual
             const btnConfirmar = document.getElementById('btn-confirmar');
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btnConfirmar.disabled = true;
             
-            // Enviar para o bot
             if (tg && tg.sendData) {
                 tg.sendData(JSON.stringify(dataToBot));
                 console.log("✅ Dados enviados para o bot");
@@ -1422,7 +1480,6 @@ function togglePD(jogoId) {
                 console.log("📤 Dados simulados (Telegram não disponível):", dataToBot);
             }
             
-            // Fechar o web app após 1.5 segundos
             setTimeout(() => {
                 if (tg && tg.close) {
                     tg.close();
