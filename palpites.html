@@ -7,690 +7,686 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
-:root {
-    --primary: #4361ee;
-    --secondary: #3a0ca3;
-    --success: #4cc9f0;
-    --danger: #f72585;
-    --warning: #f8961e;
-    --dark: #212529;
-    --light: #f8f9fa;
-    --gray: #6c757d;
-    --light-gray: #e9ecef;
-    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; 
-    -webkit-tap-highlight-color: transparent;
-    font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-body { 
-    background: white;
-    color: var(--dark);
-    min-height: 100vh;
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* ===== CONTAINER PRINCIPAL ===== */
-.app-container {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.main-card {
-    background: white;
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    overflow: hidden;
-    animation: slideUp 0.5s ease-out;
-}
-
-.main-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 5px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    z-index: 1;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== HEADER DA RODADA ===== */
-.header-section {
-    text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.rodada-number {
-    font-size: 26px;
-    font-weight: 800;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.rodada-icon {
-    font-size: 22px;
-}
-
-/* ===== STATUS INFORMAÇÕES ===== */
-.status-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.status-card {
-    background: var(--light);
-    border-radius: 15px;
-    padding: 15px;
-    border-left: 4px solid;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-    transition: var(--transition);
-}
-
-.status-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.status-card.horario {
-    border-left-color: var(--primary);
-}
-
-.status-card.trunfo {
-    border-left-color: var(--warning);
-}
-
-.status-card.dobrada {
-    border-left-color: var(--success);
-}
-
-.status-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    font-weight: 700;
-    color: var(--dark);
-    font-size: 14px;
-}
-
-.status-icon {
-    font-size: 16px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.status-card.horario .status-icon {
-    background: rgba(67, 97, 238, 0.1);
-    color: var(--primary);
-}
-
-.status-card.trunfo .status-icon {
-    background: rgba(248, 150, 30, 0.1);
-    color: var(--warning);
-}
-
-.status-card.dobrada .status-icon {
-    background: rgba(76, 201, 240, 0.1);
-    color: var(--success);
-}
-
-.status-content {
-    font-size: 12px;
-    line-height: 1.5;
-    color: var(--gray);
-}
-
-.time-remaining {
-    display: inline-block;
-    margin-top: 6px;
-    padding: 4px 10px;
-    background: rgba(67, 97, 238, 0.1);
-    border-radius: 50px;
-    font-weight: 700;
-    color: var(--primary);
-    font-size: 11px;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 700;
-    margin-top: 6px;
-}
-
-.status-badge.active {
-    background: rgba(76, 201, 240, 0.1);
-    color: var(--success);
-}
-
-.status-badge.inactive {
-    background: rgba(108, 117, 125, 0.1);
-    color: var(--gray);
-}
-
-.status-badge.used {
-    background: rgba(247, 37, 133, 0.1);
-    color: var(--danger);
-}
-
-.status-badge.blocked {
-    background: rgba(108, 117, 125, 0.15);
-    color: var(--gray);
-}
-
-/* ===== ALERTA DE PD JÁ USADA ===== */
-.pd-used-alert {
-    background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
-    border: 1px solid rgba(247, 37, 133, 0.2);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
-    70% { box-shadow: 0 0 0 8px rgba(247, 37, 133, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
-}
-
-.pd-used-icon {
-    font-size: 22px;
-    color: var(--danger);
-    flex-shrink: 0;
-}
-
-.pd-used-text {
-    flex-grow: 1;
-}
-
-.pd-used-title {
-    font-weight: 700;
-    color: var(--danger);
-    margin-bottom: 3px;
-    font-size: 14px;
-}
-
-.pd-used-info {
-    font-size: 12px;
-    color: #666;
-    line-height: 1.4;
-}
-
-.pd-used-game {
-    font-weight: 700;
-    color: var(--dark);
-}
-
-/* ===== LISTA DE JOGOS - LAYOUT REAJUSTADO ===== */
-.games-section {
-    margin-bottom: 20px;
-}
-
-.games-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--dark);
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.games-title i {
-    color: var(--primary);
-}
-
-.game-card {
-    background: white;
-    border-radius: 16px;
-    padding: 12px;
-    margin-bottom: 12px;
-    border: 1px solid var(--light-gray);
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 60px;
-}
-
-.game-card:hover {
-    border-color: var(--primary);
-    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.08);
-}
-
-.game-card.pd-blocked {
-    background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
-    border-color: rgba(108, 117, 125, 0.2);
-}
-
-.game-card.pd-used {
-    background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
-    border-color: rgba(247, 37, 133, 0.2);
-}
-
-/* ===== LAYOUT HORIZONTAL - MAIS ESPAÇO PARA TIMES ===== */
-.teams-container {
-    flex: 2.5; /* ⭐⭐ AUMENTADO: Mais espaço para times ⭐⭐ */
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    min-width: 0;
-}
-
-.team-name {
-    font-size: 13px; /* ⭐⭐ AUMENTADO: Fonte maior ⭐⭐ */
-    font-weight: 700;
-    padding: 6px 8px;
-    border-radius: 8px;
-    text-align: center;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    line-height: 1.2;
-}
-
-.team-home {
-    background: rgba(67, 97, 238, 0.1);
-    color: var(--primary);
-}
-
-.team-away {
-    background: rgba(58, 12, 163, 0.1);
-    color: var(--secondary);
-}
-
-.vs-symbol {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--gray);
-    min-width: 20px;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-/* ===== PLACARES COMPACTOS - MENOR ===== */
-.score-container {
-    display: flex;
-    align-items: center;
-    gap: 5px; /* ⭐⭐ REDUZIDO: Menos espaço ⭐⭐ */
-    margin: 0 5px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    flex: 1; /* ⭐⭐ MENOS ESPAÇO ⭐⭐ */
-}
-
-.score-input-container {
-    position: relative;
-    width: 40px; /* ⭐⭐ REDUZIDO: De 50px para 40px ⭐⭐ */
-}
-
-.score-input {
-    width: 100%;
-    height: 40px; /* ⭐⭐ REDUZIDO: De 45px para 40px ⭐⭐ */
-    border: 2px solid #e0e7ff;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 18px; /* ⭐⭐ REDUZIDO: De 20px para 18px ⭐⭐ */
-    font-weight: 800;
-    outline: none;
-    background: #f8faff;
-    transition: var(--transition);
-    color: var(--dark);
-}
-
-.score-input:focus {
-    border-color: var(--primary);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-}
-
-.score-input::placeholder {
-    color: #d0d7ff;
-    font-weight: 400;
-    font-size: 14px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-}
-
-.score-input:disabled {
-    background: #f5f5f5;
-    border-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-}
-
-/* ===== ESTRELA PD - MENOR ===== */
-.pd-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 40px; /* ⭐⭐ REDUZIDO: De 50px para 40px ⭐⭐ */
-    height: 40px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-    padding: 4px;
-    border-radius: 8px;
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-.pd-container.disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-.pd-container.clickable:hover:not(.disabled) {
-    background: rgba(255, 215, 0, 0.05);
-    transform: translateY(-2px);
-}
-
-.pd-star {
-    font-size: 20px; /* ⭐⭐ REDUZIDO: De 24px para 20px ⭐⭐ */
-    color: #e0e0e0;
-    transition: var(--transition);
-    filter: grayscale(1);
-    position: relative;
-}
-
-.pd-star.active {
-    color: #ffd700;
-    filter: grayscale(0);
-    transform: scale(1.1);
-    text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-}
-
-.pd-star.used {
-    color: var(--danger);
-    filter: grayscale(0);
-}
-
-.pd-star.blocked {
-    color: #cccccc;
-    filter: grayscale(1);
-}
-
-.pd-label {
-    font-size: 8px; /* ⭐⭐ REDUZIDO: De 9px para 8px ⭐⭐ */
-    font-weight: 700;
-    margin-top: 2px;
-    color: #999;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: var(--transition);
-}
-
-.pd-star.active + .pd-label {
-    color: #ffd700;
-}
-
-.pd-star.used + .pd-label {
-    color: var(--danger);
-}
-
-.pd-star.blocked + .pd-label {
-    color: #cccccc;
-}
-
-.pd-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: var(--danger);
-    color: white;
-    font-size: 7px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    padding: 1px 5px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    border-radius: 50px;
-    font-weight: 700;
-}
-
-/* ===== FOOTER BOTÕES ===== */
-.footer-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.action-btn {
-    padding: 16px;
-    border: none;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.action-btn:active {
-    transform: scale(0.98);
-}
-
-.btn-cancel {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
-    color: white;
-}
-
-.btn-send {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
-}
-
-.btn-send:disabled {
-    background: linear-gradient(135deg, #cccccc 0%, #aaaaaa 100%);
-    box-shadow: none;
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn-icon {
-    font-size: 16px;
-}
-
-/* ===== LOADING E ERROS ===== */
-.loading-container {
-    text-align: center;
-    padding: 40px 15px;
-}
-
-.loading-spinner {
-    font-size: 40px;
-    color: var(--primary);
-    margin-bottom: 15px;
-    animation: spin 1.5s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-text {
-    font-size: 16px;
-    color: var(--gray);
-    font-weight: 600;
-}
-
-.error-message {
-    background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
-    border: 1px solid rgba(247, 37, 133, 0.3);
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 20px;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    animation: shake 0.5s ease-in-out;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    75% { transform: translateX(8px); }
-}
-
-.error-icon {
-    font-size: 20px;
-    color: var(--danger);
-    flex-shrink: 0;
-}
-
-.error-text {
-    font-weight: 700;
-    color: var(--danger);
-    font-size: 14px;
-}
-
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 480px) {
-    .main-card {
-        padding: 15px;
-        border-radius: 16px;
-    }
-    
-    .status-section {
-        grid-template-columns: 1fr;
-    }
-    
-    .rodada-number {
-        font-size: 22px;
-    }
-    
-    .game-card {
-        padding: 10px;
-        gap: 6px;
-    }
-    
-    .team-name {
-        font-size: 12px; /* ⭐⭐ FONTE AINDA LEGÍVEL ⭐⭐ */
-        padding: 5px 6px;
-    }
-    
-    .score-input {
-        height: 36px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-        font-size: 16px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    }
-    
-    .score-input-container {
-        width: 35px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    }
-    
-    .pd-container {
-        width: 36px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-        height: 36px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    }
-    
-    .pd-star {
-        font-size: 18px; /* ⭐⭐ REDUZIDO ⭐⭐ */
-    }
-    
-    .footer-buttons {
-        grid-template-columns: 1fr;
-    }
-    
-    .action-btn {
-        padding: 14px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 380px) {
-    .game-card {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    .pd-container {
-        margin-left: 0;
-        margin-top: 5px;
-    }
-    
-    .teams-container {
-        order: 1;
-        width: 100%;
-    }
-    
-    .score-container {
-        order: 2;
-        margin: 5px auto;
-    }
-    
-    .pd-container {
-        order: 3;
-        margin: 0 auto;
-    }
-}
-
-/* ===== ANIMAÇÕES ===== */
-.pulse {
-    animation: pulse 2s infinite;
-}
-
-/* ===== SCROLLBAR ===== */
-::-webkit-scrollbar {
-    width: 4px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
-}
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body { 
+            background: white;
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* ===== CONTAINER PRINCIPAL ===== */
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 1;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== HEADER DA RODADA ===== */
+        .header-section {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+        
+        .rodada-number {
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .rodada-icon {
+            font-size: 22px;
+        }
+        
+        /* ===== STATUS INFORMAÇÕES ===== */
+        .status-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .status-card {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 15px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            transition: var(--transition);
+        }
+        
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-card.horario {
+            border-left-color: var(--primary);
+        }
+        
+        .status-card.trunfo {
+            border-left-color: var(--warning);
+        }
+        
+        .status-card.dobrada {
+            border-left-color: var(--success);
+        }
+        
+        .status-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 14px;
+        }
+        
+        .status-icon {
+            font-size: 16px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .status-card.horario .status-icon {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .status-card.trunfo .status-icon {
+            background: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+        
+        .status-card.dobrada .status-icon {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-content {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--gray);
+        }
+        
+        .time-remaining {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 50px;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 11px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+        
+        .status-badge.active {
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+        
+        .status-badge.inactive {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--gray);
+        }
+        
+        .status-badge.used {
+            background: rgba(247, 37, 133, 0.1);
+            color: var(--danger);
+        }
+        
+        .status-badge.blocked {
+            background: rgba(108, 117, 125, 0.15);
+            color: var(--gray);
+        }
+        
+        /* ===== ALERTA DE PD JÁ USADA ===== */
+        .pd-used-alert {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
+            border: 1px solid rgba(247, 37, 133, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
+            70% { box-shadow: 0 0 0 8px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+        
+        .pd-used-icon {
+            font-size: 22px;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+        
+        .pd-used-text {
+            flex-grow: 1;
+        }
+        
+        .pd-used-title {
+            font-weight: 700;
+            color: var(--danger);
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .pd-used-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .pd-used-game {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        /* ===== LISTA DE JOGOS ===== */
+        .games-section {
+            margin-bottom: 20px;
+        }
+        
+        .games-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .games-title i {
+            color: var(--primary);
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border: 1px solid var(--light-gray);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 70px;
+        }
+        
+        .game-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.08);
+        }
+        
+        .game-card.pd-blocked {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
+            border-color: rgba(108, 117, 125, 0.2);
+        }
+        
+        .game-card.pd-used {
+            background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
+            border-color: rgba(247, 37, 133, 0.2);
+        }
+        
+        /* ===== LAYOUT HORIZONTAL COMPACTO ===== */
+        .teams-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        
+        .team-name {
+            font-size: 14px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .team-home {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+        
+        .team-away {
+            background: rgba(58, 12, 163, 0.1);
+            color: var(--secondary);
+        }
+        
+        .vs-symbol {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--gray);
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        /* ===== PLACARES COMPACTOS ===== */
+        .score-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 10px;
+        }
+        
+        .score-input-container {
+            position: relative;
+            width: 50px;
+        }
+        
+        .score-input {
+            width: 100%;
+            height: 45px;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 800;
+            outline: none;
+            background: #f8faff;
+            transition: var(--transition);
+            color: var(--dark);
+        }
+        
+        .score-input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .score-input::placeholder {
+            color: #d0d7ff;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        
+        .score-input:disabled {
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        /* ===== ESTRELA PD (LATERAL DIREITA) ===== */
+        .pd-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        
+        .pd-container.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+        
+        .pd-container.clickable:hover:not(.disabled) {
+            background: rgba(255, 215, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .pd-star {
+            font-size: 24px;
+            color: #e0e0e0;
+            transition: var(--transition);
+            filter: grayscale(1);
+            position: relative;
+        }
+        
+        .pd-star.active {
+            color: #ffd700;
+            filter: grayscale(0);
+            transform: scale(1.1);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .pd-star.used {
+            color: var(--danger);
+            filter: grayscale(0);
+        }
+        
+        .pd-star.blocked {
+            color: #cccccc;
+            filter: grayscale(1);
+        }
+        
+        .pd-label {
+            font-size: 9px;
+            font-weight: 700;
+            margin-top: 3px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+        }
+        
+        .pd-star.active + .pd-label {
+            color: #ffd700;
+        }
+        
+        .pd-star.used + .pd-label {
+            color: var(--danger);
+        }
+        
+        .pd-star.blocked + .pd-label {
+            color: #cccccc;
+        }
+        
+        .pd-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 50px;
+            font-weight: 700;
+        }
+        
+        /* ===== FOOTER BOTÕES ===== */
+        .footer-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+            color: white;
+        }
+        
+        .btn-send {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.2);
+        }
+        
+        .btn-send:disabled {
+            background: linear-gradient(135deg, #cccccc 0%, #aaaaaa 100%);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-icon {
+            font-size: 16px;
+        }
+        
+        /* ===== LOADING E ERROS ===== */
+        .loading-container {
+            text-align: center;
+            padding: 40px 15px;
+        }
+        
+        .loading-spinner {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 16px;
+            color: var(--gray);
+            font-weight: 600;
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        
+        .error-icon {
+            font-size: 20px;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+        
+        .error-text {
+            font-weight: 700;
+            color: var(--danger);
+            font-size: 14px;
+        }
+        
+        /* ===== RESPONSIVIDADE ===== */
+        @media (max-width: 480px) {
+            .main-card {
+                padding: 15px;
+                border-radius: 16px;
+            }
+            
+            .status-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .rodada-number {
+                font-size: 22px;
+            }
+            
+            .game-card {
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .team-name {
+                font-size: 12px;
+                padding: 4px 8px;
+            }
+            
+            .score-input {
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .score-input-container {
+                width: 45px;
+            }
+            
+            .pd-container {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .pd-star {
+                font-size: 20px;
+            }
+            
+            .footer-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-btn {
+                padding: 14px;
+                font-size: 13px;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .game-card {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .pd-container {
+                margin-left: 0;
+                margin-top: 5px;
+            }
+            
+            .teams-container {
+                order: 1;
+                width: 100%;
+            }
+            
+            .score-container {
+                order: 2;
+                margin: 5px auto;
+            }
+            
+            .pd-container {
+                order: 3;
+                margin: 0 auto;
+            }
+        }
+        
+        /* ===== ANIMAÇÕES ===== */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 <body>
@@ -771,17 +767,6 @@ body {
                         </div>
                     </div>
                 </div>
-                                <!-- ALERTA DE MODO EDIÇÃO -->
-                <div id="edicao-alert" class="pd-used-alert" style="display: none; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-color: rgba(33, 150, 243, 0.2);">
-                    <i class="fas fa-edit pd-used-icon" style="color: #2196f3;"></i>
-                    <div class="pd-used-text">
-                        <div class="pd-used-title" style="color: #1976d2;">📝 MODO EDIÇÃO ATIVADO</div>
-                        <div class="pd-used-info">
-                            Você está editando seus palpites. 
-                            <span id="edicao-pd-status" class="pd-used-game"></span>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- LISTA DE JOGOS -->
                 <div class="games-section">
@@ -821,36 +806,30 @@ body {
         let pdBloqueadaAdm = false; // Quando ADM marca que não pode usar
 
         // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Informa o Telegram que a app está pronta
-                tg.ready();
-                
-                // Força a expansão para ecrã total imediatamente
-                tg.expand();
-                
-                // Configurações adicionais de UX
-                tg.enableClosingConfirmation(); // Evita fechar sem querer
-                
-                // Mudar a cor do cabeçalho para combinar com a app (opcional)
-                if (tg.setHeaderColor) {
-                    tg.setHeaderColor('#4361ee'); 
+                // ⭐⭐ TELA CHEIA IMEDIATA (CORREÇÃO ANDROID) ⭐⭐
+                try {
+                    tg.ready();
+                    tg.expand(); // ⭐⭐ EXPANDE IMEDIATAMENTE ⭐⭐
+                    tg.enableClosingConfirmation();
+                    
+                    console.log("✅ Web App expandido em tela cheia");
+                    
+                } catch (error) {
+                    console.error("❌ Erro ao expandir Web App:", error);
                 }
-
-                console.log("✅ Web App configurado e expandido");
                 
-                // Carregar os dados após a expansão
+                // Carregar dados
                 carregarDadosRodada();
                 
             } else {
-                console.error("Telegram Web App não disponível - Verifique se está a abrir via Bot");
-                // Fallback para testes fora do Telegram
-                carregarDadosRodada();
+                console.error("Telegram Web App não disponível");
+                setTimeout(carregarDadosRodada, 500);
             }
         }
 
@@ -992,37 +971,15 @@ body {
                 trunfoBadge.style.display = 'inline-block';
             }
             
-                    // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
-        const dobradaElem = document.getElementById('txt-dobrada');
-        const pdBadge = document.getElementById('pd-badge');
-        
-        // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
-        pdJaUsada = dadosOriginais.pd_ja_usada || false;
-        pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
-
-                // ⭐⭐ VERIFICA SE É EDIÇÃO E SE PODE MUDAR PD ⭐⭐
-        const ehEdicao = dadosOriginais.eh_edicao || false;
-        
-        if (ehEdicao) {
-            console.log("📝 MODO EDIÇÃO ATIVADO");
+            // 4. Pontuação Dobrada - LÓGICA ATUALIZADA
+            const dobradaElem = document.getElementById('txt-dobrada');
+            const pdBadge = document.getElementById('pd-badge');
             
-            // Se é edição e PD já foi usada, NÃO pode mudar
-            if (pdJaUsada) {
-                console.log("🔒 Edição: PD já usada → NÃO pode mudar");
-            } else if (pdBloqueadaAdm) {
-                console.log("🔒 Edição: PD bloqueada pelo ADM → NÃO pode mudar");
-            } else {
-                console.log("🔓 Edição: PD disponível → PODE trocar escolha");
-                // PD disponível para troca (lógica normal)
-            }
-        }
+            // ⭐⭐ VERIFICAÇÕES DOS NOVOS CAMPOS ⭐⭐
+            pdJaUsada = dadosOriginais.pd_ja_usada || false;
+            pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
             
-        console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
-        
-        // ⭐⭐ SE PD JÁ USADA, BUSCA INFO DO JOGO ⭐⭐
-        if (pdJaUsada && dadosOriginais.pd_jogo_info) {
-            console.log(`⭐ PD usada no jogo: ${dadosOriginais.pd_jogo_info.mandante} x ${dadosOriginais.pd_jogo_info.visitante}`);
-        }
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}`);
             
             if (pdJaUsada) {
                 // PD JÁ FOI USADA PELO USUÁRIO
@@ -1036,15 +993,12 @@ body {
                 // Mostrar alerta com info do jogo
                 mostrarAlertaPDUsada();
                 
-                            } else if (pdBloqueadaAdm) {
-                    // ⭐⭐ PD BLOQUEADA ADMINISTRATIVAMENTE ⭐⭐
-                    cardClass += ' pd-blocked';
-                    starClass += ' blocked';
-                    pdLabel = 'BLOQUEADA (ADM)';
-                    isDisabled = true;
-                    
-                    // Adiciona tooltip informativo
-                    div.title = "Pontuação dobrada bloqueada administrativamente";
+            } else if (pdBloqueadaAdm) {
+                // ADM BLOQUEOU PD PARA ESTE USUÁRIO
+                dobradaElem.textContent = "⭐ Pontuação dobrada atribuída pelo ADM - não pode selecionar.";
+                pdBadge.className = 'status-badge blocked';
+                pdBadge.textContent = 'BLOQUEADA';
+                pdBadge.style.display = 'inline-block';
                 
             } else {
                 // PD DISPONÍVEL
@@ -1092,105 +1046,7 @@ body {
                 verificarEAtualizar();
             }, 500);
         }
-            // 8. Esconder loading e mostrar conteúdo
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                
-                // Verificar se já tem palpites completos
-                verificarEAtualizar();
-                
-                // ⭐⭐ MOSTRAR ALERTA DE EDIÇÃO SE FOR O CASO ⭐⭐
-                if (dadosOriginais.eh_edicao) {
-                    mostrarAlertaEdicao();
-                }
-            }, 500);
-        
-                function mostrarAlertaEdicao() {
-            const alerta = document.getElementById('edicao-alert');
-            const statusElem = document.getElementById('edicao-pd-status');
-            
-            if (dadosOriginais.eh_edicao) {
-                let statusText = "";
-                
-                if (pdJaUsada) {
-                    statusText = "PD já utilizada → <strong>NÃO pode alterar</strong>";
-                } else if (pdBloqueadaAdm) {
-                    statusText = "PD bloqueada pelo ADM → <strong>NÃO pode usar</strong>";
-                } else {
-                    statusText = "PD disponível → <strong>PODE transferir ou remover</strong>";
-                }
-                
-                statusElem.innerHTML = statusText;
-                alerta.style.display = 'flex';
-                
-                // Esconde após 10 segundos
-                setTimeout(() => {
-                    alerta.style.display = 'none';
-                }, 10000);
-            }
-        }
 
-                function validarEnvioFinal() {
-            // 1. Verifica se todos os palpites estão preenchidos
-            if (!verificarPalpitesCompletos()) {
-                mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
-                return false;
-            }
-            
-            // 2. Verifica horário limite
-            const agora = new Date();
-            if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
-                mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
-                return false;
-            }
-            
-            // 3. Verifica se usuário com trunfo ainda está no horário
-            if (dadosOriginais.trunfo && horarioLimite) {
-                const horarioTrunfo = new Date(horarioLimite.getTime() + 30 * 60000);
-                if (agora > horarioTrunfo) {
-                    mostrarErro("❌ Horário do trunfo expirado! Você não pode mais enviar palpites.");
-                    return false;
-                }
-            }
-            
-            // 4. Verifica consistência da PD
-            if (pdSelecionado !== null) {
-                // Verifica se o jogo da PD existe
-                const jogoPD = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-                if (!jogoPD) {
-                    mostrarErro("❌ Erro: Jogo selecionado para PD não encontrado!");
-                    return false;
-                }
-                
-                // Verifica se o palpite da PD está preenchido
-                const palpitePD = palpites.find(p => p.jogo_id == pdSelecionado);
-                if (!palpitePD || palpitePD.mandante === '' || palpitePD.visitante === '') {
-                    mostrarErro("❌ Preencha o placar do jogo com pontuação dobrada!");
-                    return false;
-                }
-            }
-            
-            // 5. Verifica se é edição e PD está sendo alterada
-            if (dadosOriginais.eh_edicao && pdSelecionado !== null) {
-                const pdOriginal = dadosOriginais.pd_jogo_id;
-                
-                if (pdOriginal !== null && pdSelecionado !== pdOriginal) {
-                    // PD está sendo alterada - confirmação extra
-                    const jogoOriginal = dadosOriginais.jogos.find(j => j.id == pdOriginal);
-                    const jogoNovo = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-                    
-                    if (jogoOriginal && jogoNovo) {
-                        if (!confirm(`⚠️ **CONFIRMAR ALTERAÇÃO DE PD**\n\nVocê está transferindo a pontuação dobrada de:\n"${jogoOriginal.mandante} x ${jogoOriginal.visitante}"\n\nPara:\n"${jogoNovo.mandante} x ${jogoNovo.visitante}"\n\nTem certeza?`)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            
-            return true;
-        }
-        
         function mostrarAlertaPDUsada() {
             const alerta = document.getElementById('pd-used-alert');
             const infoElem = document.getElementById('pd-game-info');
@@ -1268,16 +1124,12 @@ body {
                 } else if (isPDSelecionada) {
                     // PD selecionada neste jogo
                     starClass += ' active';
-                    // ⭐⭐ SE FOR EDIÇÃO, MOSTRA "SELECIONADA (EDITANDO)" ⭐⭐
-                    if (dadosOriginais.eh_edicao) {
-                        pdLabel = 'SELECIONADA';
-                        // Adiciona tooltip informativo
-                        div.title = "Clique para transferir ou remover PD";
-                    } else {
-                        pdLabel = 'SELECIONADA';
-                    }
-                    
+                    pdLabel = 'SELECIONADA';
                     isClickable = true;
+                } else {
+                    // PD disponível para seleção
+                    isClickable = true;
+                }
                 
                 // Criar card do jogo
                 const div = document.createElement('div');
@@ -1328,35 +1180,10 @@ body {
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
-                function togglePD(jogoId) {
+        function togglePD(jogoId) {
             console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
             
-            // ⭐⭐ VERIFICA SE É EDIÇÃO ⭐⭐
-            const ehEdicao = dadosOriginais.eh_edicao || false;
-            
-            if (ehEdicao) {
-                console.log("📝 Modo edição ativo");
-                
-                // ⭐⭐ VERIFICA SE AINDA ESTÁ NO HORÁRIO ⭐⭐
-                const agora = new Date();
-                const horarioLimiteObj = horarioLimite;
-                
-                if (horarioLimiteObj && agora > horarioLimiteObj && !dadosOriginais.trunfo) {
-                    mostrarErro("❌ Horário limite expirado! Não pode mais alterar PD.");
-                    return;
-                }
-                
-                // ⭐⭐ SE TEM TRUNFO, VERIFICA HORÁRIO TRUNFO ⭐⭐
-                if (dadosOriginais.trunfo && horarioLimiteObj) {
-                    const horarioTrunfo = new Date(horarioLimiteObj.getTime() + 30 * 60000); // +30min
-                    if (agora > horarioTrunfo) {
-                        mostrarErro("❌ Horário do trunfo expirado! Não pode mais alterar PD.");
-                        return;
-                    }
-                }
-            }
-            
-            // VERIFICAÇÕES DE BLOQUEIO (independente de ser edição)
+            // VERIFICAÇÕES DE BLOQUEIO
             if (pdJaUsada) {
                 mostrarErro("❌ Você já utilizou a pontuação dobrada nesta rodada!");
                 return;
@@ -1367,43 +1194,19 @@ body {
                 return;
             }
             
-            // ⭐⭐ LÓGICA DE SELEÇÃO/DESSELEÇÃO ⭐⭐
             // Se clicar na mesma estrela, desseleciona
             if (pdSelecionado === jogoId) {
                 pdSelecionado = null;
                 console.log("⭐ PD desselecionada");
-                
-                // Se for edição, informa que PD foi removida
-                if (ehEdicao) {
-                    console.log("📝 Edição: PD removida do jogo");
-                }
             } else {
-                // Se já tem uma estrela selecionada
+                // Se já tem uma estrela selecionada, pergunta se quer trocar
                 if (pdSelecionado !== null) {
                     if (confirm("⚠️ Você já selecionou uma estrela em outro jogo. Deseja transferir a pontuação dobrada para este jogo?")) {
-                        const jogoAnterior = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-                        const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
-                        
                         pdSelecionado = jogoId;
-                        console.log(`⭐ PD transferida de jogo ${pdSelecionado} para ${jogoId}`);
-                        
-                        if (ehEdicao && jogoAnterior && jogoNovo) {
-                            console.log(`📝 Edição: PD transferida de "${jogoAnterior.mandante} x ${jogoAnterior.visitante}" para "${jogoNovo.mandante} x ${jogoNovo.visitante}"`);
-                        }
-                    } else {
-                        return; // Usuário cancelou
                     }
                 } else {
                     // Seleciona nova estrela
                     pdSelecionado = jogoId;
-                    console.log(`⭐ PD selecionada para jogo ${jogoId}`);
-                    
-                    if (ehEdicao) {
-                        const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == jogoId);
-                        if (jogoSelecionado) {
-                            console.log(`📝 Edição: PD atribuída a "${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}"`);
-                        }
-                    }
                 }
             }
             
@@ -1414,11 +1217,11 @@ body {
             renderizarJogos();
             verificarEAtualizar();
             
-            // Feedback visual para edição
-            if (ehEdicao && pdSelecionado !== null) {
+            // Feedback
+            if (pdSelecionado !== null) {
                 const jogoSelecionado = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
                 if (jogoSelecionado) {
-                    console.log(`📝 Edição confirmada: PD em "${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}"`);
+                    console.log(`⭐ PD selecionada para: ${jogoSelecionado.mandante} x ${jogoSelecionado.visitante}`);
                 }
             }
         }
@@ -1555,12 +1358,19 @@ body {
         document.getElementById('btn-confirmar').onclick = () => {
             console.log("📤 Enviando palpites...");
             
-            // ⭐⭐ VALIDAÇÃO FINAL ⭐⭐
-            if (!validarEnvioFinal()) {
+            // Verificar se todos os palpites foram preenchidos
+            if (!verificarPalpitesCompletos()) {
+                mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
                 return;
             }
             
-            // Resto do código permanece igual...
+            // Verificar horário limite novamente
+            const agora = new Date();
+            if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
+                mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
+                return;
+            }
+            
             // ⭐⭐ PREPARAR DADOS COMO ARRAY ORDENADO ⭐⭐
             const dataToBot = {
                 tipo: 'enviar_palpites',
