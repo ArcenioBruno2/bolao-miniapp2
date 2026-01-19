@@ -941,31 +941,135 @@
 
         // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosRodada() {
+    try {
+        console.log("🔄 Iniciando carregamento de dados...");
+        
+        // Método 1: Tenta usar URLSearchParams primeiro
+        const urlParams = new URLSearchParams(window.location.search);
+        let dadosBase64 = urlParams.get('data');
+        
+        console.log("📊 Parâmetros da URL:", window.location.search);
+        console.log("📊 Parâmetro 'data' via URLSearchParams:", dadosBase64 ? "Encontrado" : "Não encontrado");
+        
+        // Método 2: Se não encontrou, procura manualmente na URL
+        if (!dadosBase64) {
+            console.log("🔍 Buscando manualmente na URL...");
+            const urlString = window.location.href;
+            const match = urlString.match(/data=([^&]+)/);
+            
+            if (match) {
+                dadosBase64 = match[1];
+                console.log("✅ Dados encontrados manualmente:", dadosBase64.substring(0, 50) + "...");
+            }
+        }
+        
+        // Método 3: Tenta encontrar em qualquer parte da URL
+        if (!dadosBase64) {
+            console.log("🔍 Buscando em qualquer parte da URL...");
+            const urlString = window.location.href;
+            const parts = urlString.split('data=');
+            
+            if (parts.length > 1) {
+                dadosBase64 = parts[1];
+                // Remove qualquer fragmento (#) ou parâmetro adicional (&)
+                dadosBase64 = dadosBase64.split('#')[0].split('&')[0];
+                console.log("✅ Dados extraídos da URL:", dadosBase64.substring(0, 50) + "...");
+            }
+        }
+        
+        if (!dadosBase64) {
+            throw new Error("Parâmetro 'data' não encontrado na URL");
+        }
+        
+        console.log("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
+        
+        // Decodifica os dados
+        try {
+            // Primeiro tenta decodificar diretamente
+            let dadosJson;
+            
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const dadosBase64 = urlParams.get('data');
+                dadosJson = atob(dadosBase64);
+            } catch (e1) {
+                console.log("⚠️ Tentando com decodeURIComponent...");
+                // Tenta decodificar caracteres especiais primeiro
+                dadosBase64 = decodeURIComponent(dadosBase64);
+                dadosJson = atob(dadosBase64);
+            }
+            
+            dadosOriginais = JSON.parse(dadosJson);
+            console.log("📊 Dados recebidos com sucesso!");
+            console.log("- Rodada:", dadosOriginais.rodada?.numero);
+            console.log("- Jogos:", dadosOriginais.jogos?.length || 0);
+            console.log("- Usuário:", dadosOriginais.usuario?.nome);
+            
+            // Inicializar ordem original dos jogos
+            ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
+            
+            // Atualizar interface
+            atualizarInterface();
+            
+        } catch (decodeError) {
+            console.error("❌ Erro ao decodificar dados:", decodeError);
+            
+            // Tenta uma abordagem mais robusta
+            try {
+                console.log("🔄 Tentando abordagem alternativa...");
                 
-                if (!dadosBase64) {
-                    throw new Error("Dados não encontrados na URL");
+                // Remove possíveis espaços ou quebras de linha
+                dadosBase64 = dadosBase64.trim().replace(/\s/g, '');
+                
+                // Adiciona padding se necessário
+                while (dadosBase64.length % 4 !== 0) {
+                    dadosBase64 += '=';
                 }
                 
                 const dadosJson = atob(dadosBase64);
                 dadosOriginais = JSON.parse(dadosJson);
                 
-                console.log("📊 Dados recebidos:", dadosOriginais);
+                console.log("✅ Dados decodificados com abordagem alternativa!");
                 
-                // Inicializar ordem original dos jogos
                 ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
-                
-                // Atualizar interface
                 atualizarInterface();
                 
-            } catch (e) {
-                console.error("❌ Erro ao carregar dados", e);
-                mostrarErro("Erro ao carregar dados da rodada: " + e.message);
+            } catch (finalError) {
+                console.error("❌ Falha total ao decodificar:", finalError);
+                throw new Error("Falha ao decodificar dados: " + finalError.message);
             }
         }
-
+        
+    } catch (e) {
+        console.error("❌ Erro crítico ao carregar dados", e);
+        
+        // Cria mensagem de erro detalhada
+        let errorMsg = "Erro ao carregar dados da rodada: " + e.message;
+        errorMsg += "\n\nURL: " + window.location.href.substring(0, 100) + "...";
+        
+        // Mostra erro na interface
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+            
+            const errorBox = document.getElementById('error-box');
+            const errorText = document.getElementById('error-text');
+            
+            // Formata a mensagem para HTML
+            errorMsg = errorMsg.replace(/\n/g, '<br>');
+            errorText.innerHTML = errorMsg;
+            errorBox.style.display = 'flex';
+            
+            // Atualiza botão para voltar
+            const btnSair = document.getElementById('btn-sair');
+            btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar ao Bot';
+            btnSair.onclick = () => {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.close();
+                }
+            };
+            
+        }, 1000);
+    }
+}
         // ===== ATUALIZAÇÃO DA INTERFACE =====
         function atualizarInterface() {
             // 1. Número da rodada
