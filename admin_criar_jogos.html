@@ -1163,66 +1163,105 @@
                 return;
             }
             
-            // ⭐⭐ PREENCHE LISTA DE PONTUAÇÃO DOBRADA ⭐⭐
-            usuariosDobradaList.innerHTML = '';
-            todosUsuarios.forEach(usuario => {
-                const usuarioDiv = document.createElement('div');
-                usuarioDiv.className = 'usuario-item';
-                usuarioDiv.dataset.id = usuario.id;
-                usuarioDiv.innerHTML = `<span>${usuario.nome}</span>`;
-                
-                // ⭐⭐ VERIFICA SE JÁ USOU PD ⭐⭐
-                let pdJaUsada = false;
-                let tooltipText = "";
-                
-                if (tipo === 'multipla') {
-                    // Para múltiplas rodadas, verifica na rodada atual
-                    if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
-                        pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
-                        if (pdJaUsada) {
-                            tooltipText = `PD já usada na Rodada ${rodadaAtual}`;
-                        }
-                    }
-                } else {
-                    // Para rodada única
-                    pdJaUsada = usuario.pd_ja_usada || false;
-                    if (pdJaUsada) {
-                        tooltipText = "PD já utilizada nesta rodada";
-                    }
-                }
-                
-                // Se já usou PD, desabilita e mostra badge
-                if (pdJaUsada) {
-                    usuarioDiv.classList.add('disabled');
-                    usuarioDiv.title = tooltipText;
-                    usuarioDiv.setAttribute('data-tooltip', tooltipText);
-                    
-                    // Adiciona badge de PD usada
-                    const pdBadge = document.createElement('div');
-                    pdBadge.className = 'pd-used-badge';
-                    pdBadge.title = tooltipText;
-                    usuarioDiv.appendChild(pdBadge);
-                    
-                    // Adiciona texto informativo
-                    const pdInfo = document.createElement('div');
-                    pdInfo.className = 'pd-info-text';
-                    pdInfo.textContent = 'PD USADA';
-                    usuarioDiv.appendChild(pdInfo);
-                }
-                
-                const estaSelecionado = dadosPorRodada[rodadaAtual]?.dobrada.has(usuario.id);
-                if (estaSelecionado && !pdJaUsada) {
-                    usuarioDiv.classList.add('selected');
-                }
-                
-                if (!pdJaUsada) {
-                    usuarioDiv.addEventListener('click', function() {
-                        selecionarUsuario(usuario.id, this, 'dobrada');
-                    });
-                }
-                
-                usuariosDobradaList.appendChild(usuarioDiv);
-            });
+            // ⭐⭐ PREENCHE LISTA DE PONTUAÇÃO DOBRADA - COM BLOQUEIO ADM JÁ MARCADO ⭐⭐
+usuariosDobradaList.innerHTML = '';
+todosUsuarios.forEach(usuario => {
+    const usuarioDiv = document.createElement('div');
+    usuarioDiv.className = 'usuario-item';
+    usuarioDiv.dataset.id = usuario.id;
+    usuarioDiv.innerHTML = `<span>${usuario.nome}</span>`;
+    
+    // ⭐⭐ VERIFICA SE JÁ USOU PD OU ESTÁ BLOQUEADO PELO ADM ⭐⭐
+    let pdJaUsada = false;
+    let pdBloqueadaAdm = false;
+    let tooltipText = "";
+    
+    if (tipo === 'multipla') {
+        if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
+            pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+            pdBloqueadaAdm = usuario.pd_info_por_rodada[rodadaAtual].bloqueada_adm;
+            
+            // ⭐⭐ NOVO: Se está bloqueado pelo ADM, já vem SELECIONADO ⭐⭐
+            const selecionadoAdm = usuario.pd_info_por_rodada[rodadaAtual].selecionado_adm || false;
+            
+            if (pdJaUsada) {
+                tooltipText = `PD já usada na Rodada ${rodadaAtual}`;
+            } else if (pdBloqueadaAdm || selecionadoAdm) {
+                tooltipText = `PD bloqueada administrativamente`;
+            }
+        }
+    } else {
+        pdJaUsada = usuario.pd_ja_usada || false;
+        pdBloqueadaAdm = usuario.pd_bloqueada_adm || false;
+        
+        // ⭐⭐ NOVO: Se está bloqueado pelo ADM, já vem SELECIONADO ⭐⭐
+        const selecionadoAdm = usuario.pd_selecionado_adm || false;
+        
+        if (pdJaUsada) {
+            tooltipText = "PD já utilizada nesta rodada";
+        } else if (pdBloqueadaAdm || selecionadoAdm) {
+            tooltipText = "PD bloqueada administrativamente";
+        }
+    }
+    
+    // ⭐⭐ SE ESTÁ BLOQUEADO PELO ADM, JÁ VEM SELECIONADO E DESABILITADO ⭐⭐
+    if (pdBloqueadaAdm) {
+        usuarioDiv.classList.add('disabled');
+        usuarioDiv.classList.add('selected');  // ⭐⭐ JÁ MARCADO! ⭐⭐
+        usuarioDiv.title = tooltipText;
+        usuarioDiv.setAttribute('data-tooltip', tooltipText);
+        
+        // Adiciona badge de PD bloqueada
+        const pdBadge = document.createElement('div');
+        pdBadge.className = 'pd-used-badge';
+        pdBadge.title = tooltipText;
+        pdBadge.style.background = '#f72585';  // Vermelho para bloqueio
+        pdBadge.innerHTML = '🔒';
+        usuarioDiv.appendChild(pdBadge);
+        
+        // Adiciona texto informativo
+        const pdInfo = document.createElement('div');
+        pdInfo.className = 'pd-info-text';
+        pdInfo.textContent = 'BLOQUEADA ADM';
+        pdInfo.style.color = '#f72585';
+        usuarioDiv.appendChild(pdInfo);
+        
+        // ⭐⭐ ADICIONA À LISTA DE DOBRADA AUTOMATICAMENTE ⭐⭐
+        if (dadosPorRodada[rodadaAtual]) {
+            dadosPorRodada[rodadaAtual].dobrada.add(usuario.id);
+        }
+        
+    } else if (pdJaUsada) {
+        // PD já usada (mas não bloqueada pelo ADM)
+        usuarioDiv.classList.add('disabled');
+        usuarioDiv.title = tooltipText;
+        usuarioDiv.setAttribute('data-tooltip', tooltipText);
+        
+        const pdBadge = document.createElement('div');
+        pdBadge.className = 'pd-used-badge';
+        pdBadge.title = tooltipText;
+        usuarioDiv.appendChild(pdBadge);
+        
+        const pdInfo = document.createElement('div');
+        pdInfo.className = 'pd-info-text';
+        pdInfo.textContent = 'PD USADA';
+        usuarioDiv.appendChild(pdInfo);
+    }
+    
+    const estaSelecionado = dadosPorRodada[rodadaAtual]?.dobrada.has(usuario.id);
+    if (estaSelecionado && !pdJaUsada && !pdBloqueadaAdm) {
+        usuarioDiv.classList.add('selected');
+    }
+    
+    // ⭐⭐ SÓ PERMITE CLICAR SE NÃO ESTIVER BLOQUEADO ⭐⭐
+    if (!pdJaUsada && !pdBloqueadaAdm) {
+        usuarioDiv.addEventListener('click', function() {
+            selecionarUsuario(usuario.id, this, 'dobrada');
+        });
+    }
+    
+    usuariosDobradaList.appendChild(usuarioDiv);
+});
             
             // ⭐⭐ PREENCHE LISTA DE TRUNFO ⭐⭐
             usuariosTrunfoList.innerHTML = '';
