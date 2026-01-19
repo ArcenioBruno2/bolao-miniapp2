@@ -658,23 +658,23 @@
         }
         
         // ===== COMUNICAÇÃO COM BOT =====
-        function enviarParaBot(dados) {
-            try {
-                // Mostra carregamento
-                document.getElementById('loading-text').textContent = 'Processando solicitação...';
-                mostrarTela('carregando');
-                
-                // Envia dados para o bot via WebAppData
-                TelegramWebApp.sendData(JSON.stringify(dados));
-                
-                // O bot vai responder e fechar o Web App ou mostrar nova tela
-                // Essa resposta será processada no handler do bot
-                
-            } catch (error) {
-                console.error('Erro ao enviar para bot:', error);
-                mostrarErro('Erro ao comunicar com o bot. Tente novamente.');
-            }
-        }
+function enviarParaBot(dados) {
+    try {
+        // Mostra carregamento
+        document.getElementById('loading-text').textContent = 'Processando solicitação...';
+        mostrarTela('carregando');
+        
+        // Envia dados para o bot via WebAppData
+        TelegramWebApp.sendData(JSON.stringify(dados));
+        
+        // O bot vai responder e fechar o Web App ou mostrar nova tela
+        // Essa resposta será processada no handler do bot
+        
+    } catch (error) {
+        console.error('Erro ao enviar para bot:', error);
+        mostrarErro('Erro ao comunicar com o bot. Tente novamente.');
+    }
+}
         
         // ===== TRATAMENTO DE RESPOSTA DO BOT =====
         // Esta função será chamada quando o bot enviar dados de volta
