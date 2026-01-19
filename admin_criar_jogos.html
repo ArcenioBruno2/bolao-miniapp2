@@ -1283,58 +1283,63 @@
         }
         
         function selecionarUsuario(usuarioId, element, tipoLista) {
-            if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) {
-                console.error("❌ Rodada atual não definida");
-                showError("Rodada atual não definida");
-                return;
+    if (!rodadaAtual || !dadosPorRodada[rodadaAtual]) {
+        console.error("❌ Rodada atual não definida");
+        showError("Rodada atual não definida");
+        return;
+    }
+    
+    // ⭐⭐ VERIFICA SE USUÁRIO JÁ USOU PD (PARA DOBRADA) ⭐⭐
+    if (tipoLista === 'dobrada') {
+        const usuario = todosUsuarios.find(u => u.id === usuarioId);
+        let pdJaUsada = false;
+        let pdBloqueadaAdm = false;
+        
+        if (tipo === 'multipla') {
+            if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
+                pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
+                pdBloqueadaAdm = usuario.pd_info_por_rodada[rodadaAtual].bloqueada_adm || false;
             }
-            
-            // ⭐⭐ VERIFICA SE USUÁRIO JÁ USOU PD (PARA DOBRADA) ⭐⭐
-            if (tipoLista === 'dobrada') {
-                const usuario = todosUsuarios.find(u => u.id === usuarioId);
-                let pdJaUsada = false;
-                
-                if (tipo === 'multipla') {
-                    if (usuario.pd_info_por_rodada && usuario.pd_info_por_rodada[rodadaAtual]) {
-                        pdJaUsada = usuario.pd_info_por_rodada[rodadaAtual].ja_usada;
-                    }
-                } else {
-                    pdJaUsada = usuario.pd_ja_usada || false;
-                }
-                
-                if (pdJaUsada) {
-                    showError("❌ Este usuário já usou a pontuação dobrada nesta rodada!");
-                    return;
-                }
-            }
-            
-            console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
-            
-            if (tipoLista === 'dobrada') {
-                if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
-                    dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
-                    element.classList.remove('selected');
-                    console.log(`❌ Usuário ${usuarioId} removido da dobrada`);
-                } else {
-                    dadosPorRodada[rodadaAtual].dobrada.add(usuarioId);
-                    element.classList.add('selected');
-                    console.log(`✅ Usuário ${usuarioId} adicionado à dobrada`);
-                }
-            } else if (tipoLista === 'trunfo') {
-                if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
-                    dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
-                    element.classList.remove('selected');
-                    console.log(`❌ Usuário ${usuarioId} removido do trunfo`);
-                } else {
-                    dadosPorRodada[rodadaAtual].trunfo.add(usuarioId);
-                    element.classList.add('selected');
-                    console.log(`✅ Usuário ${usuarioId} adicionado ao trunfo`);
-                }
-            }
-            
-            atualizarEstatisticas();
-            verificarBotaoEnviar();
+        } else {
+            pdJaUsada = usuario.pd_ja_usada || false;
+            pdBloqueadaAdm = usuario.pd_bloqueada_adm || false;
         }
+        
+        // ⭐⭐ PERMITE SELECIONAR MESMO SE JÁ USOU - SERÁ PD ADMINISTRATIVA ⭐⭐
+        // (Admin pode marcar como "bloqueado")
+        if (pdJaUsada || pdBloqueadaAdm) {
+            // Apenas mostra mensagem informativa
+            console.log(`ℹ️ Usuário ${usuario.nome} já usou PD ou está bloqueado - marcando como administrativo`);
+        }
+    }
+    
+    console.log(`👤 Selecionando usuário ${usuarioId} para ${tipoLista}`);
+    
+    if (tipoLista === 'dobrada') {
+        if (dadosPorRodada[rodadaAtual].dobrada.has(usuarioId)) {
+            dadosPorRodada[rodadaAtual].dobrada.delete(usuarioId);
+            element.classList.remove('selected');
+            console.log(`❌ Usuário ${usuarioId} removido da dobrada`);
+        } else {
+            dadosPorRodada[rodadaAtual].dobrada.add(usuarioId);
+            element.classList.add('selected');
+            console.log(`✅ Usuário ${usuarioId} adicionado à dobrada`);
+        }
+    } else if (tipoLista === 'trunfo') {
+        if (dadosPorRodada[rodadaAtual].trunfo.has(usuarioId)) {
+            dadosPorRodada[rodadaAtual].trunfo.delete(usuarioId);
+            element.classList.remove('selected');
+            console.log(`❌ Usuário ${usuarioId} removido do trunfo`);
+        } else {
+            dadosPorRodada[rodadaAtual].trunfo.add(usuarioId);
+            element.classList.add('selected');
+            console.log(`✅ Usuário ${usuarioId} adicionado ao trunfo`);
+        }
+    }
+    
+    atualizarEstatisticas();
+    verificarBotaoEnviar();
+}
         
         function atualizarTabsRodadas() {
             console.log("🔢 Atualizando tabs de rodadas...");
@@ -1478,101 +1483,121 @@
         // ============================================
         
         function enviarRodada() {
-            console.log("🚀 ========== INICIANDO ENVIO DA RODADA ==========");
-            console.log("Tipo:", tipo);
-            console.log("Rodada Atual:", rodadaAtual);
+    console.log("🚀 ========== INICIANDO ENVIO DA RODADA ==========");
+    
+    const btnEnviar = document.getElementById('btnEnviar');
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = "ENVIANDO...";
+    
+    if (rodadaAtual && dadosPorRodada[rodadaAtual]) {
+        const horarioInput = document.getElementById('horarioFechamento');
+        dadosPorRodada[rodadaAtual].horario = horarioInput.value;
+    }
+    
+    // ⭐⭐ COLETAR USUÁRIOS COM PD ADMINISTRATIVA (BLOQUEADOS) ⭐⭐
+    const pdBloqueados = new Set();
+    
+    if (tipo === 'unica') {
+        const dados = dadosPorRodada[rodadaAtual];
+        
+        if (!dados || dados.jogos.size === 0) {
+            showError('Selecione pelo menos um jogo!');
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = "ENVIAR RODADA";
+            return;
+        }
+        
+        // Coletar usuários que estão selecionados para PD administrativa
+        // (usuários que aparecem como "disabled" mas estão selecionados)
+        const elementosUsuarios = document.querySelectorAll('#usuariosDobrada .usuario-item');
+        elementosUsuarios.forEach(el => {
+            if (el.classList.contains('selected') && el.classList.contains('disabled')) {
+                const usuarioId = parseInt(el.dataset.id);
+                pdBloqueados.add(usuarioId);
+            }
+        });
+        
+        const dadosEnvio = {
+            tipo: 'unica',
+            rodada: rodadaAtual,
+            jogos: Array.from(dados.jogos),
+            horario: dados.horario,
+            dobrada: Array.from(dados.dobrada),
+            trunfo: Array.from(dados.trunfo),
+            pd_bloqueados: Array.from(pdBloqueados)  // ⭐⭐ NOVO: PD ADMINISTRATIVA ⭐⭐
+        };
+        
+        console.log("📦 Dados para envio (única):", dadosEnvio);
+        console.log(`📊 PD Administrativa: ${pdBloqueados.size} usuários bloqueados`);
+        enviarParaTelegram(dadosEnvio);
+        
+    } else {
+        const horarioInput = document.getElementById('horarioFechamento').value;
+        if (!horarioInput) {
+            showError('Defina um horário de fechamento!');
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = "ENVIAR RODADA";
+            return;
+        }
+        
+        const rodadasValidas = [];
+        const pdBloqueadosPorRodada = {};  // ⭐⭐ NOVO: PD ADMINISTRATIVA POR RODADA ⭐⭐
+        
+        rodadasSelecionadas.forEach(numero => {
+            const dados = dadosPorRodada[numero];
             
-            const btnEnviar = document.getElementById('btnEnviar');
-            btnEnviar.disabled = true;
-            btnEnviar.textContent = "ENVIANDO...";
-            
-            if (rodadaAtual && dadosPorRodada[rodadaAtual]) {
-                const horarioInput = document.getElementById('horarioFechamento');
-                dadosPorRodada[rodadaAtual].horario = horarioInput.value;
-                console.log(`💾 Horário final salvo: ${horarioInput.value}`);
+            if (!dados || dados.jogos.size === 0) {
+                showError(`Rodada ${numero} não tem jogos selecionados!`);
+                btnEnviar.disabled = false;
+                btnEnviar.textContent = "ENVIAR RODADA";
+                return;
             }
             
-            if (tipo === 'unica') {
-                const dados = dadosPorRodada[rodadaAtual];
+            dados.horario = horarioInput;
+            
+            rodadasValidas.push({
+                rodada: numero,
+                jogos: Array.from(dados.jogos),
+                horario: dados.horario,
+                dobrada: Array.from(dados.dobrada),
+                trunfo: Array.from(dados.trunfo)
+            });
+            
+            // Coletar PD administrativa para esta rodada
+            if (numero === rodadaAtual) {
+                const elementosUsuarios = document.querySelectorAll('#usuariosDobrada .usuario-item');
+                const bloqueadosEstaRodada = new Set();
                 
-                if (!dados || dados.jogos.size === 0) {
-                    showError('Selecione pelo menos um jogo!');
-                    console.error("❌ Validação falhou: Nenhum jogo selecionado");
-                    btnEnviar.disabled = false;
-                    btnEnviar.textContent = "ENVIAR RODADA";
-                    return;
-                }
-                
-                if (!dados.horario) {
-                    showError('Defina um horário de fechamento!');
-                    console.error("❌ Validação falhou: Horário não definido");
-                    btnEnviar.disabled = false;
-                    btnEnviar.textContent = "ENVIAR RODADA";
-                    return;
-                }
-                
-                const dadosEnvio = {
-                    tipo: 'unica',
-                    rodada: rodadaAtual,
-                    jogos: Array.from(dados.jogos),
-                    horario: dados.horario,
-                    dobrada: Array.from(dados.dobrada),
-                    trunfo: Array.from(dados.trunfo)
-                };
-                
-                console.log("📦 Dados para envio (única):", dadosEnvio);
-                enviarParaTelegram(dadosEnvio);
-                
-            } else {
-                const horarioInput = document.getElementById('horarioFechamento').value;
-                if (!horarioInput) {
-                    showError('Defina um horário de fechamento!');
-                    console.error("❌ Validação falhou: Horário não definido");
-                    btnEnviar.disabled = false;
-                    btnEnviar.textContent = "ENVIAR RODADA";
-                    return;
-                }
-                
-                const rodadasValidas = [];
-                
-                rodadasSelecionadas.forEach(numero => {
-                    const dados = dadosPorRodada[numero];
-                    
-                    if (!dados || dados.jogos.size === 0) {
-                        showError(`Rodada ${numero} não tem jogos selecionados!`);
-                        console.error(`❌ Validação falhou: Rodada ${numero} sem jogos`);
-                        btnEnviar.disabled = false;
-                        btnEnviar.textContent = "ENVIAR RODADA";
-                        return;
+                elementosUsuarios.forEach(el => {
+                    if (el.classList.contains('selected') && el.classList.contains('disabled')) {
+                        const usuarioId = parseInt(el.dataset.id);
+                        bloqueadosEstaRodada.add(usuarioId);
                     }
-                    
-                    dados.horario = horarioInput;
-                    
-                    rodadasValidas.push({
-                        rodada: numero,
-                        jogos: Array.from(dados.jogos),
-                        horario: dados.horario,
-                        dobrada: Array.from(dados.dobrada),
-                        trunfo: Array.from(dados.trunfo)
-                    });
                 });
                 
-                if (rodadasValidas.length === 0) {
-                    console.error("❌ Nenhuma rodada válida para envio");
-                    btnEnviar.disabled = false;
-                    btnEnviar.textContent = "ENVIAR RODADA";
-                    return;
+                if (bloqueadosEstaRodada.size > 0) {
+                    pdBloqueadosPorRodada[numero] = Array.from(bloqueadosEstaRodada);
                 }
-                
-                const dadosEnvio = {
-                    tipo: 'multipla',
-                    rodadas: rodadasValidas
-                };
-                
-                console.log("📦 Dados para envio (múltipla):", dadosEnvio);
-                enviarParaTelegram(dadosEnvio);
             }
+        });
+        
+        if (rodadasValidas.length === 0) {
+            btnEnviar.disabled = false;
+            btnEnviar.textContent = "ENVIAR RODADA";
+            return;
         }
+        
+        const dadosEnvio = {
+            tipo: 'multipla',
+            rodadas: rodadasValidas,
+            pd_bloqueados_por_rodada: pdBloqueadosPorRodada  // ⭐⭐ NOVO ⭐⭐
+        };
+        
+        console.log("📦 Dados para envio (múltipla):", dadosEnvio);
+        console.log("📊 PD Administrativa por rodada:", pdBloqueadosPorRodada);
+        enviarParaTelegram(dadosEnvio);
+    }
+}
         
         function enviarParaTelegram(dados) {
             console.log("📤 INICIANDO ENVIO PARA TELEGRAM");
