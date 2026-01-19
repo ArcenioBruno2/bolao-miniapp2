@@ -836,37 +836,64 @@
         let ehEdicao = false;
 
         // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
-        function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+function initTelegramWebApp() {
+    try {
+        // ⭐⭐ TENTA LOG COM SEGURANÇA ⭐⭐
+        try { console.log("🔧 INICIALIZANDO TELEGRAM WEB APP"); } catch(e) {}
+        
+        if (window.Telegram && window.Telegram.WebApp) {
+            tg = window.Telegram.WebApp;
             
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
+            // ⭐⭐ TELA CHEIA IMEDIATA (100% WIDTH) ⭐⭐
+            try {
+                tg.ready();
+                tg.expand(); // Expande para tela cheia
+                tg.enableClosingConfirmation();
                 
-                // ⭐⭐ TELA CHEIA IMEDIATA (100% WIDTH) ⭐⭐
-                try {
-                    tg.ready();
-                    tg.expand(); // Expande para tela cheia
-                    tg.enableClosingConfirmation();
-                    
-                    // Configura para usar 100% da tela
-                    tg.setHeaderColor('#4a6cf7');
-                    tg.setBackgroundColor('#ffffff');
-                    
-                    console.log("✅ Web App expandido em tela cheia (100%)");
-                    
-                } catch (error) {
-                    console.error("❌ Erro ao expandir Web App:", error);
-                }
+                // Configura para usar 100% da tela
+                tg.setHeaderColor('#4a6cf7');
+                tg.setBackgroundColor('#ffffff');
                 
-                // Carregar dados
-                carregarDadosRodada();
+                try { console.log("✅ Web App expandido em tela cheia (100%)"); } catch(e) {}
                 
-            } else {
-                console.error("Telegram Web App não disponível - modo desenvolvimento");
-                setTimeout(carregarDadosRodada, 500);
+            } catch (error) {
+                try { console.error("❌ Erro ao expandir Web App:", error); } catch(e) {}
             }
+            
+            // Carregar dados
+            carregarDadosRodada();
+            
+        } else {
+            try { console.error("Telegram Web App não disponível - modo desenvolvimento"); } catch(e) {}
+            setTimeout(carregarDadosRodada, 500);
         }
+    } catch (mainError) {
+        // Se tudo falhar, tenta carregar os dados de qualquer forma
+        setTimeout(carregarDadosRodada, 1000);
+    }
+}
 
+        // ===== LOGGING SEGURO PARA TELEGRAM WEB APP =====
+function safeLog(...args) {
+    try {
+        if (typeof console !== 'undefined' && console.log) {
+            console.log(...args);
+        }
+    } catch (e) {
+        // Silenciosamente ignora erros de console
+    }
+}
+
+function safeError(...args) {
+    try {
+        if (typeof console !== 'undefined' && console.error) {
+            console.error(...args);
+        }
+    } catch (e) {
+        // Silenciosamente ignora erros de console
+    }
+}
+        
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
@@ -939,33 +966,32 @@
             }
         }
 
-        // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosRodada() {
     try {
-        console.log("🔄 Iniciando carregamento de dados...");
+        safeLog("🔄 Iniciando carregamento de dados...");
         
         // Método 1: Tenta usar URLSearchParams primeiro
         const urlParams = new URLSearchParams(window.location.search);
         let dadosBase64 = urlParams.get('data');
         
-        console.log("📊 Parâmetros da URL:", window.location.search);
-        console.log("📊 Parâmetro 'data' via URLSearchParams:", dadosBase64 ? "Encontrado" : "Não encontrado");
+        safeLog("📊 Parâmetros da URL:", window.location.search);
+        safeLog("📊 Parâmetro 'data' via URLSearchParams:", dadosBase64 ? "Encontrado" : "Não encontrado");
         
         // Método 2: Se não encontrou, procura manualmente na URL
         if (!dadosBase64) {
-            console.log("🔍 Buscando manualmente na URL...");
+            safeLog("🔍 Buscando manualmente na URL...");
             const urlString = window.location.href;
             const match = urlString.match(/data=([^&]+)/);
             
             if (match) {
                 dadosBase64 = match[1];
-                console.log("✅ Dados encontrados manualmente:", dadosBase64.substring(0, 50) + "...");
+                safeLog("✅ Dados encontrados manualmente:", dadosBase64.substring(0, 50) + "...");
             }
         }
         
         // Método 3: Tenta encontrar em qualquer parte da URL
         if (!dadosBase64) {
-            console.log("🔍 Buscando em qualquer parte da URL...");
+            safeLog("🔍 Buscando em qualquer parte da URL...");
             const urlString = window.location.href;
             const parts = urlString.split('data=');
             
@@ -973,7 +999,7 @@
                 dadosBase64 = parts[1];
                 // Remove qualquer fragmento (#) ou parâmetro adicional (&)
                 dadosBase64 = dadosBase64.split('#')[0].split('&')[0];
-                console.log("✅ Dados extraídos da URL:", dadosBase64.substring(0, 50) + "...");
+                safeLog("✅ Dados extraídos da URL:", dadosBase64.substring(0, 50) + "...");
             }
         }
         
@@ -981,7 +1007,7 @@
             throw new Error("Parâmetro 'data' não encontrado na URL");
         }
         
-        console.log("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
+        safeLog("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
         
         // Decodifica os dados
         try {
@@ -991,17 +1017,20 @@
             try {
                 dadosJson = atob(dadosBase64);
             } catch (e1) {
-                console.log("⚠️ Tentando com decodeURIComponent...");
+                safeLog("⚠️ Tentando com decodeURIComponent...");
                 // Tenta decodificar caracteres especiais primeiro
                 dadosBase64 = decodeURIComponent(dadosBase64);
                 dadosJson = atob(dadosBase64);
             }
             
             dadosOriginais = JSON.parse(dadosJson);
-            console.log("📊 Dados recebidos com sucesso!");
-            console.log("- Rodada:", dadosOriginais.rodada?.numero);
-            console.log("- Jogos:", dadosOriginais.jogos?.length || 0);
-            console.log("- Usuário:", dadosOriginais.usuario?.nome);
+            safeLog("📊 Dados recebidos com sucesso!");
+            safeLog("- Rodada:", dadosOriginais.rodada?.numero);
+            safeLog("- Jogos:", dadosOriginais.jogos?.length || 0);
+            safeLog("- Usuário:", dadosOriginais.usuario?.nome);
+            safeLog("- PD Disponível:", dadosOriginais.pd_disponivel);
+            safeLog("- PD Bloqueada ADM:", dadosOriginais.pd_bloqueada_adm);
+            safeLog("- É Edição:", dadosOriginais.eh_edicao);
             
             // Inicializar ordem original dos jogos
             ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
@@ -1010,11 +1039,11 @@
             atualizarInterface();
             
         } catch (decodeError) {
-            console.error("❌ Erro ao decodificar dados:", decodeError);
+            safeError("❌ Erro ao decodificar dados:", decodeError);
             
             // Tenta uma abordagem mais robusta
             try {
-                console.log("🔄 Tentando abordagem alternativa...");
+                safeLog("🔄 Tentando abordagem alternativa...");
                 
                 // Remove possíveis espaços ou quebras de linha
                 dadosBase64 = dadosBase64.trim().replace(/\s/g, '');
@@ -1027,19 +1056,19 @@
                 const dadosJson = atob(dadosBase64);
                 dadosOriginais = JSON.parse(dadosJson);
                 
-                console.log("✅ Dados decodificados com abordagem alternativa!");
+                safeLog("✅ Dados decodificados com abordagem alternativa!");
                 
                 ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                 atualizarInterface();
                 
             } catch (finalError) {
-                console.error("❌ Falha total ao decodificar:", finalError);
+                safeError("❌ Falha total ao decodificar:", finalError);
                 throw new Error("Falha ao decodificar dados: " + finalError.message);
             }
         }
         
     } catch (e) {
-        console.error("❌ Erro crítico ao carregar dados", e);
+        safeError("❌ Erro crítico ao carregar dados", e);
         
         // Cria mensagem de erro detalhada
         let errorMsg = "Erro ao carregar dados da rodada: " + e.message;
