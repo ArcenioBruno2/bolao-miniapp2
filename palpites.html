@@ -1125,172 +1125,182 @@
 
         // ===== RENDERIZAÇÃO DOS JOGOS =====
         function renderizarJogos() {
-            const container = document.getElementById('lista-jogos');
-            container.innerHTML = '';
+    const container = document.getElementById('lista-jogos');
+    container.innerHTML = '';
+    
+    if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
+        container.innerHTML = `
+            <div class="game-card">
+                <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
+                    <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 10px; color: var(--warning);"></i>
+                    <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // ⭐⭐ NOVA VARIÁVEL: Pode trocar PD durante edição? ⭐⭐
+    const pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
+    
+    dadosOriginais.jogos.forEach(jogo => {
+        const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
+            mandante: '', 
+            visitante: '', 
+            pd: false 
+        };
+        
+        const isPDSelecionada = pdSelecionado == jogo.id;
+        const isPDJaUsada = dadosOriginais.pd_jogo_id == jogo.id;
+        
+        // ⭐⭐ DETERMINAR STATUS DA PD - LÓGICA CORRIGIDA ⭐⭐
+        let cardClass = 'game-card';
+        let starClass = 'pd-star';
+        let pdLabel = 'DOBRAR';
+        let isClickable = false;
+        let isDisabled = false;
+        
+        // REGRA 1: PD BLOQUEADA ADMINISTRATIVAMENTE (SEMPRE)
+        if (pdBloqueadaAdm) {
+            cardClass += ' pd-blocked';
+            starClass += ' blocked';
+            pdLabel = 'BLOQUEADA ADM';
+            isDisabled = true;
+            logger.info(`Jogo ${jogo.id}: PD BLOQUEADA ADM`);
+        } 
+        // REGRA 2: PD já usada em rodada anterior
+        else if (pdJaUsouAnteriormente) {
+            cardClass += ' pd-blocked';
+            starClass += ' blocked';
+            pdLabel = 'BLOQUEADO';
+            isDisabled = true;
+        } 
+        // REGRA 3: PD já usada neste jogo específico
+        else if (isPDJaUsada) {
+            cardClass += ' pd-used';
+            starClass += ' used';
             
-            if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
-                container.innerHTML = `
-                    <div class="game-card">
-                        <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
-                            <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 10px; color: var(--warning);"></i>
-                            <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Renderizar na ORDEM ORIGINAL
-            dadosOriginais.jogos.forEach(jogo => {
-                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
-                    mandante: '', 
-                    visitante: '', 
-                    pd: false 
-                };
-                
-                const isPDSelecionada = pdSelecionado == jogo.id;
-                const isPDJaUsada = dadosOriginais.pd_jogo_id == jogo.id;
-                
-                // ⭐⭐ DETERMINAR STATUS DA PD ⭐⭐
-                let cardClass = 'game-card';
-                let starClass = 'pd-star';
-                let pdLabel = 'DOBRAR';
-                let isClickable = false;
-                let isDisabled = false;
-                
-                // REGRA 1: PD já usada em rodada anterior
-                if (pdJaUsouAnteriormente) {
-                    cardClass += ' pd-blocked';
-                    starClass += ' blocked';
-                    pdLabel = 'BLOQUEADO';
-                    isDisabled = true;
-                } 
-                // REGRA 2: PD bloqueada administrativamente
-                else if (pdBloqueadaAdm) {
-                    cardClass += ' pd-blocked';
-                    starClass += ' blocked';
-                    pdLabel = 'BLOQUEADA';
-                    isDisabled = true;
-                } 
-                // REGRA 3: PD já usada neste jogo
-                else if (isPDJaUsada) {
-                    cardClass += ' pd-used';
-                    starClass += ' used';
-                    pdLabel = 'UTILIZADA';
-                    isDisabled = true;
-                } 
-                // REGRA 4: PD já usada em outro jogo, mas é edição
-                else if (pdJaUsada && ehEdicao) {
-                    if (isPDSelecionada) {
-                        starClass += ' active';
-                        pdLabel = 'SELECIONADA';
-                        isClickable = true;
-                    } else {
-                        isClickable = true;
-                    }
-                } 
-                // REGRA 5: PD já usada em outro jogo
-                else if (pdJaUsada) {
-                    cardClass += ' pd-blocked';
-                    starClass += ' blocked';
-                    pdLabel = 'INDISPONÍVEL';
-                    isDisabled = true;
-                } 
-                // REGRA 6: PD selecionada
-                else if (isPDSelecionada) {
-                    starClass += ' active';
+            // ⭐⭐ CORREÇÃO: Se é edição E pode trocar, estrela fica clicável ⭐⭐
+            if (ehEdicao && pdPodeTrocar) {
+                if (isPDSelecionada) {
                     pdLabel = 'SELECIONADA';
                     isClickable = true;
-                } 
-                // REGRA 7: PD disponível
-                else {
-                    isClickable = true;
+                } else {
+                    pdLabel = 'TROCAR';
+                    isClickable = true;  // ⭐⭐ AGORA PODE CLICAR PARA TROCAR! ⭐⭐
                 }
-                
-                const div = document.createElement('div');
-                div.className = cardClass;
-                div.style.width = '100%';
-                
-                div.innerHTML = `
-                    <div class="teams-container">
-                        <div class="team-name team-home">${jogo.mandante}</div>
-                        <div class="vs-symbol">X</div>
-                        <div class="team-name team-away">${jogo.visitante}</div>
-                    </div>
-                    
-                    <div class="score-container">
-                        <div class="score-input-container">
-                            <input type="number" min="0" max="99" class="score-input" 
-                                   value="${palpiteAtual.mandante}" 
-                                   oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                   placeholder="0"
-                                   ${isPDJaUsada && !palpiteAtual.mandante ? 'required' : ''}>
-                        </div>
-                        
-                        <div style="font-size: 16px; font-weight: 800; color: var(--gray);">X</div>
-                        
-                        <div class="score-input-container">
-                            <input type="number" min="0" max="99" class="score-input" 
-                                   value="${palpiteAtual.visitante}" 
-                                   oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                   placeholder="0"
-                                   ${isPDJaUsada && !palpiteAtual.visitante ? 'required' : ''}>
-                        </div>
-                    </div>
-                    
-                    <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
-                         onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
-                        <div class="${starClass}">
-                            ⭐
-                            ${isPDJaUsada ? '<div class="pd-badge">USADA</div>' : ''}
-                        </div>
-                        <div class="pd-label">${pdLabel}</div>
-                    </div>
-                `;
-                
-                container.appendChild(div);
-            });
+            } else {
+                pdLabel = 'UTILIZADA';
+                isDisabled = true;
+            }
+        } 
+        // REGRA 4: PD já usada em outro jogo, mas é edição E pode trocar
+        else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
+            if (isPDSelecionada) {
+                starClass += ' active';
+                pdLabel = 'SELECIONADA';
+                isClickable = true;
+            } else {
+                pdLabel = 'TROCAR';
+                isClickable = true;  // ⭐⭐ PODE ESCOLHER OUTRO JOGO ⭐⭐
+            }
+        } 
+        // REGRA 5: PD já usada em outro jogo (sem permissão para trocar)
+        else if (pdJaUsada) {
+            cardClass += ' pd-blocked';
+            starClass += ' blocked';
+            pdLabel = 'INDISPONÍVEL';
+            isDisabled = true;
+        } 
+        // REGRA 6: PD selecionada
+        else if (isPDSelecionada) {
+            starClass += ' active';
+            pdLabel = 'SELECIONADA';
+            isClickable = true;
+        } 
+        // REGRA 7: PD disponível
+        else {
+            isClickable = true;
         }
+        
+        const div = document.createElement('div');
+        div.className = cardClass;
+        div.style.width = '100%';
+        
+        div.innerHTML = `
+            <div class="teams-container">
+                <div class="team-name team-home">${jogo.mandante}</div>
+                <div class="vs-symbol">X</div>
+                <div class="team-name team-away">${jogo.visitante}</div>
+            </div>
+            
+            <div class="score-container">
+                <div class="score-input-container">
+                    <input type="number" min="0" max="99" class="score-input" 
+                           value="${palpiteAtual.mandante}" 
+                           oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
+                           placeholder="0"
+                           ${isPDJaUsada && !palpiteAtual.mandante ? 'required' : ''}>
+                </div>
+                
+                <div style="font-size: 16px; font-weight: 800; color: var(--gray);">X</div>
+                
+                <div class="score-input-container">
+                    <input type="number" min="0" max="99" class="score-input" 
+                           value="${palpiteAtual.visitante}" 
+                           oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
+                           placeholder="0"
+                           ${isPDJaUsada && !palpiteAtual.visitante ? 'required' : ''}>
+                </div>
+            </div>
+            
+            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
+                 onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                <div class="${starClass}">
+                    ⭐
+                    ${isPDJaUsada ? '<div class="pd-badge">USADA</div>' : ''}
+                </div>
+                <div class="pd-label">${pdLabel}</div>
+            </div>
+        `;
+        
+        container.appendChild(div);
+    });
+}
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
 // No arquivo palpites.html, atualize a função togglePD:
 
 function togglePD(jogoId) {
-    console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+    console.log(`⭐ togglePD chamado para jogo ${jogoId} - Estado: ADM=${pdBloqueadaAdm}, JaUsada=${pdJaUsada}, EhEdicao=${ehEdicao}, PodeTrocar=${dadosOriginais.pd_pode_trocar}`);
     
-    // ⭐⭐ VERIFICAÇÃO IMPORTANTE: Se PD foi bloqueada administrativamente, NÃO PERMITE ALTERAR ⭐⭐
+    // ⭐⭐ VERIFICAÇÃO 1: BLOQUEIO ADMINISTRATIVO (SEMPRE PREVALECE) ⭐⭐
     if (pdBloqueadaAdm) {
-        // ⭐⭐ CORREÇÃO CRÍTICA: Verifica se há algum jogo com PD atribuída pelo ADM
-        const jogoComPDAdm = dadosOriginais.jogos.find(j => {
-            // Verifica se este jogo já tinha PD atribuída anteriormente
-            if (dadosOriginais.palpites) {
-                const palpiteExistente = dadosOriginais.palpites[`${j.id}`];
-                return palpiteExistente && palpiteExistente.pd === true;
-            }
-            return false;
-        });
-        
-        // ⭐⭐ NOVA REGRA: Se está bloqueado pelo ADM, NUNCA pode alterar a PD ⭐⭐
-        // Mesmo durante edição, se foi bloqueado pelo ADM, deve permanecer bloqueado
         mostrarErro("❌ PD atribuída administrativamente - não pode alterar!");
         return;
     }
     
-    // VERIFICAÇÕES DE BLOQUEIO POR USO ANTERIOR
+    // ⭐⭐ VERIFICAÇÃO 2: BLOQUEIO POR USO ANTERIOR ⭐⭐
     if (pdJaUsouAnteriormente) {
         mostrarErro("❌ Você já utilizou PD em rodada anterior - BLOQUEADO PERMANENTEMENTE!");
         return;
     }
     
-    // ⭐⭐ NOVA REGRA: Se já usou PD nesta rodada específica e NÃO É EDIÇÃO, não pode alterar ⭐⭐
+    // ⭐⭐ VERIFICAÇÃO 3: SE JÁ USOU PD E NÃO É EDIÇÃO ⭐⭐
     if (pdJaUsada && !ehEdicao) {
         mostrarErro("❌ Você já utilizou sua pontuação dobrada nesta rodada!");
         return;
     }
     
-    // ⭐⭐ REGRA DE EDIÇÃO: Se está editando e já usou PD, pode apenas trocar ⭐⭐
+    // ⭐⭐ VERIFICAÇÃO 4: SE É EDIÇÃO E TEM PERMISSÃO PARA TROCAR ⭐⭐
     if (ehEdicao && pdJaUsada) {
-        // Verifica se está tentando desselecionar a PD atual
+        // Verifica se pode trocar (nova flag do backend)
+        if (!dadosOriginais.pd_pode_trocar) {
+            mostrarErro("❌ Não é possível trocar a PD nesta situação!");
+            return;
+        }
+        
+        // Se está tentando desselecionar a PD atual
         if (pdSelecionado === jogoId) {
             if (confirm("⚠️ Você está removendo a pontuação dobrada. Tem certeza?")) {
                 pdSelecionado = null;
@@ -1301,10 +1311,12 @@ function togglePD(jogoId) {
             // Pergunta se quer transferir a PD
             if (confirm("⚠️ Transferir pontuação dobrada para este jogo?")) {
                 pdSelecionado = jogoId;
+            } else {
+                return;
             }
         }
     } 
-    // ⭐⭐ CASO NORMAL: PD disponível ⭐⭐
+    // ⭐⭐ CASO NORMAL: PD disponível (primeira vez ou edição sem PD) ⭐⭐
     else {
         // Se clicar na mesma estrela, desseleciona
         if (pdSelecionado === jogoId) {
@@ -1338,7 +1350,6 @@ function togglePD(jogoId) {
         }
     }
 }
-
         function atualizarPDNoArray() {
             // Remove PD de todos os palpites
             palpites.forEach(palpite => {
