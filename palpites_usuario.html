@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Palpites e Pontuação</title>
+    <title>Palpites e Pontuação - Sistema Paginado</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Pako.js para descompressão Gzip -->
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
@@ -19,45 +19,68 @@
         }
         header { 
             background: linear-gradient(135deg, #007aff 0%, #0056cc 100%); 
-            color: white; padding: 25px; text-align: center; 
+            color: white; padding: 20px; text-align: center; 
         }
-        h1 { font-size: 24px; margin-bottom: 8px; font-weight: 700; }
+        h1 { font-size: 22px; margin-bottom: 8px; font-weight: 700; }
         .subtitle { font-size: 14px; opacity: 0.9; }
-        .user-info { padding: 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; }
-        .user-name { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
-        .user-id { font-size: 13px; color: #666; }
-        .select-container { padding: 20px; }
+        .user-info { 
+            padding: 15px 20px; background: #f8f9fa; 
+            border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap;
+        }
+        .user-name { font-size: 16px; font-weight: 600; }
+        .user-id { font-size: 12px; color: #666; }
+        .rodada-info { 
+            background: #e9f7ef; padding: 15px 20px; border-bottom: 1px solid #d4edda;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .rodada-titulo { font-size: 18px; font-weight: 700; color: #28a745; }
+        .carregar-btn { 
+            background: #007aff; color: white; border: none; padding: 8px 16px;
+            border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: background 0.3s;
+        }
+        .carregar-btn:hover { background: #0056cc; }
+        .select-container { padding: 15px 20px; border-bottom: 1px solid #e0e0e0; }
         .custom-select { position: relative; width: 100%; }
         select { 
-            width: 100%; padding: 15px 20px; font-size: 16px; border: 2px solid #e0e0e0; 
-            border-radius: 12px; background: white; cursor: pointer; transition: all 0.3s;
+            width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e0e0e0; 
+            border-radius: 10px; background: white; cursor: pointer; transition: all 0.3s;
             appearance: none; -webkit-appearance: none;
         }
         select:focus { border-color: #007aff; outline: none; }
-        .rodada-resumo { 
-            padding: 25px; background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); 
-            color: white; text-align: center; 
+        .resumo-container { 
+            padding: 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; 
         }
-        .rodada-titulo { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+        .resumo-titulo { 
+            font-size: 16px; font-weight: 600; margin-bottom: 15px; color: #333;
+        }
         .stats-grid { 
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 15px; 
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
         }
         .stat-card { 
-            background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 10px; 
-            backdrop-filter: blur(10px);
+            background: white; padding: 15px; border-radius: 10px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center;
         }
-        .stat-value { display: block; font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .stat-label { font-size: 12px; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; }
-        .jogos-container { padding: 20px; }
-        .jogos-titulo { 
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0;
+        .stat-valor { 
+            display: block; font-size: 22px; font-weight: 700; margin-bottom: 5px; 
         }
-        .jogos-titulo span:first-child { font-size: 18px; font-weight: 600; }
-        #contadorJogos { font-size: 14px; color: #666; }
+        .stat-label { 
+            font-size: 12px; color: #666; text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+        }
+        .pontos-total { color: #28a745; }
+        .palpitados-total { color: #007aff; }
+        .jogos-container { padding: 0 20px 20px; }
+        .jogos-header { 
+            padding: 15px 0; display: flex; justify-content: space-between;
+            align-items: center; border-bottom: 1px solid #e0e0e0;
+        }
+        .jogos-titulo { font-size: 16px; font-weight: 600; }
+        .contador { font-size: 14px; color: #666; }
         .jogos-lista { margin-top: 15px; }
         .jogo-card { 
-            background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; 
+            background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 18px; 
             margin-bottom: 15px; position: relative; transition: transform 0.2s, box-shadow 0.2s;
         }
         .jogo-card:hover { 
@@ -69,29 +92,35 @@
             padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; 
             text-transform: uppercase;
         }
+        .jogo-header { 
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .jogo-times { font-weight: 600; font-size: 16px; }
+        .jogo-data { font-size: 12px; color: #666; }
         .placares-container { 
-            display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; 
-            margin-bottom: 15px; 
+            display: grid; grid-template-columns: 1fr auto 1fr; gap: 15px; 
+            align-items: center; margin-bottom: 15px; 
         }
         .placar-box { text-align: center; }
         .placar-label { font-size: 11px; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        .placar-valor { font-size: 20px; font-weight: 700; }
+        .placar-valor { font-size: 18px; font-weight: 700; }
         .placar-real { color: #28a745; }
         .placar-palpite { color: #007aff; }
-        .pontos-container { 
-            display: flex; justify-content: space-between; align-items: center; 
+        .pontuacao-container { 
+            display: flex; justify-content: space-between; align-items: center;
             margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0f0f0;
         }
-        .pontos { font-size: 20px; font-weight: 700; color: #28a745; }
+        .pontos { font-size: 18px; font-weight: 700; color: #28a745; }
         .acertos-container { display: flex; gap: 5px; flex-wrap: wrap; }
         .badge { 
-            padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; 
+            padding: 6px 10px; border-radius: 6px; font-size: 10px; font-weight: 600; 
             text-transform: uppercase; 
         }
-        .badge.pe { background: #28a745; color: white; }
-        .badge.rc { background: #007aff; color: white; }
-        .badge.gm, .badge.gv { background: #6c757d; color: white; }
-        .badge.pd { background: #dc3545; color: white; }
+        .badge.placar-exato { background: #28a745; color: white; }
+        .badge.resultado-correto { background: #007aff; color: white; }
+        .badge.gols-mandante, .badge.gols-visitante { background: #6c757d; color: white; }
+        .badge.pontuacao-dobrada { background: #dc3545; color: white; }
         .loading { 
             text-align: center; padding: 60px 20px; color: #666; 
             display: flex; flex-direction: column; align-items: center; gap: 15px;
@@ -107,13 +136,24 @@
         }
         .error { 
             text-align: center; padding: 40px 20px; color: #dc3545; background: #f8d7da;
-            border-radius: 10px; border: 1px solid #f5c6cb;
+            border-radius: 10px; border: 1px solid #f5c6cb; margin: 20px 0;
+        }
+        .no-data { 
+            text-align: center; padding: 60px 20px; color: #666; 
+        }
+        .info-note {
+            background: #e7f3ff; border-left: 4px solid #007aff;
+            padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0;
+            font-size: 14px;
         }
         @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .placares-container { grid-template-columns: 1fr; gap: 15px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .placares-container { grid-template-columns: 1fr; gap: 12px; }
             .placares-container > div:nth-child(2) { display: none; }
             .jogo-card { padding: 15px; }
+            .jogo-header { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .user-info { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .rodada-info { flex-direction: column; align-items: flex-start; gap: 10px; }
         }
     </style>
 </head>
@@ -121,75 +161,104 @@
     <div class="container">
         <header>
             <h1>📊 Palpites e Pontuação</h1>
-            <div class="subtitle" id="subtitle">Carregando dados do usuário...</div>
+            <div class="subtitle" id="subtitle">Sistema Paginado</div>
         </header>
         
-        <div class="user-info" id="userInfo">
-            <div class="user-name" id="userName">Carregando...</div>
-            <div class="user-id" id="userId">ID: --</div>
+        <div class="user-info">
+            <div>
+                <div class="user-name" id="userName">Carregando...</div>
+                <div class="user-id" id="userId">ID: -- | Telegram: --</div>
+            </div>
+        </div>
+        
+        <div class="rodada-info">
+            <div class="rodada-titulo" id="rodadaTitulo">Rodada --</div>
+            <button class="carregar-btn" onclick="carregarRodadaAtual()">
+                🔄 Carregar Rodada
+            </button>
         </div>
         
         <div class="select-container">
             <div class="custom-select">
-                <select id="rodadaSelect" onchange="mudarRodada()">
-                    <option value="">Carregando rodadas...</option>
+                <select id="rodadaSelect" onchange="selecionarRodadaFromSelect()">
+                    <option value="">Selecione uma rodada...</option>
                 </select>
             </div>
         </div>
         
-        <div class="rodada-resumo" id="rodadaResumo" style="display: none;">
-            <div class="rodada-titulo" id="rodadaTitulo">Rodada --</div>
+        <div class="resumo-container">
+            <div class="resumo-titulo">Resumo da Rodada</div>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <span class="stat-value" id="totalPontos">0</span>
-                    <span class="stat-label">Pontos</span>
+                    <span class="stat-valor pontos-total" id="totalPontos">0</span>
+                    <span class="stat-label">Pontos Totais</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="jogosPalpitados">0</span>
-                    <span class="stat-label">Palpitados</span>
+                    <span class="stat-valor palpitados-total" id="jogosPalpitados">0</span>
+                    <span class="stat-label">Jogos Palpitados</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="totalJogos">0</span>
-                    <span class="stat-label">Total</span>
+                    <span class="stat-valor" id="totalJogos">0</span>
+                    <span class="stat-label">Total de Jogos</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="jogosComPlacar">0</span>
-                    <span class="stat-label">Com placar</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="totalPE">0</span>
-                    <span class="stat-label">PE</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="temPD">Não</span>
-                    <span class="stat-label">PD</span>
+                    <span class="stat-valor" id="jogosComPlacar">0</span>
+                    <span class="stat-label">Com Placar Real</span>
                 </div>
             </div>
         </div>
         
         <div class="jogos-container">
-            <div class="jogos-titulo">
-                <span>Jogos da rodada</span>
-                <span id="contadorJogos">0 jogos palpitados</span>
+            <div class="jogos-header">
+                <div class="jogos-titulo">Detalhes dos Jogos</div>
+                <div class="contador" id="contadorJogos">0/0 jogos</div>
             </div>
+            
+            <div class="info-note">
+                📝 <strong>Legenda dos Acertos:</strong><br>
+                • <span class="badge placar-exato">Placar Exato</span>: 10 pontos<br>
+                • <span class="badge resultado-correto">Resultado Correto</span>: 4 pontos<br>
+                • <span class="badge gols-mandante">Gols Mandante</span>: 2 pontos<br>
+                • <span class="badge gols-visitante">Gols Visitante</span>: 2 pontos<br>
+                • <span class="badge pontuacao-dobrada">Pontuação Dobrada</span>: Dobra os pontos
+            </div>
+            
             <div id="loading" class="loading">
                 <div class="loading-spinner"></div>
-                <div>Carregando jogos...</div>
+                <div>Carregando dados da rodada...</div>
             </div>
-            <div id="jogosLista" class="jogos-lista"></div>
+            
+            <div id="jogosLista" class="jogos-lista" style="display: none;"></div>
+            
+            <div id="noData" class="no-data" style="display: none;">
+                <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
+                <div style="font-weight: 600; margin-bottom: 10px; color: #333;">
+                    Nenhum palpite nesta rodada
+                </div>
+                <div style="color: #666; margin-bottom: 20px;">
+                    Você não fez palpites nos jogos desta rodada.
+                </div>
+            </div>
+            
             <div id="error" class="error" style="display: none;"></div>
         </div>
     </div>
 
     <script>
-        // Variáveis globais
-        let appData = {};
+        // ============================================
+        // VARIÁVEIS GLOBAIS E CONFIGURAÇÃO
+        // ============================================
+        let appData = null;
         let rodadasDisponiveis = [];
-        let rodadasDados = {};
-        let rodadaAtualNum = null;
+        let rodadasDadosCache = {}; // Cache local de rodadas já carregadas
+        let rodadaAtual = null;
+        let usuarioId = null;
         
-        // Inicialização
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Configuração do Telegram Web App
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.expand();
                 Telegram.WebApp.enableClosingConfirmation();
@@ -197,236 +266,164 @@
                 Telegram.WebApp.setHeaderColor('#007aff');
             }
             
+            console.log('🚀 Inicializando Web App Paginado...');
             carregarDadosDaURL();
         });
         
+        // ============================================
+        // FUNÇÃO PRINCIPAL: CARREGAR DADOS DA URL
+        // ============================================
         function carregarDadosDaURL() {
-    try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const dataParam = urlParams.get('data');
-        
-        if (!dataParam) {
-            mostrarErro('❌ Dados não encontrados na URL');
-            console.error('Parâmetro "data" não encontrado na URL');
-            console.log('URL completa:', window.location.href);
-            return;
-        }
-        
-        console.log('=== CARREGANDO DADOS DA URL ===');
-        console.log('URL Parameters:', Object.fromEntries(urlParams.entries()));
-        console.log('Dados recebidos (início):', dataParam.substring(0, 50) + '...');
-        console.log('Tamanho dos dados:', dataParam.length, 'caracteres');
-        
-        // Tenta descomprimir com Gzip
-        let dados;
-        try {
-            console.log('Tentando descompressão Gzip...');
-            dados = descomprimirGzip(dataParam);
-            console.log('✅ Descompressão Gzip bem-sucedida');
-        } catch (gzipError) {
-            console.warn('⚠️ Falha na descompressão Gzip:', gzipError.message);
-            
-            // Tenta Base64 normal como fallback
-            console.log('Tentando Base64 normal como fallback...');
             try {
-                // Primeiro tenta URL-safe
-                const safeBase64 = dataParam
-                    .replace(/\-/g, '+')
-                    .replace(/\_/g, '/')
-                    .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
+                console.log('🔍 Analisando URL para dados...');
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataParam = urlParams.get('data');
                 
-                const jsonString = atob(safeBase64);
-                console.log('JSON string (primeiros 200 chars):', jsonString.substring(0, 200));
-                dados = JSON.parse(jsonString);
-                console.log('✅ Parse Base64 normal bem-sucedido (URL-safe)');
-            } catch (base64Error) {
-                console.error('❌ Fallback Base64 também falhou:', base64Error.message);
-                
-                // Última tentativa: Base64 direto
-                try {
-                    const jsonString = atob(dataParam);
-                    console.log('Última tentativa (primeiros 200 chars):', jsonString.substring(0, 200));
-                    dados = JSON.parse(jsonString);
-                    console.log('✅ Parse Base64 direto bem-sucedido');
-                } catch (finalError) {
-                    throw new Error('Falha em todos os métodos: ' + 
-                        gzipError.message + ' | ' + 
-                        base64Error.message + ' | ' + 
-                        finalError.message);
+                if (!dataParam) {
+                    mostrarErro('❌ Dados não encontrados na URL');
+                    return;
                 }
-            }
-        }
-        
-        console.log('Dados processados:', dados);
-        
-        // Valida dados
-        if (!dados || !dados.t) {
-            console.error('Formato de dados inválido:', dados);
-            throw new Error('Formato de dados inválido ou incompleto');
-        }
-        
-        if (dados.t !== 'palpites_usuario_gzip') {
-            console.warn('⚠️ Tipo de dados:', dados.t, '- esperado: palpites_usuario_gzip');
-        }
-        
-        appData = dados;
-        
-        // Preenche informações do usuário
-        document.getElementById('userName').textContent = appData.u?.n || 'Usuário desconhecido';
-        document.getElementById('userId').textContent = `ID: ${appData.u?.id || '--'} | Telegram: ${appData.u?.tid || '--'}`;
-        document.getElementById('subtitle').textContent = `Usuário: ${appData.u?.n || '--'}`;
-        
-        // Armazena dados das rodadas
-        rodadasDisponiveis = appData.rd || [];
-        rodadasDados = {};
-        
-        // Primeira rodada já vem completa
-        if (appData.ra && appData.rdc) {
-            rodadasDados[appData.ra] = appData.rdc;
-            rodadaAtualNum = appData.ra;
-            console.log(`✅ Rodada atual: ${rodadaAtualNum}`);
-        }
-        
-        console.log('Rodadas disponíveis:', rodadasDisponiveis.length);
-        console.log('Rodadas no cache:', Object.keys(rodadasDados));
-        
-        // Popula o select com as rodadas
-        popularSelectRodadas();
-        
-        // Exibe a primeira rodada
-        if (rodadaAtualNum) {
-            selecionarRodada(rodadaAtualNum);
-        } else if (rodadasDisponiveis.length > 0) {
-            selecionarRodada(rodadasDisponiveis[0].n);
-        }
-        
-        // Esconde loading
-        document.getElementById('loading').style.display = 'none';
-        console.log('✅ Dados carregados com sucesso!');
-        
-    } catch (error) {
-        console.error('❌ Erro ao carregar dados:', error);
-        console.error('Stack:', error.stack);
-        
-        // Mostra mais detalhes no console
-        console.log('URL atual:', window.location.href);
-        console.log('Dados da URL (primeiros 200 chars):', 
-            new URLSearchParams(window.location.search).get('data')?.substring(0, 200));
-        
-        mostrarErro(`Erro ao processar dados: ${error.message}`);
-    }
-}
-        
-       function descomprimirGzip(base64Data) {
-    try {
-        console.log('=== INICIANDO DESCOMPRESSÃO GZIP ===');
-        console.log('Dados recebidos (início):', base64Data.substring(0, 50) + '...');
-        console.log('Tamanho total:', base64Data.length, 'caracteres');
-        
-        // Verifica caracteres inválidos
-        const invalidChars = base64Data.match(/[^A-Za-z0-9\+\/\=\-_]/g);
-        if (invalidChars) {
-            console.warn('⚠️ Caracteres inválidos encontrados:', invalidChars.slice(0, 10));
-        }
-        
-        // URL-safe Base64: substituir caracteres
-        console.log('Convertendo para Base64 padrão...');
-        const safeBase64 = base64Data
-            .replace(/\-/g, '+')
-            .replace(/\_/g, '/')
-            // Adiciona padding se necessário
-            .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
-        
-        console.log('Base64 após correção (primeiros 100 chars):', safeBase64.substring(0, 100));
-        
-        try {
-            // Decodifica Base64
-            console.log('Decodificando Base64...');
-            const binaryString = atob(safeBase64);
-            console.log('String binária decodificada:', binaryString.length, 'caracteres');
-            
-            if (binaryString.length === 0) {
-                throw new Error('String binária vazia após decodificação');
-            }
-            
-            const bytes = new Uint8Array(binaryString.length);
-            
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            
-            console.log('Bytes convertidos:', bytes.length, 'bytes');
-            console.log('Primeiros bytes:', Array.from(bytes.slice(0, 10)));
-            
-            // Verifica se é Gzip válido (primeiros 2 bytes: 0x1F 0x8B)
-            const isGzip = bytes[0] === 0x1F && bytes[1] === 0x8B;
-            console.log('É Gzip válido?', isGzip, 'Bytes:', bytes[0], bytes[1], 'esperado: 31, 139');
-            
-            if (isGzip) {
-                // Descomprime Gzip usando Pako
-                console.log('Descomprimindo Gzip...');
-                const decompressed = pako.inflate(bytes, { to: 'string' });
                 
-                console.log('Descomprimido:', decompressed.length, 'caracteres');
-                console.log('Primeiros 200 chars:', decompressed.substring(0, 200));
+                console.log('✅ Dados encontrados na URL:', dataParam.length, 'caracteres');
                 
-                // Parse JSON
-                console.log('Fazendo parse do JSON...');
-                const result = JSON.parse(decompressed);
-                console.log('✅ Parse bem-sucedido!');
-                console.log('Tipo:', result.t);
-                console.log('Usuário:', result.u?.n);
-                console.log('Rodadas:', result.rd?.length);
-                return result;
-            } else {
-                console.warn('⚠️ Dados não parecem ser Gzip válido');
-                console.log('Tentando interpretar como JSON direto...');
+                // Processa os dados (Gzip + Base64)
+                appData = processarDadosRecebidos(dataParam);
                 
-                // Tenta interpretar como JSON direto
-                const jsonString = binaryString;
-                console.log('JSON string (primeiros 200 chars):', jsonString.substring(0, 200));
-                const result = JSON.parse(jsonString);
-                console.log('✅ Parse JSON direto bem-sucedido!');
-                return result;
+                if (!appData) {
+                    mostrarErro('❌ Falha ao processar dados');
+                    return;
+                }
+                
+                // Inicializa variáveis globais
+                usuarioId = appData.usuario?.id || appData.u?.id;
+                rodadasDisponiveis = appData.rodadas_disponiveis || appData.rd || [];
+                
+                // Tenta carregar rodada atual dos dados
+                const rodadaAtualNum = appData.rodada_atual?.numero || appData.ra;
+                const rodadaAtualDados = appData.rodada_atual || appData.rdc;
+                
+                if (rodadaAtualNum && rodadaAtualDados) {
+                    rodadasDadosCache[rodadaAtualNum] = rodadaAtualDados;
+                    rodadaAtual = rodadaAtualNum;
+                    console.log(`✅ Rodada inicial: ${rodadaAtual}`);
+                }
+                
+                // Configura interface
+                configurarInterface();
+                
+                // Exibe primeira rodada
+                if (rodadaAtual) {
+                    exibirRodada(rodadaAtual);
+                } else if (rodadasDisponiveis.length > 0) {
+                    const primeiraRodada = rodadasDisponiveis[0].n || rodadasDisponiveis[0].numero;
+                    carregarRodadaDoBot(primeiraRodada);
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro fatal:', error);
+                mostrarErro(`Erro: ${error.message}`);
             }
+        }
+        
+        // ============================================
+        // PROCESSAMENTO DE DADOS (GZIP + BASE64)
+        // ============================================
+        function processarDadosRecebidos(dataParam) {
+            console.log('🧩 Processando dados recebidos...');
             
-        } catch (innerError) {
-            console.error('❌ Erro na decodificação/descompressão:', innerError);
-            
-            // Tenta um método alternativo
-            console.log('Tentando método alternativo...');
+            // 1. Tenta descompressão Gzip
             try {
-                // Tenta decodificar diretamente como Base64 normal (não URL-safe)
-                const directDecode = atob(base64Data);
-                console.log('Decodificação direta funcionou:', directDecode.substring(0, 100));
-                return JSON.parse(directDecode);
-            } catch (directError) {
-                console.error('❌ Método alternativo também falhou:', directError);
-                throw new Error('Falha em todos os métodos de decodificação: ' + innerError.message);
+                console.log('🔄 Tentando descompressão Gzip...');
+                const dados = descomprimirGzip(dataParam);
+                console.log('✅ Gzip descomprimido com sucesso');
+                console.log('📊 Tipo:', dados.tipo || dados.t);
+                return dados;
+            } catch (gzipError) {
+                console.warn('⚠️ Gzip falhou:', gzipError.message);
+            }
+            
+            // 2. Tenta Base64 URL-safe
+            try {
+                console.log('🔄 Tentando Base64 URL-safe...');
+                const base64Corrigida = corrigirBase64(dataParam);
+                const jsonString = atob(base64Corrigida);
+                console.log('✅ Base64 decodificado:', jsonString.length, 'caracteres');
+                const dados = JSON.parse(jsonString);
+                console.log('✅ JSON parseado com sucesso');
+                return dados;
+            } catch (base64Error) {
+                console.warn('⚠️ Base64 URL-safe falhou:', base64Error.message);
+            }
+            
+            // 3. Tenta Base64 normal
+            try {
+                console.log('🔄 Tentando Base64 normal...');
+                const jsonString = atob(dataParam);
+                const dados = JSON.parse(jsonString);
+                console.log('✅ Base64 normal funcionou');
+                return dados;
+            } catch (finalError) {
+                console.error('❌ Todos os métodos falharam');
+                throw new Error('Não foi possível decodificar os dados');
             }
         }
         
-    } catch (error) {
-        console.error('❌ Erro geral na descompressão:', error);
-        console.error('Stack:', error.stack);
-        
-        // Fallback: tenta como Base64 normal (sem Gzip)
-        try {
-            console.log('Tentando fallback...');
-            const safeBase64 = base64Data
+        function corrigirBase64(base64String) {
+            // Converte URL-safe Base64 para Base64 padrão
+            return base64String
                 .replace(/\-/g, '+')
                 .replace(/\_/g, '/')
-                .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
-            
-            const jsonString = atob(safeBase64);
-            console.log('Fallback Base64 direto (primeiros 200 chars):', jsonString.substring(0, 200));
-            return JSON.parse(jsonString);
-        } catch (fallbackError) {
-            console.error('❌ Fallback também falhou:', fallbackError);
-            throw new Error('Falha em ambos os métodos: ' + error.message + ' | Fallback: ' + fallbackError.message);
+                .padEnd(base64String.length + (4 - base64String.length % 4) % 4, '=');
         }
-    }
-}
+        
+        function descomprimirGzip(base64String) {
+            try {
+                // 1. Corrige Base64
+                const base64Corrigida = corrigirBase64(base64String);
+                
+                // 2. Decodifica Base64 para bytes
+                const binaryString = atob(base64Corrigida);
+                const bytes = new Uint8Array(binaryString.length);
+                
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // 3. Verifica se é Gzip válido
+                if (bytes[0] === 0x1F && bytes[1] === 0x8B) {
+                    // 4. Descomprime com Pako
+                    const decompressed = pako.inflate(bytes, { to: 'string' });
+                    
+                    // 5. Parse JSON
+                    return JSON.parse(decompressed);
+                } else {
+                    // Não é Gzip, tenta como JSON direto
+                    const jsonString = binaryString;
+                    return JSON.parse(jsonString);
+                }
+            } catch (error) {
+                console.error('Erro na descompressão Gzip:', error);
+                throw error;
+            }
+        }
+        
+        // ============================================
+        // CONFIGURAÇÃO DA INTERFACE
+        // ============================================
+        function configurarInterface() {
+            console.log('🎨 Configurando interface...');
+            
+            // Informações do usuário
+            const usuarioNome = appData.usuario?.nome || appData.u?.n || 'Usuário';
+            const telegramId = appData.usuario?.telegram_id || appData.u?.tid || '--';
+            
+            document.getElementById('userName').textContent = usuarioNome;
+            document.getElementById('userId').textContent = `ID: ${usuarioId} | Telegram: ${telegramId}`;
+            document.getElementById('subtitle').textContent = `Usuário: ${usuarioNome}`;
+            
+            // Popula select de rodadas
+            popularSelectRodadas();
+        }
         
         function popularSelectRodadas() {
             const select = document.getElementById('rodadaSelect');
@@ -440,249 +437,411 @@
                 return;
             }
             
+            // Ordena rodadas por número
+            rodadasDisponiveis.sort((a, b) => {
+                const numA = a.numero || a.n || 0;
+                const numB = b.numero || b.n || 0;
+                return numA - numB;
+            });
+            
+            // Adiciona opções
             rodadasDisponiveis.forEach(rodada => {
                 const option = document.createElement('option');
-                option.value = rodada.n;
+                const rodadaNum = rodada.numero || rodada.n;
+                const pontos = rodada.pontos || rodada.p || 0;
+                const status = rodada.status || rodada.s || '';
+                const palpitados = rodada.palpitados || rodada.j || 0;
+                const totalJogos = rodada.total_jogos || rodada.jt || 0;
                 
-                let texto = `Rodada ${rodada.n}`;
+                option.value = rodadaNum;
                 
-                // Adiciona informações
-                if (rodada.p !== undefined) texto += ` • ${rodada.p} pts`;
-                if (rodada.s === 'fechada') texto += ' • 🔒';
-                if (rodada.jc !== undefined) {
-                    const total = rodada.jt || rodada.j || 0;
-                    texto += ` • 📊 ${rodada.jc}/${total}`;
+                // Texto formatado
+                let texto = `Rodada ${rodadaNum}`;
+                
+                if (pontos > 0) {
+                    texto += ` • ${pontos} pts`;
+                }
+                
+                if (status === 'fechada') {
+                    texto += ' • 🔒';
+                }
+                
+                if (totalJogos > 0) {
+                    texto += ` • 📊 ${palpitados}/${totalJogos}`;
+                }
+                
+                // Marca como selecionada se for a atual
+                if (rodadaNum === rodadaAtual) {
+                    texto += ' • ✅';
+                    option.selected = true;
                 }
                 
                 option.textContent = texto;
                 select.appendChild(option);
             });
-            
-            // Seleciona a rodada atual
-            if (rodadaAtualNum) {
-                select.value = rodadaAtualNum;
-            }
         }
         
-        function selecionarRodada(numeroRodada) {
-            console.log(`Selecionando rodada ${numeroRodada}...`);
-            
-            const rodadaData = rodadasDados[numeroRodada];
-            
-            if (!rodadaData) {
-                // Se não temos dados desta rodada, tentamos carregar
-                console.log(`Rodada ${numeroRodada} não encontrada em cache`);
-                carregarRodadaDoBot(numeroRodada);
-                return;
-            }
-            
-            rodadaAtualNum = numeroRodada;
-            document.getElementById('rodadaSelect').value = numeroRodada;
-            exibirResumoRodada(rodadaData);
-            exibirJogosRodada(rodadaData);
-        }
-        
-        function exibirResumoRodada(rodada) {
-            const resumo = document.getElementById('rodadaResumo');
-            resumo.style.display = 'block';
-            
-            // Atualiza título
-            const rodadaNum = rodada.num || rodadaAtualNum;
-            document.getElementById('rodadaTitulo').textContent = `Rodada ${rodadaNum}`;
-            
-            // Atualiza estatísticas
-            document.getElementById('totalPontos').textContent = rodada.tp || 0;
-            document.getElementById('jogosPalpitados').textContent = rodada.jp || rodada.j || 0;
-            document.getElementById('totalJogos').textContent = rodada.jt || rodada.total_jogos || 0;
-            document.getElementById('jogosComPlacar').textContent = rodada.jcp || 0;
-            document.getElementById('totalPE').textContent = rodada.est?.pe || 0;
-            document.getElementById('temPD').textContent = (rodada.est?.pd_usada || rodada.pd_usada) ? 'Sim' : 'Não';
-        }
-        
-        function exibirJogosRodada(rodada) {
-            const container = document.getElementById('jogosLista');
-            const jogos = rodada.jogos || [];
-            
-            console.log(`Exibindo ${jogos.length} jogos da rodada ${rodada.num || rodadaAtualNum}`);
-            
-            // Limpa container
-            container.innerHTML = '';
-            
-            // Atualiza contador
-            const totalJogos = rodada.jt || rodada.total_jogos || 0;
-            const jogosPalpitados = rodada.jp || jogos.length;
-            document.getElementById('contadorJogos').textContent = 
-                `${jogosPalpitados}/${totalJogos} jogos palpitados`;
-            
-            if (jogos.length === 0) {
-                container.innerHTML = `
-                    <div class="jogo-card" style="text-align: center; color: #666;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📭</div>
-                        <div style="font-weight: 600; margin-bottom: 5px;">Nenhum palpite nesta rodada</div>
-                        <div style="font-size: 14px;">Você não fez palpites nos jogos desta rodada</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Ordena jogos por data/hora se disponível
-            jogos.sort((a, b) => {
-                if (a.dh && b.dh) {
-                    return new Date(a.dh) - new Date(b.dh);
-                }
-                return 0;
-            });
-            
-            // Cria cards para cada jogo
-            jogos.forEach((jogo, index) => {
-                const div = document.createElement('div');
-                div.className = `jogo-card ${jogo.pd ? 'pd' : ''}`;
-                
-                // Formata data/hora se disponível
-                let dataFormatada = '';
-                if (jogo.dh) {
-                    try {
-                        const data = new Date(jogo.dh);
-                        if (!isNaN(data)) {
-                            dataFormatada = data.toLocaleDateString('pt-BR', {
-                                day: '2-digit',
-                                month: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                        }
-                    } catch (e) {
-                        console.warn('Erro ao formatar data:', e);
-                    }
-                }
-                
-                let html = '';
-                
-                // Badge de PD
-                if (jogo.pd) {
-                    html += '<div class="pd-badge">Pontuação Dobrada</div>';
-                }
-                
-                // Título do jogo e data
-                html += `
-                    <div style="margin-bottom: 15px;">
-                        <div style="font-weight: 600; font-size: 16px; margin-bottom: 5px;">
-                            ${jogo.m || jogo.mandante || 'Time A'} vs ${jogo.v || jogo.visitante || 'Time B'}
-                        </div>
-                        ${dataFormatada ? `
-                            <div style="font-size: 12px; color: #666;">
-                                <span>📅</span> ${dataFormatada}
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // Placar real vs palpite
-                html += `
-                    <div class="placares-container">
-                        <div class="placar-box">
-                            <div class="placar-label">Placar Real</div>
-                            <div class="placar-valor placar-real">
-                                ${jogo.pr || jogo.placar_real || '?x?'}
-                            </div>
-                        </div>
-                        <div style="font-size: 20px; color: #ccc; font-weight: 300;">→</div>
-                        <div class="placar-box">
-                            <div class="placar-label">Seu Palpite</div>
-                            <div class="placar-valor placar-palpite">
-                                ${jogo.pal || jogo.palpite || '0x0'}
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                // Pontuação e acertos
-                html += `
-                    <div class="pontos-container">
-                        <div class="pontos">${jogo.pts || jogo.pontos || 0} pontos</div>
-                        <div class="acertos-container">
-                `;
-                
-                // Badges de acertos
-                if (jogo.ac && jogo.ac.length > 0) {
-                    jogo.ac.forEach(acerto => {
-                        html += `<span class="badge ${acerto.toLowerCase()}">${acerto}</span>`;
-                    });
-                } else {
-                    html += `<span style="font-size: 12px; color: #666;">Sem acertos</span>`;
-                }
-                
-                html += `</div></div>`;
-                
-                div.innerHTML = html;
-                container.appendChild(div);
-            });
-            
-            // Esconde loading
-            document.getElementById('loading').style.display = 'none';
-        }
-        
-        function mudarRodada() {
+        // ============================================
+        // FUNÇÕES PARA MANIPULAR RODADAS
+        // ============================================
+        function selecionarRodadaFromSelect() {
             const select = document.getElementById('rodadaSelect');
-            const numeroRodada = parseInt(select.value);
+            const rodadaNum = parseInt(select.value);
             
-            if (!isNaN(numeroRodada)) {
-                console.log(`Mudando para rodada ${numeroRodada}`);
-                selecionarRodada(numeroRodada);
+            if (!isNaN(rodadaNum)) {
+                carregarRodadaDoBot(rodadaNum);
+            }
+        }
+        
+        function carregarRodadaAtual() {
+            if (rodadaAtual) {
+                carregarRodadaDoBot(rodadaAtual);
+            } else {
+                alert('Selecione uma rodada primeiro');
             }
         }
         
         function carregarRodadaDoBot(numeroRodada) {
-            console.log(`Solicitando rodada ${numeroRodada} do bot...`);
+            console.log(`📡 Solicitando rodada ${numeroRodada}...`);
             
             // Mostra loading
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('jogosLista').innerHTML = '';
+            mostrarLoading(true);
             
-            // Em uma versão futura, faríamos uma requisição ao bot
-            // Por enquanto, apenas mostra mensagem
+            // Verifica se já temos em cache
+            if (rodadasDadosCache[numeroRodada]) {
+                console.log('✅ Rodada encontrada em cache');
+                setTimeout(() => {
+                    exibirRodada(numeroRodada);
+                }, 300);
+                return;
+            }
+            
+            // Para rodadas não carregadas, vamos navegar para nova URL
+            // Esta é a parte que fecha e reabre o WebApp
+            console.log('🔄 Navegando para nova rodada...');
+            
+            // Constrói URL de navegação
+            const novaURL = construirURLNavegacao(numeroRodada);
+            
+            // Fecha o WebApp atual e abre novo
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.close();
+                // O bot irá reabrir com os novos dados
+            }
+            
+            // Fallback: mostra mensagem
             setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('jogosLista').innerHTML = `
-                    <div class="jogo-card" style="text-align: center;">
-                        <div style="font-size: 48px; margin-bottom: 15px;">⏳</div>
-                        <div style="font-weight: 600; margin-bottom: 10px;">Rodada ${numeroRodada}</div>
-                        <div style="color: #666; margin-bottom: 15px;">
-                            Os dados desta rodada serão carregados em uma atualização futura.
-                        </div>
-                        <div style="font-size: 14px; color: #999;">
-                            No momento, apenas a primeira rodada está disponível.
-                        </div>
+                mostrarErro(`Por favor, selecione a rodada ${numeroRodada} novamente no menu do bot.`);
+            }, 2000);
+        }
+        
+        function construirURLNavegacao(rodadaNum) {
+            // Esta URL seria processada pelo bot via /start command
+            return `https://t.me/${Telegram.WebApp.initDataUnsafe.user?.username || 'bot'}?start=palpites_${usuarioId}_${rodadaNum}`;
+        }
+        
+        function exibirRodada(numeroRodada) {
+            console.log(`🎯 Exibindo rodada ${numeroRodada}...`);
+            
+            const rodadaDados = rodadasDadosCache[numeroRodada];
+            
+            if (!rodadaDados) {
+                mostrarErro(`Dados da rodada ${numeroRodada} não encontrados`);
+                return;
+            }
+            
+            // Atualiza estado atual
+            rodadaAtual = numeroRodada;
+            
+            // Atualiza título
+            document.getElementById('rodadaTitulo').textContent = `Rodada ${numeroRodada}`;
+            
+            // Atualiza select
+            document.getElementById('rodadaSelect').value = numeroRodada;
+            
+            // Exibe resumo
+            exibirResumoRodada(rodadaDados);
+            
+            // Exibe jogos
+            exibirJogosRodada(rodadaDados);
+            
+            // Esconde loading
+            mostrarLoading(false);
+        }
+        
+        function exibirResumoRodada(rodada) {
+            console.log('📊 Exibindo resumo da rodada...');
+            
+            // Extrai dados
+            const pontosTotal = rodada.pontuacao_total || rodada.tp || 0;
+            const jogosPalpitados = rodada.contagem?.jogos_palpitados || rodada.jp || 0;
+            const totalJogos = rodada.contagem?.total_jogos_rodada || rodada.jt || 0;
+            const jogosComPlacar = rodada.contagem?.jogos_com_placar || rodada.jcp || 0;
+            
+            // Estatísticas por extenso
+            const estatisticas = rodada.estatisticas || rodada.est || {};
+            const placarExato = estatisticas.placar_exato || estatisticas.pe || 0;
+            const resultadoCorreto = estatisticas.resultado_correto || estatisticas.rc || 0;
+            const golsMandante = estatisticas.gols_mandante || estatisticas.gm || 0;
+            const golsVisitante = estatisticas.gols_visitante || estatisticas.gv || 0;
+            const temPD = estatisticas.pd_usada || false;
+            
+            // Atualiza elementos
+            document.getElementById('totalPontos').textContent = pontosTotal;
+            document.getElementById('jogosPalpitados').textContent = jogosPalpitados;
+            document.getElementById('totalJogos').textContent = totalJogos;
+            document.getElementById('jogosComPlacar').textContent = jogosComPlacar;
+            
+            // Atualiza contador
+            document.getElementById('contadorJogos').textContent = 
+                `${jogosPalpitados}/${totalJogos} jogos palpitados`;
+        }
+        
+        function exibirJogosRodada(rodada) {
+            console.log('⚽ Exibindo jogos da rodada...');
+            
+            const jogos = rodada.jogos || [];
+            const container = document.getElementById('jogosLista');
+            const noDataDiv = document.getElementById('noData');
+            const errorDiv = document.getElementById('error');
+            
+            // Limpa e reseta
+            container.innerHTML = '';
+            errorDiv.style.display = 'none';
+            noDataDiv.style.display = 'none';
+            
+            if (jogos.length === 0) {
+                container.style.display = 'none';
+                noDataDiv.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'block';
+            
+            // Ordena jogos pela ordem original (mantém ordem do bot)
+            // O bot já envia na ordem correta
+            
+            // Cria cards para cada jogo
+            jogos.forEach((jogo, index) => {
+                const div = document.createElement('div');
+                
+                // Determina classe CSS
+                let classeCSS = 'jogo-card';
+                if (jogo.pd || jogo.pontuacao_dobrada) {
+                    classeCSS += ' pd';
+                }
+                
+                div.className = classeCSS;
+                
+                // HTML do card
+                div.innerHTML = criarHTMLJogoCard(jogo, index + 1);
+                
+                container.appendChild(div);
+            });
+        }
+        
+        function criarHTMLJogoCard(jogo, numero) {
+            // Extrai dados
+            const mandante = jogo.mandante || jogo.m || 'Time Mandante';
+            const visitante = jogo.visitante || jogo.v || 'Time Visitante';
+            const dataHorario = jogo.data_horario || jogo.dh;
+            const placarReal = jogo.placar_real || jogo.pr || '?x?';
+            const palpite = jogo.palpite || jogo.pal || '0x0';
+            const pontos = jogo.pontos || jogo.pts || 0;
+            const acertos = jogo.acertos || jogo.ac || [];
+            const acertosExtenso = jogo.acertos_extenso || [];
+            const temPD = jogo.pd || jogo.pontuacao_dobrada || false;
+            const palpitou = jogo.palpitou !== false;
+            
+            // Formata data/hora
+            let dataFormatada = '';
+            if (dataHorario) {
+                try {
+                    const data = new Date(dataHorario);
+                    if (!isNaN(data)) {
+                        dataFormatada = data.toLocaleDateString('pt-BR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                } catch (e) {
+                    console.warn('Erro ao formatar data:', e);
+                }
+            }
+            
+            // Inicia HTML
+            let html = '';
+            
+            // Badge de PD
+            if (temPD) {
+                html += '<div class="pd-badge">Pontuação Dobrada</div>';
+            }
+            
+            // Cabeçalho do jogo
+            html += `
+                <div class="jogo-header">
+                    <div class="jogo-times">
+                        ${mandante} vs ${visitante}
+                    </div>
+                    ${dataFormatada ? `
+                        <div class="jogo-data">📅 ${dataFormatada}</div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Se não palpitou
+            if (!palpitou) {
+                html += `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        <div style="font-size: 32px; margin-bottom: 10px;">❌</div>
+                        <div style="font-weight: 600;">Não palpitou neste jogo</div>
                     </div>
                 `;
-            }, 1000);
+                return html;
+            }
+            
+            // Placar real vs palpite
+            html += `
+                <div class="placares-container">
+                    <div class="placar-box">
+                        <div class="placar-label">Placar Real</div>
+                        <div class="placar-valor placar-real">${placarReal}</div>
+                    </div>
+                    <div style="font-size: 20px; color: #ccc; font-weight: 300;">→</div>
+                    <div class="placar-box">
+                        <div class="placar-label">Seu Palpite</div>
+                        <div class="placar-valor placar-palpite">${palpite}</div>
+                    </div>
+                </div>
+            `;
+            
+            // Pontuação e acertos
+            html += `
+                <div class="pontuacao-container">
+                    <div class="pontos">${pontos} pontos</div>
+                    <div class="acertos-container">
+            `;
+            
+            // Badges de acertos (prefere versão por extenso)
+            if (acertosExtenso.length > 0) {
+                acertosExtenso.forEach(acerto => {
+                    let classeBadge = '';
+                    
+                    if (acerto.includes('Placar Exato')) classeBadge = 'placar-exato';
+                    else if (acerto.includes('Resultado Correto')) classeBadge = 'resultado-correto';
+                    else if (acerto.includes('Gols Mandante')) classeBadge = 'gols-mandante';
+                    else if (acerto.includes('Gols Visitante')) classeBadge = 'gols-visitante';
+                    else if (acerto.includes('Pontuação Dobrada')) classeBadge = 'pontuacao-dobrada';
+                    
+                    html += `<span class="badge ${classeBadge}">${acerto}</span>`;
+                });
+            } else if (acertos.length > 0) {
+                // Fallback para versão abreviada
+                acertos.forEach(acerto => {
+                    let texto = '';
+                    let classeBadge = '';
+                    
+                    switch(acerto) {
+                        case 'PE': 
+                            texto = 'Placar Exato'; 
+                            classeBadge = 'placar-exato';
+                            break;
+                        case 'RC': 
+                            texto = 'Resultado Correto'; 
+                            classeBadge = 'resultado-correto';
+                            break;
+                        case 'GM': 
+                            texto = 'Gols Mandante'; 
+                            classeBadge = 'gols-mandante';
+                            break;
+                        case 'GV': 
+                            texto = 'Gols Visitante'; 
+                            classeBadge = 'gols-visitante';
+                            break;
+                        case 'PD': 
+                            texto = 'Pontuação Dobrada'; 
+                            classeBadge = 'pontuacao-dobrada';
+                            break;
+                        default: 
+                            texto = acerto;
+                            classeBadge = '';
+                    }
+                    
+                    html += `<span class="badge ${classeBadge}">${texto}</span>`;
+                });
+            } else {
+                html += `<span style="font-size: 12px; color: #666;">Sem acertos</span>`;
+            }
+            
+            html += `</div></div>`;
+            
+            return html;
+        }
+        
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+        function mostrarLoading(mostrar) {
+            const loadingDiv = document.getElementById('loading');
+            const jogosLista = document.getElementById('jogosLista');
+            
+            if (mostrar) {
+                loadingDiv.style.display = 'flex';
+                jogosLista.style.display = 'none';
+                document.getElementById('noData').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+            } else {
+                loadingDiv.style.display = 'none';
+            }
         }
         
         function mostrarErro(mensagem) {
-            console.error('Mostrando erro:', mensagem);
+            console.error('💥 Erro:', mensagem);
             
-            document.getElementById('loading').style.display = 'none';
+            mostrarLoading(false);
             
             const errorDiv = document.getElementById('error');
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `
-                <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+                <div style="font-size: 32px; margin-bottom: 15px;">❌</div>
                 <div style="font-weight: 600; margin-bottom: 10px;">Erro ao carregar</div>
-                <div style="margin-bottom: 15px;">${mensagem}</div>
-                <div style="font-size: 14px; color: #666;">
+                <div style="margin-bottom: 15px; font-size: 14px;">${mensagem}</div>
+                <div style="font-size: 12px; color: #666;">
                     Tente novamente ou entre em contato com o administrador.
                 </div>
             `;
+            
+            document.getElementById('jogosLista').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
         }
         
-        // Função de debug para testar dados manualmente
+        // ============================================
+        // FUNÇÕES DE DEBUG (para desenvolvimento)
+        // ============================================
         window.debugDados = function() {
-            console.log('=== DEBUG ===');
+            console.log('=== DEBUG DADOS ===');
             console.log('appData:', appData);
             console.log('rodadasDisponiveis:', rodadasDisponiveis);
-            console.log('rodadasDados:', rodadasDados);
-            console.log('rodadaAtualNum:', rodadaAtualNum);
-            console.log('=============');
+            console.log('rodadasDadosCache:', rodadasDadosCache);
+            console.log('rodadaAtual:', rodadaAtual);
+            console.log('usuarioId:', usuarioId);
+            console.log('====================');
+            
+            // Mostra cache de rodadas
+            Object.keys(rodadasDadosCache).forEach(num => {
+                const rodada = rodadasDadosCache[num];
+                console.log(`Rodada ${num}:`, {
+                    jogos: rodada.jogos?.length || 0,
+                    pontos: rodada.pontuacao_total || rodada.tp,
+                    palpitados: rodada.contagem?.jogos_palpitados || rodada.jp
+                });
+            });
+        };
+        
+        window.recarregar = function() {
+            location.reload();
         };
     </script>
 </body>
