@@ -3,89 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking por Rodada - Bolão</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Ranking da Rodada - Bolão</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
+            padding: 15px;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 25px;
+            padding: 20px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 28px;
             margin-bottom: 10px;
-            font-weight: 600;
         }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1rem;
+        .selector-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .selector-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .selector-container select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .selector-container select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         .content {
-            padding: 25px;
+            padding: 20px;
+            min-height: 300px;
         }
 
-        .select-rodada {
-            margin-bottom: 25px;
-        }
-
-        .select-rodada h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .select-rodada select {
-            width: 100%;
+        .rodada-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 1rem;
-            background: white;
-            color: #333;
-            transition: border-color 0.3s;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
-        .select-rodada select:focus {
-            outline: none;
-            border-color: #2c3e50;
+        .rodada-info h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .rodada-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .rodada-details div {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .ranking-table thead {
+            background: #f8f9fa;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .ranking-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .ranking-table tbody tr {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.3s ease;
+        }
+
+        .ranking-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .ranking-table td {
+            padding: 15px;
+            color: #333;
+        }
+
+        .posicao {
+            font-weight: bold;
+            font-size: 18px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .posicao.primeiro {
+            color: #ffc107;
+            font-size: 20px;
+        }
+
+        .posicao.segundo {
+            color: #c0c0c0;
+            font-size: 20px;
+        }
+
+        .posicao.terceiro {
+            color: #cd7f32;
+            font-size: 20px;
+        }
+
+        .nome-usuario {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+
+        .pontuacao {
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .acertos {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .acerto-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .acerto-badge {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .medal {
+            display: inline-block;
+            font-size: 24px;
+            margin-right: 8px;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             color: #666;
         }
 
         .loading-spinner {
             border: 4px solid #f3f3f3;
-            border-top: 4px solid #2c3e50;
+            border-top: 4px solid #667eea;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -98,121 +217,13 @@
             100% { transform: rotate(360deg); }
         }
 
-        .rodada-info {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            border-left: 5px solid #2c3e50;
-        }
-
-        .rodada-info h3 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-item label {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .info-item span {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .ranking-container {
-            margin-top: 25px;
-        }
-
-        .ranking-header {
-            display: grid;
-            grid-template-columns: 50px 1fr 100px 100px 100px 100px 100px;
-            gap: 15px;
+        .error {
+            background: #f8d7da;
+            color: #721c24;
             padding: 15px;
-            background: #2c3e50;
-            color: white;
-            border-radius: 12px 12px 0 0;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .ranking-item {
-            display: grid;
-            grid-template-columns: 50px 1fr 100px 100px 100px 100px 100px;
-            gap: 15px;
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            align-items: center;
-            transition: background 0.3s;
-        }
-
-        .ranking-item:hover {
-            background: #f8f9fa;
-        }
-
-        .ranking-item.posicao-1 {
-            background: linear-gradient(135deg, #ffd700 0%, #fff8e1 100%);
-            font-weight: bold;
-        }
-
-        .ranking-item.posicao-2 {
-            background: linear-gradient(135deg, #c0c0c0 0%, #f5f5f5 100%);
-        }
-
-        .ranking-item.posicao-3 {
-            background: linear-gradient(135deg, #cd7f32 0%, #f8ecd8 100%);
-        }
-
-        .posicao {
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            color: #2c3e50;
-        }
-
-        .nome-usuario {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .pontuacao {
-            text-align: center;
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.1rem;
-        }
-
-        .estatistica {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .ranking-geral {
-            margin-top: 40px;
-            padding-top: 25px;
-            border-top: 2px solid #e0e0e0;
-        }
-
-        .ranking-geral h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
+            border-radius: 6px;
+            border: 1px solid #f5c6cb;
+            margin: 20px 0;
         }
 
         .empty-state {
@@ -221,98 +232,46 @@
             color: #666;
         }
 
-        .empty-state i {
-            font-size: 3rem;
-            color: #ddd;
-            margin-bottom: 20px;
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
         }
 
-        .legenda {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #666;
+        .desempate-info {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #004085;
         }
 
-        .legenda h4 {
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .legenda-item {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 15px;
+        .desempate-info strong {
+            display: block;
             margin-bottom: 5px;
         }
 
-        .legenda-cor {
-            width: 15px;
-            height: 15px;
-            border-radius: 3px;
-            margin-right: 8px;
-        }
-
-        .legenda-cor.ouro { background: #ffd700; }
-        .legenda-cor.prata { background: #c0c0c0; }
-        .legenda-cor.bronze { background: #cd7f32; }
-
-        .btn-voltar {
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: block;
-            margin: 30px auto 0;
-        }
-
-        .btn-voltar:hover {
-            background: #5a6268;
-        }
-
         @media (max-width: 768px) {
-            .ranking-header, .ranking-item {
-                grid-template-columns: 40px 1fr 80px;
-                font-size: 0.8rem;
-                gap: 10px;
+            .header h1 {
+                font-size: 22px;
             }
-            
-            .ranking-header div:nth-child(4),
-            .ranking-header div:nth-child(5),
-            .ranking-header div:nth-child(6),
-            .ranking-header div:nth-child(7),
-            .ranking-item div:nth-child(4),
-            .ranking-item div:nth-child(5),
-            .ranking-item div:nth-child(6),
-            .ranking-item div:nth-child(7) {
-                display: none;
-            }
-            
-            .estatisticas-mobile {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-                margin-top: 10px;
-                font-size: 0.8rem;
-            }
-        }
 
-        @media (max-width: 600px) {
-            .container {
-                border-radius: 15px;
+            .ranking-table {
+                font-size: 14px;
             }
-            
-            .content {
-                padding: 15px;
+
+            .ranking-table th,
+            .ranking-table td {
+                padding: 10px 8px;
             }
-            
-            .info-grid {
+
+            .acertos {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .rodada-details {
                 grid-template-columns: 1fr;
             }
         }
@@ -321,404 +280,218 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏆 Ranking por Rodada</h1>
-            <p>Classificação dos participantes</p>
+            <h1>🏆 Ranking da Rodada</h1>
+            <p>Veja a classificação dos participantes</p>
         </div>
 
-        <div class="content">
-            <div class="select-rodada">
-                <h3>Selecione uma Rodada</h3>
-                <select id="selectRodada">
-                    <option value="">Carregando rodadas...</option>
-                </select>
-            </div>
+        <div class="selector-container">
+            <label for="rodadaSelect">Selecione a Rodada:</label>
+            <select id="rodadaSelect">
+                <option value="">Carregando rodadas...</option>
+            </select>
+        </div>
 
-            <div id="loading" class="loading">
+        <div class="content" id="content">
+            <div class="loading">
                 <div class="loading-spinner"></div>
-                <p>Carregando ranking da rodada...</p>
-            </div>
-
-            <div id="rodadaContent" style="display: none;">
-                <div class="rodada-info">
-                    <h3>Informações da Rodada</h3>
-                    <div class="info-grid" id="rodadaInfo"></div>
-                </div>
-
-                <div id="rankingContainer" class="ranking-container">
-                    <div class="ranking-header">
-                        <div>#</div>
-                        <div>Participante</div>
-                        <div>Pontos</div>
-                        <div>PE</div>
-                        <div>RC</div>
-                        <div>GM</div>
-                        <div>GV</div>
-                    </div>
-                    <div id="rankingList"></div>
-                </div>
-
-                <div id="emptyState" class="empty-state" style="display: none;">
-                    <i>📭</i>
-                    <h3>Nenhum participante encontrado</h3>
-                    <p>Não há palpites registrados para esta rodada.</p>
-                </div>
-
-                <div class="legenda">
-                    <h4>Legenda:</h4>
-                    <div class="legenda-item">
-                        <div class="legenda-cor ouro"></div>
-                        <span>1º Lugar</span>
-                    </div>
-                    <div class="legenda-item">
-                        <div class="legenda-cor prata"></div>
-                        <span>2º Lugar</span>
-                    </div>
-                    <div class="legenda-item">
-                        <div class="legenda-cor bronze"></div>
-                        <span>3º Lugar</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>PE = Placar Exato</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>RC = Resultado Correto</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>GM = Gols Mandante</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>GV = Gols Visitante</span>
-                    </div>
-                </div>
+                <p>Carregando dados...</p>
             </div>
         </div>
     </div>
 
     <script>
-        // Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        // Decodifica dados da URL
+        function getDataFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const data = params.get('data');
+            
+            if (!data) {
+                console.error('Nenhum dado encontrado na URL');
+                return null;
+            }
 
-        // Elementos DOM
-        const selectRodadaEl = document.getElementById('selectRodada');
-        const loadingEl = document.getElementById('loading');
-        const rodadaContentEl = document.getElementById('rodadaContent');
-        const rodadaInfoEl = document.getElementById('rodadaInfo');
-        const rankingListEl = document.getElementById('rankingList');
-        const emptyStateEl = document.getElementById('emptyState');
+            try {
+                const decoded = atob(data);
+                return JSON.parse(decoded);
+            } catch (e) {
+                console.error('Erro ao decodificar dados:', e);
+                return null;
+            }
+        }
 
-        // Estado da aplicação
-        let rodadasDisponiveis = [];
+        // Dados globais
+        let dadosGlobais = {};
         let rodadaSelecionada = null;
-        let rankingRodada = null;
 
-        // Inicialização
-        async function init() {
-            try {
-                // Obter dados da URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const dataParam = urlParams.get('data');
-                
-                if (!dataParam) {
-                    showError('Dados não encontrados na URL');
-                    return;
-                }
-
-                // Decodificar dados
-                const dadosJson = atob(dataParam);
-                const dados = JSON.parse(dadosJson);
-                
-                if (dados.tipo !== 'ranking_rodada') {
-                    showError('Tipo de dados inválido');
-                    return;
-                }
-
-                rodadasDisponiveis = dados.rodadas_disponiveis || [];
-                rodadaSelecionada = dados.rodada_numero;
-
-                // Preencher dropdown de rodadas
-                renderRodadasDropdown();
-
-                // Selecionar rodada inicial se especificada
-                if (rodadaSelecionada) {
-                    selectRodadaEl.value = rodadaSelecionada;
-                    await carregarRankingRodada(rodadaSelecionada);
-                }
-
-                // Esconder loading
-                loadingEl.style.display = 'none';
-
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                showError('Erro ao carregar dados');
-            }
-        }
-
-        // Renderizar dropdown de rodadas
-        function renderRodadasDropdown() {
-            if (rodadasDisponiveis.length === 0) {
-                selectRodadaEl.innerHTML = '<option value="">Nenhuma rodada disponível</option>';
+        // Inicializa a página
+        async function inicializar() {
+            dadosGlobais = getDataFromURL();
+            
+            if (!dadosGlobais) {
+                mostrarErro('Erro ao carregar dados da URL');
                 return;
             }
 
-            selectRodadaEl.innerHTML = '<option value="">Selecione uma rodada...</option>';
-            
-            rodadasDisponiveis.forEach(rodadaNum => {
-                const option = document.createElement('option');
-                option.value = rodadaNum;
-                option.textContent = `Rodada ${rodadaNum}`;
-                selectRodadaEl.appendChild(option);
-            });
+            console.log('Dados recebidos:', dadosGlobais);
 
-            // Adicionar listener para mudança
-            selectRodadaEl.addEventListener('change', onRodadaSelecionada);
-        }
+            // Popula seletor de rodadas
+            const select = document.getElementById('rodadaSelect');
+            select.innerHTML = '';
 
-        // Quando uma rodada é selecionada
-        async function onRodadaSelecionada(event) {
-            const rodadaNum = parseInt(event.target.value);
-            
-            if (!rodadaNum) {
-                rodadaContentEl.style.display = 'none';
-                return;
-            }
+            if (dadosGlobais.rodadas_disponiveis && dadosGlobais.rodadas_disponiveis.length > 0) {
+                dadosGlobais.rodadas_disponiveis.forEach(rodada => {
+                    const option = document.createElement('option');
+                    option.value = rodada.numero;
+                    option.textContent = `Rodada ${rodada.numero} - ${new Date(rodada.data_criacao).toLocaleDateString('pt-BR')}`;
+                    select.appendChild(option);
+                });
 
-            rodadaSelecionada = rodadaNum;
-            
-            // Mostrar loading
-            loadingEl.style.display = 'block';
-            rodadaContentEl.style.display = 'none';
-            emptyStateEl.style.display = 'none';
-
-            try {
-                // Carregar ranking da rodada
-                await carregarRankingRodada(rodadaNum);
-            } catch (error) {
-                console.error('Erro ao carregar rodada:', error);
-                showError('Erro ao carregar ranking da rodada');
-            }
-        }
-
-        // Carregar ranking da rodada
-        async function carregarRankingRodada(rodadaNum) {
-            try {
-                // Em produção, isso seria uma API real
-                // Por enquanto, vamos simular dados
-                await simularRankingRodada(rodadaNum);
-
-            } catch (error) {
-                console.error('Erro na requisição:', error);
-                // Carregar dados simulados
-                await simularRankingRodada(rodadaNum);
-            }
-        }
-
-        // Simular dados do ranking (para desenvolvimento)
-        async function simularRankingRodada(rodadaNum) {
-            // Simular delay de rede
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            // Dados simulados
-            const dadosRanking = {
-                rodada_numero: rodadaNum,
-                data_abertura: '10/01/2026',
-                horario_fechamento: '20:00',
-                total_participantes: 8,
-                ranking: [
-                    {
-                        posicao: 1,
-                        usuario_id: 1,
-                        nome: 'João Silva',
-                        total_pontos: 42,
-                        estatisticas: { pe: 2, rc: 3, gm: 5, gv: 4 },
-                        pd_usada: true,
-                        trunfo: true
-                    },
-                    {
-                        posicao: 2,
-                        usuario_id: 3,
-                        nome: 'Maria Santos',
-                        total_pontos: 38,
-                        estatisticas: { pe: 1, rc: 4, gm: 6, gv: 3 },
-                        pd_usada: false,
-                        trunfo: false
-                    },
-                    {
-                        posicao: 3,
-                        usuario_id: 5,
-                        nome: 'Pedro Oliveira',
-                        total_pontos: 36,
-                        estatisticas: { pe: 2, rc: 2, gm: 4, gv: 4 },
-                        pd_usada: true,
-                        trunfo: true
-                    },
-                    {
-                        posicao: 4,
-                        usuario_id: 2,
-                        nome: 'Ana Costa',
-                        total_pontos: 32,
-                        estatisticas: { pe: 1, rc: 3, gm: 3, gv: 3 },
-                        pd_usada: false,
-                        trunfo: false
-                    },
-                    {
-                        posicao: 5,
-                        usuario_id: 4,
-                        nome: 'Carlos Souza',
-                        total_pontos: 28,
-                        estatisticas: { pe: 0, rc: 4, gm: 4, gv: 2 },
-                        pd_usada: false,
-                        trunfo: true
-                    },
-                    {
-                        posicao: 6,
-                        usuario_id: 6,
-                        nome: 'Fernanda Lima',
-                        total_pontos: 24,
-                        estatisticas: { pe: 1, rc: 2, gm: 3, gv: 1 },
-                        pd_usada: true,
-                        trunfo: false
-                    },
-                    {
-                        posicao: 7,
-                        usuario_id: 7,
-                        nome: 'Roberto Alves',
-                        total_pontos: 20,
-                        estatisticas: { pe: 0, rc: 3, gm: 2, gv: 2 },
-                        pd_usada: false,
-                        trunfo: false
-                    },
-                    {
-                        posicao: 8,
-                        usuario_id: 8,
-                        nome: 'Juliana Rocha',
-                        total_pontos: 18,
-                        estatisticas: { pe: 0, rc: 2, gm: 2, gv: 1 },
-                        pd_usada: false,
-                        trunfo: false
-                    }
-                ]
-            };
-
-            rankingRodada = dadosRanking;
-            renderRankingInfo();
-        }
-
-        // Renderizar informações do ranking
-        function renderRankingInfo() {
-            if (!rankingRodada) return;
-
-            // Informações da rodada
-            rodadaInfoEl.innerHTML = `
-                <div class="info-item">
-                    <label>Rodada:</label>
-                    <span>${rankingRodada.rodada_numero}ª</span>
-                </div>
-                <div class="info-item">
-                    <label>Data:</label>
-                    <span>${rankingRodada.data_abertura}</span>
-                </div>
-                <div class="info-item">
-                    <label>Participantes:</label>
-                    <span>${rankingRodada.total_participantes}</span>
-                </div>
-                <div class="info-item">
-                    <label>Horário limite:</label>
-                    <span>${rankingRodada.horario_fechamento}</span>
-                </div>
-            `;
-
-            // Renderizar ranking
-            renderRankingList();
-
-            // Mostrar/ocultar estados
-            if (rankingRodada.ranking.length > 0) {
-                emptyStateEl.style.display = 'none';
+                // Seleciona rodada atual ou primeira disponível
+                const rodadaAtual = dadosGlobais.rodada_numero || dadosGlobais.rodadas_disponiveis[0].numero;
+                select.value = rodadaAtual;
+                rodadaSelecionada = rodadaAtual;
+                await carregarRodada(rodadaSelecionada);
             } else {
-                emptyStateEl.style.display = 'block';
+                mostrarErro('Nenhuma rodada disponível');
             }
 
-            // Esconder loading e mostrar conteúdo
-            loadingEl.style.display = 'none';
-            rodadaContentEl.style.display = 'block';
-        }
-
-        // Renderizar lista de ranking
-        function renderRankingList() {
-            if (!rankingRodada || !rankingRodada.ranking) return;
-
-            rankingListEl.innerHTML = '';
-
-            rankingRodada.ranking.forEach(participante => {
-                const rankingItem = document.createElement('div');
-                rankingItem.className = `ranking-item posicao-${participante.posicao}`;
-                
-                // Verificar se é mobile
-                const isMobile = window.innerWidth <= 768;
-                
-                if (isMobile) {
-                    rankingItem.innerHTML = `
-                        <div class="posicao">${participante.posicao}º</div>
-                        <div class="nome-usuario">
-                            ${escapeHtml(participante.nome)}
-                            ${participante.trunfo ? ' 👑' : ''}
-                            ${participante.pd_usada ? ' ⭐' : ''}
-                        </div>
-                        <div class="pontuacao">${participante.total_pontos}</div>
-                        <div class="estatisticas-mobile">
-                            <div>PE: ${participante.estatisticas.pe}</div>
-                            <div>RC: ${participante.estatisticas.rc}</div>
-                            <div>GM: ${participante.estatisticas.gm}</div>
-                            <div>GV: ${participante.estatisticas.gv}</div>
-                        </div>
-                    `;
-                } else {
-                    rankingItem.innerHTML = `
-                        <div class="posicao">${participante.posicao}º</div>
-                        <div class="nome-usuario">
-                            ${escapeHtml(participante.nome)}
-                            ${participante.trunfo ? ' 👑' : ''}
-                            ${participante.pd_usada ? ' ⭐' : ''}
-                        </div>
-                        <div class="pontuacao">${participante.total_pontos}</div>
-                        <div class="estatistica">${participante.estatisticas.pe}</div>
-                        <div class="estatistica">${participante.estatisticas.rc}</div>
-                        <div class="estatistica">${participante.estatisticas.gm}</div>
-                        <div class="estatistica">${participante.estatisticas.gv}</div>
-                    `;
-                }
-
-                rankingListEl.appendChild(rankingItem);
+            // Event listener para mudança de rodada
+            select.addEventListener('change', (e) => {
+                rodadaSelecionada = e.target.value;
+                carregarRodada(rodadaSelecionada);
             });
         }
 
-        // Funções auxiliares
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        // Carrega dados de uma rodada específica
+        async function carregarRodada(numeroRodada) {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Carregando ranking...</p></div>';
+
+            try {
+                // Busca dados da rodada nos dados globais
+                const rodada = dadosGlobais.rodadas_disponiveis.find(r => r.numero == numeroRodada);
+                
+                if (!rodada) {
+                    mostrarErro('Rodada não encontrada');
+                    return;
+                }
+
+                // Renderiza o ranking
+                renderizarRanking(rodada);
+            } catch (e) {
+                console.error('Erro ao carregar rodada:', e);
+                mostrarErro('Erro ao carregar dados da rodada');
+            }
         }
 
-        function showError(message) {
-            loadingEl.innerHTML = `
-                <div style="color: #dc3545; text-align: center;">
-                    <p style="font-size: 2rem;">⚠️</p>
-                    <h3>Erro</h3>
-                    <p>${message}</p>
+        // Renderiza o ranking da rodada
+        function renderizarRanking(rodada) {
+            const content = document.getElementById('content');
+            let html = '';
+
+            // Info da rodada
+            html += `
+                <div class="rodada-info">
+                    <h2>🏆 Rodada ${rodada.numero}</h2>
+                    <div class="rodada-details">
+                        <div>📅 Data: ${new Date(rodada.data_criacao).toLocaleDateString('pt-BR')}</div>
+                        <div>⏰ Horário: ${rodada.horario_fechamento ? new Date(rodada.horario_fechamento).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : 'N/A'}</div>
+                        ${rodada.trunfo ? `<div>🎯 Trunfo: ${rodada.trunfo}</div>` : ''}
+                        ${rodada.total_participantes ? `<div>👥 Participantes: ${rodada.total_participantes}</div>` : ''}
+                    </div>
                 </div>
             `;
+
+            // Ranking
+            if (rodada.ranking && rodada.ranking.length > 0) {
+                html += `
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">Pos.</th>
+                                <th>Participante</th>
+                                <th style="width: 120px; text-align: center;">Pontuação</th>
+                                <th>Acertos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                rodada.ranking.forEach((participante, index) => {
+                    const posicao = index + 1;
+                    let medalClass = '';
+                    let medal = '';
+
+                    if (posicao === 1) {
+                        medalClass = 'primeiro';
+                        medal = '🥇';
+                    } else if (posicao === 2) {
+                        medalClass = 'segundo';
+                        medal = '🥈';
+                    } else if (posicao === 3) {
+                        medalClass = 'terceiro';
+                        medal = '🥉';
+                    }
+
+                    const acertos = participante.estatisticas || {};
+                    const pe = acertos.pe || 0;
+                    const rc = acertos.rc || 0;
+                    const gm = acertos.gm || 0;
+                    const gv = acertos.gv || 0;
+
+                    html += `
+                        <tr>
+                            <td class="posicao ${medalClass}">
+                                ${medal ? `<span class="medal">${medal}</span>` : posicao}
+                            </td>
+                            <td class="nome-usuario">${participante.nome}</td>
+                            <td class="pontuacao">${participante.total}</td>
+                            <td class="acertos">
+                                <div class="acerto-item">
+                                    <span>PE:</span>
+                                    <span class="acerto-badge">${pe}</span>
+                                </div>
+                                <div class="acerto-item">
+                                    <span>RC:</span>
+                                    <span class="acerto-badge">${rc}</span>
+                                </div>
+                                <div class="acerto-item">
+                                    <span>GM:</span>
+                                    <span class="acerto-badge">${gm}</span>
+                                </div>
+                                <div class="acerto-item">
+                                    <span>GV:</span>
+                                    <span class="acerto-badge">${gv}</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                html += `
+                        </tbody>
+                    </table>
+                    <div class="desempate-info">
+                        <strong>ℹ️ Critérios de Desempate:</strong>
+                        1º - Placar Exato (PE)<br>
+                        2º - Resultado Correto (RC)
+                    </div>
+                `;
+            } else {
+                html += '<div class="empty-state"><div class="empty-state-icon">📊</div><p>Nenhum dado de ranking disponível para esta rodada</p></div>';
+            }
+
+            content.innerHTML = html;
         }
 
-        // Lidar com redimensionamento da tela
-        window.addEventListener('resize', () => {
-            if (rankingRodada) {
-                renderRankingList();
-            }
-        });
+        // Mostra mensagem de erro
+        function mostrarErro(mensagem) {
+            const content = document.getElementById('content');
+            content.innerHTML = `<div class="error">❌ ${mensagem}</div>`;
+        }
 
-        // Inicializar app
-        document.addEventListener('DOMContentLoaded', init);
+        // Inicia quando a página carrega
+        window.addEventListener('load', inicializar);
     </script>
 </body>
 </html>
