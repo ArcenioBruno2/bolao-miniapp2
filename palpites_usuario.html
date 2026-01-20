@@ -18,14 +18,14 @@
         body { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
         
         .container { 
             max-width: 900px; 
             margin: 0 auto; 
             background: white; 
-            border-radius: 20px; 
+            border-radius: 16px; 
             overflow: hidden; 
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
@@ -34,20 +34,19 @@
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 30px 25px;
+            padding: 25px 20px;
             text-align: center;
-            position: relative;
         }
         
         .header h1 {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
         
         .header .subtitle {
-            font-size: 15px;
+            font-size: 14px;
             opacity: 0.9;
             font-weight: 400;
         }
@@ -55,73 +54,73 @@
         /* Informações do usuário */
         .user-info {
             background: #f8fafc;
-            padding: 20px 25px;
+            padding: 15px 20px;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
         
         .user-main {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
         
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 20px;
             color: white;
             font-weight: bold;
         }
         
         .user-details h2 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 4px;
         }
         
         .user-details p {
-            font-size: 13px;
+            font-size: 12px;
             color: #718096;
         }
         
         /* Seletor de rodada */
         .select-section {
-            padding: 25px;
+            padding: 20px;
             background: #f1f5f9;
             border-bottom: 1px solid #e2e8f0;
         }
         
         .custom-select {
             position: relative;
-            max-width: 400px;
+            max-width: 100%;
         }
         
         .custom-select select {
             width: 100%;
-            padding: 16px 20px;
-            font-size: 16px;
+            padding: 14px 18px;
+            font-size: 15px;
             border: 2px solid #cbd5e0;
-            border-radius: 12px;
+            border-radius: 10px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 15px center;
-            background-size: 20px;
-            padding-right: 50px;
+            background-size: 16px;
+            padding-right: 45px;
         }
         
         .custom-select select:focus {
@@ -130,81 +129,64 @@
             outline: none;
         }
         
-        /* Estatísticas da rodada */
+        /* Estatísticas da rodada - CORES SIMPLES */
         .stats-section {
-            padding: 30px 25px;
-            background: linear-gradient(135deg, #4c51bf 0%, #2d3748 100%);
+            padding: 20px;
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
             color: white;
-        }
-        
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            text-align: center;
         }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
         }
         
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 18px 15px;
+            border-radius: 10px;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.2s ease;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-2px);
         }
         
         .stat-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             margin-bottom: 8px;
             display: block;
         }
         
         .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 13px;
+            opacity: 0.95;
+            font-weight: 500;
         }
         
         /* Lista de jogos */
         .games-section {
-            padding: 30px 25px;
+            padding: 25px 20px;
         }
         
         .games-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
             margin-bottom: 25px;
             padding-bottom: 15px;
             border-bottom: 2px solid #e2e8f0;
         }
         
         .games-header h2 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: #2d3748;
+            margin-bottom: 8px;
         }
         
         .games-counter {
-            background: #4299e1;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
             font-size: 14px;
-            font-weight: 600;
+            color: #718096;
+            font-weight: 500;
         }
         
         .games-list {
@@ -216,19 +198,13 @@
         .game-card {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 25px;
+            border-radius: 14px;
+            padding: 20px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .game-card:hover {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
         }
         
         .game-card.pd {
-            border-left: 5px solid #e53e3e;
+            border-left: 4px solid #e53e3e;
             background: linear-gradient(to right, #fff5f5, white);
         }
         
@@ -238,9 +214,9 @@
             right: 15px;
             background: #e53e3e;
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -251,81 +227,115 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
         
         .game-teams {
             flex: 1;
-            min-width: 250px;
+            min-width: 200px;
         }
         
         .game-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #2d3748;
             margin-bottom: 8px;
         }
         
         .game-date {
-            font-size: 14px;
+            font-size: 13px;
             color: #718096;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
-        /* Placar comparativo */
-        .score-comparison {
+        /* Layout de placar CORRIGIDO: Times um abaixo do outro */
+        .score-layout {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 25px;
-            padding: 25px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 20px;
+            padding: 20px;
             background: #f8fafc;
             border-radius: 12px;
         }
         
         .score-column {
-            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
         
-        .score-label {
-            font-size: 14px;
+        .score-header {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .score-header-label {
+            font-size: 13px;
             color: #718096;
-            margin-bottom: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
+            margin-bottom: 5px;
         }
         
-        .score-value {
-            font-size: 36px;
+        .score-header-value {
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 10px;
+            color: #2d3748;
         }
         
-        .score-real {
+        .score-real .score-header-value {
             color: #38a169;
         }
         
-        .score-guess {
+        .score-guess .score-header-value {
             color: #4299e1;
         }
         
+        /* Times e placares - UM ABAIXO DO OUTRO */
         .score-teams {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .score-team {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .team-name {
             font-size: 14px;
-            color: #4a5568;
-            line-height: 1.6;
+            font-weight: 500;
+            color: #2d3748;
         }
         
-        .score-teams span {
-            display: block;
-            margin-bottom: 4px;
+        .team-score {
+            font-size: 18px;
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
         }
         
-        /* Pontuação detalhada */
+        .real-score {
+            color: #38a169;
+        }
+        
+        .guess-score {
+            color: #4299e1;
+        }
+        
+        /* Pontuação detalhada - INFORMAÇÕES COMPLETAS DOS PONTOS */
         .points-details {
             background: #edf2f7;
             border-radius: 12px;
@@ -336,48 +346,80 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .total-points {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: #38a169;
         }
         
         .points-breakdown {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
         }
         
         .breakdown-item {
-            text-align: center;
-            padding: 12px;
             background: white;
             border-radius: 8px;
+            padding: 12px;
             border: 1px solid #e2e8f0;
         }
         
         .breakdown-label {
             font-size: 12px;
             color: #718096;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             margin-bottom: 6px;
+            font-weight: 500;
         }
         
         .breakdown-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: #2d3748;
+            margin-bottom: 4px;
         }
         
         .breakdown-points {
             font-size: 12px;
             color: #38a169;
-            margin-top: 4px;
         }
+        
+        /* Informações de acertos */
+        .acertos-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .acertos-label {
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .acertos-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .badge {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge.pe { background: #38a169; color: white; }
+        .badge.rc { background: #4299e1; color: white; }
+        .badge.gm { background: #718096; color: white; }
+        .badge.gv { background: #a0aec0; color: white; }
+        .badge.pd { background: #e53e3e; color: white; }
         
         /* Loading e Erros */
         .loading {
@@ -415,13 +457,13 @@
         
         /* Responsividade */
         @media (max-width: 768px) {
-            .score-comparison {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
-            
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .score-layout {
+                grid-template-columns: 1fr;
+                gap: 20px;
             }
             
             .points-breakdown {
@@ -429,47 +471,49 @@
             }
             
             .header h1 {
-                font-size: 24px;
+                font-size: 22px;
             }
             
             .stat-value {
-                font-size: 28px;
+                font-size: 24px;
             }
         }
         
         @media (max-width: 480px) {
             .container {
-                border-radius: 15px;
+                border-radius: 12px;
             }
             
             .header, .user-info, .select-section, .stats-section, .games-section {
-                padding: 20px 15px;
-            }
-            
-            .stat-card {
                 padding: 15px;
             }
             
-            .game-card {
-                padding: 20px;
+            .stat-card {
+                padding: 12px;
             }
             
-            .score-comparison {
-                padding: 20px;
+            .game-card {
+                padding: 15px;
+            }
+            
+            .score-layout {
+                padding: 15px;
+            }
+            
+            .points-breakdown {
+                grid-template-columns: 1fr;
             }
         }
         
-        /* Tipografia e utilidades */
+        /* Utilitários */
         .emoji {
-            font-size: 20px;
-            margin-right: 8px;
+            font-size: 18px;
+            margin-right: 6px;
             vertical-align: middle;
         }
         
-        .divider {
-            height: 2px;
-            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-            margin: 30px 0;
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -503,31 +547,30 @@
         
         <!-- Estatísticas da rodada -->
         <div class="stats-section" id="rodadaResumo" style="display: none;">
-            <h2 class="section-title" id="rodadaTitulo">Rodada --</h2>
             <div class="stats-grid">
                 <div class="stat-card">
                     <span class="stat-value" id="totalPontos">0</span>
-                    <span class="stat-label">Pontos (TP)</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="jogosReais">0</span>
-                    <span class="stat-label">Jogos Reais (JR)</span>
+                    <span class="stat-label">Pontos</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="jogosPalpitados">0</span>
-                    <span class="stat-label">Palpitados (JP)</span>
+                    <span class="stat-label">Palpitados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="totalJogos">10</span>
+                    <span class="stat-label">Jogos</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="pdUsada">Não</span>
-                    <span class="stat-label">PD Usada</span>
+                    <span class="stat-label">PD</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="totalPE">0</span>
-                    <span class="stat-label">Placar Exato (PE)</span>
+                    <span class="stat-label">Placar Exato</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="totalRC">0</span>
-                    <span class="stat-label">Resultado (RC)</span>
+                    <span class="stat-label">Resultado</span>
                 </div>
             </div>
         </div>
@@ -536,7 +579,7 @@
         <div class="games-section">
             <div class="games-header">
                 <h2>Jogos da Rodada</h2>
-                <div class="games-counter" id="contadorJogos">0 jogos</div>
+                <div class="games-counter" id="contadorJogos">0/10 jogos</div>
             </div>
             
             <!-- Loading -->
@@ -582,12 +625,13 @@
                     return;
                 }
                 
-                console.log('Carregando dados da URL...');
+                console.log('=== CARREGANDO DADOS DA URL ===');
                 
                 // Tenta descomprimir com Gzip primeiro
                 let dados;
                 try {
                     dados = descomprimirGzip(dataParam);
+                    console.log('✅ Dados descomprimidos com Gzip');
                 } catch (gzipError) {
                     // Fallback para Base64 normal
                     try {
@@ -598,6 +642,7 @@
                         
                         const jsonString = atob(safeBase64);
                         dados = JSON.parse(jsonString);
+                        console.log('✅ Dados carregados via Base64');
                     } catch (base64Error) {
                         throw new Error('Falha ao decodificar dados: ' + base64Error.message);
                     }
@@ -606,6 +651,23 @@
                 // Valida dados
                 if (!dados || !dados.t) {
                     throw new Error('Formato de dados inválido');
+                }
+                
+                // Debug: Mostra estrutura dos dados
+                console.log('Estrutura dos dados:', {
+                    tipo: dados.t,
+                    usuario: dados.u,
+                    totalRodadas: dados.rd ? dados.rd.length : 0,
+                    rodadaAtual: dados.ra,
+                    rodadaAtualDados: dados.rdc ? Object.keys(dados.rdc) : 'Nenhum'
+                });
+                
+                if (dados.rdc) {
+                    console.log('Detalhes rodada atual:', {
+                        campos: Object.keys(dados.rdc),
+                        estatisticas: dados.rdc.est,
+                        totalJogos: dados.rdc.jogos ? dados.rdc.jogos.length : 0
+                    });
                 }
                 
                 appData = dados;
@@ -628,6 +690,7 @@
                 if (appData.ra && appData.rdc) {
                     rodadasDados[appData.ra] = appData.rdc;
                     rodadaAtualNum = appData.ra;
+                    console.log(`✅ Rodada atual: ${rodadaAtualNum}`);
                 }
                 
                 // Popula o select com as rodadas
@@ -644,7 +707,7 @@
                 document.getElementById('loading').style.display = 'none';
                 
             } catch (error) {
-                console.error('Erro ao carregar dados:', error);
+                console.error('❌ Erro ao carregar dados:', error);
                 mostrarErro(`Erro ao processar dados: ${error.message}`);
             }
         }
@@ -702,12 +765,21 @@
                 
                 let texto = `Rodada ${rodada.n}`;
                 
-                // Adiciona informações extras
-                if (rodada.p !== undefined) texto += ` • ${rodada.p} pontos`;
-                if (rodada.s === 'fechada') texto += ' • 🔒';
-                if (rodada.jc !== undefined) {
-                    const total = rodada.jt || rodada.j || 0;
-                    texto += ` • ${rodada.jc}/${total} jogos`;
+                // Formato: Jogos Palpitados / Jogos Totais (sempre 10)
+                if (rodada.jp !== undefined && rodada.jt !== undefined) {
+                    texto += ` • ${rodada.jp}/10 jogos`;
+                } else if (rodada.jp !== undefined) {
+                    texto += ` • ${rodada.jp}/10 jogos`;
+                }
+                
+                // Adiciona pontos se disponível
+                if (rodada.p !== undefined) {
+                    texto += ` • ${rodada.p} pontos`;
+                }
+                
+                // Status da rodada
+                if (rodada.s === 'fechada') {
+                    texto += ' • 🔒';
                 }
                 
                 option.textContent = texto;
@@ -740,17 +812,62 @@
             const resumo = document.getElementById('rodadaResumo');
             resumo.style.display = 'block';
             
-            // Atualiza título
-            const rodadaNum = rodada.num || rodadaAtualNum;
-            document.getElementById('rodadaTitulo').textContent = `Rodada ${rodadaNum}`;
+            // ⭐⭐ CALCULA ESTATÍSTICAS COM BASE NOS JOGOS ⭐⭐
+            const jogos = rodada.jogos || [];
             
-            // Atualiza estatísticas com os campos corretos
-            document.getElementById('totalPontos').textContent = rodada.tp || 0; // TP
-            document.getElementById('jogosReais').textContent = rodada.jr || rodada.total_jogos || 0; // JR
-            document.getElementById('jogosPalpitados').textContent = rodada.jp || rodada.j || 0; // JP
-            document.getElementById('pdUsada').textContent = (rodada.pd_usada || rodada.pd_usada === true) ? 'Sim' : 'Não'; // PD
-            document.getElementById('totalPE').textContent = rodada.est?.pe || rodada.pe || 0; // PE
-            document.getElementById('totalRC').textContent = rodada.est?.rc || rodada.rc || 0; // RC
+            // Total de pontos
+            let totalPontos = rodada.tp || 0;
+            
+            // Jogos palpitados
+            let jogosPalpitados = rodada.jp || jogos.length;
+            
+            // Jogos totais (sempre 10, mas verifica se tem no dado)
+            let totalJogos = rodada.jt || 10;
+            
+            // PD usada
+            let pdUsada = false;
+            let totalPE = 0;
+            let totalRC = 0;
+            
+            // Calcula estatísticas baseadas nos acertos dos jogos
+            jogos.forEach(jogo => {
+                const acertos = jogo.ac || [];
+                
+                // Verifica se usou PD neste jogo
+                if (jogo.pd) {
+                    pdUsada = true;
+                }
+                
+                // Conta acertos
+                acertos.forEach(acerto => {
+                    if (acerto === 'PE') totalPE++;
+                    if (acerto === 'RC') totalRC++;
+                });
+            });
+            
+            // Se não encontrou nos jogos, tenta no objeto estatísticas
+            if (rodada.est) {
+                pdUsada = rodada.est.pd_usada || pdUsada;
+                totalPE = rodada.est.pe || totalPE;
+                totalRC = rodada.est.rc || totalRC;
+            }
+            
+            // Atualiza a interface
+            document.getElementById('totalPontos').textContent = totalPontos;
+            document.getElementById('jogosPalpitados').textContent = jogosPalpitados;
+            document.getElementById('totalJogos').textContent = totalJogos;
+            document.getElementById('pdUsada').textContent = pdUsada ? 'Sim' : 'Não';
+            document.getElementById('totalPE').textContent = totalPE;
+            document.getElementById('totalRC').textContent = totalRC;
+            
+            console.log('Estatísticas calculadas:', {
+                totalPontos,
+                jogosPalpitados,
+                totalJogos,
+                pdUsada,
+                totalPE,
+                totalRC
+            });
         }
         
         function exibirJogosRodada(rodada) {
@@ -760,9 +877,9 @@
             // Limpa container
             container.innerHTML = '';
             
-            // Atualiza contador
-            const totalJogos = rodada.jr || rodada.total_jogos || 0;
+            // Atualiza contador - SEMPRE 10 jogos totais
             const jogosPalpitados = rodada.jp || jogos.length;
+            const totalJogos = rodada.jt || 10;
             document.getElementById('contadorJogos').textContent = 
                 `${jogosPalpitados}/${totalJogos} jogos`;
             
@@ -809,29 +926,35 @@
                     }
                 }
                 
-                // Placar real e palpite
-                const placarReal = jogo.pr || jogo.placar_real || '? x ?';
-                const placarPalpite = jogo.pal || jogo.palpite || '0 x 0';
+                // Extrai valores dos placares
+                let placarReal = jogo.pr || '? x ?';
+                let placarPalpite = jogo.pal || '0 x 0';
                 
-                // Extrai valores do placar
-                const [realCasa, realVisitante] = placarReal.split(' x ').map(v => v.trim());
-                const [palpiteCasa, palpiteVisitante] = placarPalpite.split(' x ').map(v => v.trim());
+                // Tenta extrair os valores numéricos
+                let [realMandante, realVisitante] = placarReal.split('x').map(v => v.trim());
+                let [palpiteMandante, palpiteVisitante] = placarPalpite.split('x').map(v => v.trim());
+                
+                // Valores padrão se não conseguir extrair
+                if (!realMandante || !realVisitante) {
+                    realMandante = '?';
+                    realVisitante = '?';
+                }
+                
+                if (!palpiteMandante || !palpiteVisitante) {
+                    palpiteMandante = '0';
+                    palpiteVisitante = '0';
+                }
                 
                 // Nomes dos times
-                const timeCasa = jogo.m || jogo.mandante || 'Time Casa';
+                const timeMandante = jogo.m || jogo.mandante || 'Time Casa';
                 const timeVisitante = jogo.v || jogo.visitante || 'Time Visitante';
                 
                 // Pontos e acertos
-                const pontos = jogo.pts || jogo.pontos || 0;
+                const pontos = jogo.pts || 0;
                 const acertos = jogo.ac || [];
                 
-                // Contadores por tipo de acerto
-                const contadores = {
-                    'PE': acertos.filter(a => a === 'PE').length,
-                    'RC': acertos.filter(a => a === 'RC').length,
-                    'GM': acertos.filter(a => a === 'GM').length,
-                    'GV': acertos.filter(a => a === 'GV').length
-                };
+                // ⭐⭐ CALCULA PONTUAÇÃO DETALHADA CONFORME AS REGRAS DO BOT ⭐⭐
+                let detalhesPontuacao = calcularDetalhesPontuacao(acertos, jogo.pd);
                 
                 // HTML do jogo
                 div.innerHTML = `
@@ -839,7 +962,7 @@
                     
                     <div class="game-info">
                         <div class="game-teams">
-                            <div class="game-title">${timeCasa} vs ${timeVisitante}</div>
+                            <div class="game-title">${timeMandante} vs ${timeVisitante}</div>
                             ${dataFormatada ? `
                                 <div class="game-date">
                                     <span class="emoji">📅</span> ${dataFormatada}
@@ -848,89 +971,70 @@
                         </div>
                     </div>
                     
-                    <div class="score-comparison">
-                        <div class="score-column">
-                            <div class="score-label">Placar Real</div>
-                            <div class="score-value score-real">${placarReal}</div>
+                    <div class="score-layout">
+                        <!-- PLACAR REAL -->
+                        <div class="score-column score-real">
+                            <div class="score-header">
+                                <div class="score-header-label">Placar Real</div>
+                                <div class="score-header-value">${placarReal}</div>
+                            </div>
+                            
                             <div class="score-teams">
-                                <span>${timeCasa}</span>
-                                <span>${timeVisitante}</span>
+                                <!-- Time Mandante Real -->
+                                <div class="score-team">
+                                    <span class="team-name">${timeMandante}</span>
+                                    <span class="team-score real-score">${realMandante}</span>
+                                </div>
+                                
+                                <!-- Time Visitante Real -->
+                                <div class="score-team">
+                                    <span class="team-name">${timeVisitante}</span>
+                                    <span class="team-score real-score">${realVisitante}</span>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="score-column">
-                            <div class="score-label">VS</div>
-                            <div class="score-value" style="color: #a0aec0;">↔</div>
-                            <div class="score-teams" style="color: #a0aec0;">
-                                <span>Confronto</span>
-                                <span>Direto</span>
+                        <!-- PLACAR PALPITADO -->
+                        <div class="score-column score-guess">
+                            <div class="score-header">
+                                <div class="score-header-label">Seu Palpite</div>
+                                <div class="score-header-value">${placarPalpite}</div>
                             </div>
-                        </div>
-                        
-                        <div class="score-column">
-                            <div class="score-label">Seu Palpite</div>
-                            <div class="score-value score-guess">${placarPalpite}</div>
+                            
                             <div class="score-teams">
-                                <span>${timeCasa}</span>
-                                <span>${timeVisitante}</span>
+                                <!-- Time Mandante Palpite -->
+                                <div class="score-team">
+                                    <span class="team-name">${timeMandante}</span>
+                                    <span class="team-score guess-score">${palpiteMandante}</span>
+                                </div>
+                                
+                                <!-- Time Visitante Palpite -->
+                                <div class="score-team">
+                                    <span class="team-name">${timeVisitante}</span>
+                                    <span class="team-score guess-score">${palpiteVisitante}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
+                    <!-- INFORMAÇÕES COMPLETAS DOS PONTOS -->
                     <div class="points-details">
                         <div class="points-header">
                             <div class="total-points">${pontos} pontos</div>
                         </div>
                         
-                        <div class="points-breakdown">
-                            ${contadores.PE > 0 ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">Placar Exato</div>
-                                    <div class="breakdown-value">${contadores.PE}x</div>
-                                    <div class="breakdown-points">+${contadores.PE * 25} pts</div>
+                        ${detalhesPontuacao}
+                        
+                        ${acertos.length > 0 ? `
+                            <div class="acertos-info">
+                                <div class="acertos-label">Acertos:</div>
+                                <div class="acertos-container">
+                                    ${acertos.map(acerto => `
+                                        <span class="badge ${acerto.toLowerCase()}">${acerto}</span>
+                                    `).join('')}
                                 </div>
-                            ` : ''}
-                            
-                            ${contadores.RC > 0 ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">Resultado</div>
-                                    <div class="breakdown-value">${contadores.RC}x</div>
-                                    <div class="breakdown-points">+${contadores.RC * 10} pts</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${contadores.GM > 0 ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">Gols Mandante</div>
-                                    <div class="breakdown-value">${contadores.GM}x</div>
-                                    <div class="breakdown-points">+${contadores.GM * 5} pts</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${contadores.GV > 0 ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">Gols Visitante</div>
-                                    <div class="breakdown-value">${contadores.GV}x</div>
-                                    <div class="breakdown-points">+${contadores.GV * 5} pts</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${jogo.pd ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">PD Aplicada</div>
-                                    <div class="breakdown-value">2x</div>
-                                    <div class="breakdown-points">Pontos Dobrados</div>
-                                </div>
-                            ` : ''}
-                            
-                            ${acertos.length === 0 ? `
-                                <div class="breakdown-item">
-                                    <div class="breakdown-label">Acertos</div>
-                                    <div class="breakdown-value">0x</div>
-                                    <div class="breakdown-points">+0 pts</div>
-                                </div>
-                            ` : ''}
-                        </div>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
                 
@@ -939,6 +1043,112 @@
             
             // Esconde loading
             document.getElementById('loading').style.display = 'none';
+        }
+        
+        function calcularDetalhesPontuacao(acertos, pdUsada) {
+            // Contadores por tipo de acerto
+            const contadores = {
+                'PE': acertos.filter(a => a === 'PE').length,
+                'RC': acertos.filter(a => a === 'RC').length,
+                'GM': acertos.filter(a => a === 'GM').length,
+                'GV': acertos.filter(a => a === 'GV').length
+            };
+            
+            // ⭐⭐ CÁLCULO CORRETO CONFORME AS REGRAS DO BOT ⭐⭐
+            // PE: 10 + 2 + 2 = 14 pontos
+            // RC: 4 pontos
+            // GM: 2 pontos
+            // GV: 2 pontos
+            // PD: multiplica tudo por 2
+            
+            let totalPontos = 0;
+            let detalhesHTML = '<div class="points-breakdown">';
+            
+            // Placar Exato (PE) - 14 pontos
+            if (contadores.PE > 0) {
+                const pontosPE = 14;
+                totalPontos += pontosPE;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Placar Exato (PE)</div>
+                        <div class="breakdown-value">${contadores.PE}x</div>
+                        <div class="breakdown-points">+${pontosPE} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Resultado Correto (RC) - 4 pontos
+            if (contadores.RC > 0 && contadores.PE === 0) { // PE não soma com RC
+                const pontosRC = contadores.RC * 4;
+                totalPontos += pontosRC;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Resultado Correto (RC)</div>
+                        <div class="breakdown-value">${contadores.RC}x</div>
+                        <div class="breakdown-points">+${pontosRC} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Gols Mandante exatos (GM) - 2 pontos
+            if (contadores.GM > 0) {
+                const pontosGM = contadores.GM * 2;
+                totalPontos += pontosGM;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Gols Mandante (GM)</div>
+                        <div class="breakdown-value">${contadores.GM}x</div>
+                        <div class="breakdown-points">+${pontosGM} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Gols Visitante exatos (GV) - 2 pontos
+            if (contadores.GV > 0) {
+                const pontosGV = contadores.GV * 2;
+                totalPontos += pontosGV;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Gols Visitante (GV)</div>
+                        <div class="breakdown-value">${contadores.GV}x</div>
+                        <div class="breakdown-points">+${pontosGV} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Pontuação Dobrada (PD)
+            if (pdUsada) {
+                const totalAntesPD = totalPontos;
+                totalPontos *= 2;
+                const bonusPD = totalPontos - totalAntesPD;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Pontuação Dobrada (PD)</div>
+                        <div class="breakdown-value">2x</div>
+                        <div class="breakdown-points">+${bonusPD} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Se não teve nenhum acerto
+            if (totalPontos === 0) {
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Acertos</div>
+                        <div class="breakdown-value">0x</div>
+                        <div class="breakdown-points">+0 pontos</div>
+                    </div>
+                `;
+            }
+            
+            detalhesHTML += '</div>';
+            
+            return detalhesHTML;
         }
         
         function mudarRodada() {
