@@ -201,108 +201,232 @@
         });
         
         function carregarDadosDaURL() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        
+        if (!dataParam) {
+            mostrarErro('❌ Dados não encontrados na URL');
+            console.error('Parâmetro "data" não encontrado na URL');
+            console.log('URL completa:', window.location.href);
+            return;
+        }
+        
+        console.log('=== CARREGANDO DADOS DA URL ===');
+        console.log('URL Parameters:', Object.fromEntries(urlParams.entries()));
+        console.log('Dados recebidos (início):', dataParam.substring(0, 50) + '...');
+        console.log('Tamanho dos dados:', dataParam.length, 'caracteres');
+        
+        // Tenta descomprimir com Gzip
+        let dados;
+        try {
+            console.log('Tentando descompressão Gzip...');
+            dados = descomprimirGzip(dataParam);
+            console.log('✅ Descompressão Gzip bem-sucedida');
+        } catch (gzipError) {
+            console.warn('⚠️ Falha na descompressão Gzip:', gzipError.message);
+            
+            // Tenta Base64 normal como fallback
+            console.log('Tentando Base64 normal como fallback...');
             try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const dataParam = urlParams.get('data');
+                // Primeiro tenta URL-safe
+                const safeBase64 = dataParam
+                    .replace(/\-/g, '+')
+                    .replace(/\_/g, '/')
+                    .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
                 
-                if (!dataParam) {
-                    mostrarErro('❌ Dados não encontrados na URL');
-                    return;
-                }
+                const jsonString = atob(safeBase64);
+                console.log('JSON string (primeiros 200 chars):', jsonString.substring(0, 200));
+                dados = JSON.parse(jsonString);
+                console.log('✅ Parse Base64 normal bem-sucedido (URL-safe)');
+            } catch (base64Error) {
+                console.error('❌ Fallback Base64 também falhou:', base64Error.message);
                 
-                console.log('Dados recebidos (início):', dataParam.substring(0, 100) + '...');
-                
-                // Tenta descomprimir com Gzip
-                let dados;
+                // Última tentativa: Base64 direto
                 try {
-                    console.log('Tentando descompressão Gzip...');
-                    dados = descomprimirGzip(dataParam);
-                    console.log('✅ Descompressão Gzip bem-sucedida');
-                } catch (gzipError) {
-                    console.warn('⚠️ Falha na descompressão Gzip:', gzipError.message);
-                    console.log('Tentando Base64 normal...');
-                    try {
-                        const jsonString = atob(dataParam);
-                        console.log('JSON string:', jsonString.substring(0, 200) + '...');
-                        dados = JSON.parse(jsonString);
-                        console.log('✅ Parse Base64 normal bem-sucedido');
-                    } catch (base64Error) {
-                        throw new Error('Falha em ambos os métodos: ' + base64Error.message);
-                    }
+                    const jsonString = atob(dataParam);
+                    console.log('Última tentativa (primeiros 200 chars):', jsonString.substring(0, 200));
+                    dados = JSON.parse(jsonString);
+                    console.log('✅ Parse Base64 direto bem-sucedido');
+                } catch (finalError) {
+                    throw new Error('Falha em todos os métodos: ' + 
+                        gzipError.message + ' | ' + 
+                        base64Error.message + ' | ' + 
+                        finalError.message);
                 }
-                
-                console.log('Dados processados:', dados);
-                
-                // Valida dados
-                if (!dados || !dados.t) {
-                    throw new Error('Formato de dados inválido');
-                }
-                
-                if (dados.t !== 'palpites_usuario_gzip') {
-                    console.warn('Tipo de dados:', dados.t, '- esperado: palpites_usuario_gzip');
-                }
-                
-                appData = dados;
-                
-                // Preenche informações do usuário
-                document.getElementById('userName').textContent = appData.u?.n || 'Usuário desconhecido';
-                document.getElementById('userId').textContent = `ID: ${appData.u?.id || '--'} | Telegram: ${appData.u?.tid || '--'}`;
-                document.getElementById('subtitle').textContent = `Usuário: ${appData.u?.n || '--'}`;
-                
-                // Armazena dados das rodadas
-                rodadasDisponiveis = appData.rd || [];
-                rodadasDados = {};
-                
-                // Primeira rodada já vem completa
-                if (appData.ra && appData.rdc) {
-                    rodadasDados[appData.ra] = appData.rdc;
-                    rodadaAtualNum = appData.ra;
-                    console.log(`✅ Rodada atual: ${rodadaAtualNum}`);
-                }
-                
-                // Popula o select com as rodadas
-                popularSelectRodadas();
-                
-                // Exibe a primeira rodada
-                if (rodadaAtualNum) {
-                    selecionarRodada(rodadaAtualNum);
-                } else if (rodadasDisponiveis.length > 0) {
-                    selecionarRodada(rodadasDisponiveis[0].n);
-                }
-                
-                // Esconde loading
-                document.getElementById('loading').style.display = 'none';
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar dados:', error);
-                mostrarErro(`Erro ao processar dados: ${error.message}`);
             }
         }
         
-        function descomprimirGzip(base64Data) {
-            try {
-                // Decodifica Base64
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                console.log('Bytes Gzip:', bytes.length, 'bytes');
-                
+        console.log('Dados processados:', dados);
+        
+        // Valida dados
+        if (!dados || !dados.t) {
+            console.error('Formato de dados inválido:', dados);
+            throw new Error('Formato de dados inválido ou incompleto');
+        }
+        
+        if (dados.t !== 'palpites_usuario_gzip') {
+            console.warn('⚠️ Tipo de dados:', dados.t, '- esperado: palpites_usuario_gzip');
+        }
+        
+        appData = dados;
+        
+        // Preenche informações do usuário
+        document.getElementById('userName').textContent = appData.u?.n || 'Usuário desconhecido';
+        document.getElementById('userId').textContent = `ID: ${appData.u?.id || '--'} | Telegram: ${appData.u?.tid || '--'}`;
+        document.getElementById('subtitle').textContent = `Usuário: ${appData.u?.n || '--'}`;
+        
+        // Armazena dados das rodadas
+        rodadasDisponiveis = appData.rd || [];
+        rodadasDados = {};
+        
+        // Primeira rodada já vem completa
+        if (appData.ra && appData.rdc) {
+            rodadasDados[appData.ra] = appData.rdc;
+            rodadaAtualNum = appData.ra;
+            console.log(`✅ Rodada atual: ${rodadaAtualNum}`);
+        }
+        
+        console.log('Rodadas disponíveis:', rodadasDisponiveis.length);
+        console.log('Rodadas no cache:', Object.keys(rodadasDados));
+        
+        // Popula o select com as rodadas
+        popularSelectRodadas();
+        
+        // Exibe a primeira rodada
+        if (rodadaAtualNum) {
+            selecionarRodada(rodadaAtualNum);
+        } else if (rodadasDisponiveis.length > 0) {
+            selecionarRodada(rodadasDisponiveis[0].n);
+        }
+        
+        // Esconde loading
+        document.getElementById('loading').style.display = 'none';
+        console.log('✅ Dados carregados com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar dados:', error);
+        console.error('Stack:', error.stack);
+        
+        // Mostra mais detalhes no console
+        console.log('URL atual:', window.location.href);
+        console.log('Dados da URL (primeiros 200 chars):', 
+            new URLSearchParams(window.location.search).get('data')?.substring(0, 200));
+        
+        mostrarErro(`Erro ao processar dados: ${error.message}`);
+    }
+}
+        
+       function descomprimirGzip(base64Data) {
+    try {
+        console.log('=== INICIANDO DESCOMPRESSÃO GZIP ===');
+        console.log('Dados recebidos (início):', base64Data.substring(0, 50) + '...');
+        console.log('Tamanho total:', base64Data.length, 'caracteres');
+        
+        // Verifica caracteres inválidos
+        const invalidChars = base64Data.match(/[^A-Za-z0-9\+\/\=\-_]/g);
+        if (invalidChars) {
+            console.warn('⚠️ Caracteres inválidos encontrados:', invalidChars.slice(0, 10));
+        }
+        
+        // URL-safe Base64: substituir caracteres
+        console.log('Convertendo para Base64 padrão...');
+        const safeBase64 = base64Data
+            .replace(/\-/g, '+')
+            .replace(/\_/g, '/')
+            // Adiciona padding se necessário
+            .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
+        
+        console.log('Base64 após correção (primeiros 100 chars):', safeBase64.substring(0, 100));
+        
+        try {
+            // Decodifica Base64
+            console.log('Decodificando Base64...');
+            const binaryString = atob(safeBase64);
+            console.log('String binária decodificada:', binaryString.length, 'caracteres');
+            
+            if (binaryString.length === 0) {
+                throw new Error('String binária vazia após decodificação');
+            }
+            
+            const bytes = new Uint8Array(binaryString.length);
+            
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            console.log('Bytes convertidos:', bytes.length, 'bytes');
+            console.log('Primeiros bytes:', Array.from(bytes.slice(0, 10)));
+            
+            // Verifica se é Gzip válido (primeiros 2 bytes: 0x1F 0x8B)
+            const isGzip = bytes[0] === 0x1F && bytes[1] === 0x8B;
+            console.log('É Gzip válido?', isGzip, 'Bytes:', bytes[0], bytes[1], 'esperado: 31, 139');
+            
+            if (isGzip) {
                 // Descomprime Gzip usando Pako
+                console.log('Descomprimindo Gzip...');
                 const decompressed = pako.inflate(bytes, { to: 'string' });
                 
                 console.log('Descomprimido:', decompressed.length, 'caracteres');
+                console.log('Primeiros 200 chars:', decompressed.substring(0, 200));
                 
                 // Parse JSON
-                return JSON.parse(decompressed);
+                console.log('Fazendo parse do JSON...');
+                const result = JSON.parse(decompressed);
+                console.log('✅ Parse bem-sucedido!');
+                console.log('Tipo:', result.t);
+                console.log('Usuário:', result.u?.n);
+                console.log('Rodadas:', result.rd?.length);
+                return result;
+            } else {
+                console.warn('⚠️ Dados não parecem ser Gzip válido');
+                console.log('Tentando interpretar como JSON direto...');
                 
-            } catch (error) {
-                throw new Error('Erro na descompressão Gzip: ' + error.message);
+                // Tenta interpretar como JSON direto
+                const jsonString = binaryString;
+                console.log('JSON string (primeiros 200 chars):', jsonString.substring(0, 200));
+                const result = JSON.parse(jsonString);
+                console.log('✅ Parse JSON direto bem-sucedido!');
+                return result;
+            }
+            
+        } catch (innerError) {
+            console.error('❌ Erro na decodificação/descompressão:', innerError);
+            
+            // Tenta um método alternativo
+            console.log('Tentando método alternativo...');
+            try {
+                // Tenta decodificar diretamente como Base64 normal (não URL-safe)
+                const directDecode = atob(base64Data);
+                console.log('Decodificação direta funcionou:', directDecode.substring(0, 100));
+                return JSON.parse(directDecode);
+            } catch (directError) {
+                console.error('❌ Método alternativo também falhou:', directError);
+                throw new Error('Falha em todos os métodos de decodificação: ' + innerError.message);
             }
         }
+        
+    } catch (error) {
+        console.error('❌ Erro geral na descompressão:', error);
+        console.error('Stack:', error.stack);
+        
+        // Fallback: tenta como Base64 normal (sem Gzip)
+        try {
+            console.log('Tentando fallback...');
+            const safeBase64 = base64Data
+                .replace(/\-/g, '+')
+                .replace(/\_/g, '/')
+                .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
+            
+            const jsonString = atob(safeBase64);
+            console.log('Fallback Base64 direto (primeiros 200 chars):', jsonString.substring(0, 200));
+            return JSON.parse(jsonString);
+        } catch (fallbackError) {
+            console.error('❌ Fallback também falhou:', fallbackError);
+            throw new Error('Falha em ambos os métodos: ' + error.message + ' | Fallback: ' + fallbackError.message);
+        }
+    }
+}
         
         function popularSelectRodadas() {
             const select = document.getElementById('rodadaSelect');
