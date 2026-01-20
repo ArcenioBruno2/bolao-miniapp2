@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Palpites do Usuário - Bolão</title>
     <style>
+        /* Manter todos os estilos anteriores */
         * {
             margin: 0;
             padding: 0;
@@ -519,12 +520,41 @@
         let dadosUsuario = null;
         let rodadasDisponiveis = [];
         let dadosRodadaAtual = null;
+        let telegramWebApp = null;
         
         // Função para voltar
         function goBack() {
-            if (window.Telegram && window.Telegram.WebApp) {
-                Telegram.WebApp.close();
+            if (telegramWebApp) {
+                telegramWebApp.close();
             }
+        }
+        
+        // Inicializa o Web App do Telegram
+        function initTelegramWebApp() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                telegramWebApp = Telegram.WebApp;
+                telegramWebApp.ready();
+                telegramWebApp.expand();
+                
+                // Configurar para receber dados do bot
+                telegramWebApp.onEvent('webAppDataReceived', function(event) {
+                    try {
+                        const dados = JSON.parse(event.data);
+                        console.log('Dados recebidos do bot:', dados);
+                        
+                        if (dados.tipo === 'palpites_usuario_rodada') {
+                            dadosRodadaAtual = dados;
+                            exibirRodada();
+                        }
+                    } catch (err) {
+                        console.error('Erro ao processar dados do bot:', err);
+                        mostrarErro('Erro ao processar dados recebidos do bot');
+                    }
+                });
+                
+                return true;
+            }
+            return false;
         }
         
         // Carrega dados iniciais
@@ -576,13 +606,12 @@
                 
             } catch (err) {
                 console.error('Erro ao carregar dados:', err);
-                loading.style.display = 'none';
-                error.style.display = 'block';
+                mostrarErro('Erro ao carregar dados: ' + err.message);
             }
         }
         
         // Carrega dados da rodada selecionada
-        async function carregarRodada() {
+        function carregarRodada() {
             const rodadaNum = document.getElementById('selectRodada').value;
             if (!rodadaNum) {
                 document.getElementById('rodadaContent').style.display = 'none';
@@ -596,88 +625,20 @@
             loading.style.display = 'block';
             error.style.display = 'none';
             rodadaContent.style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
             
-            try {
-                // Aqui você faria uma requisição ao bot para buscar os dados da rodada
-                // Como estamos em um WebApp, precisamos enviar uma mensagem para o bot
+            // Envia requisição para o bot
+            if (telegramWebApp) {
+                telegramWebApp.sendData(JSON.stringify({
+                    tipo: 'buscar_palpites_usuario',
+                    usuario_id: dadosUsuario.id,
+                    rodada_numero: parseInt(rodadaNum)
+                }));
                 
-                if (window.Telegram && window.Telegram.WebApp) {
-                    // Envia requisição para o bot
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        tipo: 'buscar_palpites_usuario',
-                        usuario_id: dadosUsuario.id,
-                        rodada_numero: parseInt(rodadaNum)
-                    }));
-                    
-                    // O bot responderá com os dados via WebApp.sendData()
-                    // Esta parte precisa ser implementada no bot Python
-                    console.log('Solicitando dados da rodada:', rodadaNum);
-                } else {
-                    // Modo desenvolvimento - simulação
-                    await simularCarregamentoRodada(rodadaNum);
-                }
-                
-            } catch (err) {
-                console.error('Erro ao carregar rodada:', err);
-                loading.style.display = 'none';
-                error.style.display = 'block';
+                console.log('Solicitando dados da rodada:', rodadaNum);
+            } else {
+                mostrarErro('Web App do Telegram não disponível');
             }
-        }
-        
-        // Simulação de carregamento (para desenvolvimento)
-        async function simularCarregamentoRodada(rodadaNum) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Dados de exemplo
-            dadosRodadaAtual = {
-                rodada_info: {
-                    numero: rodadaNum,
-                    horario_fechamento: '2026-01-10 20:00:00',
-                    status: 'fechada'
-                },
-                total: 24,
-                estatisticas: {
-                    pe: 2,
-                    rc: 5,
-                    gm: 3,
-                    gv: 4,
-                    pd_usada: true
-                },
-                jogos: [
-                    {
-                        jogo_id: 1,
-                        mandante: 'Cruzeiro',
-                        visitante: 'Botafogo',
-                        placar_real: '3x0',
-                        palpite: '3x0',
-                        pontos: 14,
-                        acertos: ['PE', 'GM', 'GV', 'PD'],
-                        pd: true
-                    },
-                    {
-                        jogo_id: 2,
-                        mandante: 'Flamengo',
-                        visitante: 'Vasco',
-                        placar_real: '2x1',
-                        palpite: '1x0',
-                        pontos: 4,
-                        acertos: ['RC'],
-                        pd: false
-                    },
-                    {
-                        jogo_id: 3,
-                        mandante: 'Palmeiras',
-                        visitante: 'Corinthians',
-                        placar_real: '1x1',
-                        palpite: '2x2',
-                        pontos: 2,
-                        acertos: ['GM'],
-                        pd: false
-                    }
-                ]
-            };
-            
-            exibirRodada();
         }
         
         // Exibe os dados da rodada
@@ -717,29 +678,53 @@
             const jogosContainer = document.getElementById('jogosContainer');
             jogosContainer.innerHTML = '';
             
+            if (!dadosRodadaAtual.jogos || dadosRodadaAtual.jogos.length === 0) {
+                jogosContainer.innerHTML = '<div class="empty-state"><div>📭</div><h3>Nenhum palpite encontrado</h3><p>Você não fez palpites nesta rodada.</p></div>';
+                return;
+            }
+            
             dadosRodadaAtual.jogos.forEach(jogo => {
-                const [realMandante, realVisitante] = jogo.placar_real.split('x');
-                const [palpiteMandante, palpiteVisitante] = jogo.palpite.split('x');
+                // Processar placar real
+                let realMandante = '-';
+                let realVisitante = '-';
+                
+                if (jogo.placar_real && jogo.placar_real.includes('x')) {
+                    [realMandante, realVisitante] = jogo.placar_real.split('x');
+                } else if (jogo.gol_mandante !== null && jogo.gol_visitante !== null) {
+                    realMandante = jogo.gol_mandante;
+                    realVisitante = jogo.gol_visitante;
+                }
+                
+                // Processar palpite
+                let palpiteMandante = '-';
+                let palpiteVisitante = '-';
+                
+                if (jogo.palpite && jogo.palpite.includes('x')) {
+                    [palpiteMandante, palpiteVisitante] = jogo.palpite.split('x');
+                } else if (jogo.palpite_mandante !== null && jogo.palpite_visitante !== null) {
+                    palpiteMandante = jogo.palpite_mandante;
+                    palpiteVisitante = jogo.palpite_visitante;
+                }
                 
                 const jogoHTML = `
                     <div class="jogo-card">
                         <div class="jogo-header">
-                            <div class="jogo-title">${jogo.mandante} vs ${jogo.visitante}</div>
+                            <div class="jogo-title">${jogo.mandante || 'Time A'} vs ${jogo.visitante || 'Time B'}</div>
                             <div class="jogo-status ${jogo.pontos > 0 ? 'status-finalizado' : 'status-pendente'}">
-                                ${jogo.pontos} ponto${jogo.pontos !== 1 ? 's' : ''}
+                                ${jogo.pontos || 0} ponto${(jogo.pontos || 0) !== 1 ? 's' : ''}
                             </div>
                         </div>
                         
                         <div class="placares-container">
                             <div class="time">
-                                <div class="time-nome">${jogo.mandante}</div>
+                                <div class="time-nome">${jogo.mandante || 'Time A'}</div>
                                 <div class="placar-box placar-real">${realMandante}</div>
                             </div>
                             
                             <div class="vs">X</div>
                             
                             <div class="time">
-                                <div class="time-nome">${jogo.visitante}</div>
+                                <div class="time-nome">${jogo.visitante || 'Time B'}</div>
                                 <div class="placar-box placar-real">${realVisitante}</div>
                             </div>
                         </div>
@@ -762,11 +747,11 @@
                         
                         <div class="pontuacao-info">
                             <div class="pontuacao-header">
-                                <div class="pontuacao-total">${jogo.pontos} ponto${jogo.pontos !== 1 ? 's' : ''}</div>
+                                <div class="pontuacao-total">${jogo.pontos || 0} ponto${(jogo.pontos || 0) !== 1 ? 's' : ''}</div>
                                 ${jogo.pd ? '<div class="pd-flag">PD</div>' : ''}
                             </div>
                             
-                            ${jogo.acertos.length > 0 ? `
+                            ${jogo.acertos && jogo.acertos.length > 0 ? `
                                 <div class="acertos-list">
                                     ${jogo.acertos.map(acerto => {
                                         let classe = '';
@@ -793,45 +778,53 @@
             const resumoPontuacao = document.getElementById('resumoPontuacao');
             const estatisticas = dadosRodadaAtual.estatisticas;
             
-            resumoPontuacao.innerHTML = `
-                <div class="resumo-header">
-                    <h3>📊 Resumo da Pontuação</h3>
-                    <div>Rodada ${rodada.numero}</div>
-                </div>
-                
-                <div class="resumo-grid">
-                    <div class="resumo-item">
-                        <div class="resumo-valor">${dadosRodadaAtual.total}</div>
-                        <div class="resumo-label">PONTOS TOTAIS</div>
+            if (estatisticas) {
+                resumoPontuacao.innerHTML = `
+                    <div class="resumo-header">
+                        <h3>📊 Resumo da Pontuação</h3>
+                        <div>Rodada ${rodada.numero}</div>
                     </div>
                     
-                    <div class="resumo-item">
-                        <div class="resumo-valor">${estatisticas.pe}</div>
-                        <div class="resumo-label">PLACAR EXATO</div>
+                    <div class="resumo-grid">
+                        <div class="resumo-item">
+                            <div class="resumo-valor">${dadosRodadaAtual.total || 0}</div>
+                            <div class="resumo-label">PONTOS TOTAIS</div>
+                        </div>
+                        
+                        <div class="resumo-item">
+                            <div class="resumo-valor">${estatisticas.pe || 0}</div>
+                            <div class="resumo-label">PLACAR EXATO</div>
+                        </div>
+                        
+                        <div class="resumo-item">
+                            <div class="resumo-valor">${estatisticas.rc || 0}</div>
+                            <div class="resumo-label">RESULTADO CORRETO</div>
+                        </div>
+                        
+                        <div class="resumo-item">
+                            <div class="resumo-valor">${estatisticas.gm || 0}</div>
+                            <div class="resumo-label">GOLS MANDANTE</div>
+                        </div>
+                        
+                        <div class="resumo-item">
+                            <div class="resumo-valor">${estatisticas.gv || 0}</div>
+                            <div class="resumo-label">GOLS VISITANTE</div>
+                        </div>
                     </div>
-                    
-                    <div class="resumo-item">
-                        <div class="resumo-valor">${estatisticas.rc}</div>
-                        <div class="resumo-label">RESULTADO CORRETO</div>
-                    </div>
-                    
-                    <div class="resumo-item">
-                        <div class="resumo-valor">${estatisticas.gm}</div>
-                        <div class="resumo-label">GOLS MANDANTE</div>
-                    </div>
-                    
-                    <div class="resumo-item">
-                        <div class="resumo-valor">${estatisticas.gv}</div>
-                        <div class="resumo-label">GOLS VISITANTE</div>
-                    </div>
-                </div>
-            `;
+                `;
+            } else {
+                resumoPontuacao.style.display = 'none';
+            }
         }
         
         // Formatar data
         function formatarData(dataString) {
             try {
+                if (!dataString) return 'Data não disponível';
+                
                 const data = new Date(dataString);
+                if (isNaN(data.getTime())) return dataString;
+                
                 return data.toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -840,33 +833,28 @@
                     minute: '2-digit'
                 });
             } catch {
-                return dataString;
+                return dataString || 'Data não disponível';
             }
         }
         
-        // Inicializar quando a página carregar
-        document.addEventListener('DOMContentLoaded', carregarDadosIniciais);
-        
-        // Se estiver no Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
+        // Mostrar erro
+        function mostrarErro(mensagem) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
             
-            // Configurar para receber dados do bot
-            Telegram.WebApp.onEvent('webAppDataReceived', function(event) {
-                try {
-                    const dados = JSON.parse(event.data);
-                    console.log('Dados recebidos do bot:', dados);
-                    
-                    if (dados.tipo === 'palpites_usuario_rodada') {
-                        dadosRodadaAtual = dados;
-                        exibirRodada();
-                    }
-                } catch (err) {
-                    console.error('Erro ao processar dados do bot:', err);
-                }
-            });
+            loading.style.display = 'none';
+            error.style.display = 'block';
+            error.innerHTML = `❌ ${mensagem}`;
         }
+        
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            if (initTelegramWebApp()) {
+                carregarDadosIniciais();
+            } else {
+                mostrarErro('Web App do Telegram não disponível');
+            }
+        });
     </script>
 </body>
 </html>
