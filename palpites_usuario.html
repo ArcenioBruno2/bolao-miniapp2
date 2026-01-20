@@ -192,66 +192,52 @@
         .games-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
         
         .game-card {
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.1);
+            padding: 12px;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
             position: relative;
             min-height: auto;
             height: auto;
         }
         
-        .pd-badge-game {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #e74c3c;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Layout compacto do jogo */
+        /* Layout compacto do jogo - NOVO DESIGN */
         .game-compact {
             display: grid;
             grid-template-columns: 1fr auto auto;
-            gap: 15px;
+            gap: 10px;
             align-items: start;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .game-teams-compact {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
         
         .team-row {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 3px;
         }
         
         .team-name-compact {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             color: #2d3748;
-            line-height: 1.3;
+            line-height: 1.2;
         }
         
         .game-date-compact {
-            font-size: 11px;
+            font-size: 10px;
             color: #718096;
-            margin-top: 5px;
+            margin-top: 4px;
         }
         
         .score-column-compact {
@@ -259,25 +245,25 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-width: 60px;
+            min-width: 50px;
         }
         
         .score-header-compact {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         
         .score-header-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #718096;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .score-header-value {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #2c3e50;
         }
@@ -285,15 +271,14 @@
         .score-placar-compact {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
         
         .score-number {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
-            color: #2c3e50;
             text-align: center;
-            min-width: 25px;
+            min-width: 20px;
         }
         
         .score-number.real {
@@ -307,82 +292,97 @@
         /* Pontuação detalhada */
         .points-details {
             background: #f8fafc;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
             border: 1px solid #e2e8f0;
+            font-size: 12px;
         }
         
         .points-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .total-points {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #2c3e50;
         }
         
         .points-breakdown {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
         }
         
         .breakdown-item {
             background: white;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 6px;
+            padding: 8px;
             border: 1px solid #e2e8f0;
         }
         
         .breakdown-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #2c3e50;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             font-weight: 600;
         }
         
         .breakdown-value {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #2d3748;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
         
         .breakdown-points {
-            font-size: 11px;
+            font-size: 10px;
             color: #3498db;
             font-weight: 600;
         }
         
+        /* PD Badge dentro do jogo */
+        .pd-badge-game {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        
         /* Acertos */
         .acertos-info {
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid #e2e8f0;
         }
         
         .acertos-label {
-            font-size: 11px;
+            font-size: 10px;
             color: #718096;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
         }
         
         .acertos-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 5px;
         }
         
         .badge {
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-size: 10px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 9px;
             font-weight: 600;
         }
         
@@ -433,7 +433,7 @@
             
             .game-compact {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 10px;
             }
             
             .points-breakdown {
@@ -449,7 +449,7 @@
             }
             
             .score-column-compact {
-                min-width: 50px;
+                min-width: 45px;
             }
         }
         
@@ -467,7 +467,7 @@
             }
             
             .game-card {
-                padding: 12px;
+                padding: 10px;
             }
             
             .points-breakdown {
@@ -482,19 +482,38 @@
             
             .score-placar-compact {
                 flex-direction: row;
-                gap: 20px;
+                gap: 15px;
+            }
+            
+            .team-name-compact {
+                font-size: 12px;
+            }
+            
+            .score-number {
+                font-size: 14px;
             }
         }
         
         /* Utilitários */
         .emoji {
-            font-size: 16px;
-            margin-right: 5px;
+            font-size: 14px;
+            margin-right: 4px;
             vertical-align: middle;
         }
         
         .hidden {
             display: none;
+        }
+        
+        /* Estilo fixo para "Quantidade de jogos na Rodada" */
+        .fixed-info {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -515,6 +534,11 @@
                     <p id="userId">ID: -- | Telegram: --</p>
                 </div>
             </div>
+        </div>
+        
+        <!-- Informação fixa sobre quantidade de jogos -->
+        <div class="fixed-info">
+            Quantidade de jogos na Rodada: 10
         </div>
         
         <!-- Seletor de rodada -->
@@ -538,7 +562,7 @@
                     <span class="stat-label">Palpitados</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="totalJogos">10</span>
+                    <span class="stat-value">10</span>
                     <span class="stat-label">Jogos</span>
                 </div>
                 <div class="stat-card">
@@ -560,7 +584,7 @@
         <div class="games-section">
             <div class="games-header">
                 <h2>Jogos da Rodada</h2>
-                <div class="games-counter" id="contadorJogos">0/10 jogos</div>
+                <div class="games-counter" id="contadorJogos">0/10 jogos palpitados</div>
             </div>
             
             <!-- Loading -->
@@ -746,12 +770,11 @@
                 
                 let texto = `Rodada ${rodada.n}`;
                 
-                // Formato: Jogos Realizados / Jogos Totais (sempre 10)
-                // Busca informação jr (jogos realizados) do bot
-                const jogosRealizados = rodada.jr || rodada.jp || 0;
-                const jogosTotais = rodada.jt || 10;
+                // Formato: Jogos Palpitados / Jogos Totais (sempre 10)
+                const jogosPalpitados = rodada.jp || 0;
+                const jogosTotais = 10;
                 
-                texto += ` • ${jogosRealizados}/${jogosTotais} jogos`;
+                texto += ` • ${jogosPalpitados}/${jogosTotais} palpites`;
                 
                 // Adiciona pontos se disponível
                 if (rodada.p !== undefined) {
@@ -793,10 +816,10 @@
             const resumo = document.getElementById('rodadaResumo');
             resumo.style.display = 'block';
             
-            // Busca informação jr (jogos realizados) do bot
+            // Busca informação jp (jogos palpitados) do bot
             const jogos = rodada.jogos || [];
-            const jogosRealizados = rodada.jr || rodada.jp || jogos.length;
-            const totalJogos = rodada.jt || 10;
+            const jogosPalpitados = rodada.jp || jogos.length;
+            const totalJogos = 10;
             
             // Total de pontos
             let totalPontos = rodada.tp || 0;
@@ -831,15 +854,14 @@
             
             // Atualiza a interface
             document.getElementById('totalPontos').textContent = totalPontos;
-            document.getElementById('jogosPalpitados').textContent = jogosRealizados;
-            document.getElementById('totalJogos').textContent = totalJogos;
+            document.getElementById('jogosPalpitados').textContent = jogosPalpitados;
             document.getElementById('pdUsada').textContent = pdUsada ? 'Sim' : 'Não';
             document.getElementById('totalPE').textContent = totalPE;
             document.getElementById('totalRC').textContent = totalRC;
             
             console.log('Estatísticas calculadas:', {
                 totalPontos,
-                jogosRealizados,
+                jogosPalpitados,
                 totalJogos,
                 pdUsada,
                 totalPE,
@@ -854,20 +876,20 @@
             // Limpa container
             container.innerHTML = '';
             
-            // Atualiza contador - Busca informação jr do bot
-            const jogosRealizados = rodada.jr || rodada.jp || jogos.length;
-            const totalJogos = rodada.jt || 10;
+            // Atualiza contador
+            const jogosPalpitados = rodada.jp || jogos.length;
+            const totalJogos = 10;
             document.getElementById('contadorJogos').textContent = 
-                `${jogosRealizados}/${totalJogos} jogos`;
+                `${jogosPalpitados}/${totalJogos} jogos palpitados`;
             
             if (jogos.length === 0) {
                 container.innerHTML = `
                     <div class="game-card" style="text-align: center;">
-                        <div style="font-size: 50px; margin-bottom: 15px;">📭</div>
-                        <div style="font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 8px;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">📭</div>
+                        <div style="font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 6px;">
                             Nenhum palpite nesta rodada
                         </div>
-                        <div style="color: #718096; font-size: 14px;">
+                        <div style="color: #718096; font-size: 12px;">
                             Você não fez palpites nos jogos desta rodada
                         </div>
                     </div>
@@ -879,12 +901,6 @@
             jogos.forEach((jogo, index) => {
                 const div = document.createElement('div');
                 div.className = `game-card ${jogo.pd ? 'pd' : ''}`;
-                
-                // Badge de PD - Fica acima no canto direito
-                let pdBadge = '';
-                if (jogo.pd) {
-                    pdBadge = '<div class="pd-badge-game">Pontuação Dobrada</div>';
-                }
                 
                 // Formata data/hora
                 let dataFormatada = '';
@@ -935,7 +951,7 @@
                 
                 // HTML compacto do jogo
                 div.innerHTML = `
-                    ${pdBadge}
+                    ${jogo.pd ? '<div class="pd-badge-game">Pontuação Dobrada</div>' : ''}
                     
                     <div class="game-compact">
                         <!-- Times -->
@@ -954,7 +970,7 @@
                         <!-- Placar Real -->
                         <div class="score-column-compact">
                             <div class="score-header-compact">
-                                <div class="score-header-label">Real</div>
+                                <div class="score-header-label">PR</div>
                                 <div class="score-header-value">${placarReal}</div>
                             </div>
                             <div class="score-placar-compact">
@@ -966,7 +982,7 @@
                         <!-- Placar Palpite -->
                         <div class="score-column-compact">
                             <div class="score-header-compact">
-                                <div class="score-header-label">Palpite</div>
+                                <div class="score-header-label">PP</div>
                                 <div class="score-header-value">${placarPalpite}</div>
                             </div>
                             <div class="score-placar-compact">
@@ -978,27 +994,40 @@
                     
                     <!-- Informações dos pontos -->
                     <div class="points-details">
-                        <div class="points-header">
-                            <div class="total-points">${pontos} pontos</div>
-                        </div>
-                        
                         ${detalhesPontuacao}
                         
                         ${acertos.length > 0 ? `
                             <div class="acertos-info">
-                                <div class="acertos-label">Acertos:</div>
+                                <div class="acertos-label">Descrição:</div>
                                 <div class="acertos-container">
                                     ${acertos.map(acerto => {
-                                        let nome = '';
+                                        let descricao = '';
+                                        let pontosDesc = '';
+                                        
                                         switch(acerto) {
-                                            case 'PE': nome = 'Placar Exato'; break;
-                                            case 'RC': nome = 'Resultado Correto'; break;
-                                            case 'GM': nome = 'Gols Mandante'; break;
-                                            case 'GV': nome = 'Gols Visitante'; break;
-                                            default: nome = acerto;
+                                            case 'PE': 
+                                                descricao = 'Placar Exato'; 
+                                                pontosDesc = '14 pontos';
+                                                break;
+                                            case 'RC': 
+                                                descricao = 'Resultado Correto'; 
+                                                pontosDesc = '4 pontos';
+                                                break;
+                                            case 'GM': 
+                                                descricao = 'Gols Mandante'; 
+                                                pontosDesc = '2 pontos';
+                                                break;
+                                            case 'GV': 
+                                                descricao = 'Gols Visitante'; 
+                                                pontosDesc = '2 pontos';
+                                                break;
+                                            default: 
+                                                descricao = acerto;
+                                                pontosDesc = '0 pontos';
                                         }
-                                        return `<span class="badge ${acerto.toLowerCase()}">${nome}</span>`;
+                                        return `<span class="badge ${acerto.toLowerCase()}">${descricao} (${pontosDesc})</span>`;
                                     }).join('')}
+                                    ${jogo.pd ? '<span class="badge pe">Pontuação Dobrada (2x)</span>' : ''}
                                 </div>
                             </div>
                         ` : ''}
@@ -1021,11 +1050,11 @@
                 'GV': acertos.filter(a => a === 'GV').length
             };
             
-            // Cálculo conforme as regras do bot
+            // Cálculo conforme as regras do bot (corrigido)
             let totalPontos = 0;
             let detalhesHTML = '<div class="points-breakdown">';
             
-            // Placar Exato (PE) - 14 pontos
+            // Primeiro verifica Placar Exato (PE) - 14 pontos
             if (contadores.PE > 0) {
                 const pontosPE = 14;
                 totalPontos += pontosPE;
@@ -1037,10 +1066,9 @@
                         <div class="breakdown-points">+${pontosPE} pontos</div>
                     </div>
                 `;
-            }
-            
-            // Resultado Correto (RC) - 4 pontos
-            if (contadores.RC > 0 && contadores.PE === 0) {
+            } 
+            // Se não teve PE, verifica Resultado Correto (RC) - 4 pontos
+            else if (contadores.RC > 0) {
                 const pontosRC = contadores.RC * 4;
                 totalPontos += pontosRC;
                 
@@ -1053,7 +1081,7 @@
                 `;
             }
             
-            // Gols Mandante exatos (GM) - 2 pontos
+            // Gols Mandante exatos (GM) - 2 pontos (sempre soma, mesmo com RC)
             if (contadores.GM > 0) {
                 const pontosGM = contadores.GM * 2;
                 totalPontos += pontosGM;
@@ -1067,7 +1095,7 @@
                 `;
             }
             
-            // Gols Visitante exatos (GV) - 2 pontos
+            // Gols Visitante exatos (GV) - 2 pontos (sempre soma, mesmo com RC)
             if (contadores.GV > 0) {
                 const pontosGV = contadores.GV * 2;
                 totalPontos += pontosGV;
@@ -1077,21 +1105,6 @@
                         <div class="breakdown-label">Gols Visitante Exatos</div>
                         <div class="breakdown-value">${contadores.GV}x</div>
                         <div class="breakdown-points">+${pontosGV} pontos</div>
-                    </div>
-                `;
-            }
-            
-            // Pontuação Dobrada (PD)
-            if (pdUsada) {
-                const totalAntesPD = totalPontos;
-                totalPontos *= 2;
-                const bonusPD = totalPontos - totalAntesPD;
-                
-                detalhesHTML += `
-                    <div class="breakdown-item">
-                        <div class="breakdown-label">Pontuação Dobrada</div>
-                        <div class="breakdown-value">2x</div>
-                        <div class="breakdown-points">+${bonusPD} pontos</div>
                     </div>
                 `;
             }
@@ -1106,6 +1119,29 @@
                     </div>
                 `;
             }
+            
+            // Aplica Pontuação Dobrada (PD) - multiplica o resultado final por 2
+            if (pdUsada) {
+                const totalAntesPD = totalPontos;
+                totalPontos *= 2;
+                const bonusPD = totalPontos - totalAntesPD;
+                
+                detalhesHTML += `
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">Pontuação Dobrada</div>
+                        <div class="breakdown-value">2x</div>
+                        <div class="breakdown-points">× 2 = ${totalPontos} pontos</div>
+                    </div>
+                `;
+            }
+            
+            // Mostra total de pontos
+            detalhesHTML += `
+                <div class="breakdown-item" style="grid-column: 1 / -1; background: #e8f4fd; border-color: #3498db;">
+                    <div class="breakdown-label">Total do Jogo</div>
+                    <div class="breakdown-value" style="font-size: 16px; color: #2c3e50;">${totalPontos} pontos</div>
+                </div>
+            `;
             
             detalhesHTML += '</div>';
             
@@ -1131,14 +1167,14 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('jogosLista').innerHTML = `
                     <div class="game-card" style="text-align: center;">
-                        <div style="font-size: 50px; margin-bottom: 15px;">⏳</div>
-                        <div style="font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 8px;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
+                        <div style="font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 6px;">
                             Rodada ${numeroRodada}
                         </div>
-                        <div style="color: #718096; margin-bottom: 15px; font-size: 14px;">
+                        <div style="color: #718096; margin-bottom: 10px; font-size: 12px;">
                             Esta rodada será carregada em uma próxima atualização.
                         </div>
-                        <div style="font-size: 13px; color: #a0aec0;">
+                        <div style="font-size: 11px; color: #a0aec0;">
                             Aguarde a sincronização com o bot.
                         </div>
                     </div>
@@ -1152,10 +1188,10 @@
             const errorDiv = document.getElementById('error');
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `
-                <div style="font-size: 50px; margin-bottom: 15px;">❌</div>
-                <div style="font-size: 16px; font-weight: 600; margin-bottom: 8px;">Erro ao carregar</div>
-                <div style="margin-bottom: 15px; color: #4a5568; font-size: 14px;">${mensagem}</div>
-                <div style="color: #718096; font-size: 13px;">
+                <div style="font-size: 40px; margin-bottom: 10px;">❌</div>
+                <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Erro ao carregar</div>
+                <div style="margin-bottom: 10px; color: #4a5568; font-size: 12px;">${mensagem}</div>
+                <div style="color: #718096; font-size: 11px;">
                     Tente novamente ou entre em contato com o administrador.
                 </div>
             `;
