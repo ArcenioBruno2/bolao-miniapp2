@@ -12,15 +12,13 @@
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }
         
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333; 
-            line-height: 1.6; 
             min-height: 100vh;
-            padding: 20px; 
+            padding: 20px;
         }
         
         .container { 
@@ -29,314 +27,227 @@
             background: white; 
             border-radius: 20px; 
             overflow: hidden; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            transition: transform 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
         
-        .container:hover {
-            transform: translateY(-5px);
-        }
-        
-        header { 
-            background: linear-gradient(135deg, #007aff 0%, #0050d1 100%); 
-            color: white; 
-            padding: 30px 25px; 
-            text-align: center; 
+        /* Cabeçalho */
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px 25px;
+            text-align: center;
             position: relative;
-            overflow: hidden;
         }
         
-        header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-            background-size: 20px 20px;
-            opacity: 0.1;
-            animation: float 20s linear infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translate(0, 0) rotate(0deg); }
-            100% { transform: translate(-20px, -20px) rotate(360deg); }
-        }
-        
-        h1 { 
-            font-size: 28px; 
-            margin-bottom: 10px; 
-            font-weight: 800; 
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
             letter-spacing: -0.5px;
-            position: relative;
-            z-index: 2;
         }
         
-        .subtitle { 
-            font-size: 15px; 
-            opacity: 0.9; 
+        .header .subtitle {
+            font-size: 15px;
+            opacity: 0.9;
             font-weight: 400;
-            position: relative;
-            z-index: 2;
         }
         
-        .user-card { 
-            padding: 25px; 
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+        /* Informações do usuário */
+        .user-info {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .user-main {
             display: flex;
             align-items: center;
-            gap: 20px;
-            position: relative;
+            gap: 15px;
         }
         
         .user-avatar {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #007aff 0%, #0050d1 100%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 22px;
             color: white;
             font-weight: bold;
-            box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
         }
         
-        .user-info {
-            flex: 1;
-        }
-        
-        .user-name { 
-            font-size: 20px; 
-            font-weight: 700; 
-            margin-bottom: 5px; 
-            color: #2c3e50;
-        }
-        
-        .user-id { 
-            font-size: 13px; 
-            color: #7f8c8d; 
-            font-family: 'Courier New', monospace;
-            background: rgba(255,255,255,0.5);
-            padding: 4px 10px;
-            border-radius: 12px;
-            display: inline-block;
-        }
-        
-        .select-container { 
-            padding: 25px; 
-            background: white;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .select-label {
-            display: block;
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 12px;
+        .user-details h2 {
+            font-size: 18px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #2d3748;
+            margin-bottom: 4px;
         }
         
-        .custom-select { 
-            position: relative; 
-            width: 100%; 
+        .user-details p {
+            font-size: 13px;
+            color: #718096;
         }
         
-        select { 
-            width: 100%; 
-            padding: 18px 50px 18px 20px; 
-            font-size: 16px; 
-            border: 2px solid #e0e0e0; 
-            border-radius: 15px; 
-            background: white; 
-            cursor: pointer; 
-            transition: all 0.3s;
-            appearance: none; 
-            -webkit-appearance: none;
-            font-weight: 500;
-            color: #2c3e50;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%237f8c8d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        /* Seletor de rodada */
+        .select-section {
+            padding: 25px;
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .custom-select {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .custom-select select {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 16px;
+            border: 2px solid #cbd5e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 20px center;
+            background-position: right 15px center;
             background-size: 20px;
+            padding-right: 50px;
         }
         
-        select:focus { 
-            border-color: #007aff; 
+        .custom-select select:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
         }
         
-        select:hover {
-            border-color: #007aff;
+        /* Estatísticas da rodada */
+        .stats-section {
+            padding: 30px 25px;
+            background: linear-gradient(135deg, #4c51bf 0%, #2d3748 100%);
+            color: white;
         }
         
-        .stats-section { 
-            padding: 30px 25px; 
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-            color: white; 
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
         }
         
-        .stats-section::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
         }
         
-        .section-title { 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 30px;
-            font-size: 22px; 
-            font-weight: 700; 
-            position: relative;
-            z-index: 2;
-        }
-        
-        .section-title svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-        }
-        
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 20px; 
-            position: relative;
-            z-index: 2;
-        }
-        
-        .stat-card { 
-            background: rgba(255, 255, 255, 0.15); 
-            padding: 25px 15px; 
-            border-radius: 15px; 
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease, background 0.3s ease;
-            cursor: default;
+            transition: transform 0.2s ease;
         }
         
         .stat-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
         
-        .stat-value { 
-            display: block; 
-            font-size: 32px; 
-            font-weight: 800; 
-            margin-bottom: 8px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
         }
         
-        .stat-label { 
-            font-size: 13px; 
-            opacity: 0.9; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            font-weight: 600;
-        }
-        
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 15px;
+        .stat-label {
+            font-size: 14px;
             opacity: 0.9;
-        }
-        
-        .games-section { 
-            padding: 30px 25px; 
-            background: white;
-        }
-        
-        .section-header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 30px; 
-            padding-bottom: 20px; 
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .section-title-left {
-            font-size: 20px; 
-            font-weight: 700; 
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .section-title-left svg {
-            width: 20px;
-            height: 20px;
-            fill: #007aff;
-        }
-        
-        .games-counter { 
-            font-size: 14px; 
-            color: #7f8c8d; 
-            background: #f8f9fa;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        
-        .games-list { 
-            margin-top: 20px; 
-        }
-        
-        .game-card { 
-            background: white; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 18px; 
-            padding: 25px; 
-            margin-bottom: 20px; 
-            position: relative; 
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .game-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1); 
-            border-color: #007aff;
-        }
-        
-        .game-card.pd { 
-            border-left: 6px solid #dc3545; 
-        }
-        
-        .pd-badge { 
-            position: absolute; 
-            top: 20px; 
-            right: 20px; 
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white; 
-            padding: 8px 16px; 
-            border-radius: 10px; 
-            font-size: 12px; 
-            font-weight: 700; 
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
         }
         
-        .game-header {
+        /* Lista de jogos */
+        .games-section {
+            padding: 30px 25px;
+        }
+        
+        .games-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .games-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .games-counter {
+            background: #4299e1;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .game-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .game-card.pd {
+            border-left: 5px solid #e53e3e;
+            background: linear-gradient(to right, #fff5f5, white);
+        }
+        
+        .pd-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #e53e3e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Informações do jogo */
+        .game-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -346,229 +257,179 @@
         }
         
         .game-teams {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            flex: 1;
+            min-width: 250px;
         }
         
-        .game-vs {
-            color: #7f8c8d;
-            font-weight: 400;
+        .game-title {
             font-size: 18px;
-            margin: 0 10px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
         }
         
         .game-date {
             font-size: 14px;
-            color: #7f8c8d;
-            background: #f8f9fa;
-            padding: 8px 16px;
-            border-radius: 15px;
-            font-weight: 500;
+            color: #718096;
             display: flex;
             align-items: center;
             gap: 8px;
         }
         
-        .score-comparison { 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between;
-            margin-bottom: 25px; 
-            background: #f8f9fa;
+        /* Placar comparativo */
+        .score-comparison {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 25px;
             padding: 25px;
-            border-radius: 15px;
-            position: relative;
+            background: #f8fafc;
+            border-radius: 12px;
         }
         
-        .score-box { 
-            text-align: center; 
-            flex: 1;
+        .score-column {
+            text-align: center;
         }
         
-        .score-label { 
-            font-size: 12px; 
-            color: #7f8c8d; 
-            margin-bottom: 10px; 
-            text-transform: uppercase; 
+        .score-label {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 12px;
+            text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
         }
         
-        .score-value { 
-            font-size: 42px; 
-            font-weight: 800; 
-            line-height: 1;
-            margin-bottom: 5px;
-        }
-        
-        .score-real { 
-            color: #28a745; 
-        }
-        
-        .score-guess { 
-            color: #007aff; 
-        }
-        
-        .score-arrow {
-            font-size: 30px;
-            color: #ced4da;
-            margin: 0 20px;
-            font-weight: 300;
-        }
-        
-        .game-footer { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-top: 25px; 
-            padding-top: 25px; 
-            border-top: 1px solid rgba(0,0,0,0.05);
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .points-earned { 
-            font-size: 24px; 
-            font-weight: 800; 
-            color: #28a745;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .points-badge {
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 14px;
+        .score-value {
+            font-size: 36px;
             font-weight: 700;
+            margin-bottom: 10px;
         }
         
-        .hits-container { 
-            display: flex; 
-            gap: 10px; 
-            flex-wrap: wrap; 
-            justify-content: flex-end;
-            flex: 1;
+        .score-real {
+            color: #38a169;
         }
         
-        .hit-badge { 
-            padding: 10px 16px; 
-            border-radius: 10px; 
-            font-size: 12px; 
-            font-weight: 700; 
+        .score-guess {
+            color: #4299e1;
+        }
+        
+        .score-teams {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .score-teams span {
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        /* Pontuação detalhada */
+        .points-details {
+            background: #edf2f7;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .points-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .total-points {
+            font-size: 28px;
+            font-weight: 700;
+            color: #38a169;
+        }
+        
+        .points-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        
+        .breakdown-item {
+            text-align: center;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .breakdown-label {
+            font-size: 12px;
+            color: #718096;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 70px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 6px;
         }
         
-        .hit-type {
-            font-size: 10px;
-            opacity: 0.9;
+        .breakdown-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .breakdown-points {
+            font-size: 12px;
+            color: #38a169;
             margin-top: 4px;
         }
         
-        .hit-badge.pe { 
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%); 
-            color: white; 
-        }
-        
-        .hit-badge.rc { 
-            background: linear-gradient(135deg, #007aff 0%, #0050d1 100%); 
-            color: white; 
-        }
-        
-        .hit-badge.gm, .hit-badge.gv { 
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%); 
-            color: white; 
-        }
-        
-        .hit-badge.pd { 
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); 
-            color: white; 
-        }
-        
-        .loading { 
-            text-align: center; 
-            padding: 80px 20px; 
-            color: #666; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+        /* Loading e Erros */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 20px;
         }
         
         .loading-spinner {
-            width: 60px; 
-            height: 60px; 
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #007aff; 
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #4299e1;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         
-        .error { 
-            text-align: center; 
-            padding: 60px 20px; 
-            color: #dc3545; 
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            border-radius: 15px; 
-            border: 1px solid #f5c6cb;
-            margin: 20px 0;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .no-games {
+        .error {
             text-align: center;
-            padding: 60px 20px;
-            color: #7f8c8d;
+            padding: 50px 20px;
+            color: #e53e3e;
+            background: #fff5f5;
+            border-radius: 12px;
+            border: 2px solid #fed7d7;
         }
         
-        .no-games-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
+        /* Responsividade */
         @media (max-width: 768px) {
-            .stats-grid { 
-                grid-template-columns: repeat(2, 1fr); 
-            }
-            
             .score-comparison {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 25px;
             }
             
-            .score-arrow {
-                transform: rotate(90deg);
-                margin: 10px 0;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .game-footer {
-                flex-direction: column;
-                align-items: stretch;
+            .points-breakdown {
+                grid-template-columns: repeat(2, 1fr);
             }
             
-            .hits-container {
-                justify-content: center;
-            }
-            
-            .game-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .game-teams {
-                font-size: 18px;
+            .header h1 {
+                font-size: 24px;
             }
             
             .stat-value {
@@ -577,59 +438,62 @@
         }
         
         @media (max-width: 480px) {
-            .stats-grid { 
-                grid-template-columns: 1fr; 
-            }
-            
             .container {
                 border-radius: 15px;
             }
             
-            header, .user-card, .select-container, .stats-section, .games-section {
+            .header, .user-info, .select-section, .stats-section, .games-section {
                 padding: 20px 15px;
             }
             
-            h1 {
-                font-size: 24px;
+            .stat-card {
+                padding: 15px;
+            }
+            
+            .game-card {
+                padding: 20px;
+            }
+            
+            .score-comparison {
+                padding: 20px;
             }
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Tipografia e utilidades */
+        .emoji {
+            font-size: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
         }
         
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+            margin: 30px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Cabeçalho -->
-        <header>
-            <h1>📊 Análise de Palpites</h1>
+        <div class="header">
+            <h1>📊 Palpites e Pontuação</h1>
             <div class="subtitle" id="subtitle">Carregando dados do usuário...</div>
-        </header>
+        </div>
         
-        <!-- Card do Usuário -->
-        <div class="user-card" id="userInfo">
-            <div class="user-avatar" id="userAvatar">U</div>
-            <div class="user-info">
-                <div class="user-name" id="userName">Carregando...</div>
-                <div class="user-id" id="userId">ID: -- | Telegram: --</div>
+        <!-- Informações do usuário -->
+        <div class="user-info">
+            <div class="user-main">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-details">
+                    <h2 id="userName">Carregando...</h2>
+                    <p id="userId">ID: -- | Telegram: --</p>
+                </div>
             </div>
         </div>
         
-        <!-- Seletor de Rodada -->
-        <div class="select-container">
-            <div class="select-label">Selecione a Rodada</div>
+        <!-- Seletor de rodada -->
+        <div class="select-section">
             <div class="custom-select">
                 <select id="rodadaSelect" onchange="mudarRodada()">
                     <option value="">Carregando rodadas...</option>
@@ -637,67 +501,54 @@
             </div>
         </div>
         
-        <!-- Estatísticas da Rodada -->
+        <!-- Estatísticas da rodada -->
         <div class="stats-section" id="rodadaResumo" style="display: none;">
-            <div class="section-title">
-                <svg viewBox="0 0 24 24">
-                    <path d="M9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17ZM19 19H5V5H19V19.1M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/>
-                </svg>
-                <span id="rodadaTitulo">Rodada --</span>
-            </div>
+            <h2 class="section-title" id="rodadaTitulo">Rodada --</h2>
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-icon">🏆</div>
                     <span class="stat-value" id="totalPontos">0</span>
-                    <span class="stat-label">Pontos</span>
+                    <span class="stat-label">Pontos (TP)</span>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">✅</div>
+                    <span class="stat-value" id="jogosReais">0</span>
+                    <span class="stat-label">Jogos Reais (JR)</span>
+                </div>
+                <div class="stat-card">
                     <span class="stat-value" id="jogosPalpitados">0</span>
                     <span class="stat-label">Palpitados (JP)</span>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon">📋</div>
-                    <span class="stat-value" id="totalJogos">0</span>
-                    <span class="stat-label">Total Jogos (JT)</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎯</div>
-                    <span class="stat-value" id="totalRC">0</span>
-                    <span class="stat-label">Resultados Corretos (RC)</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <span class="stat-value" id="totalPE">0</span>
-                    <span class="stat-label">Placares Exatos (PE)</span>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⚡</div>
-                    <span class="stat-value" id="temPD">Não</span>
+                    <span class="stat-value" id="pdUsada">Não</span>
                     <span class="stat-label">PD Usada</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="totalPE">0</span>
+                    <span class="stat-label">Placar Exato (PE)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="totalRC">0</span>
+                    <span class="stat-label">Resultado (RC)</span>
                 </div>
             </div>
         </div>
         
-        <!-- Lista de Jogos -->
+        <!-- Lista de jogos -->
         <div class="games-section">
-            <div class="section-header">
-                <div class="section-title-left">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M7.07,18.28C7.5,17.38 10.12,16.5 12,16.5C13.88,16.5 16.5,17.38 16.93,18.28C15.57,19.36 13.86,20 12,20C10.14,20 8.43,19.36 7.07,18.28M18.36,16.83C16.93,15.09 13.46,14.5 12,14.5C10.54,14.5 7.07,15.09 5.64,16.83C4.62,15.5 4,13.82 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,13.82 19.38,15.5 18.36,16.83M12,6C10.06,6 8.5,7.56 8.5,9.5C8.5,11.44 10.06,13 12,13C13.94,13 15.5,11.44 15.5,9.5C15.5,7.56 13.94,6 12,6M12,11A1.5,1.5 0 0,1 10.5,9.5A1.5,1.5 0 0,1 12,8A1.5,1.5 0 0,1 13.5,9.5A1.5,1.5 0 0,1 12,11Z"/>
-                    </svg>
-                    <span>Jogos da Rodada</span>
-                </div>
-                <div class="games-counter" id="contadorJogos">0/0 jogos</div>
+            <div class="games-header">
+                <h2>Jogos da Rodada</h2>
+                <div class="games-counter" id="contadorJogos">0 jogos</div>
             </div>
             
+            <!-- Loading -->
             <div id="loading" class="loading">
                 <div class="loading-spinner"></div>
-                <div>Carregando jogos da rodada...</div>
+                <div>Carregando jogos e estatísticas...</div>
             </div>
             
+            <!-- Lista de jogos -->
             <div id="jogosLista" class="games-list"></div>
             
+            <!-- Mensagem de erro -->
             <div id="error" class="error" style="display: none;"></div>
         </div>
     </div>
@@ -709,43 +560,17 @@
         let rodadasDados = {};
         let rodadaAtualNum = null;
         
-        // Mapeamento de acertos
-        const acertoLabels = {
-            'PE': { nome: 'Placar Exato', desc: 'Acertou placar exato' },
-            'RC': { nome: 'Resultado Correto', desc: 'Acertou vencedor/empate' },
-            'GM': { nome: 'Gols Mandante', desc: 'Acertou gols do mandante' },
-            'GV': { nome: 'Gols Visitante', desc: 'Acertou gols do visitante' },
-            'PD': { nome: 'Pontuação Dobrada', desc: 'Ponto extra utilizado' }
-        };
-        
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.expand();
                 Telegram.WebApp.enableClosingConfirmation();
                 Telegram.WebApp.setBackgroundColor('#667eea');
-                Telegram.WebApp.setHeaderColor('#007aff');
+                Telegram.WebApp.setHeaderColor('#2c3e50');
             }
-            
-            // Gerar cor aleatória para o avatar
-            const colors = ['#007aff', '#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1'];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            document.getElementById('userAvatar').style.background = `linear-gradient(135deg, ${randomColor} 0%, ${darkenColor(randomColor, 20)} 100%)`;
             
             carregarDadosDaURL();
         });
-        
-        function darkenColor(color, percent) {
-            let r = parseInt(color.substring(1, 3), 16);
-            let g = parseInt(color.substring(3, 5), 16);
-            let b = parseInt(color.substring(5, 7), 16);
-            
-            r = Math.floor(r * (100 - percent) / 100);
-            g = Math.floor(g * (100 - percent) / 100);
-            b = Math.floor(b * (100 - percent) / 100);
-            
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
         
         function carregarDadosDaURL() {
             try {
@@ -759,20 +584,26 @@
                 
                 console.log('Carregando dados da URL...');
                 
-                // Tenta descomprimir
+                // Tenta descomprimir com Gzip primeiro
                 let dados;
                 try {
                     dados = descomprimirGzip(dataParam);
-                } catch (error) {
+                } catch (gzipError) {
                     // Fallback para Base64 normal
-                    const safeBase64 = dataParam
-                        .replace(/\-/g, '+')
-                        .replace(/\_/g, '/')
-                        .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
-                    const jsonString = atob(safeBase64);
-                    dados = JSON.parse(jsonString);
+                    try {
+                        const safeBase64 = dataParam
+                            .replace(/\-/g, '+')
+                            .replace(/\_/g, '/')
+                            .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
+                        
+                        const jsonString = atob(safeBase64);
+                        dados = JSON.parse(jsonString);
+                    } catch (base64Error) {
+                        throw new Error('Falha ao decodificar dados: ' + base64Error.message);
+                    }
                 }
                 
+                // Valida dados
                 if (!dados || !dados.t) {
                     throw new Error('Formato de dados inválido');
                 }
@@ -780,60 +611,76 @@
                 appData = dados;
                 
                 // Preenche informações do usuário
-                const userName = appData.u?.n || 'Usuário';
-                document.getElementById('userName').textContent = userName;
-                document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+                document.getElementById('userName').textContent = appData.u?.n || 'Usuário';
                 document.getElementById('userId').textContent = `ID: ${appData.u?.id || '--'} | Telegram: ${appData.u?.tid || '--'}`;
-                document.getElementById('subtitle').textContent = `Bem-vindo, ${userName}!`;
+                document.getElementById('subtitle').textContent = `Usuário: ${appData.u?.n || '--'}`;
                 
-                // Armazena dados
+                // Avatar com primeira letra do nome
+                if (appData.u?.n) {
+                    document.getElementById('userAvatar').textContent = appData.u.n.charAt(0).toUpperCase();
+                }
+                
+                // Armazena dados das rodadas
                 rodadasDisponiveis = appData.rd || [];
                 rodadasDados = {};
                 
-                // Primeira rodada
+                // Primeira rodada já vem completa
                 if (appData.ra && appData.rdc) {
                     rodadasDados[appData.ra] = appData.rdc;
                     rodadaAtualNum = appData.ra;
                 }
                 
-                // Popula select
+                // Popula o select com as rodadas
                 popularSelectRodadas();
                 
-                // Exibe primeira rodada
+                // Exibe a primeira rodada
                 if (rodadaAtualNum) {
                     selecionarRodada(rodadaAtualNum);
                 } else if (rodadasDisponiveis.length > 0) {
                     selecionarRodada(rodadasDisponiveis[0].n);
                 }
                 
+                // Esconde loading
                 document.getElementById('loading').style.display = 'none';
                 
             } catch (error) {
-                console.error('Erro:', error);
+                console.error('Erro ao carregar dados:', error);
                 mostrarErro(`Erro ao processar dados: ${error.message}`);
             }
         }
         
         function descomprimirGzip(base64Data) {
-            const safeBase64 = base64Data
-                .replace(/\-/g, '+')
-                .replace(/\_/g, '/')
-                .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
-            
-            const binaryString = atob(safeBase64);
-            const bytes = new Uint8Array(binaryString.length);
-            
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            
-            const isGzip = bytes[0] === 0x1F && bytes[1] === 0x8B;
-            
-            if (isGzip) {
-                const decompressed = pako.inflate(bytes, { to: 'string' });
-                return JSON.parse(decompressed);
-            } else {
-                return JSON.parse(binaryString);
+            try {
+                // URL-safe Base64 para padrão
+                const safeBase64 = base64Data
+                    .replace(/\-/g, '+')
+                    .replace(/\_/g, '/')
+                    .padEnd(base64Data.length + (4 - base64Data.length % 4) % 4, '=');
+                
+                // Decodifica Base64
+                const binaryString = atob(safeBase64);
+                
+                // Converte para Uint8Array
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Verifica se é Gzip (primeiros 2 bytes: 0x1F 0x8B)
+                const isGzip = bytes[0] === 0x1F && bytes[1] === 0x8B;
+                
+                if (isGzip) {
+                    // Descomprime Gzip usando Pako
+                    const decompressed = pako.inflate(bytes, { to: 'string' });
+                    return JSON.parse(decompressed);
+                } else {
+                    // Tenta como JSON direto
+                    const jsonString = binaryString;
+                    return JSON.parse(jsonString);
+                }
+                
+            } catch (error) {
+                throw new Error('Falha na descompressão: ' + error.message);
             }
         }
         
@@ -842,7 +689,10 @@
             select.innerHTML = '';
             
             if (rodadasDisponiveis.length === 0) {
-                select.innerHTML = '<option value="">Nenhuma rodada disponível</option>';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Nenhuma rodada disponível';
+                select.appendChild(option);
                 return;
             }
             
@@ -851,23 +701,27 @@
                 option.value = rodada.n;
                 
                 let texto = `Rodada ${rodada.n}`;
-                if (rodada.p !== undefined) texto += ` • ${rodada.p} pts`;
+                
+                // Adiciona informações extras
+                if (rodada.p !== undefined) texto += ` • ${rodada.p} pontos`;
                 if (rodada.s === 'fechada') texto += ' • 🔒';
-                if (rodada.jc !== undefined && rodada.jt !== undefined) {
-                    texto += ` • ${rodada.jc}/${rodada.jt} jogos`;
+                if (rodada.jc !== undefined) {
+                    const total = rodada.jt || rodada.j || 0;
+                    texto += ` • ${rodada.jc}/${total} jogos`;
                 }
                 
                 option.textContent = texto;
                 select.appendChild(option);
             });
             
+            // Seleciona a rodada atual
             if (rodadaAtualNum) {
                 select.value = rodadaAtualNum;
             }
         }
         
         function selecionarRodada(numeroRodada) {
-            console.log(`Carregando rodada ${numeroRodada}`);
+            console.log(`Selecionando rodada ${numeroRodada}...`);
             
             const rodadaData = rodadasDados[numeroRodada];
             
@@ -886,58 +740,40 @@
             const resumo = document.getElementById('rodadaResumo');
             resumo.style.display = 'block';
             
-            // Título
-            document.getElementById('rodadaTitulo').textContent = `Rodada ${rodada.num || rodadaAtualNum}`;
+            // Atualiza título
+            const rodadaNum = rodada.num || rodadaAtualNum;
+            document.getElementById('rodadaTitulo').textContent = `Rodada ${rodadaNum}`;
             
-            // Dados da rodada
-            const jogos = rodada.jogos || [];
-            
-            // Total de pontos (vem do bot)
-            const totalPontos = rodada.tp || jogos.reduce((sum, j) => sum + (j.pts || 0), 0);
-            
-            // Jogos palpitados (JP)
-            const jogosPalpitados = rodada.jp || jogos.filter(j => j.palpite && j.palpite !== '0x0').length;
-            
-            // Total de jogos (JT) - DEVE SER O TOTAL REAL!
-            const totalJogos = rodada.jt || jogos.length;
-            
-            // Resultados Corretos (RC) - NOVA MÉTRICA
-            const totalRC = jogos.filter(j => j.ac && j.ac.includes('RC')).length;
-            
-            // Placar Exato (PE)
-            const totalPE = rodada.est?.pe || jogos.filter(j => j.ac && j.ac.includes('PE')).length;
-            
-            // PD usada
-            const temPD = rodada.est?.pd_usada || rodada.pd_usada || jogos.some(j => j.pd);
-            
-            // Atualiza estatísticas
-            document.getElementById('totalPontos').textContent = totalPontos;
-            document.getElementById('jogosPalpitados').textContent = jogosPalpitados;
-            document.getElementById('totalJogos').textContent = totalJogos;
-            document.getElementById('totalRC').textContent = totalRC;
-            document.getElementById('totalPE').textContent = totalPE;
-            document.getElementById('temPD').textContent = temPD ? 'Sim' : 'Não';
+            // Atualiza estatísticas com os campos corretos
+            document.getElementById('totalPontos').textContent = rodada.tp || 0; // TP
+            document.getElementById('jogosReais').textContent = rodada.jr || rodada.total_jogos || 0; // JR
+            document.getElementById('jogosPalpitados').textContent = rodada.jp || rodada.j || 0; // JP
+            document.getElementById('pdUsada').textContent = (rodada.pd_usada || rodada.pd_usada === true) ? 'Sim' : 'Não'; // PD
+            document.getElementById('totalPE').textContent = rodada.est?.pe || rodada.pe || 0; // PE
+            document.getElementById('totalRC').textContent = rodada.est?.rc || rodada.rc || 0; // RC
         }
         
         function exibirJogosRodada(rodada) {
             const container = document.getElementById('jogosLista');
-            let jogos = rodada.jogos || [];
+            const jogos = rodada.jogos || [];
             
+            // Limpa container
             container.innerHTML = '';
             
-            // Contador
-            const totalJogos = rodada.jt || jogos.length;
-            const jogosPalpitados = rodada.jp || jogos.filter(j => j.palpite && j.palpite !== '0x0').length;
-            document.getElementById('contadorJogos').textContent = `${jogosPalpitados}/${totalJogos} jogos`;
+            // Atualiza contador
+            const totalJogos = rodada.jr || rodada.total_jogos || 0;
+            const jogosPalpitados = rodada.jp || jogos.length;
+            document.getElementById('contadorJogos').textContent = 
+                `${jogosPalpitados}/${totalJogos} jogos`;
             
             if (jogos.length === 0) {
                 container.innerHTML = `
-                    <div class="no-games">
-                        <div class="no-games-icon">📭</div>
-                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">
+                    <div class="game-card" style="text-align: center;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">📭</div>
+                        <div style="font-size: 18px; font-weight: 600; color: #4a5568; margin-bottom: 10px;">
                             Nenhum palpite nesta rodada
                         </div>
-                        <div style="color: #7f8c8d;">
+                        <div style="color: #718096;">
                             Você não fez palpites nos jogos desta rodada
                         </div>
                     </div>
@@ -950,7 +786,13 @@
                 const div = document.createElement('div');
                 div.className = `game-card ${jogo.pd ? 'pd' : ''}`;
                 
-                // Data formatada
+                // Badge de PD
+                let pdBadge = '';
+                if (jogo.pd) {
+                    pdBadge = '<div class="pd-badge">Pontuação Dobrada</div>';
+                }
+                
+                // Formata data/hora
                 let dataFormatada = '';
                 if (jogo.dh) {
                     try {
@@ -958,104 +800,144 @@
                         dataFormatada = data.toLocaleDateString('pt-BR', {
                             weekday: 'short',
                             day: '2-digit',
-                            month: 'short',
+                            month: '2-digit',
                             hour: '2-digit',
                             minute: '2-digit'
                         });
-                    } catch (e) {}
+                    } catch (e) {
+                        dataFormatada = jogo.dh;
+                    }
                 }
                 
-                // Badge PD
-                let pdBadge = '';
-                if (jogo.pd) {
-                    pdBadge = '<div class="pd-badge">PD ATIVADA</div>';
-                }
+                // Placar real e palpite
+                const placarReal = jogo.pr || jogo.placar_real || '? x ?';
+                const placarPalpite = jogo.pal || jogo.palpite || '0 x 0';
                 
-                // Times
-                const mandante = jogo.m || jogo.mandante || 'Time A';
-                const visitante = jogo.v || jogo.visitante || 'Time B';
-                const placarReal = jogo.pr || jogo.placar_real || '?x?';
-                const palpite = jogo.pal || jogo.palpite || '0x0';
+                // Extrai valores do placar
+                const [realCasa, realVisitante] = placarReal.split(' x ').map(v => v.trim());
+                const [palpiteCasa, palpiteVisitante] = placarPalpite.split(' x ').map(v => v.trim());
+                
+                // Nomes dos times
+                const timeCasa = jogo.m || jogo.mandante || 'Time Casa';
+                const timeVisitante = jogo.v || jogo.visitante || 'Time Visitante';
+                
+                // Pontos e acertos
                 const pontos = jogo.pts || jogo.pontos || 0;
                 const acertos = jogo.ac || [];
                 
-                // HTML do card
+                // Contadores por tipo de acerto
+                const contadores = {
+                    'PE': acertos.filter(a => a === 'PE').length,
+                    'RC': acertos.filter(a => a === 'RC').length,
+                    'GM': acertos.filter(a => a === 'GM').length,
+                    'GV': acertos.filter(a => a === 'GV').length
+                };
+                
+                // HTML do jogo
                 div.innerHTML = `
                     ${pdBadge}
                     
-                    <div class="game-header">
+                    <div class="game-info">
                         <div class="game-teams">
-                            <span>${mandante}</span>
-                            <span class="game-vs">vs</span>
-                            <span>${visitante}</span>
+                            <div class="game-title">${timeCasa} vs ${timeVisitante}</div>
+                            ${dataFormatada ? `
+                                <div class="game-date">
+                                    <span class="emoji">📅</span> ${dataFormatada}
+                                </div>
+                            ` : ''}
                         </div>
-                        ${dataFormatada ? `
-                            <div class="game-date">
-                                <span>📅</span>
-                                ${dataFormatada}
-                            </div>
-                        ` : ''}
                     </div>
                     
                     <div class="score-comparison">
-                        <div class="score-box">
+                        <div class="score-column">
                             <div class="score-label">Placar Real</div>
                             <div class="score-value score-real">${placarReal}</div>
-                            <div style="font-size: 12px; color: #28a745;">Resultado Oficial</div>
-                        </div>
-                        
-                        <div class="score-arrow">→</div>
-                        
-                        <div class="score-box">
-                            <div class="score-label">Seu Palpite</div>
-                            <div class="score-value score-guess">${palpite}</div>
-                            <div style="font-size: 12px; color: #007aff;">Sua Aposta</div>
-                        </div>
-                    </div>
-                    
-                    <div class="game-footer">
-                        <div class="points-earned">
-                            <span class="points-badge">${pontos} PONTOS</span>
-                        </div>
-                        
-                        <div class="hits-container">
-                            ${acertos.length > 0 ? acertos.map(acerto => {
-                                const tipo = acerto.toUpperCase();
-                                const info = acertoLabels[tipo] || { nome: tipo, desc: '' };
-                                return `
-                                    <div class="hit-badge ${tipo.toLowerCase()}" title="${info.desc}">
-                                        ${tipo}
-                                        <div class="hit-type">${info.nome}</div>
-                                    </div>
-                                `;
-                            }).join('') : `
-                                <div style="font-size: 14px; color: #7f8c8d; padding: 10px;">
-                                    Nenhum acerto
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                    
-                    ${acertos.includes('PE') ? `
-                        <div style="margin-top: 20px; padding: 15px; background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 10px; border-left: 4px solid #28a745;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="font-size: 20px;">🎉</span>
-                                <div style="flex: 1;">
-                                    <div style="font-weight: 600; color: #1e7e34; margin-bottom: 5px;">
-                                        PLACAR EXATO CONQUISTADO!
-                                    </div>
-                                    <div style="font-size: 13px; color: #2e7d32;">
-                                        Você acertou o placar exato! Pontuação: 14 pontos (inclui RC + GM + GV)
-                                    </div>
-                                </div>
+                            <div class="score-teams">
+                                <span>${timeCasa}</span>
+                                <span>${timeVisitante}</span>
                             </div>
                         </div>
-                    ` : ''}
+                        
+                        <div class="score-column">
+                            <div class="score-label">VS</div>
+                            <div class="score-value" style="color: #a0aec0;">↔</div>
+                            <div class="score-teams" style="color: #a0aec0;">
+                                <span>Confronto</span>
+                                <span>Direto</span>
+                            </div>
+                        </div>
+                        
+                        <div class="score-column">
+                            <div class="score-label">Seu Palpite</div>
+                            <div class="score-value score-guess">${placarPalpite}</div>
+                            <div class="score-teams">
+                                <span>${timeCasa}</span>
+                                <span>${timeVisitante}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="points-details">
+                        <div class="points-header">
+                            <div class="total-points">${pontos} pontos</div>
+                        </div>
+                        
+                        <div class="points-breakdown">
+                            ${contadores.PE > 0 ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Placar Exato</div>
+                                    <div class="breakdown-value">${contadores.PE}x</div>
+                                    <div class="breakdown-points">+${contadores.PE * 25} pts</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${contadores.RC > 0 ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Resultado</div>
+                                    <div class="breakdown-value">${contadores.RC}x</div>
+                                    <div class="breakdown-points">+${contadores.RC * 10} pts</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${contadores.GM > 0 ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Gols Mandante</div>
+                                    <div class="breakdown-value">${contadores.GM}x</div>
+                                    <div class="breakdown-points">+${contadores.GM * 5} pts</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${contadores.GV > 0 ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Gols Visitante</div>
+                                    <div class="breakdown-value">${contadores.GV}x</div>
+                                    <div class="breakdown-points">+${contadores.GV * 5} pts</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${jogo.pd ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">PD Aplicada</div>
+                                    <div class="breakdown-value">2x</div>
+                                    <div class="breakdown-points">Pontos Dobrados</div>
+                                </div>
+                            ` : ''}
+                            
+                            ${acertos.length === 0 ? `
+                                <div class="breakdown-item">
+                                    <div class="breakdown-label">Acertos</div>
+                                    <div class="breakdown-value">0x</div>
+                                    <div class="breakdown-points">+0 pts</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
                 `;
                 
                 container.appendChild(div);
             });
             
+            // Esconde loading
             document.getElementById('loading').style.display = 'none';
         }
         
@@ -1064,40 +946,33 @@
             const numeroRodada = parseInt(select.value);
             
             if (!isNaN(numeroRodada)) {
-                // Mostra loading
-                document.getElementById('loading').style.display = 'flex';
-                document.getElementById('jogosLista').innerHTML = '';
-                
-                // Na versão final, isso deve fechar e abrir nova WebApp
-                setTimeout(() => {
-                    selecionarRodada(numeroRodada);
-                }, 300);
+                selecionarRodada(numeroRodada);
             }
         }
         
         function carregarRodadaDoBot(numeroRodada) {
-            // Em produção, isso deve solicitar ao bot dados específicos
-            // Por enquanto, mostra mensagem
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('jogosLista').innerHTML = `
-                <div class="game-card" style="text-align: center;">
-                    <div style="font-size: 64px; margin-bottom: 20px;">🔄</div>
-                    <div style="font-size: 20px; font-weight: 700; margin-bottom: 15px; color: #2c3e50;">
-                        Rodada ${numeroRodada}
-                    </div>
-                    <div style="color: #7f8c8d; margin-bottom: 25px; line-height: 1.6;">
-                        Para visualizar os dados desta rodada, feche esta janela e solicite ao bot:<br>
-                        <strong>/palpites ${numeroRodada}</strong>
-                    </div>
-                    <div style="background: #f8f9fa; padding: 20px; border-radius: 15px; text-align: left;">
-                        <div style="font-weight: 600; margin-bottom: 10px; color: #2c3e50;">📌 Por que isso acontece?</div>
-                        <div style="font-size: 14px; color: #666; line-height: 1.5;">
-                            Cada rodada é carregada separadamente para evitar problemas de desempenho
-                            quando há muitas rodadas com muitos jogos.
+            // Mostra loading
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('jogosLista').innerHTML = '';
+            
+            // Em uma versão futura, faríamos uma requisição ao bot
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('jogosLista').innerHTML = `
+                    <div class="game-card" style="text-align: center;">
+                        <div style="font-size: 60px; margin-bottom: 20px;">⏳</div>
+                        <div style="font-size: 18px; font-weight: 600; color: #4a5568; margin-bottom: 10px;">
+                            Rodada ${numeroRodada}
+                        </div>
+                        <div style="color: #718096; margin-bottom: 20px;">
+                            Esta rodada será carregada em uma próxima atualização.
+                        </div>
+                        <div style="font-size: 14px; color: #a0aec0;">
+                            Aguarde a sincronização com o bot.
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            }, 1000);
         }
         
         function mostrarErro(mensagem) {
@@ -1106,18 +981,24 @@
             const errorDiv = document.getElementById('error');
             errorDiv.style.display = 'block';
             errorDiv.innerHTML = `
-                <div style="font-size: 64px; margin-bottom: 20px;">❌</div>
-                <div style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">
-                    Erro ao carregar dados
-                </div>
-                <div style="margin-bottom: 25px; line-height: 1.6;">
-                    ${mensagem}
-                </div>
-                <div style="font-size: 14px; color: #666;">
-                    Tente novamente ou entre em contato com o suporte.
+                <div style="font-size: 60px; margin-bottom: 20px;">❌</div>
+                <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Erro ao carregar</div>
+                <div style="margin-bottom: 20px; color: #4a5568;">${mensagem}</div>
+                <div style="color: #718096;">
+                    Tente novamente ou entre em contato com o administrador.
                 </div>
             `;
         }
+        
+        // Função de debug
+        window.debugDados = function() {
+            console.log('=== DEBUG ===');
+            console.log('appData:', appData);
+            console.log('rodadasDisponiveis:', rodadasDisponiveis);
+            console.log('rodadasDados:', rodadasDados);
+            console.log('rodadaAtualNum:', rodadaAtualNum);
+            console.log('=============');
+        };
     </script>
 </body>
 </html>
