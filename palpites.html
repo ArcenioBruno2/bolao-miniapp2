@@ -253,7 +253,7 @@
             color: var(--dark);
         }
         
-        /* ===== LISTA DE JOGOS - LAYOUT OTIMIZADO ===== */
+        /* ===== LISTA DE JOGOS - NOVO LAYOUT ===== */
         .games-section {
             margin-bottom: 15px;
         }
@@ -273,21 +273,18 @@
             color: var(--primary);
         }
         
-        /* ===== GAME CARD COMPACTO ===== */
+        /* ===== GAME CARD NOVO LAYOUT ===== */
         .game-card {
             background: white;
             border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
             border: 1px solid var(--light-gray);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            min-height: 60px;
+            flex-direction: column;
             width: 100%;
         }
         
@@ -305,31 +302,35 @@
             border-color: rgba(247, 37, 133, 0.2);
         }
         
-        /* TIMES - 55% do espaço (nomes grandes) */
-        .teams-container {
-            flex: 2.2;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 5px;
-            min-width: 0;
+        /* CONTAINER PRINCIPAL DO JOGO - LAYOUT EM GRID */
+        .game-content {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            width: 100%;
+            align-items: start;
         }
         
-        .team-wrapper {
+        /* TIMES - LADO ESQUERDO */
+        .teams-container {
             display: flex;
             flex-direction: column;
+            gap: 8px;
+        }
+        
+        .team-row {
+            display: flex;
             align-items: center;
-            flex: 1;
-            min-width: 0;
+            gap: 8px;
+            width: 100%;
         }
         
         .team-name {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            padding: 5px 6px;
+            padding: 8px 10px;
             border-radius: 8px;
-            text-align: center;
-            width: 100%;
+            flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -346,37 +347,33 @@
             color: var(--secondary);
         }
         
-        .vs-symbol {
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--gray);
-            min-width: 20px;
-            text-align: center;
-            padding: 0 3px;
+        /* PLACARES E ESTRELA - LADO DIREITO */
+        .scores-pd-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            min-width: 80px;
         }
         
-        /* PLACARES - 30% do espaço */
-        .score-container {
-            flex: 1.2;
+        .score-row {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 5px;
-            min-width: 80px;
+            gap: 4px;
         }
         
         .score-input-container {
             position: relative;
-            width: 32px;
+            width: 40px;
         }
         
         .score-input {
             width: 100%;
-            height: 32px;
+            height: 36px;
             border: 1.5px solid #e0e7ff;
             border-radius: 6px;
             text-align: center;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             outline: none;
             background: #f8faff;
@@ -412,28 +409,25 @@
             cursor: not-allowed;
         }
         
-        .score-x {
-            font-size: 12px;
+        .vs-symbol-small {
+            font-size: 11px;
             font-weight: 800;
             color: var(--gray);
             margin: 0 2px;
         }
         
-        /* ESTRELA - 15% do espaço */
+        /* ESTRELA */
         .pd-container {
-            flex: 0.8;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 38px;
-            height: 38px;
+            width: 50px;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-            padding: 3px;
+            padding: 5px;
             border-radius: 8px;
-            min-width: 38px;
         }
         
         .pd-container.disabled {
@@ -447,7 +441,7 @@
         }
         
         .pd-star {
-            font-size: 16px;
+            font-size: 22px;
             color: #e0e0e0;
             transition: var(--transition);
             filter: grayscale(1);
@@ -473,9 +467,9 @@
         }
         
         .pd-label {
-            font-size: 8px;
+            font-size: 9px;
             font-weight: 700;
-            margin-top: 2px;
+            margin-top: 4px;
             color: #999;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -498,12 +492,12 @@
         
         .pd-badge {
             position: absolute;
-            top: -3px;
-            right: -3px;
+            top: -5px;
+            right: -5px;
             background: var(--danger);
             color: white;
-            font-size: 6px;
-            padding: 1px 3px;
+            font-size: 7px;
+            padding: 2px 4px;
             border-radius: 50px;
             font-weight: 700;
             z-index: 2;
@@ -625,12 +619,6 @@
             font-size: 12px;
         }
         
-        /* ===== ESPAÇO PARA TIMES COM NOMES LONGOS ===== */
-        .team-name-long {
-            font-size: 11px;
-            padding: 4px 5px;
-        }
-        
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
             .main-card {
@@ -656,36 +644,25 @@
             }
             
             .team-name {
-                font-size: 11px;
-                padding: 4px 5px;
-            }
-            
-            .score-container {
-                min-width: 70px;
-            }
-            
-            .score-input {
-                height: 30px;
-                font-size: 13px;
-                width: 30px;
+                font-size: 12px;
+                padding: 6px 8px;
             }
             
             .score-input-container {
-                width: 30px;
+                width: 35px;
             }
             
-            .pd-container {
-                width: 35px;
-                height: 35px;
-                min-width: 35px;
+            .score-input {
+                height: 32px;
+                font-size: 14px;
             }
             
             .pd-star {
-                font-size: 15px;
+                font-size: 20px;
             }
             
             .pd-label {
-                font-size: 7px;
+                font-size: 8px;
             }
             
             .action-btn {
@@ -697,15 +674,24 @@
         
         @media (max-width: 320px) {
             .team-name {
-                font-size: 10px;
+                font-size: 11px;
+            }
+            
+            .score-input-container {
+                width: 32px;
+            }
+            
+            .score-input {
+                height: 30px;
+                font-size: 13px;
+            }
+            
+            .pd-star {
+                font-size: 18px;
             }
             
             .pd-label {
-                font-size: 6px;
-            }
-            
-            .status-title-compact {
-                font-size: 9px;
+                font-size: 7px;
             }
         }
         
@@ -1073,142 +1059,143 @@
 
         // ===== ATUALIZAÇÃO DA INTERFACE =====
         function atualizarInterface() {
-    document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
-    
-    // Configurar horário limite
-    const horarioElem = document.getElementById('txt-horario');
-    const horarioStr = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
-    horarioElem.textContent = `${horarioStr}`;
-    
-    const tempoRestante = calcularTempoRestante(dadosOriginais.rodada.horario_fechamento);
-    const tempoElem = document.getElementById('time-remaining');
-    
-    if (tempoRestante) {
-        tempoElem.textContent = `${tempoRestante}`;
-        tempoElem.style.display = 'inline-block';
-    } else {
-        tempoElem.style.display = 'none';
-    }
-    
-    horarioLimite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
-    
-    // Configurar trunfo
-    const trunfoElem = document.getElementById('txt-trunfo');
-    const trunfoBadge = document.getElementById('trunfo-badge');
-    
-    if (dadosOriginais.trunfo) {
-        trunfoElem.textContent = "Tem trunfo!";
-        trunfoBadge.className = 'status-badge-compact active';
-        trunfoBadge.textContent = 'ATIVO';
-        trunfoBadge.style.display = 'inline-block';
-    } else {
-        trunfoElem.textContent = "Sem trunfo";
-        trunfoBadge.className = 'status-badge-compact inactive';
-        trunfoBadge.textContent = 'INATIVO';
-        trunfoBadge.style.display = 'inline-block';
-    }
-    
-    // Configurar PD
-    const dobradaElem = document.getElementById('txt-dobrada');
-    const pdBadge = document.getElementById('pd-badge');
-    
-    pdJaUsada = dadosOriginais.pd_ja_usada || false;
-    pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
-    pdJaUsouAnteriormente = dadosOriginais.pd_ja_usou_anteriormente || false;
-    ehEdicao = dadosOriginais.eh_edicao || false;
-    pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
-    
-    console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, JaUsouAnteriormente=${pdJaUsouAnteriormente}, EhEdicao=${ehEdicao}, PodeTrocar=${pdPodeTrocar}`);
-    
-    // ===== CONFIGURAR pdSelecionado INICIAL =====
-    if (ehEdicao) {
-        // Modo edição: começa com a PD que já estava selecionada
-        pdSelecionado = dadosOriginais.pd_jogo_id;
-        console.log(`🔄 Modo edição: pdSelecionado inicial = ${pdSelecionado}`);
-    } else if (pdJaUsada) {
-        // PD já foi usada: mostrar como usada
-        pdSelecionado = dadosOriginais.pd_jogo_id;
-        console.log(`🔒 PD já usada: pdSelecionado = ${pdSelecionado}`);
-    } else {
-        // Modo normal: nenhuma PD selecionada ainda
-        pdSelecionado = null;
-        console.log(`🆕 Modo normal: pdSelecionado inicial = null`);
-    }
-    
-    // Texto do status da PD
-    if (pdJaUsouAnteriormente) {
-        dobradaElem.textContent = "Já usou PD";
-        pdBadge.className = 'status-badge-compact used';
-        pdBadge.textContent = 'BLOQUEADO';
-        pdBadge.style.display = 'inline-block';
-        mostrarAlertaPDUsada();
-    } else if (pdBloqueadaAdm) {
-        dobradaElem.textContent = "PD atribuída";
-        pdBadge.className = 'status-badge-compact blocked';
-        pdBadge.textContent = 'BLOQUEADA';
-        pdBadge.style.display = 'inline-block';
-    } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
-        dobradaElem.textContent = "PD editável";
-        pdBadge.className = 'status-badge-compact active';
-        pdBadge.textContent = 'EDITÁVEL';
-        pdBadge.style.display = 'inline-block';
-    } else if (pdJaUsada) {
-        dobradaElem.textContent = "PD usada";
-        pdBadge.className = 'status-badge-compact used';
-        pdBadge.textContent = 'UTILIZADA';
-        pdBadge.style.display = 'inline-block';
-        mostrarAlertaPDUsada();
-    } else {
-        dobradaElem.textContent = "Disponível";
-        pdBadge.className = 'status-badge-compact active';
-        pdBadge.textContent = 'DISPONÍVEL';
-        pdBadge.style.display = 'inline-block';
-    }
-    
-    // Inicializar array de palpites
-    palpites = [];
-    totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
-    
-    // Restaurar palpites existentes
-    if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
-        console.log("🔄 Restaurando palpites existentes");
-        
-        ordemOriginalJogos.forEach(jogoId => {
-            const jogoIdStr = String(jogoId);
-            if (dadosOriginais.palpites[jogoIdStr]) {
-                const palpite = dadosOriginais.palpites[jogoIdStr];
-                const novoPalpite = {
-                    jogo_id: jogoId,
-                    mandante: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
-                    visitante: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : '',
-                    pd: palpite.pd || false
-                };
-                
-                palpites.push(novoPalpite);
-                
-                // Se este palpite tinha PD, garantir que pdSelecionado está correto
-                if (palpite.pd && pdSelecionado !== jogoId) {
-                    console.log(`⚠️ Ajustando: palpite ${jogoId} tem PD=true, mas pdSelecionado=${pdSelecionado}`);
-                    pdSelecionado = jogoId;
-                }
+            document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
+            
+            // Configurar horário limite
+            const horarioElem = document.getElementById('txt-horario');
+            const horarioStr = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
+            horarioElem.textContent = `${horarioStr}`;
+            
+            const tempoRestante = calcularTempoRestante(dadosOriginais.rodada.horario_fechamento);
+            const tempoElem = document.getElementById('time-remaining');
+            
+            if (tempoRestante) {
+                tempoElem.textContent = `${tempoRestante}`;
+                tempoElem.style.display = 'inline-block';
+            } else {
+                tempoElem.style.display = 'none';
             }
-        });
-    }
-    
-    console.log(`📊 Palpites carregados: ${palpites.length}`);
-    console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
-    
-    // Renderizar jogos e verificar
-    renderizarJogos();
-    verificarHorarioLimite();
-    
-    // Mostrar conteúdo
-    setTimeout(() => {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('content').style.display = 'block';
-        verificarEAtualizar();
-    }, 500);
-}
+            
+            horarioLimite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
+            
+            // Configurar trunfo
+            const trunfoElem = document.getElementById('txt-trunfo');
+            const trunfoBadge = document.getElementById('trunfo-badge');
+            
+            if (dadosOriginais.trunfo) {
+                trunfoElem.textContent = "Tem trunfo!";
+                trunfoBadge.className = 'status-badge-compact active';
+                trunfoBadge.textContent = 'ATIVO';
+                trunfoBadge.style.display = 'inline-block';
+            } else {
+                trunfoElem.textContent = "Sem trunfo";
+                trunfoBadge.className = 'status-badge-compact inactive';
+                trunfoBadge.textContent = 'INATIVO';
+                trunfoBadge.style.display = 'inline-block';
+            }
+            
+            // Configurar PD
+            const dobradaElem = document.getElementById('txt-dobrada');
+            const pdBadge = document.getElementById('pd-badge');
+            
+            pdJaUsada = dadosOriginais.pd_ja_usada || false;
+            pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
+            pdJaUsouAnteriormente = dadosOriginais.pd_ja_usou_anteriormente || false;
+            ehEdicao = dadosOriginais.eh_edicao || false;
+            pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
+            
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, JaUsouAnteriormente=${pdJaUsouAnteriormente}, EhEdicao=${ehEdicao}, PodeTrocar=${pdPodeTrocar}`);
+            
+            // ===== CONFIGURAR pdSelecionado INICIAL =====
+            if (ehEdicao) {
+                // Modo edição: começa com a PD que já estava selecionada
+                pdSelecionado = dadosOriginais.pd_jogo_id;
+                console.log(`🔄 Modo edição: pdSelecionado inicial = ${pdSelecionado}`);
+            } else if (pdJaUsada) {
+                // PD já foi usada: mostrar como usada
+                pdSelecionado = dadosOriginais.pd_jogo_id;
+                console.log(`🔒 PD já usada: pdSelecionado = ${pdSelecionado}`);
+            } else {
+                // Modo normal: nenhuma PD selecionada ainda
+                pdSelecionado = null;
+                console.log(`🆕 Modo normal: pdSelecionado inicial = null`);
+            }
+            
+            // Texto do status da PD
+            if (pdJaUsouAnteriormente) {
+                dobradaElem.textContent = "Já usou PD";
+                pdBadge.className = 'status-badge-compact used';
+                pdBadge.textContent = 'BLOQUEADO';
+                pdBadge.style.display = 'inline-block';
+                mostrarAlertaPDUsada();
+            } else if (pdBloqueadaAdm) {
+                dobradaElem.textContent = "PD atribuída";
+                pdBadge.className = 'status-badge-compact blocked';
+                pdBadge.textContent = 'BLOQUEADA';
+                pdBadge.style.display = 'inline-block';
+            } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
+                dobradaElem.textContent = "PD editável";
+                pdBadge.className = 'status-badge-compact active';
+                pdBadge.textContent = 'EDITÁVEL';
+                pdBadge.style.display = 'inline-block';
+            } else if (pdJaUsada) {
+                dobradaElem.textContent = "PD usada";
+                pdBadge.className = 'status-badge-compact used';
+                pdBadge.textContent = 'UTILIZADA';
+                pdBadge.style.display = 'inline-block';
+                mostrarAlertaPDUsada();
+            } else {
+                dobradaElem.textContent = "Disponível";
+                pdBadge.className = 'status-badge-compact active';
+                pdBadge.textContent = 'DISPONÍVEL';
+                pdBadge.style.display = 'inline-block';
+            }
+            
+            // Inicializar array de palpites
+            palpites = [];
+            totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
+            
+            // Restaurar palpites existentes
+            if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
+                console.log("🔄 Restaurando palpites existentes");
+                
+                ordemOriginalJogos.forEach(jogoId => {
+                    const jogoIdStr = String(jogoId);
+                    if (dadosOriginais.palpites[jogoIdStr]) {
+                        const palpite = dadosOriginais.palpites[jogoIdStr];
+                        const novoPalpite = {
+                            jogo_id: jogoId,
+                            mandante: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
+                            visitante: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : '',
+                            pd: palpite.pd || false
+                        };
+                        
+                        palpites.push(novoPalpite);
+                        
+                        // Se este palpite tinha PD, garantir que pdSelecionado está correto
+                        if (palpite.pd && pdSelecionado !== jogoId) {
+                            console.log(`⚠️ Ajustando: palpite ${jogoId} tem PD=true, mas pdSelecionado=${pdSelecionado}`);
+                            pdSelecionado = jogoId;
+                        }
+                    }
+                });
+            }
+            
+            console.log(`📊 Palpites carregados: ${palpites.length}`);
+            console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
+            
+            // Renderizar jogos e verificar
+            renderizarJogos();
+            verificarHorarioLimite();
+            
+            // Mostrar conteúdo
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                verificarEAtualizar();
+            }, 500);
+        }
+
         function mostrarAlertaPDUsada() {
             const alerta = document.getElementById('pd-used-alert');
             const infoElem = document.getElementById('pd-game-info');
@@ -1228,403 +1215,402 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - LAYOT OTIMIZADO =====
+        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
         function renderizarJogos() {
-    const container = document.getElementById('lista-jogos');
-    container.innerHTML = '';
-    
-    if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
-        container.innerHTML = `
-            <div class="game-card">
-                <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
-                    <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 10px; color: var(--warning);"></i>
-                    <p style="font-size: 13px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
-                </div>
-            </div>
-        `;
-        return;
-    }
-    
-    const pdOriginalId = dadosOriginais.pd_jogo_id;
-    const horarioExpirado = (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo);
-    
-    dadosOriginais.jogos.forEach(jogo => {
-        const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
-            mandante: '', 
-            visitante: '', 
-            pd: false 
-        };
-        
-        const isOriginalPD = (pdOriginalId == jogo.id);
-        const isPDAtual = (pdSelecionado == jogo.id);
-        const tinhaPDOriginal = (pdJaUsada && isOriginalPD);
-        
-        let cardClass = 'game-card';
-        let starClass = 'pd-star';
-        let pdLabel = 'SELECIONAR';
-        let isClickable = true;
-        let isDisabled = false;
-        let showBadge = false;
-        let badgeText = '';
-        
-        // ===== LÓGICA DE ESTADO DA ESTRELA =====
-        
-        // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
-        if (pdBloqueadaAdm) {
-            // PD bloqueada administrativamente
-            cardClass += ' pd-blocked';
-            starClass += ' blocked';
-            pdLabel = 'BLOQUEADA';
-            isClickable = false;
-            isDisabled = true;
-        }
-        else if (pdJaUsouAnteriormente) {
-            // PD já usada em rodada anterior - BLOQUEIO PERMANENTE
-            cardClass += ' pd-blocked';
-            starClass += ' blocked';
-            pdLabel = 'BLOQUEADO';
-            isClickable = false;
-            isDisabled = true;
-        }
-        // 2. HORÁRIO EXPIRADO (sem trunfo)
-        else if (horarioExpirado) {
-            isClickable = false;
-            if (!isDisabled) {
-                starClass += ' blocked';
-                pdLabel = 'EXPIRADO';
-            }
-        }
-        // 3. MODO NORMAL (NÃO É EDIÇÃO)
-        else if (!ehEdicao) {
-            if (pdJaUsada) {
-                // PD já foi usada nesta rodada
-                if (isOriginalPD) {
-                    // Esta é a PD que foi usada
-                    cardClass += ' pd-used';
-                    starClass += ' used';
-                    pdLabel = 'UTILIZADA';
-                    isClickable = false;
-                    isDisabled = true;
-                    showBadge = true;
-                    badgeText = 'USADA';
-                } else {
-                    // Não é a PD usada - não pode selecionar outra
-                    starClass += ' blocked';
-                    pdLabel = 'INDISPONÍVEL';
-                    isClickable = false;
-                    isDisabled = true;
-                }
-            } else {
-                // PD ainda não foi usada - disponível para seleção
-                if (isPDAtual) {
-                    // Esta é a PD selecionada
-                    starClass += ' active';
-                    pdLabel = 'SELECIONADA';
-                } else {
-                    // Disponível para seleção
-                    pdLabel = 'SELECIONAR';
-                }
-            }
-        }
-        // 4. MODO EDIÇÃO
-        else {
-            if (pdPodeTrocar) {
-                // Pode trocar a PD durante edição
-                if (isPDAtual) {
-                    // Esta é a PD atualmente selecionada
-                    starClass += ' active';
-                    pdLabel = 'SELECIONADA';
-                    
-                    // Se era a PD original, mostrar badge
-                    if (tinhaPDOriginal) {
-                        showBadge = true;
-                        badgeText = 'ORIGINAL';
-                    }
-                } else {
-                    // Não é a PD selecionada no momento
-                    if (tinhaPDOriginal) {
-                        // Era a PD original, mas não está mais selecionada
-                        // Mostrar como normal, disponível para seleção
-                        pdLabel = 'SELECIONAR';
-                    } else {
-                        // Nunca foi PD - disponível para seleção
-                        pdLabel = 'SELECIONAR';
-                    }
-                }
-            } else {
-                // Não pode trocar PD durante edição
-                if (tinhaPDOriginal) {
-                    // É a PD original e não pode trocar
-                    cardClass += ' pd-used';
-                    starClass += ' used';
-                    pdLabel = 'UTILIZADA';
-                    isClickable = false;
-                    isDisabled = true;
-                    showBadge = true;
-                    badgeText = 'USADA';
-                } else {
-                    // Nunca foi PD e não pode selecionar agora
-                    starClass += ' blocked';
-                    pdLabel = 'INDISPONÍVEL';
-                    isClickable = false;
-                    isDisabled = true;
-                }
-            }
-        }
-        
-        // Ajustar tamanho do nome do time se for muito longo
-        const mandanteNome = jogo.mandante;
-        const visitanteNome = jogo.visitante;
-        const isNomeLongo = (mandanteNome.length > 15 || visitanteNome.length > 15);
-        const teamNameClass = isNomeLongo ? 'team-name team-name-long' : 'team-name';
-        
-        // Criar o elemento do jogo
-        const div = document.createElement('div');
-        div.className = cardClass;
-        
-        div.innerHTML = `
-            <!-- TIMES (55% do espaço) -->
-            <div class="teams-container">
-                <div class="team-wrapper">
-                    <div class="${teamNameClass} team-home" title="${mandanteNome}">
-                        ${mandanteNome}
+            const container = document.getElementById('lista-jogos');
+            container.innerHTML = '';
+            
+            if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
+                container.innerHTML = `
+                    <div class="game-card">
+                        <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 10px; color: var(--warning);"></i>
+                            <p style="font-size: 13px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="vs-symbol">X</div>
-                
-                <div class="team-wrapper">
-                    <div class="${teamNameClass} team-away" title="${visitanteNome}">
-                        ${visitanteNome}
-                    </div>
-                </div>
-            </div>
-            
-            <!-- PLACARES (30% do espaço) -->
-            <div class="score-container">
-                <div class="score-input-container">
-                    <input type="number" min="0" max="99" class="score-input" 
-                           value="${palpiteAtual.mandante}" 
-                           oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                           placeholder="0"
-                           ${horarioExpirado ? 'disabled' : ''}>
-                </div>
-                
-                <div class="score-x">X</div>
-                
-                <div class="score-input-container">
-                    <input type="number" min="0" max="99" class="score-input" 
-                           value="${palpiteAtual.visitante}" 
-                           oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                           placeholder="0"
-                           ${horarioExpirado ? 'disabled' : ''}>
-                </div>
-            </div>
-            
-            <!-- ESTRELA (15% do espaço) -->
-            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
-                 onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
-                <div class="${starClass}">
-                    ⭐
-                    ${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}
-                </div>
-                <div class="pd-label">${pdLabel}</div>
-            </div>
-        `;
-        
-        container.appendChild(div);
-    });
-}
-        // ===== FUNÇÕES DE INTERAÇÃO - CORRIGIDA =====
-        function togglePD(jogoId) {
-    console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
-    console.log(`📊 Estado: ehEdicao=${ehEdicao}, pdJaUsada=${pdJaUsada}, pdPodeTrocar=${pdPodeTrocar}, pdSelecionado=${pdSelecionado}`);
-    
-    // Verificar bloqueios
-    if (pdBloqueadaAdm) {
-        mostrarErro("❌ PD atribuída administrativamente!");
-        return;
-    }
-    
-    if (pdJaUsouAnteriormente) {
-        mostrarErro("❌ PD já usada em rodada anterior!");
-        return;
-    }
-    
-    // Verificar horário limite (se não tem trunfo)
-    if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) {
-        mostrarErro("❌ Horário limite expirado!");
-        return;
-    }
-    
-    const pdOriginalId = dadosOriginais.pd_jogo_id;
-    const isOriginalPD = (pdOriginalId == jogoId);
-    const isPDAtual = (pdSelecionado == jogoId);
-    
-    console.log(`📊 Detalhes: isOriginalPD=${isOriginalPD}, isPDAtual=${isPDAtual}`);
-    
-    // CASO 1: Clicou na mesma estrela que já está selecionada
-    if (isPDAtual) {
-        // Só permite remover se estiver em modo edição E puder trocar
-        if (ehEdicao && pdPodeTrocar) {
-            if (confirm("⚠️ Remover pontuação dobrada deste jogo?\n\nSe remover, poderá selecionar outra estrela depois.")) {
-                pdSelecionado = null;
-                // Limpar PD de todos os palpites
-                palpites.forEach(p => {
-                    if (p.jogo_id == jogoId) {
-                        p.pd = false;
-                    }
-                });
-                console.log("✅ PD removida do jogo:", jogoId);
-            }
-        } else if (!ehEdicao && !pdJaUsada) {
-            // Modo normal, PD não foi usada ainda - pode desselecionar
-            if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
-                pdSelecionado = null;
-                palpites.forEach(p => {
-                    if (p.jogo_id == jogoId) {
-                        p.pd = false;
-                    }
-                });
-                console.log("✅ PD removida (modo normal)");
-            }
-        } else {
-            mostrarErro("❌ Não é possível remover a PD nesta situação!");
-        }
-    }
-    // CASO 2: Clicou em uma estrela diferente
-    else {
-        // 2A: Modo normal (não é edição) e PD já foi usada
-        if (!ehEdicao && pdJaUsada) {
-            mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
-            return;
-        }
-        
-        // 2B: Modo edição mas não pode trocar PD
-        if (ehEdicao && !pdPodeTrocar) {
-            mostrarErro("❌ Não é possível trocar a PD nesta situação!");
-            return;
-        }
-        
-        // 2C: Já tem uma PD selecionada (vai trocar/transferir)
-        if (pdSelecionado !== null) {
-            const jogoAtual = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-            const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
-            
-            let mensagem = "⚠️ Transferir pontuação dobrada para este jogo?\n\n";
-            if (jogoAtual) {
-                mensagem += `De: ${jogoAtual.mandante} x ${jogoAtual.visitante}\n`;
-            }
-            if (jogoNovo) {
-                mensagem += `Para: ${jogoNovo.mandante} x ${jogoNovo.visitante}`;
-            }
-            
-            if (confirm(mensagem)) {
-                // Limpar PD anterior de todos os palpites
-                palpites.forEach(p => {
-                    if (p.jogo_id == pdSelecionado) {
-                        p.pd = false;
-                    }
-                });
-                
-                // Definir nova PD
-                pdSelecionado = jogoId;
-                
-                // Adicionar PD ao novo jogo
-                let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
-                if (palpiteIndex === -1) {
-                    // Criar novo palpite para este jogo
-                    palpites.push({
-                        jogo_id: jogoId,
-                        mandante: '',
-                        visitante: '',
-                        pd: true
-                    });
-                    console.log(`✅ Nova PD criada para jogo ${jogoId}`);
-                } else {
-                    // Atualizar palpite existente
-                    palpites[palpiteIndex].pd = true;
-                    console.log(`✅ PD atualizada para jogo ${jogoId}`);
-                }
-            } else {
-                console.log("❌ Transferência cancelada pelo usuário");
+                `;
                 return;
             }
-        }
-        // 2D: Primeira seleção (não tem PD selecionada ainda)
-        else {
-            pdSelecionado = jogoId;
             
-            // Adicionar PD ao jogo
+            const pdOriginalId = dadosOriginais.pd_jogo_id;
+            const horarioExpirado = (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo);
+            
+            dadosOriginais.jogos.forEach(jogo => {
+                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
+                    mandante: '', 
+                    visitante: '', 
+                    pd: false 
+                };
+                
+                const isOriginalPD = (pdOriginalId == jogo.id);
+                const isPDAtual = (pdSelecionado == jogo.id);
+                const tinhaPDOriginal = (pdJaUsada && isOriginalPD);
+                
+                let cardClass = 'game-card';
+                let starClass = 'pd-star';
+                let pdLabel = 'SELECIONAR';
+                let isClickable = true;
+                let isDisabled = false;
+                let showBadge = false;
+                let badgeText = '';
+                
+                // ===== LÓGICA DE ESTADO DA ESTRELA =====
+                
+                // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
+                if (pdBloqueadaAdm) {
+                    // PD bloqueada administrativamente
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'BLOQUEADA';
+                    isClickable = false;
+                    isDisabled = true;
+                }
+                else if (pdJaUsouAnteriormente) {
+                    // PD já usada em rodada anterior - BLOQUEIO PERMANENTE
+                    cardClass += ' pd-blocked';
+                    starClass += ' blocked';
+                    pdLabel = 'BLOQUEADO';
+                    isClickable = false;
+                    isDisabled = true;
+                }
+                // 2. HORÁRIO EXPIRADO (sem trunfo)
+                else if (horarioExpirado) {
+                    isClickable = false;
+                    if (!isDisabled) {
+                        starClass += ' blocked';
+                        pdLabel = 'EXPIRADO';
+                    }
+                }
+                // 3. MODO NORMAL (NÃO É EDIÇÃO)
+                else if (!ehEdicao) {
+                    if (pdJaUsada) {
+                        // PD já foi usada nesta rodada
+                        if (isOriginalPD) {
+                            // Esta é a PD que foi usada
+                            cardClass += ' pd-used';
+                            starClass += ' used';
+                            pdLabel = 'UTILIZADA';
+                            isClickable = false;
+                            isDisabled = true;
+                            showBadge = true;
+                            badgeText = 'USADA';
+                        } else {
+                            // Não é a PD usada - não pode selecionar outra
+                            starClass += ' blocked';
+                            pdLabel = 'INDISPONÍVEL';
+                            isClickable = false;
+                            isDisabled = true;
+                        }
+                    } else {
+                        // PD ainda não foi usada - disponível para seleção
+                        if (isPDAtual) {
+                            // Esta é a PD selecionada
+                            starClass += ' active';
+                            pdLabel = 'SELECIONADA';
+                        } else {
+                            // Disponível para seleção
+                            pdLabel = 'SELECIONAR';
+                        }
+                    }
+                }
+                // 4. MODO EDIÇÃO
+                else {
+                    if (pdPodeTrocar) {
+                        // Pode trocar a PD durante edição
+                        if (isPDAtual) {
+                            // Esta é a PD atualmente selecionada
+                            starClass += ' active';
+                            pdLabel = 'SELECIONADA';
+                            
+                            // Se era a PD original, mostrar badge
+                            if (tinhaPDOriginal) {
+                                showBadge = true;
+                                badgeText = 'ORIGINAL';
+                            }
+                        } else {
+                            // Não é a PD selecionada no momento
+                            if (tinhaPDOriginal) {
+                                // Era a PD original, mas não está mais selecionada
+                                // Mostrar como normal, disponível para seleção
+                                pdLabel = 'SELECIONAR';
+                            } else {
+                                // Nunca foi PD - disponível para seleção
+                                pdLabel = 'SELECIONAR';
+                            }
+                        }
+                    } else {
+                        // Não pode trocar PD durante edição
+                        if (tinhaPDOriginal) {
+                            // É a PD original e não pode trocar
+                            cardClass += ' pd-used';
+                            starClass += ' used';
+                            pdLabel = 'UTILIZADA';
+                            isClickable = false;
+                            isDisabled = true;
+                            showBadge = true;
+                            badgeText = 'USADA';
+                        } else {
+                            // Nunca foi PD e não pode selecionar agora
+                            starClass += ' blocked';
+                            pdLabel = 'INDISPONÍVEL';
+                            isClickable = false;
+                            isDisabled = true;
+                        }
+                    }
+                }
+                
+                // Criar o elemento do jogo com NOVO LAYOUT
+                const div = document.createElement('div');
+                div.className = cardClass;
+                
+                div.innerHTML = `
+                    <div class="game-content">
+                        <!-- TIMES - LADO ESQUERDO -->
+                        <div class="teams-container">
+                            <div class="team-row">
+                                <div class="team-name team-home" title="${jogo.mandante}">
+                                    ${jogo.mandante}
+                                </div>
+                            </div>
+                            
+                            <div class="team-row">
+                                <div class="team-name team-away" title="${jogo.visitante}">
+                                    ${jogo.visitante}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- PLACARES E ESTRELA - LADO DIREITO -->
+                        <div class="scores-pd-container">
+                            <!-- PLACARES -->
+                            <div class="score-row">
+                                <div class="score-input-container">
+                                    <input type="number" min="0" max="99" class="score-input" 
+                                           value="${palpiteAtual.mandante}" 
+                                           oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
+                                           placeholder="0"
+                                           ${horarioExpirado ? 'disabled' : ''}>
+                                </div>
+                                
+                                <div class="vs-symbol-small">X</div>
+                                
+                                <div class="score-input-container">
+                                    <input type="number" min="0" max="99" class="score-input" 
+                                           value="${palpiteAtual.visitante}" 
+                                           oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
+                                           placeholder="0"
+                                           ${horarioExpirado ? 'disabled' : ''}>
+                                </div>
+                            </div>
+                            
+                            <!-- ESTRELA -->
+                            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
+                                 onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                                <div class="${starClass}">
+                                    ⭐
+                                    ${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}
+                                </div>
+                                <div class="pd-label">${pdLabel}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        // ===== FUNÇÕES DE INTERAÇÃO =====
+        function togglePD(jogoId) {
+            console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
+            console.log(`📊 Estado: ehEdicao=${ehEdicao}, pdJaUsada=${pdJaUsada}, pdPodeTrocar=${pdPodeTrocar}, pdSelecionado=${pdSelecionado}`);
+            
+            // Verificar bloqueios
+            if (pdBloqueadaAdm) {
+                mostrarErro("❌ PD atribuída administrativamente!");
+                return;
+            }
+            
+            if (pdJaUsouAnteriormente) {
+                mostrarErro("❌ PD já usada em rodada anterior!");
+                return;
+            }
+            
+            // Verificar horário limite (se não tem trunfo)
+            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) {
+                mostrarErro("❌ Horário limite expirado!");
+                return;
+            }
+            
+            const pdOriginalId = dadosOriginais.pd_jogo_id;
+            const isOriginalPD = (pdOriginalId == jogoId);
+            const isPDAtual = (pdSelecionado == jogoId);
+            
+            console.log(`📊 Detalhes: isOriginalPD=${isOriginalPD}, isPDAtual=${isPDAtual}`);
+            
+            // CASO 1: Clicou na mesma estrela que já está selecionada
+            if (isPDAtual) {
+                // Só permite remover se estiver em modo edição E puder trocar
+                if (ehEdicao && pdPodeTrocar) {
+                    if (confirm("⚠️ Remover pontuação dobrada deste jogo?\n\nSe remover, poderá selecionar outra estrela depois.")) {
+                        pdSelecionado = null;
+                        // Limpar PD de todos os palpites
+                        palpites.forEach(p => {
+                            if (p.jogo_id == jogoId) {
+                                p.pd = false;
+                            }
+                        });
+                        console.log("✅ PD removida do jogo:", jogoId);
+                    }
+                } else if (!ehEdicao && !pdJaUsada) {
+                    // Modo normal, PD não foi usada ainda - pode desselecionar
+                    if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
+                        pdSelecionado = null;
+                        palpites.forEach(p => {
+                            if (p.jogo_id == jogoId) {
+                                p.pd = false;
+                            }
+                        });
+                        console.log("✅ PD removida (modo normal)");
+                    }
+                } else {
+                    mostrarErro("❌ Não é possível remover a PD nesta situação!");
+                }
+            }
+            // CASO 2: Clicou em uma estrela diferente
+            else {
+                // 2A: Modo normal (não é edição) e PD já foi usada
+                if (!ehEdicao && pdJaUsada) {
+                    mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
+                    return;
+                }
+                
+                // 2B: Modo edição mas não pode trocar PD
+                if (ehEdicao && !pdPodeTrocar) {
+                    mostrarErro("❌ Não é possível trocar a PD nesta situação!");
+                    return;
+                }
+                
+                // 2C: Já tem uma PD selecionada (vai trocar/transferir)
+                if (pdSelecionado !== null) {
+                    const jogoAtual = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
+                    const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
+                    
+                    let mensagem = "⚠️ Transferir pontuação dobrada para este jogo?\n\n";
+                    if (jogoAtual) {
+                        mensagem += `De: ${jogoAtual.mandante} x ${jogoAtual.visitante}\n`;
+                    }
+                    if (jogoNovo) {
+                        mensagem += `Para: ${jogoNovo.mandante} x ${jogoNovo.visitante}`;
+                    }
+                    
+                    if (confirm(mensagem)) {
+                        // Limpar PD anterior de todos os palpites
+                        palpites.forEach(p => {
+                            if (p.jogo_id == pdSelecionado) {
+                                p.pd = false;
+                            }
+                        });
+                        
+                        // Definir nova PD
+                        pdSelecionado = jogoId;
+                        
+                        // Adicionar PD ao novo jogo
+                        let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
+                        if (palpiteIndex === -1) {
+                            // Criar novo palpite para este jogo
+                            palpites.push({
+                                jogo_id: jogoId,
+                                mandante: '',
+                                visitante: '',
+                                pd: true
+                            });
+                            console.log(`✅ Nova PD criada para jogo ${jogoId}`);
+                        } else {
+                            // Atualizar palpite existente
+                            palpites[palpiteIndex].pd = true;
+                            console.log(`✅ PD atualizada para jogo ${jogoId}`);
+                        }
+                    } else {
+                        console.log("❌ Transferência cancelada pelo usuário");
+                        return;
+                    }
+                }
+                // 2D: Primeira seleção (não tem PD selecionada ainda)
+                else {
+                    pdSelecionado = jogoId;
+                    
+                    // Adicionar PD ao jogo
+                    let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
+                    if (palpiteIndex === -1) {
+                        palpites.push({
+                            jogo_id: jogoId,
+                            mandante: '',
+                            visitante: '',
+                            pd: true
+                        });
+                        console.log(`✅ PD selecionada pela primeira vez no jogo ${jogoId}`);
+                    } else {
+                        palpites[palpiteIndex].pd = true;
+                        console.log(`✅ PD adicionada ao jogo existente ${jogoId}`);
+                    }
+                }
+            }
+            
+            // Atualizar interface
+            renderizarJogos();
+            verificarEAtualizar();
+            
+            console.log(`📊 Estado final: pdSelecionado=${pdSelecionado}`);
+            console.log("📋 Palpites com PD:", palpites.filter(p => p.pd).map(p => p.jogo_id));
+        }
+
+        function salvarPlacar(jogoId, time, valor) {
+            // Limpar e validar valor
+            valor = valor.replace(/\D/g, '');
+            valor = valor.slice(0, 2);
+            const valorNum = valor === '' ? '' : parseInt(valor) || 0;
+            
+            // Validar range
+            if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
+                valor = '';
+            }
+            
+            // Encontrar ou criar palpite
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
+            
             if (palpiteIndex === -1) {
+                // Criar novo palpite
                 palpites.push({
                     jogo_id: jogoId,
                     mandante: '',
                     visitante: '',
-                    pd: true
+                    pd: false
                 });
-                console.log(`✅ PD selecionada pela primeira vez no jogo ${jogoId}`);
-            } else {
-                palpites[palpiteIndex].pd = true;
-                console.log(`✅ PD adicionada ao jogo existente ${jogoId}`);
+                palpiteIndex = palpites.length - 1;
             }
+            
+            // Atualizar placar
+            palpites[palpiteIndex][time] = valorNum;
+            
+            // Se este jogo tem a PD selecionada, manter a PD
+            if (pdSelecionado === jogoId) {
+                palpites[palpiteIndex].pd = true;
+            }
+            
+            // Atualizar campo visualmente (opcional)
+            const inputSelector = `.score-input[oninput*="${jogoId}"]`;
+            const inputs = document.querySelectorAll(inputSelector);
+            inputs.forEach(input => {
+                if (input.oninput.toString().includes(`'${time}'`)) {
+                    input.value = valor;
+                }
+            });
+            
+            // Verificar se pode enviar
+            verificarEAtualizar();
         }
-    }
-    
-    // Atualizar interface
-    renderizarJogos();
-    verificarEAtualizar();
-    
-    console.log(`📊 Estado final: pdSelecionado=${pdSelecionado}`);
-    console.log("📋 Palpites com PD:", palpites.filter(p => p.pd).map(p => p.jogo_id));
-}
 
-        function salvarPlacar(jogoId, time, valor) {
-    // Limpar e validar valor
-    valor = valor.replace(/\D/g, '');
-    valor = valor.slice(0, 2);
-    const valorNum = valor === '' ? '' : parseInt(valor) || 0;
-    
-    // Validar range
-    if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
-        valor = '';
-    }
-    
-    // Encontrar ou criar palpite
-    let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
-    
-    if (palpiteIndex === -1) {
-        // Criar novo palpite
-        palpites.push({
-            jogo_id: jogoId,
-            mandante: '',
-            visitante: '',
-            pd: false
-        });
-        palpiteIndex = palpites.length - 1;
-    }
-    
-    // Atualizar placar
-    palpites[palpiteIndex][time] = valorNum;
-    
-    // Se este jogo tem a PD selecionada, manter a PD
-    if (pdSelecionado === jogoId) {
-        palpites[palpiteIndex].pd = true;
-    }
-    
-    // Atualizar campo visualmente (opcional)
-    const inputSelector = `.score-input[oninput*="${jogoId}"]`;
-    const inputs = document.querySelectorAll(inputSelector);
-    inputs.forEach(input => {
-        if (input.oninput.toString().includes(`'${time}'`)) {
-            input.value = valor;
-        }
-    });
-    
-    // Verificar se pode enviar
-    verificarEAtualizar();
-}
         // ===== VERIFICAÇÕES =====
         function verificarPalpitesCompletos() {
             let preenchidos = 0;
