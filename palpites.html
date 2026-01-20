@@ -350,30 +350,38 @@
         /* PLACARES E ESTRELA - LADO DIREITO */
         .scores-pd-container {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 8px;
-            min-width: 80px;
+            gap: 12px;
+            min-width: 90px;
+        }
+        
+        /* CONTÊINER DOS PLACARES (VERTICAL) */
+        .scores-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            align-items: center;
         }
         
         .score-row {
             display: flex;
             align-items: center;
             gap: 4px;
+            width: 100%;
         }
         
         .score-input-container {
             position: relative;
-            width: 40px;
+            width: 36px;
         }
         
         .score-input {
             width: 100%;
-            height: 36px;
+            height: 32px;
             border: 1.5px solid #e0e7ff;
             border-radius: 6px;
             text-align: center;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             outline: none;
             background: #f8faff;
@@ -410,10 +418,20 @@
         }
         
         .vs-symbol-small {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: var(--gray);
             margin: 0 2px;
+        }
+        
+        /* ROTULO DO PLACAR (M / V) */
+        .score-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            margin-right: 2px;
+            min-width: 12px;
         }
         
         /* ESTRELA */
@@ -422,7 +440,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 50px;
+            width: 44px;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
@@ -441,7 +459,7 @@
         }
         
         .pd-star {
-            font-size: 22px;
+            font-size: 20px;
             color: #e0e0e0;
             transition: var(--transition);
             filter: grayscale(1);
@@ -467,7 +485,7 @@
         }
         
         .pd-label {
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
             margin-top: 4px;
             color: #999;
@@ -492,12 +510,12 @@
         
         .pd-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
+            top: -4px;
+            right: -4px;
             background: var(--danger);
             color: white;
-            font-size: 7px;
-            padding: 2px 4px;
+            font-size: 6px;
+            padding: 1px 3px;
             border-radius: 50px;
             font-weight: 700;
             z-index: 2;
@@ -649,35 +667,6 @@
             }
             
             .score-input-container {
-                width: 35px;
-            }
-            
-            .score-input {
-                height: 32px;
-                font-size: 14px;
-            }
-            
-            .pd-star {
-                font-size: 20px;
-            }
-            
-            .pd-label {
-                font-size: 8px;
-            }
-            
-            .action-btn {
-                padding: 12px 8px;
-                font-size: 12px;
-                height: 42px;
-            }
-        }
-        
-        @media (max-width: 320px) {
-            .team-name {
-                font-size: 11px;
-            }
-            
-            .score-input-container {
                 width: 32px;
             }
             
@@ -692,6 +681,44 @@
             
             .pd-label {
                 font-size: 7px;
+            }
+            
+            .action-btn {
+                padding: 12px 8px;
+                font-size: 12px;
+                height: 42px;
+            }
+            
+            .scores-pd-container {
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            .team-name {
+                font-size: 11px;
+                padding: 5px 6px;
+            }
+            
+            .score-input-container {
+                width: 28px;
+            }
+            
+            .score-input {
+                height: 28px;
+                font-size: 12px;
+            }
+            
+            .pd-star {
+                font-size: 16px;
+            }
+            
+            .pd-label {
+                font-size: 6px;
+            }
+            
+            .scores-pd-container {
+                min-width: 80px;
             }
         }
         
@@ -1382,24 +1409,30 @@
                         
                         <!-- PLACARES E ESTRELA - LADO DIREITO -->
                         <div class="scores-pd-container">
-                            <!-- PLACARES -->
-                            <div class="score-row">
-                                <div class="score-input-container">
-                                    <input type="number" min="0" max="99" class="score-input" 
-                                           value="${palpiteAtual.mandante}" 
-                                           oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                           placeholder="0"
-                                           ${horarioExpirado ? 'disabled' : ''}>
+                            <!-- PLACARES (VERTICAL) -->
+                            <div class="scores-container">
+                                <!-- PLACAR MANDANTE -->
+                                <div class="score-row">
+                                    <div class="score-label">M</div>
+                                    <div class="score-input-container">
+                                        <input type="number" min="0" max="99" class="score-input" 
+                                               value="${palpiteAtual.mandante}" 
+                                               oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
+                                               placeholder="0"
+                                               ${horarioExpirado ? 'disabled' : ''}>
+                                    </div>
                                 </div>
                                 
-                                <div class="vs-symbol-small">X</div>
-                                
-                                <div class="score-input-container">
-                                    <input type="number" min="0" max="99" class="score-input" 
-                                           value="${palpiteAtual.visitante}" 
-                                           oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                           placeholder="0"
-                                           ${horarioExpirado ? 'disabled' : ''}>
+                                <!-- PLACAR VISITANTE -->
+                                <div class="score-row">
+                                    <div class="score-label">V</div>
+                                    <div class="score-input-container">
+                                        <input type="number" min="0" max="99" class="score-input" 
+                                               value="${palpiteAtual.visitante}" 
+                                               oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
+                                               placeholder="0"
+                                               ${horarioExpirado ? 'disabled' : ''}>
+                                    </div>
                                 </div>
                             </div>
                             
