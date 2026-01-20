@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Editor de Placares - Bolão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #3a5488 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 i {
+            font-size: 28px;
+        }
+
+        .rodada-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            text-align: left;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #FFD700;
+        }
+
+        /* Abas */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab.active {
+            color: #4a6fa5;
+            border-bottom: 3px solid #4a6fa5;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px;
+            min-height: 300px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Lista de Jogos */
+        .jogos-container {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .jogo-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .jogo-card:hover {
+            border-color: #4a6fa5;
+            box-shadow: 0 5px 15px rgba(74, 111, 165, 0.1);
+        }
+
+        .jogo-card.usado {
+            border-left: 5px solid #28a745;
+        }
+
+        .jogo-card.com-placar {
+            border-left: 5px solid #17a2b8;
+        }
+
+        .jogo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .jogo-times {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .jogo-times span {
+            padding: 5px 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .jogo-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-placar {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-sem-placar {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-usado {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        /* Formulário de placar */
+        .placar-form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .placar-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .placar-input {
+            width: 70px;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .placar-input:focus {
+            outline: none;
+            border-color: #4a6fa5;
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+        }
+
+        .placar-separator {
+            font-size: 20px;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .time-nome {
+            font-weight: 600;
+            color: #495057;
+            min-width: 100px;
+        }
+
+        .btn-salvar {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .btn-salvar:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-salvar:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 25px;
+            border-top: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-cancelar {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-cancelar:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-enviar {
+            background: #4a6fa5;
+            color: white;
+        }
+
+        .btn-enviar:hover {
+            background: #3a5488;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(74, 111, 165, 0.3);
+        }
+
+        .btn-enviar:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Mensagens */
+        .mensagem {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mensagem.sucesso {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .mensagem.erro {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .mensagem.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .mensagem.ativa {
+            display: flex;
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .rodada-info {
+                grid-template-columns: 1fr;
+                padding: 12px;
+            }
+
+            .tab {
+                padding: 15px 0;
+                font-size: 14px;
+            }
+
+            .tab-content {
+                padding: 20px 15px;
+            }
+
+            .jogo-card {
+                padding: 15px;
+            }
+
+            .jogo-times {
+                font-size: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .placar-form {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .btn-salvar {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4a6fa5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Ícones */
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .icon-edit {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z'/%3E%3C/svg%3E");
+        }
+
+        .icon-check {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+        }
+
+        .icon-close {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+        }
+
+        .icon-send {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho com informações da rodada -->
+        <div class="header">
+            <h1><i>📊</i> Editor de Placares</h1>
+            <div id="rodadaInfo" class="rodada-info">
+                <!-- Dados da rodada serão preenchidos via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Mensagens de status -->
+        <div id="mensagemSucesso" class="mensagem sucesso">
+            <div class="icon icon-check"></div>
+            <span>Placares salvos com sucesso!</span>
+        </div>
+        
+        <div id="mensagemErro" class="mensagem erro">
+            <div class="icon icon-close"></div>
+            <span id="textoErro">Erro ao salvar placares.</span>
+        </div>
+
+        <!-- Abas -->
+        <div class="tabs">
+            <div class="tab active" onclick="mudarAba('rodada')">
+                <span>Todos os Jogos</span>
+            </div>
+            <div class="tab" onclick="mudarAba('jogos-usados')">
+                <span>Jogos Usados</span>
+                <small id="contadorUsados">(0)</small>
+            </div>
+        </div>
+
+        <!-- Conteúdo da aba "Todos os Jogos" -->
+        <div id="aba-rodada" class="tab-content active">
+            <div class="jogos-container" id="listaJogosCompletos">
+                <!-- Lista de todos os jogos será preenchida via JavaScript -->
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Carregando jogos da rodada...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo da aba "Jogos Usados" -->
+        <div id="aba-jogos-usados" class="tab-content">
+            <div class="jogos-container" id="listaJogosUsados">
+                <!-- Lista de jogos usados será preenchida via JavaScript -->
+                <div class="info">
+                    <p>Nenhum jogo usado encontrado nesta rodada.</p>
+                    <p><small>Os jogos usados são aqueles selecionados em rodadas criadas.</small></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rodapé com botões de ação -->
+        <div class="footer">
+            <button id="btnCancelar" class="btn btn-cancelar" onclick="cancelar()">
+                <div class="icon icon-close"></div>
+                Cancelar
+            </button>
+            <button id="btnEnviar" class="btn btn-enviar" onclick="enviarPlacares()" disabled>
+                <div class="icon icon-send"></div>
+                Enviar Placares
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ============= VARIÁVEIS GLOBAIS =============
+        let dadosRodada = null;
+        let jogosAtualizados = [];
+        let placaresModificados = new Set();
+
+        // ============= FUNÇÕES DE INICIALIZAÇÃO =============
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verifica se estamos no Telegram Web App
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                Telegram.WebApp.setHeaderColor('#4a6fa5');
+                Telegram.WebApp.setBackgroundColor('#667eea');
+                
+                // Inicializa com dados da URL
+                processarDadosURL();
+            } else {
+                // Modo de desenvolvimento - carrega dados de exemplo
+                carregarDadosExemplo();
+            }
+        });
+
+        function processarDadosURL() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosBase64 = urlParams.get('data');
+                
+                if (!dadosBase64) {
+                    mostrarErro('Dados da rodada não encontrados na URL.');
+                    return;
+                }
+                
+                // Decodifica os dados base64
+                const dadosJson = atob(dadosBase64);
+                const dados = JSON.parse(dadosJson);
+                
+                if (dados.tipo !== 'placares') {
+                    mostrarErro('Tipo de dados inválido.');
+                    return;
+                }
+                
+                // Salva os dados globalmente
+                dadosRodada = dados;
+                
+                // Atualiza a interface
+                atualizarInterface();
+                
+            } catch (error) {
+                console.error('Erro ao processar dados:', error);
+                mostrarErro('Erro ao carregar dados da rodada.');
+            }
+        }
+
+        function carregarDadosExemplo() {
+            // Dados de exemplo para desenvolvimento
+            dadosRodada = {
+                tipo: 'placares',
+                rodada: {
+                    numero: 5,
+                    total_jogos: 8,
+                    jogos_com_placar: 3,
+                    porcentagem: 37.5,
+                    jogos_usados: 5
+                },
+                jogos_completos: [
+                    {
+                        id: 101,
+                        mandante: "Flamengo",
+                        visitante: "Corinthians",
+                        gol_mandante: 2,
+                        gol_visitante: 1,
+                        usado: true,
+                        data_horario: "2024-01-20 16:00:00"
+                    },
+                    {
+                        id: 102,
+                        mandante: "Palmeiras",
+                        visitante: "São Paulo",
+                        gol_mandante: null,
+                        gol_visitante: null,
+                        usado: false,
+                        data_horario: "2024-01-20 18:00:00"
+                    },
+                    {
+                        id: 103,
+                        mandante: "Vasco",
+                        visitante: "Botafogo",
+                        gol_mandante: 1,
+                        gol_visitante: 1,
+                        usado: true,
+                        data_horario: "2024-01-21 16:00:00"
+                    }
+                ],
+                jogos_usados: [
+                    {
+                        id: 101,
+                        mandante: "Flamengo",
+                        visitante: "Corinthians",
+                        gol_mandante: 2,
+                        gol_visitante: 1,
+                        usado: true,
+                        data_horario: "2024-01-20 16:00:00"
+                    },
+                    {
+                        id: 103,
+                        mandante: "Vasco",
+                        visitante: "Botafogo",
+                        gol_mandante: 1,
+                        gol_visitante: 1,
+                        usado: true,
+                        data_horario: "2024-01-21 16:00:00"
+                    }
+                ]
+            };
+            
+            atualizarInterface();
+        }
+
+        // ============= ATUALIZAÇÃO DA INTERFACE =============
+        function atualizarInterface() {
+            if (!dadosRodada) return;
+            
+            // Atualiza informações da rodada
+            atualizarInfoRodada();
+            
+            // Atualiza contador de jogos usados
+            document.getElementById('contadorUsados').textContent = 
+                `(${dadosRodada.jogos_usados.length})`;
+            
+            // Carrega as listas de jogos
+            carregarJogosCompletos();
+            carregarJogosUsados();
+            
+            // Habilita o botão de enviar se houver jogos usados
+            const btnEnviar = document.getElementById('btnEnviar');
+            if (dadosRodada.jogos_usados.length > 0) {
+                btnEnviar.disabled = false;
+            }
+        }
+
+        function atualizarInfoRodada() {
+            const rodada = dadosRodada.rodada;
+            const infoDiv = document.getElementById('rodadaInfo');
+            
+            infoDiv.innerHTML = `
+                <div class="stat-item">
+                    <span class="stat-label">Rodada:</span>
+                    <span class="stat-value">${rodada.numero}ª</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Jogos:</span>
+                    <span class="stat-value">${rodada.total_jogos}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Jogos Usados:</span>
+                    <span class="stat-value">${rodada.jogos_usados}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Com Placares:</span>
+                    <span class="stat-value">${rodada.jogos_com_placar} (${rodada.porcentagem}%)</span>
+                </div>
+            `;
+        }
+
+        function carregarJogosCompletos() {
+            const container = document.getElementById('listaJogosCompletos');
+            if (!dadosRodada.jogos_completos.length) {
+                container.innerHTML = '<p class="info">Nenhum jogo encontrado nesta rodada.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            dadosRodada.jogos_completos.forEach(jogo => {
+                const temPlacar = jogo.gol_mandante !== null && jogo.gol_visitante !== null;
+                const statusClass = temPlacar ? 'com-placar' : 'sem-placar';
+                const statusText = temPlacar ? 'COM PLACAR' : 'SEM PLACAR';
+                const statusBg = temPlacar ? 'status-placar' : 'status-sem-placar';
+                
+                if (jogo.usado) {
+                    html += `
+                    <div class="jogo-card usado">
+                        <div class="jogo-header">
+                            <div class="jogo-times">
+                                <span class="time-nome">${jogo.mandante}</span>
+                                <span class="placar-atual">${jogo.gol_mandante !== null ? jogo.gol_mandante : '-'}</span>
+                                <span>×</span>
+                                <span class="placar-atual">${jogo.gol_visitante !== null ? jogo.gol_visitante : '-'}</span>
+                                <span class="time-nome">${jogo.visitante}</span>
+                            </div>
+                            <div class="jogo-status ${statusBg}">${statusText}</div>
+                        </div>
+                    </div>
+                    `;
+                } else {
+                    html += `
+                    <div class="jogo-card">
+                        <div class="jogo-header">
+                            <div class="jogo-times">
+                                <span class="time-nome">${jogo.mandante}</span>
+                                <span class="placar-atual">${jogo.gol_mandante !== null ? jogo.gol_mandante : '-'}</span>
+                                <span>×</span>
+                                <span class="placar-atual">${jogo.gol_visitante !== null ? jogo.gol_visitante : '-'}</span>
+                                <span class="time-nome">${jogo.visitante}</span>
+                            </div>
+                            <div class="jogo-status ${statusBg}">${statusText}</div>
+                        </div>
+                        <div class="info">
+                            <small><i>Este jogo não foi usado em rodadas criadas.</i></small>
+                        </div>
+                    </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function carregarJogosUsados() {
+            const container = document.getElementById('listaJogosUsados');
+            if (!dadosRodada.jogos_usados.length) {
+                container.innerHTML = `
+                    <div class="info">
+                        <p>Nenhum jogo usado encontrado nesta rodada.</p>
+                        <p><small>Os jogos usados são aqueles selecionados em rodadas criadas.</small></p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            dadosRodada.jogos_usados.forEach(jogo => {
+                const temPlacar = jogo.gol_mandante !== null && jogo.gol_visitante !== null;
+                
+                html += `
+                <div class="jogo-card usado" id="jogo-${jogo.id}">
+                    <div class="jogo-header">
+                        <div class="jogo-times">
+                            <span class="time-nome">${jogo.mandante}</span>
+                            <span class="placar-atual">${jogo.gol_mandante !== null ? jogo.gol_mandante : '-'}</span>
+                            <span>×</span>
+                            <span class="placar-atual">${jogo.gol_visitante !== null ? jogo.gol_visitante : '-'}</span>
+                            <span class="time-nome">${jogo.visitante}</span>
+                        </div>
+                        <div class="jogo-status ${temPlacar ? 'status-placar' : 'status-sem-placar'}">
+                            ${temPlacar ? 'COM PLACAR' : 'SEM PLACAR'}
+                        </div>
+                    </div>
+                    
+                    <div class="placar-form">
+                        <div class="placar-input-group">
+                            <span class="time-nome">${jogo.mandante}</span>
+                            <input type="number" 
+                                   id="gol-mandante-${jogo.id}"
+                                   class="placar-input" 
+                                   min="0" 
+                                   max="20"
+                                   value="${jogo.gol_mandante !== null ? jogo.gol_mandante : ''}"
+                                   placeholder="0"
+                                   onchange="marcarComoModificado(${jogo.id})">
+                        </div>
+                        
+                        <span class="placar-separator">×</span>
+                        
+                        <div class="placar-input-group">
+                            <input type="number" 
+                                   id="gol-visitante-${jogo.id}"
+                                   class="placar-input" 
+                                   min="0" 
+                                   max="20"
+                                   value="${jogo.gol_visitante !== null ? jogo.gol_visitante : ''}"
+                                   placeholder="0"
+                                   onchange="marcarComoModificado(${jogo.id})">
+                            <span class="time-nome">${jogo.visitante}</span>
+                        </div>
+                        
+                        <button class="btn-salvar" onclick="salvarJogoIndividual(${jogo.id})">
+                            <div class="icon icon-check"></div>
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // ============= FUNÇÕES DE CONTROLE =============
+        function mudarAba(aba) {
+            // Atualiza as abas
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Ativa a aba selecionada
+            if (aba === 'rodada') {
+                document.querySelector('.tab:nth-child(1)').classList.add('active');
+                document.getElementById('aba-rodada').classList.add('active');
+            } else {
+                document.querySelector('.tab:nth-child(2)').classList.add('active');
+                document.getElementById('aba-jogos-usados').classList.add('active');
+            }
+        }
+
+        function marcarComoModificado(jogoId) {
+            placaresModificados.add(jogoId);
+            
+            // Habilita o botão de enviar se houver modificações
+            const btnEnviar = document.getElementById('btnEnviar');
+            if (placaresModificados.size > 0) {
+                btnEnviar.disabled = false;
+            }
+        }
+
+        function salvarJogoIndividual(jogoId) {
+            const golMandante = document.getElementById(`gol-mandante-${jogoId}`).value;
+            const golVisitante = document.getElementById(`gol-visitante-${jogoId}`).value;
+            
+            // Validações
+            if (golMandante === '' || golVisitante === '') {
+                mostrarMensagem('erro', 'Preencha ambos os placares para salvar.');
+                return;
+            }
+            
+            const mandanteNum = parseInt(golMandante);
+            const visitanteNum = parseInt(golVisitante);
+            
+            if (mandanteNum < 0 || mandanteNum > 20 || visitanteNum < 0 || visitanteNum > 20) {
+                mostrarMensagem('erro', 'Placares devem estar entre 0 e 20.');
+                return;
+            }
+            
+            // Atualiza o jogo no array de atualizados
+            const index = jogosAtualizados.findIndex(j => j.id === jogoId);
+            
+            if (index === -1) {
+                // Adiciona novo jogo atualizado
+                jogosAtualizados.push({
+                    id: jogoId,
+                    gol_mandante: mandanteNum,
+                    gol_visitante: visitanteNum
+                });
+            } else {
+                // Atualiza jogo existente
+                jogosAtualizados[index].gol_mandante = mandanteNum;
+                jogosAtualizados[index].gol_visitante = visitanteNum;
+            }
+            
+            // Atualiza a exibição do placar atual
+            const placarAtualElement = document.querySelector(`#jogo-${jogoId} .placar-atual`);
+            if (placarAtualElement) {
+                placarAtualElement.textContent = `${mandanteNum} × ${visitanteNum}`;
+            }
+            
+            // Atualiza o status
+            const statusElement = document.querySelector(`#jogo-${jogoId} .jogo-status`);
+            if (statusElement) {
+                statusElement.textContent = 'COM PLACAR';
+                statusElement.className = 'jogo-status status-placar';
+            }
+            
+            // Remove das modificações pendentes
+            placaresModificados.delete(jogoId);
+            
+            mostrarMensagem('sucesso', `Placar do jogo ${jogoId} salvo localmente.`);
+        }
+
+        function coletarTodosPlacares() {
+            jogosAtualizados = [];
+            
+            dadosRodada.jogos_usados.forEach(jogo => {
+                const golMandanteInput = document.getElementById(`gol-mandante-${jogo.id}`);
+                const golVisitanteInput = document.getElementById(`gol-visitante-${jogo.id}`);
+                
+                if (golMandanteInput && golVisitanteInput) {
+                    const golMandante = golMandanteInput.value;
+                    const golVisitante = golVisitanteInput.value;
+                    
+                    // Só adiciona se ambos os placares foram preenchidos
+                    if (golMandante !== '' && golVisitante !== '') {
+                        jogosAtualizados.push({
+                            id: jogo.id,
+                            gol_mandante: parseInt(golMandante),
+                            gol_visitante: parseInt(golVisitante)
+                        });
+                    }
+                }
+            });
+            
+            return jogosAtualizados;
+        }
+
+        function enviarPlacares() {
+            const placares = coletarTodosPlacares();
+            
+            if (placares.length === 0) {
+                mostrarMensagem('erro', 'Nenhum placar para enviar. Preencha pelo menos um jogo.');
+                return;
+            }
+            
+            // Desabilita o botão de enviar durante o processamento
+            const btnEnviar = document.getElementById('btnEnviar');
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; border-width: 3px;"></div> Enviando...';
+            
+            // Prepara os dados para envio
+            const dadosEnvio = {
+                tipo: 'placares',
+                rodada: dadosRodada.rodada,
+                jogos_atualizados: placares
+            };
+            
+            // Envia para o Telegram Web App
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify(dadosEnvio));
+                
+                // Fecha o Web App após um breve delay
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 1500);
+                
+            } else {
+                // Modo de desenvolvimento - simula envio
+                console.log('Dados enviados:', dadosEnvio);
+                
+                mostrarMensagem('sucesso', `${placares.length} placares enviados com sucesso! (Modo desenvolvimento)`);
+                
+                // Restaura o botão
+                setTimeout(() => {
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = '<div class="icon icon-send"></div> Enviar Placares';
+                }, 2000);
+            }
+        }
+
+        function cancelar() {
+            if (placaresModificados.size > 0) {
+                if (confirm('Você tem alterações não salvas. Deseja realmente cancelar?')) {
+                    fecharWebApp();
+                }
+            } else {
+                fecharWebApp();
+            }
+        }
+
+        function fecharWebApp() {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.close();
+            } else {
+                mostrarMensagem('info', 'Web App fechado (Modo desenvolvimento)');
+            }
+        }
+
+        // ============= FUNÇÕES DE MENSAGENS =============
+        function mostrarMensagem(tipo, texto) {
+            // Esconde todas as mensagens primeiro
+            document.querySelectorAll('.mensagem').forEach(msg => {
+                msg.classList.remove('ativa');
+            });
+            
+            // Mostra a mensagem específica
+            const mensagemDiv = document.getElementById(`mensagem${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`);
+            if (mensagemDiv) {
+                const textoElement = mensagemDiv.querySelector('span');
+                if (textoElement) {
+                    textoElement.textContent = texto;
+                }
+                mensagemDiv.classList.add('ativa');
+                
+                // Auto-esconde após 5 segundos
+                setTimeout(() => {
+                    mensagemDiv.classList.remove('ativa');
+                }, 5000);
+            }
+        }
+
+        function mostrarErro(texto) {
+            mostrarMensagem('erro', texto);
+        }
+
+        // ============= VALIDAÇÕES DE INPUT =============
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('placar-input')) {
+                // Limita o valor entre 0 e 20
+                let value = parseInt(e.target.value);
+                if (isNaN(value)) {
+                    e.target.value = '';
+                } else if (value < 0) {
+                    e.target.value = 0;
+                } else if (value > 20) {
+                    e.target.value = 20;
+                }
+            }
+        });
+
+        // ============= HOTKEYS =============
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + S para salvar todos
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                enviarPlacares();
+            }
+            
+            // ESC para cancelar
+            if (e.key === 'Escape') {
+                cancelar();
+            }
+        });
+    </script>
+</body>
+</html>
