@@ -10,310 +10,451 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
+            color: #333;
         }
-
+        
         .container {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             overflow: hidden;
         }
-
+        
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
-            padding: 20px;
+            padding: 25px;
             text-align: center;
+            position: relative;
         }
-
+        
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
-
-        .usuario-info {
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .user-info {
             background: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 2px solid #e9ecef;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
         }
-
-        .usuario-info .nome {
+        
+        .user-name {
             font-size: 18px;
-            font-weight: bold;
-            color: #333;
+            font-weight: 600;
+            color: #2c3e50;
         }
-
-        .usuario-info .rodada-info {
+        
+        .user-id {
             font-size: 14px;
-            color: #666;
+            color: #7f8c8d;
+            background: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 15px;
         }
-
-        .selector-container {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-        }
-
-        .selector-container label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .selector-container select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #667eea;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            background: white;
-        }
-
-        .selector-container select:focus {
-            outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
+        
         .content {
-            padding: 20px;
-            min-height: 300px;
+            padding: 25px;
         }
-
-        .rodada-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        
+        .select-container {
+            margin-bottom: 25px;
         }
-
-        .rodada-header h2 {
-            font-size: 22px;
+        
+        .select-label {
+            display: block;
             margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
         }
-
+        
+        .select-rodada {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: border 0.3s;
+        }
+        
+        .select-rodada:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .error {
+            text-align: center;
+            padding: 30px;
+            color: #e74c3c;
+            background: #ffeaea;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .rodada-info {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .rodada-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .rodada-number {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .rodada-data {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
         .rodada-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
             font-size: 14px;
         }
-
-        .rodada-details div {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 12px;
-            border-radius: 4px;
+        
+        .detail-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 3px;
         }
-
-        .jogos-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        
+        .detail-value {
+            font-weight: 600;
         }
-
+        
+        .jogos-container {
+            margin-top: 30px;
+        }
+        
         .jogo-card {
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            background: #f8f9fa;
-            transition: all 0.3s ease;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
+        
         .jogo-card:hover {
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-
+        
         .jogo-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        
+        .jogo-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .jogo-status {
+            font-size: 14px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .status-pendente {
+            background: #ffeaa7;
+            color: #e17055;
+        }
+        
+        .status-finalizado {
+            background: #55efc4;
+            color: #00b894;
+        }
+        
+        .placares-container {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .time {
+            text-align: center;
+        }
+        
+        .time-nome {
+            font-size: 16px;
+            font-weight: 600;
             margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .placar-box {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            border-radius: 10px;
+        }
+        
+        .placar-real {
+            background: #f8f9fa;
+            border: 3px solid #dfe6e9;
+            color: #2c3e50;
+        }
+        
+        .placar-palpite {
+            background: #ffeaa7;
+            border: 3px solid #fdcb6e;
+            color: #e17055;
+        }
+        
+        .vs {
+            font-size: 24px;
+            font-weight: 700;
+            color: #7f8c8d;
+        }
+        
+        .pontuacao-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .pontuacao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .pontuacao-total {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .pd-flag {
+            background: #fd79a8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .acertos-list {
+            display: flex;
             flex-wrap: wrap;
             gap: 10px;
-        }
-
-        .jogo-times {
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-            flex: 1;
-        }
-
-        .pd-badge {
-            background: #ffc107;
-            color: #333;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .placar-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 10px 0;
-        }
-
-        .placar-box {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #667eea;
-        }
-
-        .placar-box.usuario {
-            border-left-color: #28a745;
-        }
-
-        .placar-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            font-weight: bold;
-        }
-
-        .placar-valor {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            text-align: center;
-        }
-
-        .pontuacao-info {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            border-left: 4px solid #28a745;
             margin-top: 10px;
         }
-
-        .pontuacao-titulo {
+        
+        .acerto-item {
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
             font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            font-weight: bold;
-            margin-bottom: 5px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-
-        .pontuacao-detalhes {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.6;
+        
+        .acerto-pe {
+            background: #55efc4;
+            color: #00b894;
         }
-
-        .pontuacao-total {
-            font-size: 18px;
-            font-weight: bold;
-            color: #28a745;
-            margin-top: 8px;
-            text-align: right;
+        
+        .acerto-rc {
+            background: #74b9ff;
+            color: #0984e3;
         }
-
-        .sem-palpite {
-            background: #fff3cd;
-            border-left-color: #ffc107;
-            color: #856404;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 14px;
+        
+        .acerto-gm, .acerto-gv {
+            background: #ffeaa7;
+            color: #e17055;
         }
-
-        .rodada-total {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        
+        .acerto-pd {
+            background: #fd79a8;
             color: white;
+        }
+        
+        .resumo-pontuacao {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .resumo-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .resumo-header h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .resumo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .resumo-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .resumo-valor {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .resumo-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .footer {
+            text-align: center;
             padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
         }
-
-        .rodada-total h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .rodada-total .total-valor {
-            font-size: 36px;
-            font-weight: bold;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-        }
-
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
             border-radius: 50%;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto;
         }
-
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 6px;
-            border: 1px solid #f5c6cb;
-            margin: 20px 0;
-        }
-
+        
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: #666;
+            padding: 50px 20px;
+            color: #7f8c8d;
         }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            opacity: 0.5;
         }
-
-        @media (max-width: 768px) {
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
             .header h1 {
-                font-size: 22px;
+                font-size: 18px;
             }
-
-            .usuario-info {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .placar-container {
-                grid-template-columns: 1fr;
-            }
-
+            
             .rodada-details {
                 grid-template-columns: 1fr;
+            }
+            
+            .placares-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .vs {
+                margin: 10px 0;
             }
         }
     </style>
@@ -321,235 +462,411 @@
 <body>
     <div class="container">
         <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
             <h1>👤 Palpites do Usuário</h1>
-            <p>Visualize seus palpites e pontuação por rodada</p>
+            <div class="subtitle">Veja seus palpites e pontuação por rodada</div>
         </div>
-
-        <div class="usuario-info" id="usuarioInfo">
-            <div class="nome" id="nomeUsuario">Carregando...</div>
-            <div class="rodada-info" id="rodadaInfo"></div>
+        
+        <div class="user-info">
+            <div class="user-name" id="userName">Carregando...</div>
+            <div class="user-id" id="userId">ID: --</div>
         </div>
-
-        <div class="selector-container">
-            <label for="rodadaSelect">Selecione a Rodada:</label>
-            <select id="rodadaSelect">
-                <option value="">Carregando rodadas...</option>
-            </select>
-        </div>
-
-        <div class="content" id="content">
-            <div class="loading">
-                <div class="loading-spinner"></div>
-                <p>Carregando dados...</p>
+        
+        <div class="content">
+            <div class="select-container">
+                <label class="select-label">Selecione uma rodada:</label>
+                <select class="select-rodada" id="selectRodada" onchange="carregarRodada()">
+                    <option value="">Selecione uma rodada...</option>
+                </select>
             </div>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <div style="margin-top: 15px;">Carregando informações...</div>
+            </div>
+            
+            <div id="error" class="error" style="display: none;">
+                ❌ Ocorreu um erro ao carregar os dados. Tente novamente.
+            </div>
+            
+            <div id="rodadaContent" style="display: none;">
+                <div class="rodada-info" id="rodadaInfo">
+                    <!-- Informações da rodada serão inseridas aqui -->
+                </div>
+                
+                <div class="jogos-container" id="jogosContainer">
+                    <!-- Lista de jogos será inserida aqui -->
+                </div>
+                
+                <div class="resumo-pontuacao" id="resumoPontuacao">
+                    <!-- Resumo da pontuação será inserido aqui -->
+                </div>
+            </div>
+            
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div>📭</div>
+                <h3>Nenhuma rodada disponível</h3>
+                <p>As rodadas aparecerão aqui quando os placares reais forem preenchidos.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            Bolão 2026 • Dados atualizados em tempo real
         </div>
     </div>
 
     <script>
-        // Decodifica dados da URL
-        function getDataFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            const data = params.get('data');
-            
-            if (!data) {
-                console.error('Nenhum dado encontrado na URL');
-                return null;
-            }
-
-            try {
-                const decoded = atob(data);
-                return JSON.parse(decoded);
-            } catch (e) {
-                console.error('Erro ao decodificar dados:', e);
-                return null;
+        let dadosUsuario = null;
+        let rodadasDisponiveis = [];
+        let dadosRodadaAtual = null;
+        
+        // Função para voltar
+        function goBack() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.close();
             }
         }
-
-        // Dados globais
-        let dadosGlobais = {};
-        let rodadaSelecionada = null;
-
-        // Inicializa a página
-        async function inicializar() {
-            dadosGlobais = getDataFromURL();
+        
+        // Carrega dados iniciais
+        function carregarDadosIniciais() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const selectRodada = document.getElementById('selectRodada');
             
-            if (!dadosGlobais) {
-                mostrarErro('Erro ao carregar dados da URL');
+            try {
+                // Obter dados da URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataParam = urlParams.get('data');
+                
+                if (!dataParam) {
+                    throw new Error('Dados não encontrados na URL');
+                }
+                
+                // Decodificar dados
+                const dados = JSON.parse(atob(dataParam));
+                console.log('Dados recebidos:', dados);
+                
+                if (dados.tipo !== 'palpites_usuario') {
+                    throw new Error('Tipo de dados inválido');
+                }
+                
+                dadosUsuario = dados.usuario;
+                rodadasDisponiveis = dados.rodadas_disponiveis;
+                
+                // Atualizar informações do usuário
+                document.getElementById('userName').textContent = dadosUsuario.nome;
+                document.getElementById('userId').textContent = `ID: ${dadosUsuario.id}`;
+                
+                // Popular dropdown de rodadas
+                if (rodadasDisponiveis && rodadasDisponiveis.length > 0) {
+                    selectRodada.innerHTML = '<option value="">Selecione uma rodada...</option>';
+                    
+                    rodadasDisponiveis.forEach(rodadaNum => {
+                        const option = document.createElement('option');
+                        option.value = rodadaNum;
+                        option.textContent = `Rodada ${rodadaNum}`;
+                        selectRodada.appendChild(option);
+                    });
+                    
+                    loading.style.display = 'none';
+                } else {
+                    loading.style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+                
+            } catch (err) {
+                console.error('Erro ao carregar dados:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+            }
+        }
+        
+        // Carrega dados da rodada selecionada
+        async function carregarRodada() {
+            const rodadaNum = document.getElementById('selectRodada').value;
+            if (!rodadaNum) {
+                document.getElementById('rodadaContent').style.display = 'none';
                 return;
             }
-
-            console.log('Dados recebidos:', dadosGlobais);
-
-            // Preenche informações do usuário
-            document.getElementById('nomeUsuario').textContent = `👤 ${dadosGlobais.usuario.nome}`;
-
-            // Popula seletor de rodadas
-            const select = document.getElementById('rodadaSelect');
-            select.innerHTML = '';
-
-            if (dadosGlobais.rodadas_disponiveis && dadosGlobais.rodadas_disponiveis.length > 0) {
-                dadosGlobais.rodadas_disponiveis.forEach(rodada => {
-                    const option = document.createElement('option');
-                    option.value = rodada.numero;
-                    option.textContent = `Rodada ${rodada.numero} - ${new Date(rodada.data_criacao).toLocaleDateString('pt-BR')}`;
-                    select.appendChild(option);
-                });
-
-                // Seleciona primeira rodada
-                select.value = dadosGlobais.rodadas_disponiveis[0].numero;
-                rodadaSelecionada = dadosGlobais.rodadas_disponiveis[0].numero;
-                await carregarRodada(rodadaSelecionada);
-            } else {
-                mostrarErro('Nenhuma rodada disponível');
-            }
-
-            // Event listener para mudança de rodada
-            select.addEventListener('change', (e) => {
-                rodadaSelecionada = e.target.value;
-                carregarRodada(rodadaSelecionada);
-            });
-        }
-
-        // Carrega dados de uma rodada específica
-        async function carregarRodada(numeroRodada) {
-            const content = document.getElementById('content');
-            content.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Carregando rodada...</p></div>';
-
+            
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const rodadaContent = document.getElementById('rodadaContent');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            rodadaContent.style.display = 'none';
+            
             try {
-                // Busca dados da rodada nos dados globais
-                const rodada = dadosGlobais.rodadas_disponiveis.find(r => r.numero == numeroRodada);
+                // Aqui você faria uma requisição ao bot para buscar os dados da rodada
+                // Como estamos em um WebApp, precisamos enviar uma mensagem para o bot
                 
-                if (!rodada) {
-                    mostrarErro('Rodada não encontrada');
-                    return;
+                if (window.Telegram && window.Telegram.WebApp) {
+                    // Envia requisição para o bot
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        tipo: 'buscar_palpites_usuario',
+                        usuario_id: dadosUsuario.id,
+                        rodada_numero: parseInt(rodadaNum)
+                    }));
+                    
+                    // O bot responderá com os dados via WebApp.sendData()
+                    // Esta parte precisa ser implementada no bot Python
+                    console.log('Solicitando dados da rodada:', rodadaNum);
+                } else {
+                    // Modo desenvolvimento - simulação
+                    await simularCarregamentoRodada(rodadaNum);
                 }
-
-                // Renderiza a rodada
-                renderizarRodada(rodada, dadosGlobais.usuario.id);
-            } catch (e) {
-                console.error('Erro ao carregar rodada:', e);
-                mostrarErro('Erro ao carregar dados da rodada');
+                
+            } catch (err) {
+                console.error('Erro ao carregar rodada:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
             }
         }
-
-        // Renderiza a rodada com palpites e pontuação
-        function renderizarRodada(rodada, usuarioId) {
-            const content = document.getElementById('content');
-            let html = '';
-
-            // Header da rodada
-            html += `
+        
+        // Simulação de carregamento (para desenvolvimento)
+        async function simularCarregamentoRodada(rodadaNum) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Dados de exemplo
+            dadosRodadaAtual = {
+                rodada_info: {
+                    numero: rodadaNum,
+                    horario_fechamento: '2026-01-10 20:00:00',
+                    status: 'fechada'
+                },
+                total: 24,
+                estatisticas: {
+                    pe: 2,
+                    rc: 5,
+                    gm: 3,
+                    gv: 4,
+                    pd_usada: true
+                },
+                jogos: [
+                    {
+                        jogo_id: 1,
+                        mandante: 'Cruzeiro',
+                        visitante: 'Botafogo',
+                        placar_real: '3x0',
+                        palpite: '3x0',
+                        pontos: 14,
+                        acertos: ['PE', 'GM', 'GV', 'PD'],
+                        pd: true
+                    },
+                    {
+                        jogo_id: 2,
+                        mandante: 'Flamengo',
+                        visitante: 'Vasco',
+                        placar_real: '2x1',
+                        palpite: '1x0',
+                        pontos: 4,
+                        acertos: ['RC'],
+                        pd: false
+                    },
+                    {
+                        jogo_id: 3,
+                        mandante: 'Palmeiras',
+                        visitante: 'Corinthians',
+                        placar_real: '1x1',
+                        palpite: '2x2',
+                        pontos: 2,
+                        acertos: ['GM'],
+                        pd: false
+                    }
+                ]
+            };
+            
+            exibirRodada();
+        }
+        
+        // Exibe os dados da rodada
+        function exibirRodada() {
+            const loading = document.getElementById('loading');
+            const rodadaContent = document.getElementById('rodadaContent');
+            
+            loading.style.display = 'none';
+            rodadaContent.style.display = 'block';
+            
+            // Atualizar informações da rodada
+            const rodadaInfo = document.getElementById('rodadaInfo');
+            const rodada = dadosRodadaAtual.rodada_info;
+            
+            rodadaInfo.innerHTML = `
                 <div class="rodada-header">
-                    <h2>🏆 Rodada ${rodada.numero}</h2>
-                    <div class="rodada-details">
-                        <div>📅 Data: ${new Date(rodada.data_criacao).toLocaleDateString('pt-BR')}</div>
-                        <div>⏰ Horário: ${rodada.horario_fechamento ? new Date(rodada.horario_fechamento).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : 'N/A'}</div>
-                        ${rodada.trunfo ? `<div>🎯 Trunfo: ${rodada.trunfo}</div>` : ''}
-                        ${rodada.pontuacao_dobrada_jogo ? `<div>🔥 PD: ${rodada.pontuacao_dobrada_jogo}</div>` : ''}
+                    <div class="rodada-number">Rodada ${rodada.numero}</div>
+                    <div class="rodada-data">${formatarData(rodada.horario_fechamento)}</div>
+                </div>
+                <div class="rodada-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value">${rodada.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Pontuação Total</div>
+                        <div class="detail-value">${dadosRodadaAtual.total} pontos</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">PD Usada</div>
+                        <div class="detail-value">${dadosRodadaAtual.estatisticas.pd_usada ? '✅ Sim' : '❌ Não'}</div>
                     </div>
                 </div>
             `;
-
-            // Lista de jogos
-            if (rodada.jogos && rodada.jogos.length > 0) {
-                html += '<div class="jogos-list">';
-
-                let totalRodada = 0;
-
-                rodada.jogos.forEach((jogo, index) => {
-                    const palpite = rodada.palpites[jogo.id];
-
-                    if (!palpite) {
-                        html += `
-                            <div class="jogo-card">
-                                <div class="jogo-header">
-                                    <div class="jogo-times">${jogo.mandante} vs ${jogo.visitante}</div>
-                                </div>
-                                <div class="sem-palpite">
-                                    ⚠️ Você não palpitou neste jogo
-                                </div>
-                            </div>
-                        `;
-                        return;
-                    }
-
-                    const placarReal = `${jogo.gol_mandante || 0} x ${jogo.gol_visitante || 0}`;
-                    const placarPalpite = `${palpite.mandante} x ${palpite.visitante}`;
-                    const pontos = palpite.pontos || 0;
-                    const acertos = palpite.acertos || {};
-
-                    // Calcula pontuação
-                    let pontuacaoDescricao = [];
-                    let pontuacaoTotal = pontos;
-
-                    if (acertos.pe) pontuacaoDescricao.push(`Placar Exato = 10 Pts`);
-                    if (acertos.rc) pontuacaoDescricao.push(`Resultado Correto = 4 Pts`);
-                    if (acertos.gm) pontuacaoDescricao.push(`Acerto GM = 2 Pts`);
-                    if (acertos.gv) pontuacaoDescricao.push(`Acerto GV = 2 Pts`);
-
-                    if (pontuacaoDescricao.length === 0) {
-                        pontuacaoDescricao.push('SEM ACERTOS');
-                    }
-
-                    // Aplica PD se necessário
-                    if (palpite.pd) {
-                        pontuacaoTotal = pontos * 2;
-                        pontuacaoDescricao.push(`<strong>PD APLICADA (x2)</strong>`);
-                    }
-
-                    totalRodada += pontuacaoTotal;
-
-                    html += `
-                        <div class="jogo-card">
-                            <div class="jogo-header">
-                                <div class="jogo-times">${jogo.mandante} vs ${jogo.visitante}</div>
-                                ${palpite.pd ? '<span class="pd-badge">🔥 PD</span>' : ''}
-                            </div>
-                            <div class="placar-container">
-                                <div class="placar-box">
-                                    <div class="placar-label">Placar Real</div>
-                                    <div class="placar-valor">${placarReal}</div>
-                                </div>
-                                <div class="placar-box usuario">
-                                    <div class="placar-label">Seu Palpite</div>
-                                    <div class="placar-valor">${placarPalpite}</div>
-                                </div>
-                            </div>
-                            <div class="pontuacao-info">
-                                <div class="pontuacao-titulo">Pontuação Obtida</div>
-                                <div class="pontuacao-detalhes">
-                                    ${pontuacaoDescricao.join('<br>')}
-                                </div>
-                                <div class="pontuacao-total">Total: ${pontuacaoTotal} Pts</div>
+            
+            // Atualizar lista de jogos
+            const jogosContainer = document.getElementById('jogosContainer');
+            jogosContainer.innerHTML = '';
+            
+            dadosRodadaAtual.jogos.forEach(jogo => {
+                const [realMandante, realVisitante] = jogo.placar_real.split('x');
+                const [palpiteMandante, palpiteVisitante] = jogo.palpite.split('x');
+                
+                const jogoHTML = `
+                    <div class="jogo-card">
+                        <div class="jogo-header">
+                            <div class="jogo-title">${jogo.mandante} vs ${jogo.visitante}</div>
+                            <div class="jogo-status ${jogo.pontos > 0 ? 'status-finalizado' : 'status-pendente'}">
+                                ${jogo.pontos} ponto${jogo.pontos !== 1 ? 's' : ''}
                             </div>
                         </div>
-                    `;
-                });
-
-                html += '</div>';
-
-                // Total da rodada
-                html += `
-                    <div class="rodada-total">
-                        <h3>Pontuação Total da Rodada</h3>
-                        <div class="total-valor">${totalRodada} Pontos</div>
+                        
+                        <div class="placares-container">
+                            <div class="time">
+                                <div class="time-nome">${jogo.mandante}</div>
+                                <div class="placar-box placar-real">${realMandante}</div>
+                            </div>
+                            
+                            <div class="vs">X</div>
+                            
+                            <div class="time">
+                                <div class="time-nome">${jogo.visitante}</div>
+                                <div class="placar-box placar-real">${realVisitante}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin: 15px 0; font-size: 14px; color: #7f8c8d;">
+                            Seu palpite:
+                        </div>
+                        
+                        <div class="placares-container">
+                            <div class="time">
+                                <div class="placar-box placar-palpite">${palpiteMandante}</div>
+                            </div>
+                            
+                            <div class="vs">X</div>
+                            
+                            <div class="time">
+                                <div class="placar-box placar-palpite">${palpiteVisitante}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="pontuacao-info">
+                            <div class="pontuacao-header">
+                                <div class="pontuacao-total">${jogo.pontos} ponto${jogo.pontos !== 1 ? 's' : ''}</div>
+                                ${jogo.pd ? '<div class="pd-flag">PD</div>' : ''}
+                            </div>
+                            
+                            ${jogo.acertos.length > 0 ? `
+                                <div class="acertos-list">
+                                    ${jogo.acertos.map(acerto => {
+                                        let classe = '';
+                                        let texto = '';
+                                        switch(acerto) {
+                                            case 'PE': classe = 'acerto-pe'; texto = 'Placar Exato'; break;
+                                            case 'RC': classe = 'acerto-rc'; texto = 'Resultado Correto'; break;
+                                            case 'GM': classe = 'acerto-gm'; texto = 'Gols Mandante'; break;
+                                            case 'GV': classe = 'acerto-gv'; texto = 'Gols Visitante'; break;
+                                            case 'PD': classe = 'acerto-pd'; texto = 'Pontuação Dobrada'; break;
+                                        }
+                                        return `<div class="acerto-item ${classe}">✓ ${texto}</div>`;
+                                    }).join('')}
+                                </div>
+                            ` : '<div style="color: #e74c3c; font-size: 14px;">Sem acertos neste jogo</div>'}
+                        </div>
                     </div>
                 `;
-            } else {
-                html += '<div class="empty-state"><div class="empty-state-icon">⚽</div><p>Nenhum jogo nesta rodada</p></div>';
+                
+                jogosContainer.innerHTML += jogoHTML;
+            });
+            
+            // Atualizar resumo da pontuação
+            const resumoPontuacao = document.getElementById('resumoPontuacao');
+            const estatisticas = dadosRodadaAtual.estatisticas;
+            
+            resumoPontuacao.innerHTML = `
+                <div class="resumo-header">
+                    <h3>📊 Resumo da Pontuação</h3>
+                    <div>Rodada ${rodada.numero}</div>
+                </div>
+                
+                <div class="resumo-grid">
+                    <div class="resumo-item">
+                        <div class="resumo-valor">${dadosRodadaAtual.total}</div>
+                        <div class="resumo-label">PONTOS TOTAIS</div>
+                    </div>
+                    
+                    <div class="resumo-item">
+                        <div class="resumo-valor">${estatisticas.pe}</div>
+                        <div class="resumo-label">PLACAR EXATO</div>
+                    </div>
+                    
+                    <div class="resumo-item">
+                        <div class="resumo-valor">${estatisticas.rc}</div>
+                        <div class="resumo-label">RESULTADO CORRETO</div>
+                    </div>
+                    
+                    <div class="resumo-item">
+                        <div class="resumo-valor">${estatisticas.gm}</div>
+                        <div class="resumo-label">GOLS MANDANTE</div>
+                    </div>
+                    
+                    <div class="resumo-item">
+                        <div class="resumo-valor">${estatisticas.gv}</div>
+                        <div class="resumo-label">GOLS VISITANTE</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Formatar data
+        function formatarData(dataString) {
+            try {
+                const data = new Date(dataString);
+                return data.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch {
+                return dataString;
             }
-
-            content.innerHTML = html;
         }
-
-        // Mostra mensagem de erro
-        function mostrarErro(mensagem) {
-            const content = document.getElementById('content');
-            content.innerHTML = `<div class="error">❌ ${mensagem}</div>`;
+        
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', carregarDadosIniciais);
+        
+        // Se estiver no Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            
+            // Configurar para receber dados do bot
+            Telegram.WebApp.onEvent('webAppDataReceived', function(event) {
+                try {
+                    const dados = JSON.parse(event.data);
+                    console.log('Dados recebidos do bot:', dados);
+                    
+                    if (dados.tipo === 'palpites_usuario_rodada') {
+                        dadosRodadaAtual = dados;
+                        exibirRodada();
+                    }
+                } catch (err) {
+                    console.error('Erro ao processar dados do bot:', err);
+                }
+            });
         }
-
-        // Inicia quando a página carrega
-        window.addEventListener('load', inicializar);
     </script>
 </body>
 </html>
