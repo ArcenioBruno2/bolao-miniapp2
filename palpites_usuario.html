@@ -99,51 +99,20 @@
             background: #f1f5f9;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            flex-direction: column;
+            gap: 12px;
         }
         
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .nav-btn {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #cbd5e0;
-            border-radius: 8px;
-            background: white;
-            color: #4a5568;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-btn:hover:not(:disabled) {
-            border-color: #3498db;
-            color: #3498db;
-        }
-        
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
+        /* Seleção de rodada - FICA EM CIMA */
         .rodada-selector {
-            flex: 1;
+            width: 100%;
             position: relative;
         }
         
         .rodada-selector select {
             width: 100%;
-            padding: 10px 15px;
-            font-size: 14px;
+            padding: 12px 15px;
+            font-size: 15px;
             border: 2px solid #cbd5e0;
             border-radius: 8px;
             background: white;
@@ -157,12 +126,58 @@
             padding-right: 40px;
             text-align: center;
             font-weight: 600;
+            color: #2d3748;
         }
         
         .rodada-selector select:focus {
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
             outline: none;
+        }
+        
+        /* Botões de navegação - FICAM EMBAIXO */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .nav-btn {
+            min-width: 100px;
+            height: 42px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 150px;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            border-color: #3498db;
+            background: #3498db;
+            color: white;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .nav-btn.prev {
+            order: 1;
+        }
+        
+        .nav-btn.next {
+            order: 2;
         }
         
         /* Estatísticas da rodada */
@@ -418,8 +433,9 @@
             }
             
             .nav-btn {
-                width: 36px;
-                height: 36px;
+                min-width: 80px;
+                height: 38px;
+                font-size: 15px;
             }
         }
         
@@ -456,19 +472,14 @@
                 font-size: 12px;
             }
             
-            .nav-section {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
             .nav-buttons {
-                width: 100%;
-                justify-content: space-between;
+                gap: 10px;
             }
             
             .nav-btn {
-                flex: 1;
-                max-width: 45%;
+                min-width: 70px;
+                height: 36px;
+                font-size: 14px;
             }
         }
         
@@ -497,20 +508,19 @@
             </div>
         </div>
         
-        <!-- Navegação de rodadas -->
+        <!-- Navegação de rodadas (NOVA DISPOSIÇÃO) -->
         <div class="nav-section">
-            <div class="nav-buttons">
-                <button class="nav-btn" id="btnAnterior" onclick="navegarRodada(-1)" disabled>←</button>
-            </div>
-            
+            <!-- Listbox EM CIMA -->
             <div class="rodada-selector">
                 <select id="rodadaSelect" onchange="mudarRodada()">
                     <option value="">Carregando...</option>
                 </select>
             </div>
             
+            <!-- Botões EMBAIXO -->
             <div class="nav-buttons">
-                <button class="nav-btn" id="btnProximo" onclick="navegarRodada(1)" disabled>→</button>
+                <button class="nav-btn prev" id="btnAnterior" onclick="navegarRodada(-1)" disabled>← Anterior</button>
+                <button class="nav-btn next" id="btnProximo" onclick="navegarRodada(1)" disabled>Próximo →</button>
             </div>
         </div>
         
@@ -577,6 +587,7 @@
         let rodadaAtualNum = null;
         let rodadaAtualIndex = -1;
         let usuarioId = null;
+        let chatId = null;
         
         // ==============================================
         // INICIALIZAÇÃO
@@ -590,6 +601,14 @@
                 Telegram.WebApp.enableClosingConfirmation();
                 Telegram.WebApp.setBackgroundColor('#667eea');
                 Telegram.WebApp.setHeaderColor('#2c3e50');
+                
+                // Captura informações do usuário do Telegram
+                const tgUser = Telegram.WebApp.initDataUnsafe?.user;
+                if (tgUser) {
+                    chatId = tgUser.id;
+                    console.log('✅ Chat ID capturado:', chatId);
+                }
+                
                 console.log('✅ Telegram WebApp configurado');
             }
             
@@ -1105,10 +1124,13 @@
             // Fecha o WebApp e solicita ao bot
             if (window.Telegram && Telegram.WebApp) {
                 const dataToSend = {
-                    action: 'carregar_rodada',
+                    tipo: 'carregar_rodada_usuario',  // ⭐⭐ CORRIGIDO: 'tipo' em vez de 'action' ⭐⭐
+                    action: 'carregar_rodada',        // ⭐⭐ FALLBACK para compatibilidade ⭐⭐
                     usuario_id: usuarioId,
                     rodada_num: numeroRodada,
-                    timestamp: Date.now()
+                    chat_id: chatId,                  // ⭐⭐ INCLUÍDO: para o bot saber onde responder ⭐⭐
+                    timestamp: Date.now(),
+                    origem: 'webapp_palpites_usuario'
                 };
                 
                 console.log('📤 Enviando dados para o bot:', dataToSend);
@@ -1159,6 +1181,7 @@
             console.log('📍 rodadaAtualNum:', rodadaAtualNum);
             console.log('📍 rodadaAtualIndex:', rodadaAtualIndex);
             console.log('👤 usuarioId:', usuarioId);
+            console.log('💬 chatId:', chatId);
             console.log('🌐 URL completa:', window.location.href);
             console.log('📏 Parâmetro data length:', window.location.search ? new URLSearchParams(window.location.search).get('data')?.length : 'N/A');
             console.log('=======================');
@@ -1239,12 +1262,6 @@
             
             console.log('✅ Teste com dados de exemplo executado');
         };
-        
-        // ==============================================
-        // INICIALIZAÇÃO DE DEBUG (remova em produção)
-        // ==============================================
-        // Descomente a linha abaixo para testar sem dados reais
-        // setTimeout(() => { if (rodadasDisponiveis.length === 0) window.testarComDadosExemplo(); }, 1000);
     </script>
 </body>
 </html>
