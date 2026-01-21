@@ -1002,35 +1002,32 @@
         
         // ⭐⭐ NOVA FUNÇÃO: Solicitar outra rodada ⭐⭐
         function escolherOutraRodada() {
-            console.log('🔄 Solicitando para escolher outra rodada...');
-            
-            // Fecha o WebApp para que o bot possa perguntar novamente
-            if (window.Telegram && Telegram.WebApp) {
-                const dataToSend = {
-                    tipo: 'fechar_para_escolher_nova_rodada',
-                    usuario_id: usuarioId,
-                    rodada_atual: rodadaAtualNum,
-                    timestamp: Date.now()
-                };
-                
-                console.log('📤 Enviando solicitação para fechar:', dataToSend);
-                
-                // Envia dados e fecha
-                Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-                
-                // Aguarda um pouco antes de fechar
-                setTimeout(() => {
-                    Telegram.WebApp.close();
-                }, 300);
-            } else {
-                // Ambiente de desenvolvimento
-                console.log('⚠️ Ambiente de desenvolvimento - simulando fechamento');
-                alert('Para escolher outra rodada, feche esta janela e clique novamente no botão "Ver meus palpites".');
-            }
-        }
+    console.log('🔄 Solicitando para escolher outra rodada...');
+    
+    // Fecha o WebApp para que o bot possa perguntar novamente
+    if (window.Telegram && Telegram.WebApp) {
+        const dataToSend = {
+            'tipo': 'fechar_para_escolher_nova_rodada',  // ⭐⭐ CORRIGIDO: Sem underline extra
+            'usuario_id': usuarioId,
+            'rodada_atual': rodadaAtualNum,
+            'timestamp': Date.now()
+        };
         
-        // ⭐⭐ FUNÇÃO REMOVIDA: Não precisa mais navegar entre rodadas internamente
-        // As funções mudarRodada(), navegarRodada(), solicitarRodadaAoBot() foram REMOVIDAS
+        console.log('📤 Enviando solicitação para fechar:', dataToSend);
+        
+        // Envia dados e fecha
+        Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+        
+        // Aguarda um pouco antes de fechar
+        setTimeout(() => {
+            Telegram.WebApp.close();
+        }, 300);
+    } else {
+        // Ambiente de desenvolvimento
+        console.log('⚠️ Ambiente de desenvolvimento - simulando fechamento');
+        alert('Para escolher outra rodada, feche esta janela e clique novamente no botão "Ver meus palpites".');
+    }
+}
         
         function mostrarErro(mensagem) {
             console.error('❌ ERRO:', mensagem);
