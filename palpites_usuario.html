@@ -93,36 +93,73 @@
             color: #718096;
         }
         
-        /* Seletor de rodada */
-        .select-section {
+        /* Navegação de rodadas */
+        .nav-section {
             padding: 15px 20px;
             background: #f1f5f9;
             border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
         
-        .custom-select {
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
+            background: white;
+            color: #4a5568;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .rodada-selector {
+            flex: 1;
             position: relative;
-            max-width: 100%;
         }
         
-        .custom-select select {
+        .rodada-selector select {
             width: 100%;
-            padding: 12px 18px;
+            padding: 10px 15px;
             font-size: 14px;
             border: 2px solid #cbd5e0;
-            border-radius: 10px;
+            border-radius: 8px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 15px center;
+            background-position: right 12px center;
             background-size: 16px;
-            padding-right: 45px;
+            padding-right: 40px;
+            text-align: center;
+            font-weight: 600;
         }
         
-        .custom-select select:focus {
+        .rodada-selector select:focus {
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
             outline: none;
@@ -194,7 +231,7 @@
             gap: 16px;
         }
         
-        /* Card de jogo compacto */
+        /* Card de jogo - NORMAL */
         .game-card {
             background: white;
             border: 1px solid #e2e8f0;
@@ -202,6 +239,13 @@
             padding: 15px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
             position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        /* Card de jogo - COM PD (borda vermelha) */
+        .game-card.pd-card {
+            border: 2px solid #e74c3c;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
         }
         
         .pd-badge {
@@ -372,6 +416,11 @@
                 height: 28px;
                 font-size: 14px;
             }
+            
+            .nav-btn {
+                width: 36px;
+                height: 36px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -379,7 +428,7 @@
                 border-radius: 12px;
             }
             
-            .header, .user-info, .select-section, .stats-section, .games-section {
+            .header, .user-info, .nav-section, .stats-section, .games-section {
                 padding: 12px;
             }
             
@@ -406,25 +455,26 @@
             .points-line {
                 font-size: 12px;
             }
+            
+            .nav-section {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .nav-btn {
+                flex: 1;
+                max-width: 45%;
+            }
         }
         
         /* Utilitários */
-        .emoji {
-            font-size: 14px;
-            margin-right: 4px;
-            vertical-align: middle;
-        }
-        
         .hidden {
             display: none;
-        }
-        
-        .x-separator {
-            text-align: center;
-            font-weight: 700;
-            color: #718096;
-            font-size: 14px;
-            padding: 6px 0;
         }
     </style>
 </head>
@@ -447,12 +497,20 @@
             </div>
         </div>
         
-        <!-- Seletor de rodada -->
-        <div class="select-section">
-            <div class="custom-select">
+        <!-- Navegação de rodadas -->
+        <div class="nav-section">
+            <div class="nav-buttons">
+                <button class="nav-btn" id="btnAnterior" onclick="navegarRodada(-1)" disabled>←</button>
+            </div>
+            
+            <div class="rodada-selector">
                 <select id="rodadaSelect" onchange="mudarRodada()">
-                    <option value="">Carregando rodadas...</option>
+                    <option value="">Carregando...</option>
                 </select>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-btn" id="btnProximo" onclick="navegarRodada(1)" disabled>→</button>
             </div>
         </div>
         
@@ -460,16 +518,16 @@
         <div class="stats-section" id="rodadaResumo" style="display: none;">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <span class="stat-value" id="statJUB">0</span>
-                    <span class="stat-label">JUB</span>
+                    <span class="stat-value" id="statJtf">0</span>
+                    <span class="stat-label">Quantidade de jogos na Rodada</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="statJT">0</span>
-                    <span class="stat-label">JT</span>
+                    <span class="stat-value" id="statJub">0</span>
+                    <span class="stat-label">Jogos Usados</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statJP">0</span>
-                    <span class="stat-label">JP</span>
+                    <span class="stat-label">Jogos Palpitados</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statPontos">0</span>
@@ -477,11 +535,11 @@
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statPE">0</span>
-                    <span class="stat-label">PE</span>
+                    <span class="stat-label">Placar Exato</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statRC">0</span>
-                    <span class="stat-label">RC</span>
+                    <span class="stat-label">Resultado Correto</span>
                 </div>
             </div>
         </div>
@@ -490,7 +548,7 @@
         <div class="games-section">
             <div class="games-header">
                 <h2 id="gamesTitle">Jogos da Rodada</h2>
-                <div class="games-counter" id="contadorJogos">0/0/0 (JP/JT/JUB)</div>
+                <div class="games-counter" id="contadorJogos">0/0 (JT/JUB)</div>
             </div>
             
             <!-- Loading -->
@@ -511,8 +569,9 @@
         // Variáveis globais
         let appData = {};
         let rodadasDisponiveis = [];
-        let rodadasDados = {};
         let rodadaAtualNum = null;
+        let rodadaAtualIndex = -1;
+        let usuarioId = null;
         
         // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
@@ -569,10 +628,10 @@
                     usuario: dados.u,
                     totalRodadas: dados.rd ? dados.rd.length : 0,
                     rodadaAtual: dados.ra,
-                    rodadaAtualDados: dados.rdc ? Object.keys(dados.rdc) : 'Nenhum'
                 });
                 
                 appData = dados;
+                usuarioId = dados.u?.id;
                 
                 // Preenche informações do usuário
                 document.getElementById('userName').textContent = appData.u?.n || 'Usuário';
@@ -584,29 +643,24 @@
                     document.getElementById('userAvatar').textContent = appData.u.n.charAt(0).toUpperCase();
                 }
                 
-                // Armazena dados das rodadas
+                // Armazena lista de rodadas disponíveis
                 rodadasDisponiveis = appData.rd || [];
-                rodadasDados = {};
                 
-                // Primeira rodada já vem completa
-                if (appData.ra && appData.rdc) {
-                    rodadasDados[appData.ra] = appData.rdc;
-                    rodadaAtualNum = appData.ra;
-                    console.log(`✅ Rodada atual: ${rodadaAtualNum}`);
+                // Define rodada atual (primeira na lista)
+                if (rodadasDisponiveis.length > 0) {
+                    rodadaAtualNum = appData.ra || rodadasDisponiveis[0].n;
+                    rodadaAtualIndex = rodadasDisponiveis.findIndex(r => r.n === rodadaAtualNum);
+                    
+                    console.log(`✅ Rodada atual: ${rodadaAtualNum} (índice: ${rodadaAtualIndex})`);
+                    
+                    // Popula o select com os números das rodadas
+                    popularSelectRodadas();
+                    
+                    // Carrega a rodada atual
+                    carregarRodadaAtual();
+                } else {
+                    mostrarErro('Nenhuma rodada disponível');
                 }
-                
-                // Popula o select com as rodadas
-                popularSelectRodadas();
-                
-                // Exibe a primeira rodada
-                if (rodadaAtualNum) {
-                    selecionarRodada(rodadaAtualNum);
-                } else if (rodadasDisponiveis.length > 0) {
-                    selecionarRodada(rodadasDisponiveis[0].n);
-                }
-                
-                // Esconde loading
-                document.getElementById('loading').style.display = 'none';
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
@@ -647,32 +701,10 @@
             const select = document.getElementById('rodadaSelect');
             select.innerHTML = '';
             
-            if (rodadasDisponiveis.length === 0) {
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Nenhuma rodada disponível';
-                select.appendChild(option);
-                return;
-            }
-            
             rodadasDisponiveis.forEach(rodada => {
                 const option = document.createElement('option');
                 option.value = rodada.n;
-                
-                // Formato: Rodada X • JP/JT/JUB • Y pontos
-                let texto = `Rodada ${rodada.n} • ${rodada.jp || 0}/${rodada.jt || 0}/${rodada.jub || 0}`;
-                
-                // Adiciona pontos se disponível
-                if (rodada.p !== undefined) {
-                    texto += ` • ${rodada.p} pontos`;
-                }
-                
-                // Status da rodada
-                if (rodada.s === 'fechada') {
-                    texto += ' 🔒';
-                }
-                
-                option.textContent = texto;
+                option.textContent = `Rodada ${rodada.n}`;
                 select.appendChild(option);
             });
             
@@ -682,42 +714,45 @@
             }
         }
         
-        function selecionarRodada(numeroRodada) {
-            console.log(`Selecionando rodada ${numeroRodada}...`);
+        function carregarRodadaAtual() {
+            console.log(`Carregando rodada ${rodadaAtualNum}...`);
             
-            const rodadaData = rodadasDados[numeroRodada];
-            
-            if (!rodadaData) {
-                carregarRodadaDoBot(numeroRodada);
-                return;
+            // Se temos dados da rodada atual no appData, usa eles
+            if (appData.ra === rodadaAtualNum && appData.rdc) {
+                exibirRodada(appData.rdc);
+            } else {
+                // Caso contrário, fecha e pede ao bot
+                solicitarRodadaAoBot(rodadaAtualNum);
             }
-            
-            rodadaAtualNum = numeroRodada;
-            document.getElementById('rodadaSelect').value = numeroRodada;
-            exibirResumoRodada(rodadaData);
-            exibirJogosRodada(rodadaData);
         }
         
-        function exibirResumoRodada(rodada) {
-            const resumo = document.getElementById('rodadaResumo');
-            resumo.style.display = 'block';
+        function exibirRodada(rodada) {
+            // Esconde loading
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
             
             // Atualiza estatísticas
-            document.getElementById('statJUB').textContent = rodada.jub || 0;
-            document.getElementById('statJT').textContent = rodada.jt || 0;
+            document.getElementById('rodadaResumo').style.display = 'block';
+            document.getElementById('statJtf').textContent = rodada.jub || 0;
+            document.getElementById('statJub').textContent = rodada.jt || 0;
             document.getElementById('statJP').textContent = rodada.jp || 0;
             document.getElementById('statPontos').textContent = rodada.tp || 0;
             document.getElementById('statPE').textContent = rodada.est?.pe || 0;
             document.getElementById('statRC').textContent = rodada.est?.rc || 0;
             
-            // Atualiza título
-            const jogosPalpitados = rodada.jp || 0;
+            // Atualiza título e contador
             const jogosDistintos = rodada.jt || 0;
             const jogosBanco = rodada.jub || 0;
             document.getElementById('contadorJogos').textContent = 
-                `${jogosPalpitados}/${jogosDistintos}/${jogosBanco} (JP/JT/JUB)`;
+                `${jogosDistintos}/${jogosBanco} (JT/JUB)`;
             
             document.getElementById('gamesTitle').textContent = `Jogos da Rodada ${rodada.num}`;
+            
+            // Atualiza navegação
+            atualizarBotoesNavegacao();
+            
+            // Exibe jogos
+            exibirJogosRodada(rodada);
         }
         
         function exibirJogosRodada(rodada) {
@@ -745,7 +780,7 @@
             // Cria cards para cada jogo
             jogos.forEach((jogo, index) => {
                 const div = document.createElement('div');
-                div.className = 'game-card';
+                div.className = `game-card ${jogo.pd ? 'pd-card' : ''}`;
                 
                 // Extrai valores dos placares
                 let placarReal = jogo.pr || '? x ?';
@@ -887,34 +922,79 @@
             return html;
         }
         
+        function atualizarBotoesNavegacao() {
+            const btnAnterior = document.getElementById('btnAnterior');
+            const btnProximo = document.getElementById('btnProximo');
+            
+            // Atualiza estado dos botões
+            btnAnterior.disabled = rodadaAtualIndex <= 0;
+            btnProximo.disabled = rodadaAtualIndex >= rodadasDisponiveis.length - 1;
+            
+            // Atualiza select
+            document.getElementById('rodadaSelect').value = rodadaAtualNum;
+        }
+        
+        function navegarRodada(direcao) {
+            const novoIndex = rodadaAtualIndex + direcao;
+            
+            if (novoIndex >= 0 && novoIndex < rodadasDisponiveis.length) {
+                const novaRodada = rodadasDisponiveis[novoIndex];
+                
+                // Atualiza variáveis
+                rodadaAtualIndex = novoIndex;
+                rodadaAtualNum = novaRodada.n;
+                
+                // Mostra loading
+                document.getElementById('loading').style.display = 'flex';
+                document.getElementById('jogosLista').innerHTML = '';
+                
+                // Solicita nova rodada ao bot
+                solicitarRodadaAoBot(rodadaAtualNum);
+            }
+        }
+        
         function mudarRodada() {
             const select = document.getElementById('rodadaSelect');
             const numeroRodada = parseInt(select.value);
             
-            if (!isNaN(numeroRodada)) {
-                selecionarRodada(numeroRodada);
+            if (!isNaN(numeroRodada) && numeroRodada !== rodadaAtualNum) {
+                const index = rodadasDisponiveis.findIndex(r => r.n === numeroRodada);
+                
+                if (index !== -1) {
+                    rodadaAtualIndex = index;
+                    rodadaAtualNum = numeroRodada;
+                    
+                    // Mostra loading
+                    document.getElementById('loading').style.display = 'flex';
+                    document.getElementById('jogosLista').innerHTML = '';
+                    
+                    // Solicita nova rodada ao bot
+                    solicitarRodadaAoBot(rodadaAtualNum);
+                }
             }
         }
         
-        function carregarRodadaDoBot(numeroRodada) {
-            // Mostra loading
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('jogosLista').innerHTML = '';
+        function solicitarRodadaAoBot(numeroRodada) {
+            console.log(`Solicitando rodada ${numeroRodada} ao bot...`);
             
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('jogosLista').innerHTML = `
-                    <div class="game-card" style="text-align: center;">
-                        <div style="font-size: 40px; margin-bottom: 10px;">⏳</div>
-                        <div style="font-size: 14px; font-weight: 600; color: #4a5568; margin-bottom: 6px;">
-                            Rodada ${numeroRodada}
-                        </div>
-                        <div style="color: #718096; margin-bottom: 10px; font-size: 12px;">
-                            Esta rodada será carregada em uma próxima atualização.
-                        </div>
-                    </div>
-                `;
-            }, 1000);
+            // Fecha o WebApp e solicita ao bot
+            if (window.Telegram && Telegram.WebApp) {
+                // Envia dados para o bot via Telegram WebApp
+                const dataToSend = {
+                    action: 'carregar_rodada',
+                    usuario_id: usuarioId,
+                    rodada_num: numeroRodada,
+                    rodadas_disponiveis: rodadasDisponiveis.map(r => r.n)
+                };
+                
+                Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+                Telegram.WebApp.close();
+            } else {
+                // Fallback para ambiente de desenvolvimento
+                setTimeout(() => {
+                    mostrarErro('Em ambiente de desenvolvimento, não é possível carregar nova rodada.');
+                }, 500);
+            }
         }
         
         function mostrarErro(mensagem) {
@@ -934,8 +1014,9 @@
             console.log('=== DEBUG ===');
             console.log('appData:', appData);
             console.log('rodadasDisponiveis:', rodadasDisponiveis);
-            console.log('rodadasDados:', rodadasDados);
             console.log('rodadaAtualNum:', rodadaAtualNum);
+            console.log('rodadaAtualIndex:', rodadaAtualIndex);
+            console.log('usuarioId:', usuarioId);
             console.log('=============');
         };
     </script>
