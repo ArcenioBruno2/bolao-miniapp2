@@ -165,7 +165,7 @@
             outline: none;
         }
         
-        /* Estatísticas da rodada */
+        /* Estatísticas da rodada - ATUALIZADO */
         .stats-section {
             padding: 15px 20px;
             background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
@@ -476,6 +476,14 @@
         .hidden {
             display: none;
         }
+        
+        /* ⭐⭐ NOVO: Estilo para porcentagens ⭐⭐ */
+        .stat-percent {
+            display: block;
+            font-size: 10px;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
@@ -514,20 +522,24 @@
             </div>
         </div>
         
-        <!-- Estatísticas da rodada -->
+        <!-- Estatísticas da rodada - ATUALIZADO -->
         <div class="stats-section" id="rodadaResumo" style="display: none;">
             <div class="stats-grid">
                 <div class="stat-card">
-                    <span class="stat-value" id="statJtf">0</span>
-                    <span class="stat-label">Quantidade de jogos na Rodada</span>
+                    <span class="stat-value" id="statTotalRodada">0</span>
+                    <span class="stat-label">Total da Rodada</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="statJub">0</span>
-                    <span class="stat-label">Jogos Usados</span>
+                    <span class="stat-value" id="statUsadosAdm">0</span>
+                    <span class="stat-label">Usados pelo ADM</span>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-value" id="statJP">0</span>
-                    <span class="stat-label">Jogos Palpitados</span>
+                    <span class="stat-value" id="statMeusPalpites">0</span>
+                    <span class="stat-label">Meus Palpites</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="statComPlacar">0</span>
+                    <span class="stat-label">Com Placar Real</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statPontos">0</span>
@@ -537,10 +549,6 @@
                     <span class="stat-value" id="statPE">0</span>
                     <span class="stat-label">Placar Exato</span>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-value" id="statRC">0</span>
-                    <span class="stat-label">Resultado Correto</span>
-                </div>
             </div>
         </div>
         
@@ -548,7 +556,10 @@
         <div class="games-section">
             <div class="games-header">
                 <h2 id="gamesTitle">Jogos da Rodada</h2>
-                <div class="games-counter" id="contadorJogos">0/0 (JT/JUB)</div>
+                <div class="games-counter" id="contadorJogos">
+                    <span id="contadorPalpites">0</span>/<span id="contadorUsados">0</span>/<span id="contadorTotal">0</span>
+                    <small style="color: #718096; font-size: 11px; margin-left: 5px;">(meus/usados/total)</small>
+                </div>
             </div>
             
             <!-- Loading -->
@@ -619,41 +630,67 @@
                 }
                 
                 // Valida dados
-                if (!dados || !dados.t) {
+                if (!dados || (!dados.t && !dados.tipo)) {
                     throw new Error('Formato de dados inválido');
                 }
                 
-                console.log('Estrutura dos dados:', {
-                    tipo: dados.t,
-                    usuario: dados.u,
-                    totalRodadas: dados.rd ? dados.rd.length : 0,
-                    rodadaAtual: dados.ra,
-                });
-                
                 appData = dados;
-                usuarioId = dados.u?.id;
+                usuarioId = dados.usuario?.id || dados.u?.id;
                 
-                // Preenche informações do usuário
-                document.getElementById('userName').textContent = appData.u?.n || 'Usuário';
-                document.getElementById('userId').textContent = `ID: ${appData.u?.id || '--'} | Telegram: ${appData.u?.tid || '--'}`;
-                document.getElementById('subtitle').textContent = `Usuário: ${appData.u?.n || '--'}`;
+                // ⭐⭐ DETECTA ESTRUTURA DE DADOS ⭐⭐
+                console.log('📊 ESTRUTURA DOS DADOS RECEBIDOS:');
+                console.log('- Tipo:', dados.tipo || dados.t);
+                console.log('- Usuário:', dados.usuario || dados.u);
+                console.log('- Total de rodadas:', (dados.rodadas || dados.rd || []).length);
+                console.log('- Rodada ativa:', dados.rodada_ativa || dados.ra);
                 
-                // Avatar com primeira letra do nome
-                if (appData.u?.n) {
-                    document.getElementById('userAvatar').textContent = appData.u.n.charAt(0).toUpperCase();
+                // Normaliza estrutura para facilitar acesso
+                if (dados.tipo) {
+                    // Nova estrutura (com nomes completos)
+                    rodadasDisponiveis = dados.rodadas || [];
+                    if (dados.rodada_detalhada) {
+                        appData.rdc = dados.rodada_detalhada;
+                    }
+                } else {
+                    // Estrutura antiga (abreviada)
+                    rodadasDisponiveis = dados.rd || [];
+                    appData.rdc = dados.rdc;
                 }
                 
-                // Armazena lista de rodadas disponíveis
-                rodadasDisponiveis = appData.rd || [];
+                // Preenche informações do usuário
+                const usuario = dados.usuario || dados.u || {};
+                document.getElementById('userName').textContent = usuario.nome || usuario.n || 'Usuário';
+                document.getElementById('userId').textContent = `ID: ${usuario.id || '--'} | Telegram: ${usuario.telegram_id || usuario.tid || '--'}`;
+                document.getElementById('subtitle').textContent = `Usuário: ${usuario.nome || usuario.n || '--'}`;
                 
-                // Define rodada atual (primeira na lista)
+                // Avatar com primeira letra do nome
+                if (usuario.nome || usuario.n) {
+                    const nomeCompleto = usuario.nome || usuario.n;
+                    document.getElementById('userAvatar').textContent = nomeCompleto.charAt(0).toUpperCase();
+                }
+                
+                // Define rodada atual
                 if (rodadasDisponiveis.length > 0) {
-                    rodadaAtualNum = appData.ra || rodadasDisponiveis[0].n;
+                    rodadaAtualNum = dados.rodada_ativa || dados.ra || rodadasDisponiveis[0].n;
                     rodadaAtualIndex = rodadasDisponiveis.findIndex(r => r.n === rodadaAtualNum);
                     
                     console.log(`✅ Rodada atual: ${rodadaAtualNum} (índice: ${rodadaAtualIndex})`);
                     
-                    // Popula o select com os números das rodadas
+                    // Log detalhado da primeira rodada
+                    if (rodadasDisponiveis[0]) {
+                        const primeiraRodada = rodadasDisponiveis[0];
+                        console.log('📋 PRIMEIRA RODADA - DADOS:', {
+                            numero: primeiraRodada.n,
+                            pontos: primeiraRodada.p,
+                            meusPalpites: primeiraRodada.j,    // Jogos que palpitei
+                            usadosAdm: primeiraRodada.u,       // Jogos usados pelo ADM
+                            totalRodada: primeiraRodada.t,     // Total da rodada (10)
+                            comPlacar: primeiraRodada.c,       // Com placar real
+                            status: primeiraRodada.s
+                        });
+                    }
+                    
+                    // Popula o select
                     popularSelectRodadas();
                     
                     // Carrega a rodada atual
@@ -704,7 +741,18 @@
             rodadasDisponiveis.forEach(rodada => {
                 const option = document.createElement('option');
                 option.value = rodada.n;
-                option.textContent = `Rodada ${rodada.n}`;
+                
+                // Formata com dados completos
+                const pontos = rodada.p || 0;
+                const meusPalpites = rodada.j || 0;
+                const usadosAdm = rodada.u || 0;
+                const totalRodada = rodada.t || 0;
+                
+                option.textContent = `Rodada ${rodada.n} - ${pontos} pontos`;
+                option.dataset.total = totalRodada;
+                option.dataset.usados = usadosAdm;
+                option.dataset.palpites = meusPalpites;
+                
                 select.appendChild(option);
             });
             
@@ -727,26 +775,55 @@
         }
         
         function exibirRodada(rodada) {
+            console.log('📦 EXIBINDO RODADA:', rodada);
+            
             // Esconde loading
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             
+            // ⭐⭐ NOVA ESTRUTURA DE DADOS ⭐⭐
+            // Tenta ambos os formatos (nova e antiga estrutura)
+            const totalRodada = rodada.jtf || rodada.t || 0;
+            const usadosAdm = rodada.jub || rodada.u || 0;
+            const meusPalpites = rodada.jp || rodada.j || 0;
+            const comPlacar = rodada.jcp || rodada.c || 0;
+            const pontos = rodada.tp || rodada.p || 0;
+            const placarExato = rodada.est?.pe || 0;
+            
+            // Calcula porcentagens
+            const percentUsados = totalRodada > 0 ? Math.round((usadosAdm / totalRodada) * 100) : 0;
+            const percentPalpites = usadosAdm > 0 ? Math.round((meusPalpites / usadosAdm) * 100) : 0;
+            const percentPlacar = meusPalpites > 0 ? Math.round((comPlacar / meusPalpites) * 100) : 0;
+            
+            console.log('📊 ESTATÍSTICAS CALCULADAS:', {
+                totalRodada,
+                usadosAdm,
+                meusPalpites,
+                comPlacar,
+                pontos,
+                placarExato,
+                percentUsados: `${percentUsados}%`,
+                percentPalpites: `${percentPalpites}%`,
+                percentPlacar: `${percentPlacar}%`
+            });
+            
             // Atualiza estatísticas
             document.getElementById('rodadaResumo').style.display = 'block';
-            document.getElementById('statJtf').textContent = rodada.jub || 0;
-            document.getElementById('statJub').textContent = rodada.jt || 0;
-            document.getElementById('statJP').textContent = rodada.jp || 0;
-            document.getElementById('statPontos').textContent = rodada.tp || 0;
-            document.getElementById('statPE').textContent = rodada.est?.pe || 0;
-            document.getElementById('statRC').textContent = rodada.est?.rc || 0;
+            document.getElementById('statTotalRodada').textContent = totalRodada;
+            document.getElementById('statUsadosAdm').textContent = usadosAdm;
+            document.getElementById('statMeusPalpites').textContent = meusPalpites;
+            document.getElementById('statComPlacar').textContent = comPlacar;
+            document.getElementById('statPontos').textContent = pontos;
+            document.getElementById('statPE').textContent = placarExato;
             
-            // Atualiza título e contador
-            const jogosDistintos = rodada.jt || 0;
-            const jogosBanco = rodada.jub || 0;
-            document.getElementById('contadorJogos').textContent = 
-                `${jogosDistintos}/${jogosBanco} (JT/JUB)`;
+            // Atualiza contador de jogos (meus/usados/total)
+            document.getElementById('contadorPalpites').textContent = meusPalpites;
+            document.getElementById('contadorUsados').textContent = usadosAdm;
+            document.getElementById('contadorTotal').textContent = totalRodada;
             
-            document.getElementById('gamesTitle').textContent = `Jogos da Rodada ${rodada.num}`;
+            // Atualiza título
+            const rodadaNum = rodada.num || rodada.n || rodadaAtualNum;
+            document.getElementById('gamesTitle').textContent = `Jogos da Rodada ${rodadaNum}`;
             
             // Atualiza navegação
             atualizarBotoesNavegacao();
@@ -799,7 +876,7 @@
                     palpiteVisitante = '0';
                 }
                 
-                // Nomes dos times
+                // Nomes dos times (ambos formatos)
                 const timeMandante = jogo.m || jogo.mandante || 'Time Casa';
                 const timeVisitante = jogo.v || jogo.visitante || 'Time Visitante';
                 
