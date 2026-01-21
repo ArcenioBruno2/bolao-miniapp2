@@ -1058,6 +1058,7 @@
                 // Mostra loading
                 document.getElementById('loading').style.display = 'flex';
                 document.getElementById('jogosLista').innerHTML = '';
+                document.getElementById('rodadaResumo').style.display = 'none';
                 
                 // Solicita nova rodada ao bot
                 solicitarRodadaAoBot(rodadaAtualNum);
@@ -1080,6 +1081,7 @@
                     // Mostra loading
                     document.getElementById('loading').style.display = 'flex';
                     document.getElementById('jogosLista').innerHTML = '';
+                    document.getElementById('rodadaResumo').style.display = 'none';
                     
                     // Solicita nova rodada ao bot
                     solicitarRodadaAoBot(rodadaAtualNum);
@@ -1089,6 +1091,16 @@
         
         function solicitarRodadaAoBot(numeroRodada) {
             console.log(`📡 Solicitando rodada ${numeroRodada} ao bot...`);
+            
+            // Mostra mensagem de carregamento
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').innerHTML = `
+                <div class="loading-spinner"></div>
+                <div>Carregando rodada ${numeroRodada}...</div>
+                <div style="font-size: 12px; color: #718096; margin-top: 10px;">
+                    Aguarde enquanto preparamos os dados da rodada ${numeroRodada}
+                </div>
+            `;
             
             // Fecha o WebApp e solicita ao bot
             if (window.Telegram && Telegram.WebApp) {
@@ -1101,14 +1113,17 @@
                 
                 console.log('📤 Enviando dados para o bot:', dataToSend);
                 
+                // Envia os dados para o bot
                 Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-                Telegram.WebApp.close();
+                
+                // Espera um pouco antes de fechar para garantir que os dados foram enviados
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 500);
             } else {
                 // Ambiente de desenvolvimento
                 console.log('⚠️ Ambiente de desenvolvimento - simulando solicitação');
-                setTimeout(() => {
-                    mostrarErro('Em ambiente de desenvolvimento, é necessário solicitar nova rodada diretamente ao bot.');
-                }, 1000);
+                mostrarErro('Em ambiente de desenvolvimento, é necessário solicitar nova rodada diretamente ao bot.');
             }
         }
         
