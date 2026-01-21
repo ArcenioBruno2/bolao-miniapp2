@@ -103,7 +103,7 @@
             gap: 12px;
         }
         
-        /* Seleção de rodada - FICA EM CIMA */
+        /* Seleção de rodada */
         .rodada-selector {
             width: 100%;
             position: relative;
@@ -135,7 +135,7 @@
             outline: none;
         }
         
-        /* Botões de navegação - FICAM EMBAIXO */
+        /* Botões de navegação */
         .nav-buttons {
             display: flex;
             justify-content: center;
@@ -170,14 +170,6 @@
         .nav-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-        
-        .nav-btn.prev {
-            order: 1;
-        }
-        
-        .nav-btn.next {
-            order: 2;
         }
         
         /* Estatísticas da rodada */
@@ -246,7 +238,7 @@
             gap: 16px;
         }
         
-        /* Card de jogo - NORMAL */
+        /* Card de jogo */
         .game-card {
             background: white;
             border: 1px solid #e2e8f0;
@@ -257,7 +249,6 @@
             transition: all 0.3s ease;
         }
         
-        /* Card de jogo - COM PD (borda vermelha) */
         .game-card.pd-card {
             border: 2px solid #e74c3c;
             box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
@@ -315,7 +306,7 @@
             color: #d35400;
         }
         
-        /* Legenda dos placares */
+        /* Legenda */
         .score-legend {
             display: grid;
             grid-template-columns: 40% 30% 30%;
@@ -508,7 +499,7 @@
             </div>
         </div>
         
-        <!-- Navegação de rodadas (NOVA DISPOSIÇÃO) -->
+        <!-- Navegação de rodadas -->
         <div class="nav-section">
             <!-- Listbox EM CIMA -->
             <div class="rodada-selector">
@@ -583,11 +574,13 @@
         // VARIÁVEIS GLOBAIS
         // ==============================================
         let appData = {};
-        let rodadasDisponiveis = [];
+        let rodadasDisponiveis = [];      // APENAS METADADOS
+        let rodadaDetalhada = null;       // DADOS COMPLETOS DA RODADA ATUAL (se disponíveis)
         let rodadaAtualNum = null;
         let rodadaAtualIndex = -1;
         let usuarioId = null;
         let chatId = null;
+        let modoLeve = true;              // Indica se estamos em modo leve
         
         // ==============================================
         // INICIALIZAÇÃO
@@ -638,9 +631,8 @@
                 let dados = null;
                 let metodoUsado = '';
                 
-                // Método 1: Base64 normal (mais comum)
+                // Método 1: Base64 normal
                 try {
-                    // Primeiro tenta base64 normal
                     const jsonString = atob(dataParam);
                     dados = JSON.parse(jsonString);
                     metodoUsado = 'Base64 normal';
@@ -648,123 +640,56 @@
                 } catch (erro1) {
                     console.log('❌ Falha com Base64 normal:', erro1.message);
                     
-                    // Método 2: URL-safe Base64 (Telegram)
+                    // Método 2: URL-safe Base64 + Gzip
                     try {
                         const safeBase64 = dataParam
                             .replace(/\-/g, '+')
                             .replace(/\_/g, '/')
                             .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
                         
-                        const jsonString = atob(safeBase64);
-                        dados = JSON.parse(jsonString);
-                        metodoUsado = 'URL-safe Base64';
-                        console.log('✅ Sucesso com URL-safe Base64');
-                    } catch (erro2) {
-                        console.log('❌ Falha com URL-safe Base64:', erro2.message);
-                        
-                        // Método 3: Gzip (se disponível)
-                        if (typeof pako !== 'undefined') {
-                            try {
-                                const safeBase64 = dataParam
-                                    .replace(/\-/g, '+')
-                                    .replace(/\_/g, '/')
-                                    .padEnd(dataParam.length + (4 - dataParam.length % 4) % 4, '=');
-                                
-                                const binaryString = atob(safeBase64);
-                                const bytes = new Uint8Array(binaryString.length);
-                                for (let i = 0; i < binaryString.length; i++) {
-                                    bytes[i] = binaryString.charCodeAt(i);
-                                }
-                                
-                                const decompressed = pako.inflate(bytes, { to: 'string' });
-                                dados = JSON.parse(decompressed);
-                                metodoUsado = 'Gzip decompress';
-                                console.log('✅ Sucesso com Gzip decompress');
-                            } catch (erro3) {
-                                console.log('❌ Falha com Gzip:', erro3.message);
-                            }
+                        const binaryString = atob(safeBase64);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
                         }
+                        
+                        const decompressed = pako.inflate(bytes, { to: 'string' });
+                        dados = JSON.parse(decompressed);
+                        metodoUsado = 'Gzip decompress';
+                        console.log('✅ Sucesso com Gzip decompress');
+                    } catch (erro2) {
+                        console.log('❌ Falha com Gzip:', erro2.message);
+                        throw new Error('Não foi possível decodificar os dados');
                     }
                 }
                 
-                // 3. VERIFICA SE CONSEGUIU DECODIFICAR
-                if (!dados) {
-                    throw new Error('Não foi possível decodificar os dados. Métodos tentados: Base64, URL-safe, Gzip');
-                }
-                
                 console.log(`🎯 Dados carregados via: ${metodoUsado}`);
-                console.log('📊 Estrutura completa dos dados:', dados);
+                console.log('📊 Tipo de dados:', dados.tipo);
                 
-                // 4. VERIFICA ESTRUTURA BÁSICA
-                if (typeof dados !== 'object') {
-                    throw new Error('Dados não são um objeto JSON válido');
-                }
-                
-                // 5. DETECTA FORMATO DOS DADOS
-                // Formato 1: Novo (nomes completos)
-                // Formato 2: Antigo (abreviado)
-                let formato = '';
-                
-                if (dados.tipo || dados.usuario) {
-                    formato = 'novo';
-                    console.log('📝 Formato detectado: NOVO (nomes completos)');
-                } else if (dados.t || dados.u) {
-                    formato = 'antigo';
-                    console.log('📝 Formato detectado: ANTIGO (abreviado)');
-                } else {
-                    throw new Error('Formato de dados não reconhecido');
-                }
-                
-                // 6. NORMALIZA OS DADOS
+                // 3. SALVA DADOS GERAIS
                 appData = dados;
+                rodadasDisponiveis = dados.rodadas || [];
+                usuarioId = dados.usuario?.id;
+                rodadaAtualNum = dados.rodada_ativa;
+                modoLeve = dados.tipo === 'palpites_usuario_leve' || !dados.rodada_detalhada;
                 
-                // Normaliza informações do usuário
-                const usuario = formato === 'novo' ? dados.usuario : dados.u;
-                if (!usuario) {
-                    throw new Error('Dados não contêm informações do usuário');
-                }
+                console.log(`📋 Total de rodadas: ${rodadasDisponiveis.length}`);
+                console.log(`📊 Modo: ${modoLeve ? 'LEVE' : 'COMPLETO'}`);
                 
-                usuarioId = usuario.id;
-                
-                // Preenche informações do usuário
-                const nomeUsuario = usuario.nome || usuario.n || 'Usuário';
-                const telegramId = usuario.telegram_id || usuario.tid || '--';
+                // 4. PREENCHE INFORMAÇÕES DO USUÁRIO
+                const nomeUsuario = dados.usuario?.nome || 'Usuário';
+                const telegramId = dados.usuario?.telegram_id || '--';
                 
                 document.getElementById('userName').textContent = nomeUsuario;
                 document.getElementById('userId').textContent = `ID: ${usuarioId} | Telegram: ${telegramId}`;
                 document.getElementById('subtitle').textContent = `Usuário: ${nomeUsuario}`;
                 
-                // Avatar
                 if (nomeUsuario && nomeUsuario !== 'Usuário') {
                     document.getElementById('userAvatar').textContent = nomeUsuario.charAt(0).toUpperCase();
                 }
                 
-                // 7. NORMALIZA RODADAS DISPONÍVEIS
-                rodadasDisponiveis = formato === 'novo' ? dados.rodadas : dados.rd;
-                
-                if (!rodadasDisponiveis || !Array.isArray(rodadasDisponiveis)) {
-                    throw new Error('Dados não contêm lista de rodadas');
-                }
-                
-                console.log(`📋 Total de rodadas: ${rodadasDisponiveis.length}`);
-                
-                // 8. NORMALIZA RODADA DETALHADA
-                if (formato === 'novo') {
-                    appData.rdc = dados.rodada_detalhada;
-                    rodadaAtualNum = dados.rodada_ativa;
-                } else {
-                    appData.rdc = dados.rdc;
-                    rodadaAtualNum = dados.ra;
-                }
-                
-                // Se não tem rodada ativa definida, usa a primeira
-                if (!rodadaAtualNum && rodadasDisponiveis.length > 0) {
-                    rodadaAtualNum = rodadasDisponiveis[0].n;
-                }
-                
-                // Encontra índice da rodada atual
+                // 5. ENCONTRA ÍNDICE DA RODADA ATUAL
                 rodadaAtualIndex = rodadasDisponiveis.findIndex(r => r.n === rodadaAtualNum);
-                
                 if (rodadaAtualIndex === -1 && rodadasDisponiveis.length > 0) {
                     rodadaAtualIndex = 0;
                     rodadaAtualNum = rodadasDisponiveis[0].n;
@@ -772,13 +697,73 @@
                 
                 console.log(`📍 Rodada atual: ${rodadaAtualNum} (índice: ${rodadaAtualIndex})`);
                 
-                // 9. POPULA SELECT E CARREGA RODADA
+                // 6. SE TEM DADOS DETALHADOS, EXIBE DIRETAMENTE
+                if (dados.rodada_detalhada) {
+                    console.log('✅ Dados detalhados disponíveis, exibindo...');
+                    rodadaDetalhada = dados.rodada_detalhada;
+                    exibirRodada(rodadaDetalhada);
+                } else {
+                    console.log('🔍 Modo leve - solicitando dados detalhados...');
+                    // Em modo leve, precisa carregar dados detalhados
+                    carregarRodadaDetalhada(rodadaAtualNum);
+                }
+                
+                // 7. POPULA SELECT DE RODADAS
                 popularSelectRodadas();
-                carregarRodadaAtual();
                 
             } catch (error) {
                 console.error('❌ ERRO CRÍTICO AO CARREGAR DADOS:', error);
                 mostrarErro(`Erro ao carregar dados: ${error.message}`);
+            }
+        }
+        
+        // ==============================================
+        // FUNÇÃO PARA CARREGAR RODADA DETALHADA
+        // ==============================================
+        function carregarRodadaDetalhada(numeroRodada) {
+            console.log(`🔄 Solicitando dados detalhados da rodada ${numeroRodada}...`);
+            
+            // Mostra loading
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').innerHTML = `
+                <div class="loading-spinner"></div>
+                <div>Carregando rodada ${numeroRodada}...</div>
+                <div style="font-size: 12px; color: #718096; margin-top: 10px;">
+                    Aguarde enquanto preparamos os dados
+                </div>
+            `;
+            
+            document.getElementById('jogosLista').innerHTML = '';
+            document.getElementById('rodadaResumo').style.display = 'none';
+            
+            // FECHA WEBAPP E SOLICITA NOVA RODADA AO BOT
+            if (window.Telegram && Telegram.WebApp) {
+                const dataToSend = {
+                    tipo: 'carregar_rodada_usuario',
+                    usuario_id: usuarioId,
+                    rodada_num: numeroRodada,
+                    chat_id: chatId,
+                    timestamp: Date.now(),
+                    origem: 'webapp_palpites_usuario_leve',
+                    solicitar_detalhes: true  // Indica que quer dados detalhados
+                };
+                
+                console.log('📤 Enviando solicitação para carregar rodada...', dataToSend);
+                
+                // Envia os dados para o bot
+                Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+                
+                // Fecha o WebApp após um breve delay
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 300);
+                
+            } else {
+                // AMBIENTE DE DESENVOLVIMENTO
+                console.log('⚠️ Ambiente de desenvolvimento - simulando carregamento');
+                setTimeout(() => {
+                    mostrarErro('Em ambiente de desenvolvimento, a troca de rodada requer fechar/reabrir o WebApp');
+                }, 1000);
             }
         }
         
@@ -792,42 +777,16 @@
             rodadasDisponiveis.forEach(rodada => {
                 const option = document.createElement('option');
                 option.value = rodada.n;
-                
-                // Formata texto com dados importantes
-                const pontos = rodada.p || 0;
-                const meusPalpites = rodada.j || 0;
-                const usadosAdm = rodada.u || 0;
-                const totalRodada = rodada.t || 0;
-                
-                option.textContent = `Rodada ${rodada.n} - ${pontos} pontos`;
-                option.dataset.palpites = meusPalpites;
-                option.dataset.usados = usadosAdm;
-                option.dataset.total = totalRodada;
-                
+                option.textContent = `Rodada ${rodada.n} - ${rodada.p} pontos`;
                 select.appendChild(option);
             });
             
-            // Seleciona rodada atual
             if (rodadaAtualNum) {
                 select.value = rodadaAtualNum;
             }
             
             console.log(`✅ Select populado com ${rodadasDisponiveis.length} rodadas`);
-        }
-        
-        function carregarRodadaAtual() {
-            console.log(`🔄 Carregando rodada ${rodadaAtualNum}...`);
-            
-            // Se temos dados detalhados da rodada atual, usa eles
-            if (appData.rdc) {
-                exibirRodada(appData.rdc);
-            } else {
-                // Caso contrário, mostra loading e tenta carregar
-                document.getElementById('loading').style.display = 'flex';
-                setTimeout(() => {
-                    mostrarErro('Dados da rodada não disponíveis');
-                }, 2000);
-            }
+            atualizarBotoesNavegacao();
         }
         
         function exibirRodada(rodada) {
@@ -837,13 +796,16 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             
-            // EXTRAI DADOS (suporta ambos formatos)
-            const totalRodada = rodada.jtf || rodada.t || 0;           // Total fixo (10)
-            const usadosAdm = rodada.jub || rodada.u || 0;            // Usados pelo ADM (7)
-            const meusPalpites = rodada.jp || rodada.j || 0;          // Meus palpites (6)
-            const comPlacar = rodada.jcp || rodada.c || 0;            // Com placar real
-            const pontos = rodada.tp || rodada.p || 0;                // Pontuação total
-            const placarExato = rodada.est?.pe || 0;                  // Placar exato
+            // Salva rodada detalhada
+            rodadaDetalhada = rodada;
+            
+            // EXTRAI DADOS
+            const totalRodada = rodada.jtf || rodada.t || 0;
+            const usadosAdm = rodada.jub || rodada.u || 0;
+            const meusPalpites = rodada.jp || rodada.j || 0;
+            const comPlacar = rodada.jcp || rodada.c || 0;
+            const pontos = rodada.tp || rodada.p || 0;
+            const placarExato = rodada.est?.pe || 0;
             
             console.log('📈 Estatísticas extraídas:', {
                 totalRodada,
@@ -909,7 +871,7 @@
                 const div = document.createElement('div');
                 div.className = `game-card ${jogo.pd ? 'pd-card' : ''}`;
                 
-                // EXTRAI VALORES (suporta ambos formatos)
+                // EXTRAI VALORES
                 const placarReal = jogo.pr || '? x ?';
                 const placarPalpite = jogo.pal || '0 x 0';
                 
@@ -927,7 +889,7 @@
                     palpiteVisitante = '0';
                 }
                 
-                // Nomes dos times (ambos formatos)
+                // Nomes dos times
                 const timeMandante = jogo.m || jogo.mandante || 'Time Casa';
                 const timeVisitante = jogo.v || jogo.visitante || 'Time Visitante';
                 
@@ -1000,13 +962,11 @@
                 itensPontos.push('Resultado Correto (4)');
                 totalCalculado = 4;
                 
-                // Adiciona GM se acertou
                 if (contadores.GM > 0) {
                     itensPontos.push('Acerto GM (2)');
                     totalCalculado += 2;
                 }
                 
-                // Adiciona GV se acertou
                 if (contadores.GV > 0) {
                     itensPontos.push('Acerto GV (2)');
                     totalCalculado += 2;
@@ -1072,15 +1032,10 @@
                 rodadaAtualIndex = novoIndex;
                 rodadaAtualNum = novaRodada.n;
                 
-                console.log(`➡️ Navegando para rodada ${rodadaAtualNum} (índice: ${rodadaAtualIndex})`);
+                console.log(`➡️ Navegando para rodada ${rodadaAtualNum}`);
                 
-                // Mostra loading
-                document.getElementById('loading').style.display = 'flex';
-                document.getElementById('jogosLista').innerHTML = '';
-                document.getElementById('rodadaResumo').style.display = 'none';
-                
-                // Solicita nova rodada ao bot
-                solicitarRodadaAoBot(rodadaAtualNum);
+                // Solicita nova rodada
+                carregarRodadaDetalhada(rodadaAtualNum);
             }
         }
         
@@ -1097,55 +1052,9 @@
                     
                     console.log(`🔀 Mudando para rodada ${rodadaAtualNum} via select`);
                     
-                    // Mostra loading
-                    document.getElementById('loading').style.display = 'flex';
-                    document.getElementById('jogosLista').innerHTML = '';
-                    document.getElementById('rodadaResumo').style.display = 'none';
-                    
-                    // Solicita nova rodada ao bot
-                    solicitarRodadaAoBot(rodadaAtualNum);
+                    // Solicita nova rodada
+                    carregarRodadaDetalhada(rodadaAtualNum);
                 }
-            }
-        }
-        
-        function solicitarRodadaAoBot(numeroRodada) {
-            console.log(`📡 Solicitando rodada ${numeroRodada} ao bot...`);
-            
-            // Mostra mensagem de carregamento
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').innerHTML = `
-                <div class="loading-spinner"></div>
-                <div>Carregando rodada ${numeroRodada}...</div>
-                <div style="font-size: 12px; color: #718096; margin-top: 10px;">
-                    Aguarde enquanto preparamos os dados da rodada ${numeroRodada}
-                </div>
-            `;
-            
-            // Fecha o WebApp e solicita ao bot
-            if (window.Telegram && Telegram.WebApp) {
-                const dataToSend = {
-                    tipo: 'carregar_rodada_usuario',  // ⭐⭐ CORRIGIDO: 'tipo' em vez de 'action' ⭐⭐
-                    action: 'carregar_rodada',        // ⭐⭐ FALLBACK para compatibilidade ⭐⭐
-                    usuario_id: usuarioId,
-                    rodada_num: numeroRodada,
-                    chat_id: chatId,                  // ⭐⭐ INCLUÍDO: para o bot saber onde responder ⭐⭐
-                    timestamp: Date.now(),
-                    origem: 'webapp_palpites_usuario'
-                };
-                
-                console.log('📤 Enviando dados para o bot:', dataToSend);
-                
-                // Envia os dados para o bot
-                Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-                
-                // Espera um pouco antes de fechar para garantir que os dados foram enviados
-                setTimeout(() => {
-                    Telegram.WebApp.close();
-                }, 500);
-            } else {
-                // Ambiente de desenvolvimento
-                console.log('⚠️ Ambiente de desenvolvimento - simulando solicitação');
-                mostrarErro('Em ambiente de desenvolvimento, é necessário solicitar nova rodada diretamente ao bot.');
             }
         }
         
@@ -1171,96 +1080,21 @@
         }
         
         // ==============================================
-        // FUNÇÕES DE DEBUG (útil para desenvolvimento)
+        // FUNÇÕES DE DEBUG
         // ==============================================
         window.debugDados = function() {
             console.clear();
             console.log('=== DEBUG COMPLETO ===');
             console.log('📊 appData:', appData);
             console.log('📋 rodadasDisponiveis:', rodadasDisponiveis);
+            console.log('📍 rodadaDetalhada:', rodadaDetalhada);
             console.log('📍 rodadaAtualNum:', rodadaAtualNum);
             console.log('📍 rodadaAtualIndex:', rodadaAtualIndex);
             console.log('👤 usuarioId:', usuarioId);
             console.log('💬 chatId:', chatId);
+            console.log('📊 modoLeve:', modoLeve);
             console.log('🌐 URL completa:', window.location.href);
-            console.log('📏 Parâmetro data length:', window.location.search ? new URLSearchParams(window.location.search).get('data')?.length : 'N/A');
             console.log('=======================');
-        };
-        
-        // Função para testar com dados de exemplo
-        window.testarComDadosExemplo = function() {
-            const dadosExemplo = {
-                tipo: 'palpites_usuario_gzip',
-                usuario: {
-                    id: 123,
-                    nome: 'João Silva',
-                    telegram_id: 456789
-                },
-                rodadas: [
-                    {
-                        n: 1,
-                        p: 24,
-                        j: 6,
-                        u: 7,
-                        t: 10,
-                        c: 6,
-                        s: 'ativa'
-                    },
-                    {
-                        n: 2,
-                        p: 18,
-                        j: 5,
-                        u: 8,
-                        t: 10,
-                        c: 3,
-                        s: 'ativa'
-                    }
-                ],
-                rodada_ativa: 1,
-                rodada_detalhada: {
-                    num: 1,
-                    tp: 24,
-                    jp: 6,
-                    jub: 7,
-                    jtf: 10,
-                    jcp: 6,
-                    est: { pe: 2, rc: 1, gm: 3, gv: 2, pd_usada: true },
-                    jogos: [
-                        {
-                            id: 1,
-                            m: 'Flamengo',
-                            v: 'Vasco',
-                            pal: '2x1',
-                            pr: '2x1',
-                            pts: 14,
-                            ac: ['PE', 'GM', 'GV', 'PD'],
-                            pd: true
-                        },
-                        {
-                            id: 2,
-                            m: 'São Paulo',
-                            v: 'Corinthians',
-                            pal: '1x0',
-                            pr: '1x0',
-                            pts: 10,
-                            ac: ['PE', 'GM', 'GV'],
-                            pd: false
-                        }
-                    ]
-                }
-            };
-            
-            // Simula carregamento
-            appData = dadosExemplo;
-            rodadasDisponiveis = dadosExemplo.rodadas;
-            rodadaAtualNum = 1;
-            rodadaAtualIndex = 0;
-            usuarioId = 123;
-            
-            popularSelectRodadas();
-            exibirRodada(dadosExemplo.rodada_detalhada);
-            
-            console.log('✅ Teste com dados de exemplo executado');
         };
     </script>
 </body>
