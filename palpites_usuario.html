@@ -275,6 +275,16 @@
             color: #d35400;
         }
         
+        /* NOVO: Estilo para "c/vim" */
+        .guess-score.cvim {
+            color: #718096;
+            font-style: italic;
+            font-weight: normal;
+            font-size: 14px;
+            border: 2px dashed #cbd5e0;
+            background-color: #f7fafc;
+        }
+        
         /* Legenda dos placares */
         .score-legend {
             display: grid;
@@ -324,6 +334,22 @@
             background: rgba(231, 76, 60, 0.1);
             border-radius: 6px;
             border-left: 3px solid #e74c3c;
+        }
+        
+        /* NOVO: Estilo para jogos sem palpite */
+        .sem-palpite-info {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+        }
+        
+        .sem-palpite-info strong {
+            color: #4a5568;
         }
         
         /* Loading e Erros */
@@ -568,7 +594,7 @@
         let rodadaAtualNum = null;
         let usuarioId = null;
         let chatId = null;
-        let apenasUmaRodada = true; // ⭐⭐ NOVA FLAG: indica que veio apenas 1 rodada
+        let apenasUmaRodada = true;
         
         // ==============================================
         // INICIALIZAÇÃO
@@ -576,14 +602,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Web App iniciado (VERSÃO RODADA ÚNICA)');
             
-            // Configura Telegram WebApp
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.expand();
                 Telegram.WebApp.enableClosingConfirmation();
                 Telegram.WebApp.setBackgroundColor('#667eea');
                 Telegram.WebApp.setHeaderColor('#2c3e50');
                 
-                // Captura informações do usuário do Telegram
                 const tgUser = Telegram.WebApp.initDataUnsafe?.user;
                 if (tgUser) {
                     chatId = tgUser.id;
@@ -593,7 +617,6 @@
                 console.log('✅ Telegram WebApp configurado');
             }
             
-            // Carrega dados da URL
             carregarDadosDaURL();
         });
         
@@ -604,7 +627,6 @@
             console.log('🔍 INICIANDO CARREGAMENTO DE DADOS (Rodada Única)...');
             
             try {
-                // 1. PEGA PARÂMETRO DA URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const dataParam = urlParams.get('data');
                 
@@ -614,11 +636,9 @@
                 
                 console.log('📦 Dados recebidos (comprimento):', dataParam.length);
                 
-                // 2. TENTA DIFERENTES MÉTODOS DE DECODIFICAÇÃO
                 let dados = null;
                 let metodoUsado = '';
                 
-                // Método 1: URL-safe Base64 (Telegram)
                 try {
                     const safeBase64 = dataParam
                         .replace(/\-/g, '+')
@@ -632,7 +652,6 @@
                 } catch (erro1) {
                     console.log('❌ Falha com URL-safe Base64:', erro1.message);
                     
-                    // Método 2: Gzip (se disponível)
                     if (typeof pako !== 'undefined') {
                         try {
                             const safeBase64 = dataParam
@@ -653,7 +672,6 @@
                         } catch (erro2) {
                             console.log('❌ Falha com Gzip:', erro2.message);
                             
-                            // Método 3: Base64 normal (última tentativa)
                             try {
                                 const jsonString = atob(dataParam);
                                 dados = JSON.parse(jsonString);
@@ -666,7 +684,6 @@
                     }
                 }
                 
-                // 3. VERIFICA SE CONSEGUIU DECODIFICAR
                 if (!dados) {
                     throw new Error('Não foi possível decodificar os dados.');
                 }
@@ -674,14 +691,10 @@
                 console.log(`🎯 Dados carregados via: ${metodoUsado}`);
                 console.log('📊 Estrutura dos dados:', dados);
                 
-                // 4. VERIFICA ESTRUTURA BÁSICA
                 if (typeof dados !== 'object') {
                     throw new Error('Dados não são um objeto JSON válido');
                 }
                 
-                // 5. DETECTA FORMATO DOS DADOS
-                // Formato 1: Novo (nomes completos)
-                // Formato 2: Antigo (abreviado)
                 let formato = '';
                 
                 if (dados.tipo || dados.usuario) {
@@ -694,10 +707,8 @@
                     throw new Error('Formato de dados não reconhecido');
                 }
                 
-                // 6. NORMALIZA OS DADOS
                 appData = dados;
                 
-                // Normaliza informações do usuário
                 const usuario = formato === 'novo' ? dados.usuario : dados.u;
                 if (!usuario) {
                     throw new Error('Dados não contêm informações do usuário');
@@ -705,7 +716,6 @@
                 
                 usuarioId = usuario.id;
                 
-                // Preenche informações do usuário
                 const nomeUsuario = usuario.nome || usuario.n || 'Usuário';
                 const telegramId = usuario.telegram_id || usuario.tid || '--';
                 
@@ -713,32 +723,23 @@
                 document.getElementById('userId').textContent = `ID: ${usuarioId} | Telegram: ${telegramId}`;
                 document.getElementById('subtitle').textContent = `Usuário: ${nomeUsuario}`;
                 
-                // Avatar
                 if (nomeUsuario && nomeUsuario !== 'Usuário') {
                     document.getElementById('userAvatar').textContent = nomeUsuario.charAt(0).toUpperCase();
                 }
                 
-                // ⭐⭐ VERIFICA SE TEM APENAS UMA RODADA ⭐⭐
                 const rodadasDisponiveis = formato === 'novo' ? dados.rodadas : dados.rd;
                 
                 if (rodadasDisponiveis && Array.isArray(rodadasDisponiveis) && rodadasDisponiveis.length === 1) {
                     apenasUmaRodada = true;
                     console.log('📌 Apenas UMA rodada disponível (modo específico)');
-                    
-                    // Mostra mensagem informativa
                     document.getElementById('singleRodadaInfo').style.display = 'block';
-                    
-                    // Atualiza botão
                     document.getElementById('btnEscolherOutraRodada').textContent = '↩️ Escolher Outra Rodada';
                 } else if (rodadasDisponiveis && rodadasDisponiveis.length > 1) {
                     apenasUmaRodada = false;
                     console.log(`📌 Múltiplas rodadas (${rodadasDisponiveis.length}) - modo navegação`);
-                    
-                    // Atualiza botão
                     document.getElementById('btnEscolherOutraRodada').textContent = '↩️ Voltar e Navegar';
                 }
                 
-                // 7. NORMALIZA RODADA DETALHADA
                 if (formato === 'novo') {
                     appData.rdc = dados.rodada_detalhada;
                     rodadaAtualNum = dados.rodada_ativa;
@@ -747,17 +748,13 @@
                     rodadaAtualNum = dados.ra;
                 }
                 
-                // Se não tem rodada ativa definida, usa a primeira da lista
                 if (!rodadaAtualNum && rodadasDisponiveis && rodadasDisponiveis.length > 0) {
                     rodadaAtualNum = rodadasDisponiveis[0].n || rodadasDisponiveis[0].numero;
                 }
                 
                 console.log(`📍 Rodada atual: ${rodadaAtualNum}`);
-                
-                // 8. ATUALIZA INFORMAÇÃO DA RODADA
                 document.getElementById('rodadaInfo').textContent = `Rodada ${rodadaAtualNum} - Visualização`;
                 
-                // 9. CARREGA RODADA
                 carregarRodadaAtual();
                 
             } catch (error) {
@@ -772,11 +769,9 @@
         function carregarRodadaAtual() {
             console.log(`🔄 Carregando rodada ${rodadaAtualNum}...`);
             
-            // Se temos dados detalhados da rodada atual, usa eles
             if (appData.rdc) {
                 exibirRodada(appData.rdc);
             } else {
-                // Caso contrário, mostra loading e tenta carregar
                 document.getElementById('loading').style.display = 'flex';
                 setTimeout(() => {
                     mostrarErro('Dados da rodada não disponíveis');
@@ -787,17 +782,15 @@
         function exibirRodada(rodada) {
             console.log('📊 Exibindo rodada:', rodada);
             
-            // Esconde loading e erro
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
             
-            // EXTRAI DADOS (suporta ambos formatos)
-            const totalRodada = rodada.jtf || rodada.t || 0;           // Total fixo (10)
-            const usadosAdm = rodada.jub || rodada.u || 0;            // Usados pelo ADM (7)
-            const meusPalpites = rodada.jp || rodada.j || 0;          // Meus palpites (6)
-            const comPlacar = rodada.jcp || rodada.c || 0;            // Com placar real
-            const pontos = rodada.tp || rodada.p || 0;                // Pontuação total
-            const placarExato = rodada.est?.pe || 0;                  // Placar exato
+            const totalRodada = rodada.jtf || rodada.t || 0;
+            const usadosAdm = rodada.jub || rodada.u || 0;
+            const meusPalpites = rodada.jp || rodada.j || 0;
+            const comPlacar = rodada.jcp || rodada.c || 0;
+            const pontos = rodada.tp || rodada.p || 0;
+            const placarExato = rodada.est?.pe || 0;
             
             console.log('📈 Estatísticas extraídas:', {
                 totalRodada,
@@ -808,7 +801,6 @@
                 placarExato
             });
             
-            // ATUALIZA ESTATÍSTICAS
             document.getElementById('rodadaResumo').style.display = 'block';
             document.getElementById('statTotalRodada').textContent = totalRodada;
             document.getElementById('statUsadosAdm').textContent = usadosAdm;
@@ -817,17 +809,14 @@
             document.getElementById('statPontos').textContent = pontos;
             document.getElementById('statPE').textContent = placarExato;
             
-            // ATUALIZA CONTADOR
             document.getElementById('contadorPalpites').textContent = meusPalpites;
             document.getElementById('contadorUsados').textContent = usadosAdm;
             document.getElementById('contadorTotal').textContent = totalRodada;
             
-            // ATUALIZA TÍTULO
             const rodadaNum = rodada.num || rodada.n || rodadaAtualNum;
             document.getElementById('gamesTitle').textContent = `Jogos da Rodada ${rodadaNum}`;
             document.getElementById('rodadaInfo').textContent = `Rodada ${rodadaNum} - Palpites e Pontuação`;
             
-            // EXIBE JOGOS
             exibirJogosRodada(rodada);
         }
         
@@ -835,7 +824,6 @@
             const container = document.getElementById('jogosLista');
             const jogos = rodada.jogos || [];
             
-            // Limpa container
             container.innerHTML = '';
             
             if (jogos.length === 0) {
@@ -843,11 +831,10 @@
                     <div class="game-card" style="text-align: center; padding: 30px 20px;">
                         <div style="font-size: 40px; margin-bottom: 15px;">📭</div>
                         <div style="font-size: 16px; font-weight: 600; color: #4a5568; margin-bottom: 8px;">
-                            Nenhum palpite nesta rodada
+                            Nenhum jogo nesta rodada
                         </div>
                         <div style="color: #718096; font-size: 13px; line-height: 1.4;">
-                            Você não fez palpites nos jogos desta rodada.<br>
-                            Para participar, clique no botão "Enviar Palpites" no grupo.
+                            Não há jogos com placar real nesta rodada.
                         </div>
                     </div>
                 `;
@@ -856,39 +843,53 @@
             
             console.log(`🎮 Exibindo ${jogos.length} jogos`);
             
-            // Cria cards para cada jogo
+            // Contadores para estatísticas
+            let jogosComPalpite = 0;
+            let jogosSemPalpite = 0;
+            
             jogos.forEach((jogo, index) => {
+                // ⭐⭐ VERIFICAÇÃO CRÍTICA: Detecta se tem palpite
+                const temPalpite = jogo.tem_palpite === true || 
+                                 (jogo.pal !== 'c/vim' && jogo.pal !== 'Sem palpite');
+                
+                if (temPalpite) {
+                    jogosComPalpite++;
+                } else {
+                    jogosSemPalpite++;
+                }
+                
                 const div = document.createElement('div');
                 div.className = `game-card ${jogo.pd ? 'pd-card' : ''}`;
                 
-                // EXTRAI VALORES (suporta ambos formatos)
                 const placarReal = jogo.pr || '? x ?';
-                const placarPalpite = jogo.pal || '0 x 0';
+                const placarPalpite = temPalpite ? (jogo.pal || '0 x 0') : 'c/vim';
                 
                 let [realMandante, realVisitante] = placarReal.split('x').map(v => v.trim());
-                let [palpiteMandante, palpiteVisitante] = placarPalpite.split('x').map(v => v.trim());
+                let palpiteMandante, palpiteVisitante;
                 
-                // Garante valores válidos
+                if (temPalpite) {
+                    [palpiteMandante, palpiteVisitante] = placarPalpite.split('x').map(v => v.trim());
+                } else {
+                    palpiteMandante = palpiteVisitante = 'c/vim';
+                }
+                
                 if (!realMandante || !realVisitante) {
-                    realMandante = '?';
-                    realVisitante = '?';
+                    realMandante = realVisitante = '?';
                 }
                 
                 if (!palpiteMandante || !palpiteVisitante) {
-                    palpiteMandante = '0';
-                    palpiteVisitante = '0';
+                    palpiteMandante = palpiteVisitante = '0';
                 }
                 
-                // Nomes dos times (ambos formatos)
                 const timeMandante = jogo.m || jogo.mandante || 'Time Casa';
                 const timeVisitante = jogo.v || jogo.visitante || 'Time Visitante';
-                
-                // Pontuação
                 const pontos = jogo.pts || 0;
                 const acertos = jogo.ac || [];
                 const pdUsada = jogo.pd || false;
                 
-                // HTML do jogo
+                // ⭐⭐ DETERMINA SE MOSTRA "c/vim"
+                const mostrarCvim = !temPalpite;
+                
                 div.innerHTML = `
                     ${pdUsada ? '<div class="pd-badge">⭐ PONTUAÇÃO DOBRADA</div>' : ''}
                     
@@ -897,7 +898,9 @@
                         <!-- Linha 1: Mandante -->
                         <div class="team-name">${timeMandante}</div>
                         <div class="score-box real-score">${realMandante}</div>
-                        <div class="score-box guess-score">${palpiteMandante}</div>
+                        <div class="score-box guess-score ${mostrarCvim ? 'cvim' : ''}">
+                            ${mostrarCvim ? 'c/vim' : palpiteMandante}
+                        </div>
                         
                         <!-- Separador visual -->
                         <div style="grid-column: 1 / -1; height: 1px;"></div>
@@ -905,7 +908,9 @@
                         <!-- Linha 2: Visitante -->
                         <div class="team-name">${timeVisitante}</div>
                         <div class="score-box real-score">${realVisitante}</div>
-                        <div class="score-box guess-score">${palpiteVisitante}</div>
+                        <div class="score-box guess-score ${mostrarCvim ? 'cvim' : ''}">
+                            ${mostrarCvim ? 'c/vim' : palpiteVisitante}
+                        </div>
                     </div>
                     
                     <!-- Legenda -->
@@ -917,18 +922,35 @@
                     
                     <!-- Pontuação detalhada -->
                     <div class="points-calculation">
-                        ${calcularDetalhesPontuacao(acertos, pdUsada, pontos)}
+                        ${calcularDetalhesPontuacao(temPalpite, acertos, pdUsada, pontos)}
                     </div>
+                    
+                    <!-- Mensagem de jogo sem palpite -->
+                    ${mostrarCvim ? `
+                        <div class="sem-palpite-info">
+                            <strong>⚠️ Sem palpite:</strong> Você não palpitou neste jogo
+                        </div>
+                    ` : ''}
                 `;
                 
                 container.appendChild(div);
             });
+            
+            console.log(`📊 Resumo: ${jogosComPalpite} com palpite, ${jogosSemPalpite} sem palpite`);
         }
         
-        function calcularDetalhesPontuacao(acertos, pdUsada, pontosTotais) {
+        function calcularDetalhesPontuacao(temPalpite, acertos, pdUsada, pontosTotais) {
+            if (!temPalpite) {
+                return `
+                    <div class="points-line" style="color: #718096; font-style: italic;">
+                        Sem palpite para calcular pontos
+                    </div>
+                    <div class="points-total">Total do jogo: 0 pontos</div>
+                `;
+            }
+            
             let html = '';
             
-            // Conta acertos por tipo
             const contadores = {
                 'PE': acertos.filter(a => a === 'PE').length,
                 'RC': acertos.filter(a => a === 'RC').length,
@@ -936,35 +958,29 @@
                 'GV': acertos.filter(a => a === 'GV').length
             };
             
-            // Lista de itens de pontuação
             const itensPontos = [];
             let totalCalculado = 0;
             
-            // Placar Exato (PE) - 10 pontos base + 2 GM + 2 GV = 14 total
             if (contadores.PE > 0) {
                 itensPontos.push('Placar Exato (10)');
                 itensPontos.push('Acerto GM (2)');
                 itensPontos.push('Acerto GV (2)');
                 totalCalculado = 14;
             }
-            // Resultado Correto (RC) - 4 pontos
             else if (contadores.RC > 0) {
                 itensPontos.push('Resultado Correto (4)');
                 totalCalculado = 4;
                 
-                // Adiciona GM se acertou
                 if (contadores.GM > 0) {
                     itensPontos.push('Acerto GM (2)');
                     totalCalculado += 2;
                 }
                 
-                // Adiciona GV se acertou
                 if (contadores.GV > 0) {
                     itensPontos.push('Acerto GV (2)');
                     totalCalculado += 2;
                 }
             }
-            // Apenas GM ou GV
             else {
                 if (contadores.GM > 0) {
                     itensPontos.push('Acerto GM (2)');
@@ -982,16 +998,13 @@
                 }
             }
             
-            // Monta a linha de pontuação
             if (itensPontos.length > 0) {
                 const linhaPontos = itensPontos.join(' + ');
                 html += `<div class="points-line">${linhaPontos}</div>`;
             }
             
-            // Total do jogo (antes da PD)
             html += `<div class="points-total">Total do jogo: ${totalCalculado} pontos</div>`;
             
-            // Aplica Pontuação Dobrada se usada neste jogo
             if (pdUsada) {
                 const totalFinal = totalCalculado * 2;
                 html += `<div class="points-pd">[PD 2x] → ${totalFinal} pontos</div>`;
@@ -1000,34 +1013,29 @@
             return html;
         }
         
-        // ⭐⭐ NOVA FUNÇÃO: Solicitar outra rodada ⭐⭐
         function escolherOutraRodada() {
-    console.log('🔄 Solicitando para escolher outra rodada...');
-    
-    // Fecha o WebApp para que o bot possa perguntar novamente
-    if (window.Telegram && Telegram.WebApp) {
-        const dataToSend = {
-            'tipo': 'fechar_para_escolher_nova_rodada',  // ⭐⭐ CORRIGIDO: Sem underline extra
-            'usuario_id': usuarioId,
-            'rodada_atual': rodadaAtualNum,
-            'timestamp': Date.now()
-        };
-        
-        console.log('📤 Enviando solicitação para fechar:', dataToSend);
-        
-        // Envia dados e fecha
-        Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-        
-        // Aguarda um pouco antes de fechar
-        setTimeout(() => {
-            Telegram.WebApp.close();
-        }, 300);
-    } else {
-        // Ambiente de desenvolvimento
-        console.log('⚠️ Ambiente de desenvolvimento - simulando fechamento');
-        alert('Para escolher outra rodada, feche esta janela e clique novamente no botão "Ver meus palpites".');
-    }
-}
+            console.log('🔄 Solicitando para escolher outra rodada...');
+            
+            if (window.Telegram && Telegram.WebApp) {
+                const dataToSend = {
+                    'tipo': 'fechar_para_escolher_nova_rodada',
+                    'usuario_id': usuarioId,
+                    'rodada_atual': rodadaAtualNum,
+                    'timestamp': Date.now()
+                };
+                
+                console.log('📤 Enviando solicitação para fechar:', dataToSend);
+                
+                Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+                
+                setTimeout(() => {
+                    Telegram.WebApp.close();
+                }, 300);
+            } else {
+                console.log('⚠️ Ambiente de desenvolvimento - simulando fechamento');
+                alert('Para escolher outra rodada, feche esta janela e clique novamente no botão "Ver meus palpites".');
+            }
+        }
         
         function mostrarErro(mensagem) {
             console.error('❌ ERRO:', mensagem);
@@ -1051,7 +1059,7 @@
         }
         
         // ==============================================
-        // FUNÇÕES DE DEBUG (útil para desenvolvimento)
+        // FUNÇÕES DE DEBUG
         // ==============================================
         window.debugDados = function() {
             console.clear();
@@ -1066,7 +1074,6 @@
             console.log('=======================');
         };
         
-        // Função para testar com dados de exemplo
         window.testarComDadosExemplo = function() {
             const dadosExemplo = {
                 tipo: 'palpites_usuario_gzip',
@@ -1104,23 +1111,35 @@
                             pr: '2x1',
                             pts: 14,
                             ac: ['PE', 'GM', 'GV', 'PD'],
-                            pd: true
+                            pd: true,
+                            tem_palpite: true
                         },
                         {
                             id: 2,
                             m: 'São Paulo',
                             v: 'Corinthians',
-                            pal: '1x0',
+                            pal: 'c/vim',
                             pr: '1x0',
-                            pts: 10,
-                            ac: ['PE', 'GM', 'GV'],
-                            pd: false
+                            pts: 0,
+                            ac: [],
+                            pd: false,
+                            tem_palpite: false
+                        },
+                        {
+                            id: 3,
+                            m: 'Palmeiras',
+                            v: 'Santos',
+                            pal: 'Sem palpite',
+                            pr: '3x2',
+                            pts: 0,
+                            ac: [],
+                            pd: false,
+                            tem_palpite: false
                         }
                     ]
                 }
             };
             
-            // Simula carregamento
             appData = dadosExemplo;
             rodadaAtualNum = 1;
             usuarioId = 123;
@@ -1129,7 +1148,7 @@
             exibirRodada(dadosExemplo.rodada_detalhada);
             document.getElementById('singleRodadaInfo').style.display = 'block';
             
-            console.log('✅ Teste com dados de exemplo executado (modo rodada única)');
+            console.log('✅ Teste com dados de exemplo executado (com jogos sem palpite)');
         };
     </script>
 </body>
