@@ -6,6 +6,26 @@
     <title>Editor de Placares - Bolão</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ===== CORREÇÃO ANDROID - TELA CHEIA ===== */
+        html, body {
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow-x: hidden !important;
+            position: fixed !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .container {
+            width: 100% !important;
+            height: 100% !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            min-height: 100vh !important;
+        }
+        /* ===== FIM CORREÇÃO ANDROID ===== */
+
         * {
             margin: 0;
             padding: 0;
@@ -478,6 +498,39 @@
     <div id="message" class="message"></div>
 
     <script>
+        // ===== CORREÇÃO FINAL PARA ANDROID =====
+        window.addEventListener('load', function() {
+            console.log("📱 CORREÇÃO ANDROID APLICADA");
+            
+            // 1. Força dimensões corretas
+            document.documentElement.style.width = '100vw';
+            document.documentElement.style.height = '100vh';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+            
+            // 2. Expansão múltipla para Android
+            if (window.Telegram && Telegram.WebApp) {
+                setTimeout(() => Telegram.WebApp.expand(), 50);
+                setTimeout(() => Telegram.WebApp.expand(), 200);
+                setTimeout(() => Telegram.WebApp.expand(), 500);
+            }
+            
+            // 3. Remove qualquer padding/margin extra
+            document.body.style.margin = '0';
+            document.body.style.padding = '0';
+            
+            // 4. Garante que o container principal ocupe 100%
+            const mainContainer = document.querySelector('.container');
+            
+            if (mainContainer) {
+                mainContainer.style.width = '100%';
+                mainContainer.style.height = '100%';
+                mainContainer.style.margin = '0';
+                mainContainer.style.borderRadius = '0';
+                mainContainer.style.maxWidth = '100%';
+            }
+        });
+
         // Telegram Web App
         const tg = window.Telegram.WebApp;
         tg.expand();
