@@ -6,6 +6,7 @@
     <title>Palpites e Pontuação</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         * { 
             margin: 0; 
@@ -173,6 +174,60 @@
             font-size: 12px;
             opacity: 0.95;
             font-weight: 500;
+        }
+        
+        /* Botão de enviar */
+        .send-section {
+            padding: 15px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        
+        .send-button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #25d366 0%, #128C7E 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .send-button:hover {
+            background: linear-gradient(135deg, #1da851 0%, #0d7d6a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .send-button:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .send-info {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 6px;
+            color: #234e52;
+            font-size: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Lista de jogos */
@@ -440,7 +495,7 @@
                 font-size: 14px;
             }
             
-            .back-button {
+            .back-button, .send-button {
                 padding: 10px;
                 font-size: 14px;
             }
@@ -451,7 +506,7 @@
                 border-radius: 12px;
             }
             
-            .header, .user-info, .nav-section, .stats-section, .games-section {
+            .header, .user-info, .nav-section, .stats-section, .games-section, .send-section {
                 padding: 12px;
             }
             
@@ -479,7 +534,7 @@
                 font-size: 12px;
             }
             
-            .back-button {
+            .back-button, .send-button {
                 padding: 8px;
                 font-size: 13px;
             }
@@ -562,6 +617,16 @@
             </div>
         </div>
         
+        <!-- Botão de enviar para Telegram -->
+        <div class="send-section" id="sendSection" style="display: none;">
+            <button class="send-button" id="btnEnviarTelegram" onclick="enviarParaTelegram()">
+                📤 Enviar para o Telegram
+            </button>
+            <div class="send-info" id="sendInfo" style="display: none;">
+                <small>✅ Captura enviada! Você pode compartilhar no chat.</small>
+            </div>
+        </div>
+        
         <!-- Lista de jogos -->
         <div class="games-section">
             <div class="games-header">
@@ -600,7 +665,7 @@
         // INICIALIZAÇÃO
         // ==============================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Web App iniciado (VERSÃO RODADA ÚNICA)');
+            console.log('🚀 Web App iniciado (VERSÃO COM ENVIO)');
             
             if (window.Telegram && Telegram.WebApp) {
                 Telegram.WebApp.expand();
@@ -784,6 +849,7 @@
             
             document.getElementById('loading').style.display = 'none';
             document.getElementById('error').style.display = 'none';
+            document.getElementById('sendSection').style.display = 'block';
             
             const totalRodada = rodada.jtf || rodada.t || 0;
             const usadosAdm = rodada.jub || rodada.u || 0;
@@ -1013,6 +1079,125 @@
             return html;
         }
         
+        // ==============================================
+        // FUNÇÃO PARA ENVIAR PARA TELEGRAM
+        // ==============================================
+        function enviarParaTelegram() {
+            console.log('📤 Iniciando envio para Telegram...');
+            
+            const btnEnviar = document.getElementById('btnEnviarTelegram');
+            const sendInfo = document.getElementById('sendInfo');
+            
+            // Desabilita o botão durante o processo
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '📤 Gerando captura...';
+            
+            // Verifica se html2canvas está disponível
+            if (typeof html2canvas === 'undefined') {
+                console.error('❌ html2canvas não carregado');
+                mostrarMensagemEnvio('Erro: Biblioteca html2canvas não carregada', false);
+                btnEnviar.disabled = false;
+                btnEnviar.innerHTML = '📤 Enviar para o Telegram';
+                return;
+            }
+            
+            // Cria um elemento temporário para a captura
+            const container = document.querySelector('.container');
+            
+            // Opções para html2canvas
+            const options = {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                logging: true,
+                allowTaint: true,
+                width: container.offsetWidth,
+                height: container.offsetHeight,
+                windowWidth: container.scrollWidth,
+                windowHeight: container.scrollHeight
+            };
+            
+            // Tenta capturar a tela
+            html2canvas(container, options)
+                .then(canvas => {
+                    console.log('✅ Captura criada com sucesso');
+                    
+                    // Converte canvas para data URL
+                    const imageData = canvas.toDataURL('image/jpeg', 0.9);
+                    
+                    if (window.Telegram && Telegram.WebApp) {
+                        // Envia a imagem para o bot
+                        const dataToSend = {
+                            'tipo': 'enviar_captura_rodada',
+                            'usuario_id': usuarioId,
+                            'rodada_atual': rodadaAtualNum,
+                            'imagem_data': imageData,
+                            'timestamp': Date.now()
+                        };
+                        
+                        console.log('📤 Enviando captura para o bot...');
+                        
+                        Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+                        
+                        // Mostra mensagem de sucesso
+                        mostrarMensagemEnvio('✅ Captura enviada! Você pode compartilhar no chat.', true);
+                        
+                        // Habilita o botão novamente após 3 segundos
+                        setTimeout(() => {
+                            btnEnviar.disabled = false;
+                            btnEnviar.innerHTML = '📤 Enviar para o Telegram';
+                        }, 3000);
+                        
+                    } else {
+                        // Modo de desenvolvimento - simula envio
+                        console.log('⚠️ Ambiente de desenvolvimento - simulando envio');
+                        
+                        // Cria um link para download no modo desenvolvimento
+                        const link = document.createElement('a');
+                        link.download = `rodada-${rodadaAtualNum}-${usuarioId}.jpg`;
+                        link.href = imageData;
+                        link.click();
+                        
+                        mostrarMensagemEnvio('✅ Captura gerada! No Telegram real, seria enviada ao bot.', true);
+                        
+                        // Habilita o botão novamente após 2 segundos
+                        setTimeout(() => {
+                            btnEnviar.disabled = false;
+                            btnEnviar.innerHTML = '📤 Enviar para o Telegram';
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Erro ao criar captura:', error);
+                    mostrarMensagemEnvio('❌ Erro ao criar captura da tela', false);
+                    
+                    // Habilita o botão novamente
+                    btnEnviar.disabled = false;
+                    btnEnviar.innerHTML = '📤 Enviar para o Telegram';
+                });
+        }
+        
+        function mostrarMensagemEnvio(mensagem, sucesso) {
+            const sendInfo = document.getElementById('sendInfo');
+            sendInfo.innerHTML = `<small>${mensagem}</small>`;
+            sendInfo.style.display = 'block';
+            
+            if (sucesso) {
+                sendInfo.style.background = '#e6fffa';
+                sendInfo.style.borderColor = '#81e6d9';
+                sendInfo.style.color = '#234e52';
+            } else {
+                sendInfo.style.background = '#fff5f5';
+                sendInfo.style.borderColor = '#fed7d7';
+                sendInfo.style.color = '#c53030';
+            }
+            
+            // Remove a mensagem após 5 segundos
+            setTimeout(() => {
+                sendInfo.style.display = 'none';
+            }, 5000);
+        }
+        
         function escolherOutraRodada() {
             console.log('🔄 Solicitando para escolher outra rodada...');
             
@@ -1041,6 +1226,7 @@
             console.error('❌ ERRO:', mensagem);
             
             document.getElementById('loading').style.display = 'none';
+            document.getElementById('sendSection').style.display = 'none';
             
             const errorDiv = document.getElementById('error');
             errorDiv.style.display = 'block';
@@ -1147,8 +1333,9 @@
             
             exibirRodada(dadosExemplo.rodada_detalhada);
             document.getElementById('singleRodadaInfo').style.display = 'block';
+            document.getElementById('sendSection').style.display = 'block';
             
-            console.log('✅ Teste com dados de exemplo executado (com jogos sem palpite)');
+            console.log('✅ Teste com dados de exemplo executado (com botão de enviar)');
         };
     </script>
 </body>
