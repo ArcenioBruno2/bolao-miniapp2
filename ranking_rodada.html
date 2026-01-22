@@ -514,7 +514,7 @@
                     <div class="legend-items">
                         <div class="legend-item">
                             <div class="legend-color" style="background: #FFD700;"></div>
-                            <div>PE = Placar Exato (10 pts)</div>
+                            <div>PE = Placar Exato (14 pts)</div>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: #74b9ff;"></div>
@@ -522,7 +522,11 @@
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: #ffeaa7;"></div>
-                            <div>GM/GV = Gols Mandante/Visitante (2 pts)</div>
+                            <div>GM = Gols Mandante (2 pts)</div>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #a29bfe;"></div>
+                            <div>GV = Gols Visitante (2 pts)</div>
                         </div>
                         <div class="legend-item">
                             <div class="legend-color" style="background: #fd79a8;"></div>
@@ -579,7 +583,7 @@
                     throw new Error('Tipo de dados inválido');
                 }
                 
-                rodadasDisponiveis = dados.rodadas_disponiveis;
+                rodadasDisponiveis = dados.rodadas_disponiveis || [];
                 rodadaAtual = dados.rodada_numero;
                 
                 // Popular dropdown de rodadas
@@ -601,6 +605,10 @@
                     // Se tem rodada atual, carrega automaticamente
                     if (rodadaAtual) {
                         carregarRanking();
+                    } else if (rodadasDisponiveis.length > 0) {
+                        // Seleciona a primeira rodada
+                        selectRodada.value = rodadasDisponiveis[0];
+                        carregarRanking();
                     }
                 } else {
                     loading.style.display = 'none';
@@ -611,6 +619,7 @@
                 console.error('Erro ao carregar dados:', err);
                 loading.style.display = 'none';
                 error.style.display = 'block';
+                document.getElementById('emptyState').style.display = 'block';
             }
         }
         
@@ -619,21 +628,23 @@
             const rodadaNum = document.getElementById('selectRodada').value;
             if (!rodadaNum) {
                 document.getElementById('rankingContent').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
                 return;
             }
             
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
             const rankingContent = document.getElementById('rankingContent');
+            const emptyState = document.getElementById('emptyState');
             
             loading.style.display = 'block';
             error.style.display = 'none';
             rankingContent.style.display = 'none';
+            emptyState.style.display = 'none';
             
             try {
-                // Aqui você faria uma requisição ao bot para buscar o ranking
+                // Se estiver no Telegram WebApp, solicita dados do bot
                 if (window.Telegram && window.Telegram.WebApp) {
-                    // Envia requisição para o bot
                     Telegram.WebApp.sendData(JSON.stringify({
                         tipo: 'buscar_ranking_rodada',
                         rodada_numero: parseInt(rodadaNum)
@@ -641,8 +652,8 @@
                     
                     console.log('Solicitando ranking da rodada:', rodadaNum);
                 } else {
-                    // Modo desenvolvimento - simulação
-                    await simularCarregamentoRanking(rodadaNum);
+                    // Modo desenvolvimento - usa API direta (apenas para testes)
+                    await carregarRankingViaAPI(rodadaNum);
                 }
                 
             } catch (err) {
@@ -652,24 +663,61 @@
             }
         }
         
-        // Simulação de carregamento (para desenvolvimento)
-        async function simularCarregamentoRanking(rodadaNum) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        // Carrega ranking via API direta (para testes sem Telegram)
+        async function carregarRankingViaAPI(rodadaNum) {
+            try {
+                // Esta é uma API de exemplo - você precisará implementar no seu bot Python
+                const response = await fetch(`/api/ranking_rodada/${rodadaNum}`);
+                if (!response.ok) {
+                    throw new Error('Erro na API');
+                }
+                
+                const dados = await response.json();
+                processarDadosRanking(dados);
+                
+            } catch (err) {
+                console.warn('API não disponível, usando dados simulados para teste', err);
+                // Fallback para dados simulados durante desenvolvimento
+                await simularCarregamentoRanking(rodadaNum);
+            }
+        }
+        
+        // Processa os dados de ranking recebidos
+        function processarDadosRanking(dados) {
+            console.log('Dados de ranking recebidos:', dados);
             
-            // Dados de exemplo
+            if (dados.sucesso === false || !dados.ranking) {
+                throw new Error(dados.erro || 'Dados de ranking inválidos');
+            }
+            
             rankingAtual = {
-                rodada_info: {
-                    numero: rodadaNum,
-                    horario_fechamento: '2026-01-10 20:00:00',
+                rodada_info: dados.rodada_info || {
+                    numero: dados.rodada_numero,
+                    horario_fechamento: dados.horario_fechamento,
                     status: 'fechada',
-                    total_participantes: 15
+                    total_participantes: dados.ranking.length
                 },
+                ranking: dados.ranking
+            };
+            
+            exibirRanking();
+        }
+        
+        // Simulação de carregamento (apenas para desenvolvimento)
+        async function simularCarregamentoRanking(rodadaNum) {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Dados de exemplo compatíveis com a estrutura do seu Python
+            const dadosExemplo = {
+                sucesso: true,
+                rodada_numero: parseInt(rodadaNum),
+                horario_fechamento: '2026-01-10 20:00:00',
                 ranking: [
                     {
                         posicao: 1,
                         usuario_id: 1,
                         nome: 'João Silva',
-                        total: 42,
+                        total: 84,
                         estatisticas: {
                             pe: 3,
                             rc: 5,
@@ -682,7 +730,7 @@
                         posicao: 2,
                         usuario_id: 2,
                         nome: 'Maria Santos',
-                        total: 38,
+                        total: 76,
                         estatisticas: {
                             pe: 2,
                             rc: 6,
@@ -695,7 +743,7 @@
                         posicao: 3,
                         usuario_id: 3,
                         nome: 'Pedro Costa',
-                        total: 36,
+                        total: 72,
                         estatisticas: {
                             pe: 2,
                             rc: 5,
@@ -708,7 +756,7 @@
                         posicao: 4,
                         usuario_id: 4,
                         nome: 'Ana Oliveira',
-                        total: 32,
+                        total: 64,
                         estatisticas: {
                             pe: 1,
                             rc: 6,
@@ -721,7 +769,7 @@
                         posicao: 5,
                         usuario_id: 5,
                         nome: 'Carlos Lima',
-                        total: 28,
+                        total: 56,
                         estatisticas: {
                             pe: 1,
                             rc: 4,
@@ -729,50 +777,11 @@
                             gv: 2,
                             pd_usada: true
                         }
-                    },
-                    {
-                        posicao: 6,
-                        usuario_id: 6,
-                        nome: 'Fernanda Rocha',
-                        total: 26,
-                        estatisticas: {
-                            pe: 0,
-                            rc: 5,
-                            gm: 2,
-                            gv: 3,
-                            pd_usada: false
-                        }
-                    },
-                    {
-                        posicao: 7,
-                        usuario_id: 7,
-                        nome: 'Ricardo Alves',
-                        total: 24,
-                        estatisticas: {
-                            pe: 1,
-                            rc: 3,
-                            gm: 2,
-                            gv: 2,
-                            pd_usada: false
-                        }
-                    },
-                    {
-                        posicao: 8,
-                        usuario_id: 8,
-                        nome: 'Juliana Martins',
-                        total: 22,
-                        estatisticas: {
-                            pe: 0,
-                            rc: 4,
-                            gm: 2,
-                            gv: 1,
-                            pd_usada: true
-                        }
                     }
                 ]
             };
             
-            exibirRanking();
+            processarDadosRanking(dadosExemplo);
         }
         
         // Exibe o ranking
@@ -798,7 +807,7 @@
                         <div class="stat-label">PARTICIPANTES</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${rodada.numero === '1' ? '42' : '--'}</div>
+                        <div class="stat-value">${rankingAtual.ranking.length > 0 ? rankingAtual.ranking[0].total : '0'}</div>
                         <div class="stat-label">MÁXIMO PONTOS</div>
                     </div>
                     <div class="stat-item">
@@ -812,56 +821,74 @@
             const rankingBody = document.getElementById('rankingBody');
             rankingBody.innerHTML = '';
             
-            rankingAtual.ranking.forEach(participante => {
+            if (!rankingAtual.ranking || rankingAtual.ranking.length === 0) {
+                rankingBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #7f8c8d;">
+                            Nenhum participante nesta rodada
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            rankingAtual.ranking.forEach((participante, index) => {
                 const row = document.createElement('tr');
-                row.className = `posicao-${participante.posicao}`;
+                row.className = `posicao-${index + 1}`;
                 
                 // Determinar cor da posição
                 let posicaoClass = '';
                 let posicaoText = '';
-                if (participante.posicao === 1) {
+                let posicaoNumero = index + 1;
+                
+                if (posicaoNumero === 1) {
                     posicaoClass = 'podium-1';
                     posicaoText = '🥇';
-                } else if (participante.posicao === 2) {
+                } else if (posicaoNumero === 2) {
                     posicaoClass = 'podium-2';
                     posicaoText = '🥈';
-                } else if (participante.posicao === 3) {
+                } else if (posicaoNumero === 3) {
                     posicaoClass = 'podium-3';
                     posicaoText = '🥉';
                 } else {
-                    posicaoText = participante.posicao;
+                    posicaoText = posicaoNumero;
                 }
+                
+                // Garantir que estatísticas existem
+                const estatisticas = participante.estatisticas || {
+                    pe: 0, rc: 0, gm: 0, gv: 0, pd_usada: false
+                };
                 
                 row.innerHTML = `
                     <td class="posicao-cell ${posicaoClass}">
-                        ${participante.posicao <= 3 ? `<span class="posicao-medal">${participante.posicao}</span>` : ''}
+                        ${posicaoNumero <= 3 ? `<span class="posicao-medal">${posicaoNumero}</span>` : ''}
                         ${posicaoText}
                     </td>
-                    <td class="usuario-cell">${participante.nome}</td>
-                    <td class="pontuacao-cell">${participante.total}</td>
+                    <td class="usuario-cell">${participante.nome || `Usuário ${participante.usuario_id}`}</td>
+                    <td class="pontuacao-cell">${participante.total || 0}</td>
                     <td class="estatisticas-cell">
                         <div class="estatisticas-grid">
                             <div class="estatistica-item">
-                                <div class="estatistica-valor">${participante.estatisticas.pe}</div>
+                                <div class="estatistica-valor">${estatisticas.pe || 0}</div>
                                 <div class="estatistica-label">PE</div>
                             </div>
                             <div class="estatistica-item">
-                                <div class="estatistica-valor">${participante.estatisticas.rc}</div>
+                                <div class="estatistica-valor">${estatisticas.rc || 0}</div>
                                 <div class="estatistica-label">RC</div>
                             </div>
                             <div class="estatistica-item">
-                                <div class="estatistica-valor">${participante.estatisticas.gm}</div>
+                                <div class="estatistica-valor">${estatisticas.gm || 0}</div>
                                 <div class="estatistica-label">GM</div>
                             </div>
                             <div class="estatistica-item">
-                                <div class="estatistica-valor">${participante.estatisticas.gv}</div>
+                                <div class="estatistica-valor">${estatisticas.gv || 0}</div>
                                 <div class="estatistica-label">GV</div>
                             </div>
                         </div>
                     </td>
                     <td class="pd-cell">
-                        <span class="pd-badge ${participante.estatisticas.pd_usada ? 'pd-sim' : 'pd-nao'}">
-                            ${participante.estatisticas.pd_usada ? 'SIM' : 'NÃO'}
+                        <span class="pd-badge ${estatisticas.pd_usada ? 'pd-sim' : 'pd-nao'}">
+                            ${estatisticas.pd_usada ? 'SIM' : 'NÃO'}
                         </span>
                     </td>
                 `;
@@ -873,7 +900,23 @@
         // Formatar data
         function formatarData(dataString) {
             try {
-                const data = new Date(dataString);
+                if (!dataString) return 'Data não disponível';
+                
+                // Tenta vários formatos
+                let data;
+                if (dataString.includes('T')) {
+                    data = new Date(dataString);
+                } else if (dataString.includes('-')) {
+                    // Formato SQL: YYYY-MM-DD HH:MM:SS
+                    data = new Date(dataString.replace(' ', 'T') + 'Z');
+                } else {
+                    return dataString;
+                }
+                
+                if (isNaN(data.getTime())) {
+                    return dataString;
+                }
+                
                 return data.toLocaleDateString('pt-BR', {
                     day: '2-digit',
                     month: '2-digit',
@@ -882,7 +925,7 @@
                     minute: '2-digit'
                 });
             } catch {
-                return dataString;
+                return dataString || 'Data não disponível';
             }
         }
         
@@ -897,17 +940,32 @@
             // Configurar para receber dados do bot
             Telegram.WebApp.onEvent('webAppDataReceived', function(event) {
                 try {
-                    const dados = JSON.parse(event.data);
-                    console.log('Dados recebidos do bot:', dados);
+                    console.log('Dados recebidos do Telegram WebApp:', event);
+                    
+                    let dados;
+                    try {
+                        dados = JSON.parse(event);
+                    } catch {
+                        dados = JSON.parse(event.data || '{}');
+                    }
+                    
+                    console.log('Dados parseados:', dados);
                     
                     if (dados.tipo === 'ranking_rodada_dados') {
-                        rankingAtual = dados;
-                        exibirRanking();
+                        processarDadosRanking(dados);
+                    } else if (dados.tipo === 'erro') {
+                        throw new Error(dados.mensagem || 'Erro desconhecido');
                     }
                 } catch (err) {
                     console.error('Erro ao processar dados do bot:', err);
+                    const errorDiv = document.getElementById('error');
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerHTML = `❌ ${err.message}`;
+                    document.getElementById('loading').style.display = 'none';
                 }
             });
+        } else {
+            console.warn('Telegram WebApp não detectado. Modo desenvolvimento ativado.');
         }
     </script>
 </body>
