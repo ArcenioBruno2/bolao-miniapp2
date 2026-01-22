@@ -6,19 +6,25 @@
     <title>⚽ Bolão - Palpites</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== VARIÁVEIS E RESET ===== */
+        /* ===== NOVA PALETA DE CORES - AZUL ESCURO ELEGANTE ===== */
         :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --dark: #212529;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --primary-dark: #1e3a8a;     /* Azul marinho escuro */
+            --primary: #2563eb;          /* Azul vibrante */
+            --primary-light: #3b82f6;    /* Azul mais claro */
+            --secondary: #7c3aed;        /* Roxo elegante */
+            --secondary-light: #8b5cf6;  /* Roxo claro */
+            --success: #10b981;          /* Verde esmeralda */
+            --danger: #ef4444;           /* Vermelho coral */
+            --warning: #f59e0b;          /* Âmbar */
+            --info: #06b6d4;             /* Ciano */
+            --dark: #0f172a;             /* Azul petróleo quase preto */
+            --light: #f8fafc;            /* Branco gelo */
+            --gray: #64748b;             /* Cinza azulado */
+            --light-gray: #e2e8f0;       /* Cinza claro */
+            --bg-gradient: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            --card-gradient: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            --input-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -27,20 +33,25 @@
             padding: 0; 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            overflow-x: hidden;
+            position: fixed;
         }
         
         body { 
-            background: white;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             color: var(--dark);
             min-height: 100vh;
             width: 100%;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            overflow-x: hidden;
+            align-items: center;
             padding-top: env(safe-area-inset-top);
-            /* padding-top: 15px; REMOVIDO */
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
@@ -49,185 +60,226 @@
             max-width: 100%;
             margin: 0;
             padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         .main-card {
-            background: white;
+            background: var(--card-gradient);
             border-radius: 0;
             padding: 16px 12px;
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
+            flex: 1;
+            overflow-y: auto;
             width: 100%;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* ===== HEADER DA RODADA ===== */
+        /* ===== HEADER DA RODADA - NOVO DESIGN ===== */
         .header-section {
             text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--light-gray);
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 0 0 15px 0;
+            margin-bottom: 20px;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary), var(--info));
         }
         
         .rodada-number {
-            font-size: 24px; /* Aumentado de 22px */
+            font-size: 26px;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .rodada-icon {
-            font-size: 22px; /* Aumentado de 20px */
+            font-size: 24px;
+            color: #fbbf24;
         }
         
-        /* ===== STATUS INFORMAÇÕES COMPACTAS ===== */
+        /* ===== STATUS INFORMAÇÕES - NOVO DESIGN ===== */
         .status-section {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .status-card-compact {
             background: white;
-            border-radius: 10px;
-            padding: 10px 8px;
-            border: 1px solid var(--light-gray);
+            border-radius: 14px;
+            padding: 14px 10px;
+            border: 2px solid var(--light-gray);
             text-align: center;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 70px;
+            min-height: 80px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-card-compact::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .status-card-compact:hover::after {
+            transform: scaleX(1);
+        }
+        
+        .status-card-compact.horario {
+            border-color: rgba(37, 99, 235, 0.2);
+        }
+        
+        .status-card-compact.trunfo {
+            border-color: rgba(245, 158, 11, 0.2);
+        }
+        
+        .status-card-compact.dobrada {
+            border-color: rgba(16, 185, 129, 0.2);
         }
         
         .status-icon-compact {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            background: var(--input-gradient);
         }
         
         .status-card-compact.horario .status-icon-compact {
-            background: rgba(67, 97, 238, 0.1);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             color: var(--primary);
         }
         
         .status-card-compact.trunfo .status-icon-compact {
-            background: rgba(248, 150, 30, 0.1);
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: var(--warning);
         }
         
         .status-card-compact.dobrada .status-icon-compact {
-            background: rgba(76, 201, 240, 0.1);
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
             color: var(--success);
         }
         
         .status-title-compact {
-            font-size: 12px; /* Aumentado de 11px */
+            font-size: 12px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .status-content-compact {
-            font-size: 11px; /* Aumentado de 10px */
-            line-height: 1.2;
+            font-size: 12px;
+            line-height: 1.3;
             color: var(--gray);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 24px;
+            font-weight: 500;
         }
         
         .time-remaining-compact {
             display: inline-block;
-            margin-top: 3px;
-            padding: 2px 6px;
-            background: rgba(67, 97, 238, 0.1);
+            margin-top: 4px;
+            padding: 3px 8px;
+            background: rgba(37, 99, 235, 0.1);
             border-radius: 50px;
             font-weight: 700;
             color: var(--primary);
-            font-size: 10px; /* Aumentado de 9px */
+            font-size: 11px;
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
         
         .status-badge-compact {
             display: inline-block;
-            padding: 2px 6px;
+            padding: 3px 8px;
             border-radius: 50px;
-            font-size: 10px; /* Aumentado de 9px */
+            font-size: 11px;
             font-weight: 700;
-            margin-top: 3px;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         
         .status-badge-compact.active {
-            background: rgba(76, 201, 240, 0.1);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
         }
         
         .status-badge-compact.inactive {
-            background: rgba(108, 117, 125, 0.1);
+            background: rgba(100, 116, 139, 0.1);
             color: var(--gray);
+            border: 1px solid rgba(100, 116, 139, 0.2);
         }
         
         .status-badge-compact.used {
-            background: rgba(247, 37, 133, 0.1);
+            background: rgba(239, 68, 68, 0.1);
             color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
         
         .status-badge-compact.blocked {
-            background: rgba(108, 117, 125, 0.15);
+            background: rgba(100, 116, 139, 0.15);
             color: var(--gray);
+            border: 1px solid rgba(100, 116, 139, 0.3);
         }
         
-        /* ===== ALERTA DE PD JÁ USADA ===== */
+        /* ===== ALERTA DE PD JÁ USADA - NOVO DESIGN ===== */
         .pd-used-alert {
-            background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
-            border: 1px solid rgba(247, 37, 133, 0.2);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
-            70% { box-shadow: 0 0 0 6px rgba(247, 37, 133, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+            0% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1); }
+            50% { box-shadow: 0 4px 20px rgba(239, 68, 68, 0.2); }
+            100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1); }
         }
         
         .pd-used-icon {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
         }
@@ -237,78 +289,96 @@
         }
         
         .pd-used-title {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--danger);
-            margin-bottom: 2px;
-            font-size: 13px; /* Aumentado de 12px */
+            margin-bottom: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .pd-used-info {
-            font-size: 11px; /* Aumentado de 10px */
+            font-size: 12px;
             color: #666;
-            line-height: 1.3;
+            line-height: 1.4;
         }
         
         .pd-used-game {
             font-weight: 700;
             color: var(--dark);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
         
-        /* ===== LISTA DE JOGOS - NOVO LAYOUT ===== */
+        /* ===== LISTA DE JOGOS - DESIGN REFINADO ===== */
         .games-section {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            flex: 1;
         }
         
         .games-title {
-            font-size: 18px; /* Aumentado de 16px */
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 800;
             color: var(--dark);
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             padding: 0 5px;
         }
         
         .games-title i {
             color: var(--primary);
-            font-size: 16px; /* Aumentado */
+            font-size: 16px;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        /* ===== GAME CARD NOVO LAYOUT ===== */
+        /* ===== GAME CARD - DESIGN MODERNO ===== */
         .game-card {
             background: white;
-            border-radius: 12px;
-            padding: 14px; /* Aumentado de 12px */
-            margin-bottom: 14px; /* Aumentado de 12px */
-            border: 1px solid var(--light-gray);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 2px solid var(--light-gray);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             width: 100%;
+            box-shadow: var(--card-shadow);
         }
         
         .game-card:hover {
             border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(30, 58, 138, 0.15);
         }
         
         .game-card.pd-blocked {
-            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
-            border-color: rgba(108, 117, 125, 0.2);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-color: rgba(100, 116, 139, 0.3);
         }
         
         .game-card.pd-used {
-            background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
-            border-color: rgba(247, 37, 133, 0.2);
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border-color: rgba(239, 68, 68, 0.3);
         }
         
-        /* CONTAINER PRINCIPAL DO JOGO - LAYOUT EM GRID */
+        /* CONTAINER PRINCIPAL DO JOGO */
         .game-content {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 14px; /* Aumentado de 12px */
+            gap: 16px;
             width: 100%;
             align-items: start;
         }
@@ -317,168 +387,164 @@
         .teams-container {
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Aumentado de 8px */
+            gap: 12px;
         }
         
         .team-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
         }
         
         .team-name {
-            font-size: 16px; /* Aumentado de 13px */
-            font-weight: 800; /* Aumentado de 700 */
-            padding: 12px 14px; /* Aumentado de 8px 10px */
-            border-radius: 10px; /* Aumentado de 8px */
+            font-size: 16px;
+            font-weight: 800;
+            padding: 14px 16px;
+            border-radius: 12px;
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             max-width: 100%;
-            min-height: 46px; /* Adicionado para altura consistente */
+            min-height: 50px;
             display: flex;
             align-items: center;
+            transition: var(--transition);
+            border-left: 4px solid;
         }
         
         .team-home {
-            background: rgba(67, 97, 238, 0.12); /* Aumentado opacidade */
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.04) 100%);
             color: var(--primary);
-            border-left: 3px solid var(--primary);
+            border-left-color: var(--primary);
         }
         
         .team-away {
-            background: rgba(58, 12, 163, 0.12); /* Aumentado opacidade */
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(124, 58, 237, 0.04) 100%);
             color: var(--secondary);
-            border-left: 3px solid var(--secondary);
+            border-left-color: var(--secondary);
         }
         
         /* PLACARES E ESTRELA - LADO DIREITO */
         .scores-pd-container {
             display: flex;
             align-items: center;
-            gap: 14px; /* Aumentado de 12px */
-            min-width: 100px; /* Aumentado de 90px */
+            gap: 16px;
+            min-width: 110px;
         }
         
-        /* CONTÊINER DOS PLACARES (VERTICAL) */
+        /* CONTÊINER DOS PLACARES */
         .scores-container {
             display: flex;
             flex-direction: column;
-            gap: 6px; /* Aumentado de 4px */
+            gap: 8px;
             align-items: center;
         }
         
         .score-row {
             display: flex;
             align-items: center;
-            gap: 6px; /* Aumentado de 4px */
+            gap: 8px;
             width: 100%;
         }
         
         .score-input-container {
             position: relative;
-            width: 44px; /* Aumentado de 36px */
+            width: 50px;
         }
         
         .score-input {
             width: 100%;
-            height: 40px; /* Aumentado de 32px */
-            border: 2px solid #e0e7ff; /* Aumentado de 1.5px */
-            border-radius: 8px; /* Aumentado de 6px */
+            height: 44px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
             text-align: center;
-            font-size: 18px; /* Aumentado de 14px */
-            font-weight: 800; /* Aumentado de 700 */
+            font-size: 20px;
+            font-weight: 800;
             outline: none;
-            background: #f8faff;
+            background: var(--input-gradient);
             transition: var(--transition);
             color: var(--dark);
             padding: 0;
             -webkit-appearance: none;
             -moz-appearance: textfield;
+            font-family: 'Inter', monospace;
         }
         
-        .score-input::-webkit-outer-spin-button,
-        .score-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+        /* ⭐⭐ ALTERAÇÃO CRÍTICA: PLACAR VAZIO EM VEZ DE ZERO ⭐⭐ */
+        .score-input::placeholder {
+            color: #cbd5e1;
+            font-weight: 400;
+            font-size: 16px;
+            content: "";
         }
         
         .score-input:focus {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15); /* Aumentado */
-        }
-        
-        .score-input::placeholder {
-            color: #d0d7ff;
-            font-weight: 400;
-            font-size: 14px; /* Aumentado de 12px */
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
         
         .score-input:disabled {
-            background: #f5f5f5;
-            border-color: #e0e0e0;
-            color: #999;
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            color: #94a3b8;
             cursor: not-allowed;
         }
         
-        .vs-symbol-small {
-            font-size: 12px; /* Aumentado de 10px */
+        .score-label {
+            font-size: 12px;
             font-weight: 800;
             color: var(--gray);
-            margin: 0 2px;
-        }
-        
-        /* ROTULO DO PLACAR (M / V) */
-        .score-label {
-            font-size: 12px; /* Aumentado de 9px */
-            font-weight: 700; /* Aumentado de 600 */
-            color: var(--gray);
             text-transform: uppercase;
-            margin-right: 2px;
-            min-width: 16px; /* Aumentado de 12px */
+            margin-right: 4px;
+            min-width: 18px;
+            background: var(--input-gradient);
+            padding: 2px 6px;
+            border-radius: 6px;
+            border: 1px solid var(--light-gray);
         }
         
-        /* ESTRELA */
+        /* ESTRELA - DESIGN REFINADO */
         .pd-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 52px; /* Aumentado de 44px */
+            width: 60px;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-            padding: 8px; /* Aumentado de 5px */
-            border-radius: 10px; /* Aumentado de 8px */
+            padding: 10px;
+            border-radius: 12px;
         }
         
         .pd-container.disabled {
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.6;
         }
         
         .pd-container.clickable:hover:not(.disabled) {
-            background: rgba(255, 215, 0, 0.08); /* Aumentado */
-            transform: translateY(-2px); /* Aumentado de -1px */
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-2px);
         }
         
         .pd-star {
-            font-size: 28px; /* Aumentado de 20px */
-            color: #e0e0e0;
+            font-size: 32px;
+            color: #e2e8f0;
             transition: var(--transition);
             filter: grayscale(1);
             position: relative;
             line-height: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .pd-star.active {
-            color: #ffd700;
+            color: #fbbf24;
             filter: grayscale(0);
-            transform: scale(1.15); /* Aumentado de 1.1 */
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); /* Aumentado */
+            transform: scale(1.2);
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.4);
         }
         
         .pd-star.used {
@@ -487,24 +553,24 @@
         }
         
         .pd-star.blocked {
-            color: #cccccc;
+            color: #cbd5e1;
             filter: grayscale(1);
         }
         
         .pd-label {
-            font-size: 10px; /* Aumentado de 8px */
-            font-weight: 800; /* Aumentado de 700 */
-            margin-top: 6px; /* Aumentado de 4px */
-            color: #999;
+            font-size: 11px;
+            font-weight: 800;
+            margin-top: 8px;
+            color: var(--gray);
             text-transform: uppercase;
-            letter-spacing: 0.5px; /* Aumentado de 0.3px */
+            letter-spacing: 0.5px;
             transition: var(--transition);
             text-align: center;
             white-space: nowrap;
         }
         
         .pd-star.active + .pd-label {
-            color: #ffd700;
+            color: #fbbf24;
         }
         
         .pd-star.used + .pd-label {
@@ -512,50 +578,70 @@
         }
         
         .pd-star.blocked + .pd-label {
-            color: #cccccc;
+            color: #cbd5e1;
         }
         
         .pd-badge {
             position: absolute;
-            top: -2px; /* Ajustado de -4px */
-            right: -2px; /* Ajustado de -4px */
+            top: -4px;
+            right: -4px;
             background: var(--danger);
             color: white;
-            font-size: 8px; /* Aumentado de 6px */
-            padding: 2px 4px; /* Aumentado de 1px 3px */
+            font-size: 9px;
+            padding: 3px 5px;
             border-radius: 50px;
-            font-weight: 700;
+            font-weight: 800;
             z-index: 2;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         
-        /* ===== FOOTER BOTÕES ===== */
+        /* ===== FOOTER BOTÕES - NOVO DESIGN ===== */
         .footer-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 10px 0;
+            gap: 12px;
+            margin-top: auto;
+            padding: 16px 0;
             position: sticky;
             bottom: 0;
-            background: white;
+            background: var(--card-gradient);
+            border-top: 2px solid var(--light-gray);
         }
         
         .action-btn {
-            padding: 16px 12px; /* Aumentado de 14px 10px */
+            padding: 18px 14px;
             border: none;
-            border-radius: 10px;
-            font-size: 15px; /* Aumentado de 13px */
-            font-weight: 800; /* Aumentado de 700 */
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
             width: 100%;
-            height: 48px; /* Aumentado de 44px */
+            height: 52px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .action-btn:hover::before {
+            transform: translateX(0);
         }
         
         .action-btn:active {
@@ -563,23 +649,26 @@
         }
         
         .btn-cancel {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
             color: white;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
         }
         
         .btn-send {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
         }
         
         .btn-send:disabled {
-            background: linear-gradient(135deg, #cccccc 0%, #aaaaaa 100%);
+            background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
         }
         
         .btn-icon {
-            font-size: 16px; /* Aumentado de 14px */
+            font-size: 18px;
         }
         
         /* ===== LOADING E ERROS ===== */
@@ -587,19 +676,24 @@
             text-align: center;
             padding: 60px 15px;
             width: 100%;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: white;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
         }
         
         .loading-spinner {
-            font-size: 48px;
+            font-size: 56px;
             color: var(--primary);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             animation: spin 1.5s linear infinite;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
         
         @keyframes spin {
@@ -608,22 +702,24 @@
         }
         
         .loading-text {
-            font-size: 16px;
-            color: var(--gray);
+            font-size: 17px;
+            color: white;
             font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .error-message {
-            background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
-            border: 1px solid rgba(247, 37, 133, 0.3);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid rgba(239, 68, 68, 0.4);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
             display: none;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             animation: shake 0.5s ease-in-out;
             width: 100%;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
         }
         
         @keyframes shake {
@@ -633,155 +729,137 @@
         }
         
         .error-icon {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
         }
         
         .error-text {
-            font-weight: 700;
+            font-weight: 800;
             color: var(--danger);
-            font-size: 13px; /* Aumentado de 12px */
+            font-size: 14px;
         }
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
             .main-card {
-                padding: 12px 8px;
+                padding: 14px 10px;
             }
             
             .status-section {
-                gap: 6px;
+                gap: 8px;
             }
             
             .status-card-compact {
-                padding: 8px 6px;
-                min-height: 65px;
-            }
-            
-            .status-title-compact {
-                font-size: 11px; /* Ajustado */
-            }
-            
-            .status-content-compact {
-                font-size: 10px; /* Ajustado */
-                height: 22px;
+                padding: 12px 8px;
+                min-height: 75px;
             }
             
             .team-name {
-                font-size: 15px; /* Aumentado de 12px */
-                padding: 10px 12px; /* Aumentado de 6px 8px */
-                min-height: 42px; /* Adicionado */
+                font-size: 15px;
+                padding: 12px 14px;
+                min-height: 46px;
             }
             
             .score-input-container {
-                width: 38px; /* Aumentado de 32px */
+                width: 44px;
             }
             
             .score-input {
-                height: 36px; /* Aumentado de 30px */
-                font-size: 16px; /* Aumentado de 13px */
+                height: 40px;
+                font-size: 18px;
             }
             
             .pd-star {
-                font-size: 24px; /* Aumentado de 18px */
+                font-size: 28px;
             }
             
-            .pd-label {
-                font-size: 9px; /* Aumentado de 7px */
+            .pd-container {
+                width: 56px;
             }
             
             .action-btn {
-                padding: 14px 10px; /* Ajustado */
-                font-size: 14px; /* Aumentado de 12px */
-                height: 44px; /* Aumentado de 42px */
+                padding: 16px 12px;
+                height: 50px;
             }
             
             .scores-pd-container {
-                gap: 10px; /* Aumentado de 8px */
-                min-width: 95px; /* Aumentado de 80px */
-            }
-            
-            .score-label {
-                font-size: 11px; /* Aumentado */
+                gap: 12px;
+                min-width: 100px;
             }
         }
         
         @media (max-width: 320px) {
             .team-name {
-                font-size: 14px; /* Aumentado de 11px */
-                padding: 9px 10px; /* Aumentado de 5px 6px */
-                min-height: 40px; /* Adicionado */
+                font-size: 14px;
+                padding: 10px 12px;
+                min-height: 44px;
             }
             
             .score-input-container {
-                width: 34px; /* Aumentado de 28px */
+                width: 40px;
             }
             
             .score-input {
-                height: 34px; /* Aumentado de 28px */
-                font-size: 15px; /* Aumentado de 12px */
+                height: 38px;
+                font-size: 17px;
             }
             
             .pd-star {
-                font-size: 22px; /* Aumentado de 16px */
+                font-size: 26px;
             }
             
-            .pd-label {
-                font-size: 8px; /* Aumentado de 6px */
+            .pd-container {
+                width: 52px;
             }
             
             .scores-pd-container {
-                min-width: 90px; /* Aumentado de 80px */
-                gap: 8px;
-            }
-            
-            .score-label {
-                font-size: 10px; /* Aumentado */
+                min-width: 95px;
+                gap: 10px;
             }
             
             .games-title {
-                font-size: 16px; /* Aumentado */
+                font-size: 17px;
             }
             
             .rodada-number {
-                font-size: 22px; /* Aumentado */
+                font-size: 24px;
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
-        html, body {
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow-x: hidden !important;
-            position: fixed !important;
-        }
-        
-        #content {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        
-        #lista-jogos {
-            width: 100% !important;
-        }
-        
-        /* ===== SCROLLBAR ===== */
+        /* ===== SCROLLBAR ESTILIZADA ===== */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 6px;
         }
         
         ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+            background: #f1f5f9;
+            border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
+            background: var(--primary);
+            border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
+            background: var(--primary-dark);
+        }
+        
+        /* ===== ANIMAÇÃO DE ENTRADA ===== */
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .main-card {
+            animation: slideUp 0.6s ease-out;
         }
     </style>
 </head>
@@ -884,37 +962,30 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // ===== CORREÇÃO FINAL PARA ANDROID =====
-        window.addEventListener('load', function() {
-            console.log("📱 CORREÇÃO ANDROID APLICADA");
+        // ===== CORREÇÃO SIMPLES PARA ANDROID - APENAS O ESSENCIAL =====
+        window.addEventListener('DOMContentLoaded', function() {
+            // Apenas garante que a página inicia corretamente
+            document.documentElement.style.height = '100%';
+            document.body.style.height = '100%';
             
-            // 1. Força dimensões corretas
-            document.documentElement.style.width = '100vw';
-            document.documentElement.style.height = '100vh';
-            document.body.style.width = '100vw';
-            document.body.style.height = '100vh';
-            
-            // 2. Expansão múltipla para Android
             if (window.Telegram && Telegram.WebApp) {
-                setTimeout(() => Telegram.WebApp.expand(), 50);
-                setTimeout(() => Telegram.WebApp.expand(), 200);
-                setTimeout(() => Telegram.WebApp.expand(), 500);
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Expansão múltipla com timeout para garantir
+                setTimeout(() => {
+                    Telegram.WebApp.expand();
+                }, 100);
+                
+                setTimeout(() => {
+                    Telegram.WebApp.expand();
+                }, 500);
             }
             
-            // 3. Remove qualquer padding/margin extra
-            document.body.style.margin = '0';
-            document.body.style.padding = '0';
-            
-            // 4. Garante que o container principal ocupe 100%
-            const mainContainer = document.querySelector('.app-container');
-            
-            if (mainContainer) {
-                mainContainer.style.width = '100%';
-                mainContainer.style.height = '100%';
-                mainContainer.style.margin = '0';
-                mainContainer.style.borderRadius = '0';
-                mainContainer.style.maxWidth = '100%';
-            }
+            // Aguarda um pouco para iniciar o carregamento
+            setTimeout(() => {
+                initTelegramWebApp();
+            }, 300);
         });
 
         // ===== VARIÁVEIS GLOBAIS =====
@@ -931,52 +1002,26 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA PARA ANDROID =====
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
-            
-            // PRIMEIRO: Garantir que a página ocupa 100% da tela
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.position = 'fixed';
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // CONFIGURAÇÕES CRÍTICAS PARA ANDROID
                 tg.ready();
+                tg.expand();
                 
-                // Expansão forçada - tela cheia
-                try {
-                    tg.expand();
-                    
-                    // Garantir expansão completa
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 100);
-                    
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 500);
-                    
-                } catch (error) {
-                    console.log("⚠️ Expand já foi chamado");
-                }
-                
-                // Configurar cores para se integrar
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
+                // Configurar cores para combinar com o novo tema
+                tg.setHeaderColor('#1e3a8a');
+                tg.setBackgroundColor('#0f172a');
                 
                 console.log("✅ Web App inicializado");
             } else {
                 console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
             }
             
-            // Iniciar carregamento
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 300);
+            carregarDadosRodada();
         }
 
         // ===== FUNÇÕES DE UTILIDADE =====
@@ -1302,7 +1347,7 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
+        // ===== RENDERIZAÇÃO DOS JOGOS - DESIGN REFINADO =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1310,9 +1355,9 @@
             if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
                 container.innerHTML = `
                     <div class="game-card">
-                        <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
-                            <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 10px; color: var(--warning);"></i>
-                            <p style="font-size: 13px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
+                        <div style="text-align: center; padding: 30px; color: var(--gray); width: 100%;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 12px; color: var(--warning);"></i>
+                            <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
                         </div>
                     </div>
                 `;
@@ -1345,7 +1390,6 @@
                 
                 // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
                 if (pdBloqueadaAdm) {
-                    // PD bloqueada administrativamente
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADA';
@@ -1353,7 +1397,6 @@
                     isDisabled = true;
                 }
                 else if (pdJaUsouAnteriormente) {
-                    // PD já usada em rodada anterior - BLOQUEIO PERMANENTE
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADO';
@@ -1371,9 +1414,7 @@
                 // 3. MODO NORMAL (NÃO É EDIÇÃO)
                 else if (!ehEdicao) {
                     if (pdJaUsada) {
-                        // PD já foi usada nesta rodada
                         if (isOriginalPD) {
-                            // Esta é a PD que foi usada
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1382,20 +1423,16 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Não é a PD usada - não pode selecionar outra
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
                             isDisabled = true;
                         }
                     } else {
-                        // PD ainda não foi usada - disponível para seleção
                         if (isPDAtual) {
-                            // Esta é a PD selecionada
                             starClass += ' active';
                             pdLabel = 'SELECIONADA';
                         } else {
-                            // Disponível para seleção
                             pdLabel = 'SELECIONAR';
                         }
                     }
@@ -1403,32 +1440,23 @@
                 // 4. MODO EDIÇÃO
                 else {
                     if (pdPodeTrocar) {
-                        // Pode trocar a PD durante edição
                         if (isPDAtual) {
-                            // Esta é a PD atualmente selecionada
                             starClass += ' active';
                             pdLabel = 'SELECIONADA';
                             
-                            // Se era a PD original, mostrar badge
                             if (tinhaPDOriginal) {
                                 showBadge = true;
                                 badgeText = 'ORIGINAL';
                             }
                         } else {
-                            // Não é a PD selecionada no momento
                             if (tinhaPDOriginal) {
-                                // Era a PD original, mas não está mais selecionada
-                                // Mostrar como normal, disponível para seleção
                                 pdLabel = 'SELECIONAR';
                             } else {
-                                // Nunca foi PD - disponível para seleção
                                 pdLabel = 'SELECIONAR';
                             }
                         }
                     } else {
-                        // Não pode trocar PD durante edição
                         if (tinhaPDOriginal) {
-                            // É a PD original e não pode trocar
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1437,7 +1465,6 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Nunca foi PD e não pode selecionar agora
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
@@ -1446,7 +1473,10 @@
                     }
                 }
                 
-                // Criar o elemento do jogo com NOVO LAYOUT
+                // ⭐⭐ ALTERAÇÃO CRÍTICA: VALORES VAZIOS EM VEZ DE ZERO ⭐⭐
+                const valorMandante = palpiteAtual.mandante === '' ? '' : palpiteAtual.mandante;
+                const valorVisitante = palpiteAtual.visitante === '' ? '' : palpiteAtual.visitante;
+                
                 const div = document.createElement('div');
                 div.className = cardClass;
                 
@@ -1476,9 +1506,9 @@
                                     <div class="score-label">M</div>
                                     <div class="score-input-container">
                                         <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.mandante}" 
+                                               value="${valorMandante}" 
                                                oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                               placeholder="0"
+                                               placeholder=""
                                                ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
@@ -1488,9 +1518,9 @@
                                     <div class="score-label">V</div>
                                     <div class="score-input-container">
                                         <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.visitante}" 
+                                               value="${valorVisitante}" 
                                                oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                               placeholder="0"
+                                               placeholder=""
                                                ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
@@ -1611,7 +1641,6 @@
                         // Adicionar PD ao novo jogo
                         let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
                         if (palpiteIndex === -1) {
-                            // Criar novo palpite para este jogo
                             palpites.push({
                                 jogo_id: jogoId,
                                 mandante: '',
@@ -1620,7 +1649,6 @@
                             });
                             console.log(`✅ Nova PD criada para jogo ${jogoId}`);
                         } else {
-                            // Atualizar palpite existente
                             palpites[palpiteIndex].pd = true;
                             console.log(`✅ PD atualizada para jogo ${jogoId}`);
                         }
@@ -1659,12 +1687,14 @@
         }
 
         function salvarPlacar(jogoId, time, valor) {
-            // Limpar e validar valor
+            // ⭐⭐ ALTERAÇÃO CRÍTICA: Mantém vazio em vez de zero ⭐⭐
             valor = valor.replace(/\D/g, '');
             valor = valor.slice(0, 2);
+            
+            // Se o usuário apagou tudo, mantém vazio
             const valorNum = valor === '' ? '' : parseInt(valor) || 0;
             
-            // Validar range
+            // Validar range apenas se tiver valor
             if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
                 valor = '';
             }
@@ -1673,7 +1703,6 @@
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
             
             if (palpiteIndex === -1) {
-                // Criar novo palpite
                 palpites.push({
                     jogo_id: jogoId,
                     mandante: '',
@@ -1683,22 +1712,13 @@
                 palpiteIndex = palpites.length - 1;
             }
             
-            // Atualizar placar
+            // Atualizar placar (mantém vazio se apagou)
             palpites[palpiteIndex][time] = valorNum;
             
             // Se este jogo tem a PD selecionada, manter a PD
             if (pdSelecionado === jogoId) {
                 palpites[palpiteIndex].pd = true;
             }
-            
-            // Atualizar campo visualmente (opcional)
-            const inputSelector = `.score-input[oninput*="${jogoId}"]`;
-            const inputs = document.querySelectorAll(inputSelector);
-            inputs.forEach(input => {
-                if (input.oninput.toString().includes(`'${time}'`)) {
-                    input.value = valor;
-                }
-            });
             
             // Verificar se pode enviar
             verificarEAtualizar();
@@ -1841,28 +1861,6 @@
                 }
             }
         };
-
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
-        window.addEventListener('DOMContentLoaded', function() {
-            // Primeiro garantir que o corpo ocupa 100%
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
-            
-            // Inicializar Telegram WebApp
-            initTelegramWebApp();
-        });
-
-        // Backup: Se o Telegram não inicializar, tentar novamente
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (!tg && window.Telegram && window.Telegram.WebApp) {
-                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
-                    initTelegramWebApp();
-                }
-            }, 1000);
-        });
     </script>
 </body>
 </html>
