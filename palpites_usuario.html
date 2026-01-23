@@ -547,9 +547,10 @@
                     <span class="stat-value" id="statMeusPalpites">0</span>
                     <span class="stat-label">Meus Palpites</span>
                 </div>
+                <!-- ALTERADO: "Com Placar" para "Resultado Correto" -->
                 <div class="stat-card">
-                    <span class="stat-value" id="startRC">0</span>
-                    <span class="stat-label">Acerto Resultado</span>
+                    <span class="stat-value" id="statResultadoCorreto">0</span>
+                    <span class="stat-label">Resultado Correto</span>
                 </div>
                 <div class="stat-card">
                     <span class="stat-value" id="statPontos">0</span>
@@ -788,7 +789,8 @@
             const totalRodada = rodada.jtf || rodada.t || 0;
             const usadosAdm = rodada.jub || rodada.u || 0;
             const meusPalpites = rodada.jp || rodada.j || 0;
-            const acertosresultados = rodada.est?.rc || 0;
+            // ALTERADO: Usar RC (Resultado Correto) das estatísticas
+            const resultadoCorreto = rodada.est?.rc || rodada.est?.rc || 0;
             const pontos = rodada.tp || rodada.p || 0;
             const placarExato = rodada.est?.pe || 0;
             
@@ -796,7 +798,7 @@
                 totalRodada,
                 usadosAdm,
                 meusPalpites,
-                acertosresultados,
+                resultadoCorreto,
                 pontos,
                 placarExato
             });
@@ -805,7 +807,8 @@
             document.getElementById('statTotalRodada').textContent = totalRodada;
             document.getElementById('statUsadosAdm').textContent = usadosAdm;
             document.getElementById('statMeusPalpites').textContent = meusPalpites;
-            document.getElementById('statRC').textContent = acertosresultados;
+            // ALTERADO: Atualiza o elemento correto
+            document.getElementById('statResultadoCorreto').textContent = resultadoCorreto;
             document.getElementById('statPontos').textContent = pontos;
             document.getElementById('statPE').textContent = placarExato;
             
@@ -1101,7 +1104,7 @@
                     jub: 7,
                     jtf: 10,
                     jcp: 6,
-                    est: { pe: 2, rc: 1, gm: 3, gv: 2, pd_usada: true },
+                    est: { pe: 2, rc: 3, gm: 3, gv: 2, pd_usada: true }, // ALTERADO: RC = 3
                     jogos: [
                         {
                             id: 1,
