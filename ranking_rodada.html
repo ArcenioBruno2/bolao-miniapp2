@@ -662,81 +662,100 @@
         
         // Função para descomprimir dados Gzip
         async function descomprimirDadosGzip(base64Data) {
-            try {
-                logDebug('Tentando descomprimir dados Gzip...');
-                logDebug(`Tamanho dos dados: ${base64Data.length} caracteres`);
-                logDebug(`Primeiros 50 chars: ${base64Data.substring(0, 50)}...`);
-                
-                // Primeiro, tenta como JSON direto (sem compressão)
-                try {
-                    logDebug('Tentando decodificar como JSON direto...');
-                    const jsonString = decodeURIComponent(escape(atob(base64Data)));
-                    const dados = JSON.parse(jsonString);
-                    logDebug('✅ Dados decodificados como JSON direto (sem compressão)');
-                    return dados;
-                } catch (e1) {
-                    logDebug(`JSON direto falhou: ${e1.message}`);
-                }
-                
-                // Verifica se o navegador suporta DecompressionStream
-                if (typeof DecompressionStream === 'undefined') {
-                    logDebug('DecompressionStream não suportado, usando fallback manual');
-                    throw new Error('Navegador não suporta descompressão Gzip');
-                }
-                
-                // Decodifica Base64 URL-safe
-                let base64 = base64Data;
-                // Substitui caracteres URL-safe
-                base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-                // Adiciona padding se necessário
-                const pad = base64.length % 4;
-                if (pad) {
-                    base64 += '='.repeat(4 - pad);
-                }
-                
-                try {
-                    const binaryString = atob(base64);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let i = 0; i < binaryString.length; i++) {
-                        bytes[i] = binaryString.charCodeAt(i);
-                    }
-                    
-                    logDebug(`Dados comprimidos: ${bytes.length} bytes`);
-                    
-                    // Descomprime Gzip
-                    const ds = new DecompressionStream('gzip');
-                    const writer = ds.writable.getWriter();
-                    writer.write(bytes);
-                    writer.close();
-                    
-                    const decompressed = await new Response(ds.readable).arrayBuffer();
-                    const decoder = new TextDecoder('utf-8');
-                    const jsonString = decoder.decode(decompressed);
-                    
-                    logDebug(`✅ Descompressão Gzip bem-sucedida`);
-                    logDebug(`Tamanho descomprimido: ${jsonString.length} caracteres`);
-                    
-                    return JSON.parse(jsonString);
-                } catch (e2) {
-                    logDebug(`Gzip falhou: ${e2.message}`);
-                    throw e2;
-                }
-                
-            } catch (error) {
-                logDebug(`❌ Erro na descompressão: ${error.message}`);
-                
-                // Última tentativa: tenta como string direta
-                try {
-                    logDebug('Tentando como string direta...');
-                    const dados = JSON.parse(base64Data);
-                    logDebug('✅ Dados parseados como string direta');
-                    return dados;
-                } catch (e3) {
-                    logDebug(`String direta falhou: ${e3.message}`);
-                    throw new Error('Não foi possível decodificar os dados: ' + error.message);
-                }
+    try {
+        logDebug('=== TENTANDO DESCOMPRIMIR ===');
+        logDebug(`Tamanho base64Data: ${base64Data.length} caracteres`);
+        logDebug(`Primeiros 50 chars: ${base64Data.substring(0, 50)}`);
+        
+        // ⭐⭐ 1. TENTA COMO JSON DIRETO (SEM COMPRESSÃO) PRIMEIRO ⭐⭐
+        try {
+            // Decodifica Base64 URL-safe
+            let base64 = base64Data;
+            base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+            
+            // Adiciona padding
+            while (base64.length % 4) {
+                base64 += '=';
             }
+            
+            const jsonString = atob(base64);
+            logDebug(`✅ Decodificado Base64: ${jsonString.substring(0, 100)}...`);
+            
+            const dados = JSON.parse(jsonString);
+            logDebug('✅ Dados parseados como JSON direto (sem compressão)');
+            return dados;
+        } catch (e1) {
+            logDebug(`❌ JSON direto falhou: ${e1.message}`);
         }
+        
+        // ⭐⭐ 2. TENTA COM GZIP ⭐⭐
+        try {
+            logDebug('Tentando descompressão Gzip...');
+            
+            // Decodifica Base64 URL-safe
+            let base64 = base64Data;
+            base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+            
+            // Adiciona padding
+            while (base64.length % 4) {
+                base64 += '=';
+            }
+            
+            const binaryString = atob(base64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            logDebug(`Bytes comprimidos: ${bytes.length}`);
+            
+            // Verifica se tem o cabeçalho Gzip (primeiros 2 bytes: 0x1F 0x8B)
+            if (bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B) {
+                logDebug('✅ Detectado cabeçalho Gzip válido');
+                
+                const ds = new DecompressionStream('gzip');
+                const writer = ds.writable.getWriter();
+                writer.write(bytes);
+                writer.close();
+                
+                const decompressed = await new Response(ds.readable).arrayBuffer();
+                const decoder = new TextDecoder('utf-8');
+                const jsonString = decoder.decode(decompressed);
+                
+                logDebug(`✅ Descompressão Gzip bem-sucedida`);
+                logDebug(`Dados descomprimidos: ${jsonString.substring(0, 100)}...`);
+                
+                return JSON.parse(jsonString);
+            } else {
+                logDebug('⚠️ Não é Gzip válido');
+                throw new Error('Não é Gzip válido');
+            }
+        } catch (e2) {
+            logDebug(`❌ Gzip falhou: ${e2.message}`);
+            throw e2;
+        }
+        
+    } catch (error) {
+        logDebug(`❌ Erro na descompressão: ${error.message}`);
+        
+        // ⭐⭐ ÚLTIMA TENTATIVA: TENTA COMO STRING DIRETA ⭐⭐
+        try {
+            logDebug('Tentando como string direta...');
+            const dados = JSON.parse(base64Data); // Talvez os dados já sejam JSON
+            logDebug('✅ Dados parseados como string direta');
+            return dados;
+        } catch (e3) {
+            logDebug(`❌ String direta falhou: ${e3.message}`);
+            
+            // ⭐⭐ MOSTRA OS DADOS RECEBIDOS PARA DEBUG ⭐⭐
+            logDebug(`=== DADOS RECEBIDOS (RAW) ===`);
+            logDebug(base64Data);
+            logDebug(`=== FIM DADOS RAW ===`);
+            
+            throw new Error('Não foi possível decodificar os dados: ' + error.message);
+        }
+    }
+}
         
         // Função para voltar
         function goBack() {
