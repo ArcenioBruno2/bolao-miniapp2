@@ -248,7 +248,7 @@
             transform: translateY(-12px);
         }
         
-        /* POSIÇÕES OTIMIZADAS */
+        /* PÓSICIONES OTIMIZADAS */
         .podium-step.pos-1 {
             order: 2;
             height: 280px;
@@ -283,10 +283,6 @@
             font-weight: 900;
             z-index: 10;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
         }
         
         .pos-1 .podium-place { color: #ffb300; }
@@ -477,10 +473,6 @@
             text-align: center;
             width: 80px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         
         .ranking-item.sem-palpite .posicao {
@@ -655,57 +647,6 @@
         .rc-color { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
         .nopal-color { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); }
         
-        /* ============= ESTILOS PARA VARIAÇÃO DE POSIÇÃO ============= */
-        .variacao-indicador {
-            font-size: 12px;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 12px;
-            margin-top: 4px;
-            display: inline-block;
-            min-width: 24px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .variacao-subiu {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        
-        .variacao-desceu {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
-        .variacao-manteve {
-            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
-            color: white;
-            border: 1px solid rgba(107, 114, 128, 0.3);
-        }
-        
-        .variacao-nova {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            color: white;
-            border: 1px solid rgba(139, 92, 246, 0.3);
-        }
-
-        /* Adicionar ao CSS existente */
-.variacao-retornou {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
-    border: 1px solid rgba(245, 158, 11, 0.3);
-}
-        
-        .podium-place .variacao-indicador {
-            font-size: 14px;
-            padding: 3px 8px;
-            margin-top: 2px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-        }
-        
         /* RESPONSIVIDADE OTIMIZADA */
         @media (max-width: 1024px) {
             .container {
@@ -845,12 +786,6 @@
                 flex-direction: column;
                 gap: 12px;
             }
-            
-            .variacao-indicador {
-                font-size: 10px;
-                padding: 1px 4px;
-                min-width: 20px;
-            }
         }
         
         @media (max-width: 480px) {
@@ -899,12 +834,6 @@
             .stat-badge {
                 padding: 6px 12px;
                 font-size: 12px;
-            }
-            
-            .variacao-indicador {
-                font-size: 9px;
-                padding: 1px 3px;
-                min-width: 18px;
             }
         }
     </style>
@@ -986,29 +915,6 @@
                         <div class="legend-item">
                             <div class="legend-color nopal-color"></div>
                             <span><strong>Sem palpite:</strong> Participante não palpitou na rodada</span>
-                        </div>
-
-                        <div class="legend-item">
-    <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
-    <span><strong>↩️</strong> = Retornou após ausência</span>
-</div>
-                        
-                        <!-- NOVA LEGENDA PARA VARIAÇÕES -->
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
-                            <span><strong>↑</strong> = Subiu posição(ões)</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"></div>
-                            <span><strong>↓</strong> = Desceu posição(ões)</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);"></div>
-                            <span><strong>→</strong> = Manteve posição</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
-                            <span><strong>🆕</strong> = Novo no ranking</span>
                         </div>
                     </div>
                 </div>
@@ -1139,152 +1045,55 @@
         }
         
         // Aplicar critério de desempate
-        // CORRIGIR esta função no HTML/JS
-function aplicarCriterioDesempate(ranking) {
-    // Garantir campos necessários
-    ranking.forEach(participante => {
-        if (!participante.estatisticas) {
-            participante.estatisticas = {};
-        }
-        participante.estatisticas.pe = participante.estatisticas.pe || 0;
-        participante.estatisticas.rc = participante.estatisticas.rc || 0;
-        participante.total = participante.total || 0;
-        participante.jogos_palpitados = participante.jogos_palpitados || 0;
-        participante.total_jogos_rodada = participante.total_jogos_rodada || 0;
-        participante.sem_palpite = participante.jogos_palpitados === 0;
-    });
-    
-    // Ordenar CORRETAMENTE
-    ranking.sort((a, b) => {
-        // 1. Por total de pontos (decrescente)
-        if (b.total !== a.total) return b.total - a.total;
-        
-        // 2. Por PE (decrescente)
-        const peA = a.estatisticas?.pe || 0;
-        const peB = b.estatisticas?.pe || 0;
-        if (peB !== peA) return peB - peA;
-        
-        // 3. Por RC (decrescente)
-        const rcA = a.estatisticas?.rc || 0;
-        const rcB = b.estatisticas?.rc || 0;
-        if (rcB !== rcA) return rcB - rcA;
-        
-        // 4. Por nome (alfabeticamente)
-        return a.nome?.localeCompare(b.nome) || 0;
-    });
-    
-    // Atribuir posições CORRETAMENTE (com empates)
-    let posicao = 1;
-    let contador = 1;
-    
-    for (let i = 0; i < ranking.length; i++) {
-        if (i > 0) {
-            const prev = ranking[i - 1];
-            const current = ranking[i];
+        function aplicarCriterioDesempate(ranking) {
+            // Garantir campos necessários
+            ranking.forEach(participante => {
+                if (!participante.estatisticas) {
+                    participante.estatisticas = {};
+                }
+                participante.estatisticas.pe = participante.estatisticas.pe || 0;
+                participante.estatisticas.rc = participante.estatisticas.rc || 0;
+                participante.total = participante.total || 0;
+                participante.jogos_palpitados = participante.jogos_palpitados || 0;
+                participante.total_jogos_rodada = participante.total_jogos_rodada || 0;
+                participante.sem_palpite = participante.jogos_palpitados === 0;
+            });
             
-            // Verifica se é empate
-            if (prev.total === current.total &&
-                (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
-                (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
-                // EMPATE: mesma posição do anterior
-                ranking[i].posicao = ranking[i - 1].posicao;
-            } else {
-                // NÃO É EMPATE: posição normal
-                ranking[i].posicao = posicao;
-            }
-        } else {
-            // Primeiro lugar
-            ranking[i].posicao = posicao;
-        }
-        
-        // Incrementa para próximo (se não for empate com próximo)
-        if (i < ranking.length - 1) {
-            const current = ranking[i];
-            const next = ranking[i + 1];
+            // Ordenar
+            ranking.sort((a, b) => {
+                if (b.total !== a.total) return b.total - a.total;
+                
+                const peA = a.estatisticas?.pe || 0;
+                const peB = b.estatisticas?.pe || 0;
+                if (peB !== peA) return peB - peA;
+                
+                const rcA = a.estatisticas?.rc || 0;
+                const rcB = b.estatisticas?.rc || 0;
+                if (rcB !== rcA) return rcB - rcA;
+                
+                return a.nome?.localeCompare(b.nome) || 0;
+            });
             
-            if (!(current.total === next.total &&
-                  (current.estatisticas?.pe || 0) === (next.estatisticas?.pe || 0) &&
-                  (current.estatisticas?.rc || 0) === (next.estatisticas?.rc || 0))) {
-                posicao = contador + 1;
+            // Atribuir posições com empates
+            let posicao = 1;
+            for (let i = 0; i < ranking.length; i++) {
+                if (i > 0) {
+                    const prev = ranking[i - 1];
+                    const current = ranking[i];
+                    
+                    if (prev.total === current.total &&
+                        (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
+                        (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
+                        ranking[i].posicao = ranking[i - 1].posicao;
+                    } else {
+                        ranking[i].posicao = posicao;
+                    }
+                } else {
+                    ranking[i].posicao = posicao;
+                }
+                posicao++;
             }
         }
-        
-        contador++;
-    }
-    
-    // Log para debug
-    console.log('Ranking após desempate:');
-    ranking.slice(0, 5).forEach((r, i) => {
-        console.log(`${r.posicao}º - ${r.nome}: ${r.total} pts (PE: ${r.estatisticas.pe}, RC: ${r.estatisticas.rc})`);
-    });
-}
-        
-        // Função para obter informações de variação
-        // Atualizar a função obterInformacoesVariacao()
-function obterInformacoesVariacao(participante) {
-    const variacao = participante.variacao || {};
-    const variacaoTipo = variacao.tipo || 'nova';
-    const variacaoValor = variacao.valor || 0;
-    const posicaoAnterior = variacao.posicao_anterior;
-    const rodadaAnterior = variacao.rodada_anterior;
-    const ausenciaRodadas = variacao.ausencia_rodadas;
-    
-    let variacaoEmoji = '';
-    let variacaoClasse = '';
-    let variacaoTexto = '';
-    
-    switch(variacaoTipo) {
-        case 'subiu':
-            variacaoEmoji = '↑';
-            variacaoClasse = 'variacao-subiu';
-            variacaoTexto = `Subiu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
-            if (posicaoAnterior) variacaoTexto += ` (era ${posicaoAnterior}º)`;
-            break;
-            
-        case 'desceu':
-            variacaoEmoji = '↓';
-            variacaoClasse = 'variacao-desceu';
-            variacaoTexto = `Desceu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
-            if (posicaoAnterior) variacaoTexto += ` (era ${posicaoAnterior}º)`;
-            break;
-            
-        case 'manteve':
-            variacaoEmoji = '→';
-            variacaoClasse = 'variacao-manteve';
-            variacaoTexto = 'Manteve posição';
-            if (posicaoAnterior) variacaoTexto += ` (${posicaoAnterior}º)`;
-            break;
-            
-        case 'nova':
-            variacaoEmoji = '🆕';
-            variacaoClasse = 'variacao-nova';
-            variacaoTexto = 'Novo no bolão';
-            break;
-            
-        case 'retornou':
-            variacaoEmoji = '↩️';
-            variacaoClasse = 'variacao-retornou';
-            variacaoTexto = `Retornou após ${ausenciaRodadas || 1} rodada${(ausenciaRodadas || 1) !== 1 ? 's' : ''}`;
-            if (posicaoAnterior && rodadaAnterior) {
-                variacaoTexto += ` (era ${posicaoAnterior}º na rodada ${rodadaAnterior})`;
-            }
-            break;
-            
-        default:
-            variacaoEmoji = '';
-            variacaoClasse = '';
-            variacaoTexto = '';
-    }
-    
-    return {
-        emoji: variacaoEmoji,
-        classe: variacaoClasse,
-        texto: variacaoTexto,
-        valor: variacaoValor,
-        tipo: variacaoTipo,
-        posicaoAnterior: posicaoAnterior
-    };
-}
         
         // Exibir ranking completo
         function exibirRankingComPodio(dados, top4) {
@@ -1338,17 +1147,11 @@ function obterInformacoesVariacao(participante) {
                         const pontos = participante.total || 0;
                         const semPalpite = participante.sem_palpite;
                         
-                        // Obter informações de variação
-                        const variacaoInfo = obterInformacoesVariacao(participante);
-                        
                         const podiumStep = document.createElement('div');
                         podiumStep.className = `podium-step pos-${posicao}`;
                         
                         podiumStep.innerHTML = `
-                            <div class="podium-place">
-                                <div>${posicao}º</div>
-                                ${variacaoInfo.emoji ? `<div class="variacao-indicador ${variacaoInfo.classe}" title="${variacaoInfo.texto}${variacaoInfo.posicaoAnterior ? ` (era ${variacaoInfo.posicaoAnterior}º)` : ''}">${variacaoInfo.emoji}${variacaoInfo.valor > 1 ? variacaoInfo.valor : ''}</div>` : ''}
-                            </div>
+                            <div class="podium-place">${posicao}º</div>
                             <div class="podium-box">
                                 <div class="podium-medal">${medalhaEmoji}</div>
                                 <div class="podium-name">${nome}</div>
@@ -1394,16 +1197,10 @@ function obterInformacoesVariacao(participante) {
                         const temPE = estatisticas.pe > 0;
                         const temRC = estatisticas.rc > 0;
                         
-                        // Obter informações de variação
-                        const variacaoInfo = obterInformacoesVariacao(participante);
-                        
                         const item = document.createElement('div');
                         item.className = `ranking-item ${semPalpite ? 'sem-palpite' : ''}`;
                         item.innerHTML = `
-                            <div class="posicao">
-                                ${posicao}º
-                                ${variacaoInfo.emoji ? `<div class="variacao-indicador ${variacaoInfo.classe}" title="${variacaoInfo.texto}${variacaoInfo.posicaoAnterior ? ` (era ${variacaoInfo.posicaoAnterior}º)` : ''}">${variacaoInfo.emoji}${variacaoInfo.valor > 1 ? variacaoInfo.valor : ''}</div>` : ''}
-                            </div>
+                            <div class="posicao">${posicao}º</div>
                             <div class="usuario-info">
                                 <div class="usuario-nome">${nome}</div>
                                 <div class="usuario-stats">
