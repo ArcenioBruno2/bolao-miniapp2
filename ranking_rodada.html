@@ -248,7 +248,7 @@
             transform: translateY(-12px);
         }
         
-        /* PÓSICIONES OTIMIZADAS */
+        /* POSIÇÕES OTIMIZADAS */
         .podium-step.pos-1 {
             order: 2;
             height: 280px;
@@ -283,6 +283,10 @@
             font-weight: 900;
             z-index: 10;
             text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
         }
         
         .pos-1 .podium-place { color: #ffb300; }
@@ -473,6 +477,10 @@
             text-align: center;
             width: 80px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
         .ranking-item.sem-palpite .posicao {
@@ -647,6 +655,50 @@
         .rc-color { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
         .nopal-color { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); }
         
+        /* ============= ESTILOS PARA VARIAÇÃO DE POSIÇÃO ============= */
+        .variacao-indicador {
+            font-size: 12px;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 12px;
+            margin-top: 4px;
+            display: inline-block;
+            min-width: 24px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .variacao-subiu {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .variacao-desceu {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .variacao-manteve {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            border: 1px solid rgba(107, 114, 128, 0.3);
+        }
+        
+        .variacao-nova {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .podium-place .variacao-indicador {
+            font-size: 14px;
+            padding: 3px 8px;
+            margin-top: 2px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
         /* RESPONSIVIDADE OTIMIZADA */
         @media (max-width: 1024px) {
             .container {
@@ -786,6 +838,12 @@
                 flex-direction: column;
                 gap: 12px;
             }
+            
+            .variacao-indicador {
+                font-size: 10px;
+                padding: 1px 4px;
+                min-width: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -834,6 +892,12 @@
             .stat-badge {
                 padding: 6px 12px;
                 font-size: 12px;
+            }
+            
+            .variacao-indicador {
+                font-size: 9px;
+                padding: 1px 3px;
+                min-width: 18px;
             }
         }
     </style>
@@ -915,6 +979,23 @@
                         <div class="legend-item">
                             <div class="legend-color nopal-color"></div>
                             <span><strong>Sem palpite:</strong> Participante não palpitou na rodada</span>
+                        </div>
+                        <!-- NOVA LEGENDA PARA VARIAÇÕES -->
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+                            <span><strong>↑</strong> = Subiu posição(ões)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"></div>
+                            <span><strong>↓</strong> = Desceu posição(ões)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);"></div>
+                            <span><strong>→</strong> = Manteve posição</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                            <span><strong>🆕</strong> = Novo no ranking</span>
                         </div>
                     </div>
                 </div>
@@ -1086,13 +1167,61 @@
                         (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
                         ranking[i].posicao = ranking[i - 1].posicao;
                     } else {
-                        ranking[i].posicao = posicao;
+                        ranking[i].posicao = ranking[i - 1].posicao;
                     }
                 } else {
                     ranking[i].posicao = posicao;
                 }
                 posicao++;
             }
+        }
+        
+        // Função para obter informações de variação
+        function obterInformacoesVariacao(participante) {
+            const variacao = participante.variacao || {};
+            const variacaoTipo = variacao.tipo || 'nova';
+            const variacaoValor = variacao.valor || 0;
+            const posicaoAnterior = variacao.posicao_anterior;
+            
+            let variacaoEmoji = '';
+            let variacaoClasse = '';
+            let variacaoTexto = '';
+            
+            switch(variacaoTipo) {
+                case 'subiu':
+                    variacaoEmoji = '↑';
+                    variacaoClasse = 'variacao-subiu';
+                    variacaoTexto = `Subiu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
+                    break;
+                case 'desceu':
+                    variacaoEmoji = '↓';
+                    variacaoClasse = 'variacao-desceu';
+                    variacaoTexto = `Desceu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
+                    break;
+                case 'manteve':
+                    variacaoEmoji = '→';
+                    variacaoClasse = 'variacao-manteve';
+                    variacaoTexto = 'Manteve posição';
+                    break;
+                case 'nova':
+                    variacaoEmoji = '🆕';
+                    variacaoClasse = 'variacao-nova';
+                    variacaoTexto = 'Nova no ranking';
+                    break;
+                default:
+                    variacaoEmoji = '';
+                    variacaoClasse = '';
+                    variacaoTexto = '';
+            }
+            
+            return {
+                emoji: variacaoEmoji,
+                classe: variacaoClasse,
+                texto: variacaoTexto,
+                valor: variacaoValor,
+                tipo: variacaoTipo,
+                posicaoAnterior: posicaoAnterior
+            };
         }
         
         // Exibir ranking completo
@@ -1147,11 +1276,17 @@
                         const pontos = participante.total || 0;
                         const semPalpite = participante.sem_palpite;
                         
+                        // Obter informações de variação
+                        const variacaoInfo = obterInformacoesVariacao(participante);
+                        
                         const podiumStep = document.createElement('div');
                         podiumStep.className = `podium-step pos-${posicao}`;
                         
                         podiumStep.innerHTML = `
-                            <div class="podium-place">${posicao}º</div>
+                            <div class="podium-place">
+                                <div>${posicao}º</div>
+                                ${variacaoInfo.emoji ? `<div class="variacao-indicador ${variacaoInfo.classe}" title="${variacaoInfo.texto}${variacaoInfo.posicaoAnterior ? ` (era ${variacaoInfo.posicaoAnterior}º)` : ''}">${variacaoInfo.emoji}${variacaoInfo.valor > 1 ? variacaoInfo.valor : ''}</div>` : ''}
+                            </div>
                             <div class="podium-box">
                                 <div class="podium-medal">${medalhaEmoji}</div>
                                 <div class="podium-name">${nome}</div>
@@ -1197,10 +1332,16 @@
                         const temPE = estatisticas.pe > 0;
                         const temRC = estatisticas.rc > 0;
                         
+                        // Obter informações de variação
+                        const variacaoInfo = obterInformacoesVariacao(participante);
+                        
                         const item = document.createElement('div');
                         item.className = `ranking-item ${semPalpite ? 'sem-palpite' : ''}`;
                         item.innerHTML = `
-                            <div class="posicao">${posicao}º</div>
+                            <div class="posicao">
+                                ${posicao}º
+                                ${variacaoInfo.emoji ? `<div class="variacao-indicador ${variacaoInfo.classe}" title="${variacaoInfo.texto}${variacaoInfo.posicaoAnterior ? ` (era ${variacaoInfo.posicaoAnterior}º)` : ''}">${variacaoInfo.emoji}${variacaoInfo.valor > 1 ? variacaoInfo.valor : ''}</div>` : ''}
+                            </div>
                             <div class="usuario-info">
                                 <div class="usuario-nome">${nome}</div>
                                 <div class="usuario-stats">
