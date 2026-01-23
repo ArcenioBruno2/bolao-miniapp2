@@ -691,6 +691,13 @@
             color: white;
             border: 1px solid rgba(139, 92, 246, 0.3);
         }
+
+        /* Adicionar ao CSS existente */
+.variacao-retornou {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
         
         .podium-place .variacao-indicador {
             font-size: 14px;
@@ -980,6 +987,12 @@
                             <div class="legend-color nopal-color"></div>
                             <span><strong>Sem palpite:</strong> Participante não palpitou na rodada</span>
                         </div>
+
+                        <div class="legend-item">
+    <div class="legend-color" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+    <span><strong>↩️</strong> = Retornou após ausência</span>
+</div>
+                        
                         <!-- NOVA LEGENDA PARA VARIAÇÕES -->
                         <div class="legend-item">
                             <div class="legend-color" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
@@ -1126,103 +1139,152 @@
         }
         
         // Aplicar critério de desempate
-        function aplicarCriterioDesempate(ranking) {
-            // Garantir campos necessários
-            ranking.forEach(participante => {
-                if (!participante.estatisticas) {
-                    participante.estatisticas = {};
-                }
-                participante.estatisticas.pe = participante.estatisticas.pe || 0;
-                participante.estatisticas.rc = participante.estatisticas.rc || 0;
-                participante.total = participante.total || 0;
-                participante.jogos_palpitados = participante.jogos_palpitados || 0;
-                participante.total_jogos_rodada = participante.total_jogos_rodada || 0;
-                participante.sem_palpite = participante.jogos_palpitados === 0;
-            });
+        // CORRIGIR esta função no HTML/JS
+function aplicarCriterioDesempate(ranking) {
+    // Garantir campos necessários
+    ranking.forEach(participante => {
+        if (!participante.estatisticas) {
+            participante.estatisticas = {};
+        }
+        participante.estatisticas.pe = participante.estatisticas.pe || 0;
+        participante.estatisticas.rc = participante.estatisticas.rc || 0;
+        participante.total = participante.total || 0;
+        participante.jogos_palpitados = participante.jogos_palpitados || 0;
+        participante.total_jogos_rodada = participante.total_jogos_rodada || 0;
+        participante.sem_palpite = participante.jogos_palpitados === 0;
+    });
+    
+    // Ordenar CORRETAMENTE
+    ranking.sort((a, b) => {
+        // 1. Por total de pontos (decrescente)
+        if (b.total !== a.total) return b.total - a.total;
+        
+        // 2. Por PE (decrescente)
+        const peA = a.estatisticas?.pe || 0;
+        const peB = b.estatisticas?.pe || 0;
+        if (peB !== peA) return peB - peA;
+        
+        // 3. Por RC (decrescente)
+        const rcA = a.estatisticas?.rc || 0;
+        const rcB = b.estatisticas?.rc || 0;
+        if (rcB !== rcA) return rcB - rcA;
+        
+        // 4. Por nome (alfabeticamente)
+        return a.nome?.localeCompare(b.nome) || 0;
+    });
+    
+    // Atribuir posições CORRETAMENTE (com empates)
+    let posicao = 1;
+    let contador = 1;
+    
+    for (let i = 0; i < ranking.length; i++) {
+        if (i > 0) {
+            const prev = ranking[i - 1];
+            const current = ranking[i];
             
-            // Ordenar
-            ranking.sort((a, b) => {
-                if (b.total !== a.total) return b.total - a.total;
-                
-                const peA = a.estatisticas?.pe || 0;
-                const peB = b.estatisticas?.pe || 0;
-                if (peB !== peA) return peB - peA;
-                
-                const rcA = a.estatisticas?.rc || 0;
-                const rcB = b.estatisticas?.rc || 0;
-                if (rcB !== rcA) return rcB - rcA;
-                
-                return a.nome?.localeCompare(b.nome) || 0;
-            });
+            // Verifica se é empate
+            if (prev.total === current.total &&
+                (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
+                (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
+                // EMPATE: mesma posição do anterior
+                ranking[i].posicao = ranking[i - 1].posicao;
+            } else {
+                // NÃO É EMPATE: posição normal
+                ranking[i].posicao = posicao;
+            }
+        } else {
+            // Primeiro lugar
+            ranking[i].posicao = posicao;
+        }
+        
+        // Incrementa para próximo (se não for empate com próximo)
+        if (i < ranking.length - 1) {
+            const current = ranking[i];
+            const next = ranking[i + 1];
             
-            // Atribuir posições com empates
-            let posicao = 1;
-            for (let i = 0; i < ranking.length; i++) {
-                if (i > 0) {
-                    const prev = ranking[i - 1];
-                    const current = ranking[i];
-                    
-                    if (prev.total === current.total &&
-                        (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
-                        (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
-                        ranking[i].posicao = ranking[i - 1].posicao;
-                    } else {
-                        ranking[i].posicao = ranking[i - 1].posicao;
-                    }
-                } else {
-                    ranking[i].posicao = posicao;
-                }
-                posicao++;
+            if (!(current.total === next.total &&
+                  (current.estatisticas?.pe || 0) === (next.estatisticas?.pe || 0) &&
+                  (current.estatisticas?.rc || 0) === (next.estatisticas?.rc || 0))) {
+                posicao = contador + 1;
             }
         }
         
+        contador++;
+    }
+    
+    // Log para debug
+    console.log('Ranking após desempate:');
+    ranking.slice(0, 5).forEach((r, i) => {
+        console.log(`${r.posicao}º - ${r.nome}: ${r.total} pts (PE: ${r.estatisticas.pe}, RC: ${r.estatisticas.rc})`);
+    });
+}
+        
         // Função para obter informações de variação
-        function obterInformacoesVariacao(participante) {
-            const variacao = participante.variacao || {};
-            const variacaoTipo = variacao.tipo || 'nova';
-            const variacaoValor = variacao.valor || 0;
-            const posicaoAnterior = variacao.posicao_anterior;
+        // Atualizar a função obterInformacoesVariacao()
+function obterInformacoesVariacao(participante) {
+    const variacao = participante.variacao || {};
+    const variacaoTipo = variacao.tipo || 'nova';
+    const variacaoValor = variacao.valor || 0;
+    const posicaoAnterior = variacao.posicao_anterior;
+    const rodadaAnterior = variacao.rodada_anterior;
+    const ausenciaRodadas = variacao.ausencia_rodadas;
+    
+    let variacaoEmoji = '';
+    let variacaoClasse = '';
+    let variacaoTexto = '';
+    
+    switch(variacaoTipo) {
+        case 'subiu':
+            variacaoEmoji = '↑';
+            variacaoClasse = 'variacao-subiu';
+            variacaoTexto = `Subiu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
+            if (posicaoAnterior) variacaoTexto += ` (era ${posicaoAnterior}º)`;
+            break;
             
-            let variacaoEmoji = '';
-            let variacaoClasse = '';
-            let variacaoTexto = '';
+        case 'desceu':
+            variacaoEmoji = '↓';
+            variacaoClasse = 'variacao-desceu';
+            variacaoTexto = `Desceu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
+            if (posicaoAnterior) variacaoTexto += ` (era ${posicaoAnterior}º)`;
+            break;
             
-            switch(variacaoTipo) {
-                case 'subiu':
-                    variacaoEmoji = '↑';
-                    variacaoClasse = 'variacao-subiu';
-                    variacaoTexto = `Subiu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
-                    break;
-                case 'desceu':
-                    variacaoEmoji = '↓';
-                    variacaoClasse = 'variacao-desceu';
-                    variacaoTexto = `Desceu ${variacaoValor} posição${variacaoValor !== 1 ? 'ões' : ''}`;
-                    break;
-                case 'manteve':
-                    variacaoEmoji = '→';
-                    variacaoClasse = 'variacao-manteve';
-                    variacaoTexto = 'Manteve posição';
-                    break;
-                case 'nova':
-                    variacaoEmoji = '🆕';
-                    variacaoClasse = 'variacao-nova';
-                    variacaoTexto = 'Nova no ranking';
-                    break;
-                default:
-                    variacaoEmoji = '';
-                    variacaoClasse = '';
-                    variacaoTexto = '';
+        case 'manteve':
+            variacaoEmoji = '→';
+            variacaoClasse = 'variacao-manteve';
+            variacaoTexto = 'Manteve posição';
+            if (posicaoAnterior) variacaoTexto += ` (${posicaoAnterior}º)`;
+            break;
+            
+        case 'nova':
+            variacaoEmoji = '🆕';
+            variacaoClasse = 'variacao-nova';
+            variacaoTexto = 'Novo no bolão';
+            break;
+            
+        case 'retornou':
+            variacaoEmoji = '↩️';
+            variacaoClasse = 'variacao-retornou';
+            variacaoTexto = `Retornou após ${ausenciaRodadas || 1} rodada${(ausenciaRodadas || 1) !== 1 ? 's' : ''}`;
+            if (posicaoAnterior && rodadaAnterior) {
+                variacaoTexto += ` (era ${posicaoAnterior}º na rodada ${rodadaAnterior})`;
             }
+            break;
             
-            return {
-                emoji: variacaoEmoji,
-                classe: variacaoClasse,
-                texto: variacaoTexto,
-                valor: variacaoValor,
-                tipo: variacaoTipo,
-                posicaoAnterior: posicaoAnterior
-            };
-        }
+        default:
+            variacaoEmoji = '';
+            variacaoClasse = '';
+            variacaoTexto = '';
+    }
+    
+    return {
+        emoji: variacaoEmoji,
+        classe: variacaoClasse,
+        texto: variacaoTexto,
+        valor: variacaoValor,
+        tipo: variacaoTipo,
+        posicaoAnterior: posicaoAnterior
+    };
+}
         
         // Exibir ranking completo
         function exibirRankingComPodio(dados, top4) {
