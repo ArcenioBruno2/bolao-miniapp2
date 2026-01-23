@@ -13,156 +13,225 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI', system-ui, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: #1a1a1a;
         }
         
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border-radius: 28px;
+            box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+            min-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
         }
         
         .header {
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
             color: white;
-            padding: 30px;
+            padding: 32px 40px;
             text-align: center;
             position: relative;
         }
         
-        .header h1 {
-            font-size: 26px;
-            margin-bottom: 8px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        
-        .header .subtitle {
-            font-size: 15px;
-            opacity: 0.9;
-            font-weight: 400;
+        .header-content {
+            position: relative;
+            z-index: 2;
         }
         
         .back-btn {
             position: absolute;
-            left: 25px;
+            left: 32px;
             top: 50%;
             transform: translateY(-50%);
             background: rgba(255, 255, 255, 0.15);
-            border: none;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 24px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10;
         }
         
         .back-btn:hover {
             background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-50%) scale(1.05);
+            transform: translateY(-50%) scale(1.08);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+            letter-spacing: 0.3px;
         }
         
         .content {
-            padding: 30px;
-            min-height: 400px;
+            padding: 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .loading {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: #64748b;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .error {
             text-align: center;
-            padding: 35px;
+            padding: 40px;
             color: #dc2626;
-            background: #fef2f2;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-radius: 20px;
             margin: 20px 0;
-            border: 1px solid #fecaca;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            box-shadow: 0 8px 24px rgba(220, 38, 38, 0.1);
         }
         
         .rodada-info {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            padding: 25px;
-            border-radius: 18px;
-            margin-bottom: 30px;
+            padding: 32px;
+            border-radius: 24px;
+            margin-bottom: 40px;
             text-align: center;
+            box-shadow: 0 16px 32px rgba(79, 70, 229, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rodada-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd600, #ff6b00);
         }
         
         .rodada-info h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .rodada-status {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
         
         .rodada-stats {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 20px;
-            margin-top: 20px;
-            flex-wrap: wrap;
+            margin-top: 28px;
         }
         
         .stat-item {
             text-align: center;
             background: rgba(255, 255, 255, 0.15);
-            padding: 16px 24px;
-            border-radius: 12px;
-            min-width: 120px;
+            padding: 24px 20px;
+            border-radius: 16px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .stat-value {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 6px;
+            font-size: 36px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .stat-label {
-            font-size: 13px;
+            font-size: 14px;
             opacity: 0.95;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 0.5px;
         }
         
-        /* PÓDIO - FORMATO ESCADA */
+        /* PÓDIO REDESENHADO */
         .podium-container {
-            margin: 40px 0;
+            margin: 48px 0;
             position: relative;
         }
         
         .podium-title {
             text-align: center;
             color: #1e293b;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            letter-spacing: 0.5px;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        .podium-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border-radius: 2px;
         }
         
         .podium {
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            gap: 15px;
-            height: 280px;
+            gap: 24px;
+            height: 320px;
             position: relative;
+            padding: 0 20px;
         }
         
         .podium-step {
@@ -170,44 +239,50 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.3s ease;
-            min-width: 130px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            max-width: 220px;
         }
         
         .podium-step:hover {
-            transform: translateY(-5px);
+            transform: translateY(-12px);
         }
         
-        /* POSIÇÕES DO PÓDIO - Formato escada */
+        /* PÓSICIONES OTIMIZADAS */
         .podium-step.pos-1 {
-            order: 2; /* Centro */
-            height: 240px;
+            order: 2;
+            height: 280px;
+            z-index: 4;
         }
         
         .podium-step.pos-2 {
-            order: 1; /* Esquerda */
-            height: 200px;
+            order: 1;
+            height: 240px;
+            z-index: 3;
         }
         
         .podium-step.pos-3 {
-            order: 3; /* Direita */
-            height: 180px;
+            order: 3;
+            height: 220px;
+            z-index: 2;
         }
         
         .podium-step.pos-4 {
-            order: 4; /* Direita do 3º */
-            height: 160px;
+            order: 4;
+            height: 200px;
+            z-index: 1;
         }
         
         .podium-place {
             position: absolute;
-            top: -45px;
+            top: -60px;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 24px;
+            font-size: 32px;
             font-weight: 900;
             z-index: 10;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         
         .pos-1 .podium-place { color: #ffb300; }
@@ -217,100 +292,106 @@
         
         .podium-box {
             width: 100%;
-            border-radius: 12px 12px 0 0;
-            padding: 20px 15px;
+            border-radius: 20px 20px 0 0;
+            padding: 28px 20px;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: 2px solid transparent;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border: 3px solid transparent;
+            background: white;
+            min-height: 240px;
         }
         
         .pos-1 .podium-box {
-            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            background: linear-gradient(145deg, #fff9c4 0%, #fff59d 100%);
             border-color: #ffd600;
-            height: 200px;
+            height: 240px;
         }
         
         .pos-2 .podium-box {
-            background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
+            background: linear-gradient(145deg, #f5f5f5 0%, #eeeeee 100%);
             border-color: #9e9e9e;
-            height: 160px;
+            height: 200px;
         }
         
         .pos-3 .podium-box {
-            background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
+            background: linear-gradient(145deg, #ffcc80 0%, #ffb74d 100%);
             border-color: #ff9800;
-            height: 140px;
+            height: 180px;
         }
         
         .pos-4 .podium-box {
-            background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
+            background: linear-gradient(145deg, #b2dfdb 0%, #80cbc4 100%);
             border-color: #26a69a;
-            height: 120px;
+            height: 160px;
+        }
+        
+        .podium-medal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         }
         
         .podium-name {
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 800;
             color: #1e293b;
             text-align: center;
-            margin-bottom: 10px;
-            line-height: 1.2;
-            min-height: 34px;
+            margin-bottom: 16px;
+            line-height: 1.3;
+            min-height: 46px;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 0 10px;
         }
         
         .podium-points {
-            font-size: 32px;
+            font-size: 48px;
             font-weight: 900;
             color: #1a237e;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .podium-stats {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 12px;
         }
         
-        /* ESTATÍSTICAS PEQUENAS */
         .podium-stat {
-            font-size: 10px;
-            font-weight: 600;
-            padding: 3px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 12px;
             border-radius: 20px;
             text-align: center;
             width: 100%;
+            letter-spacing: 0.5px;
         }
         
         .stat-pe {
-            background: #fef3c7;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
             color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
         
         .stat-rc {
-            background: #dbeafe;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
             color: #1e40af;
-        }
-        
-        .podium-medal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 20px;
-            opacity: 0.9;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
         
         .separator {
             text-align: center;
-            margin: 30px 0 20px;
+            margin: 40px 0 32px;
             position: relative;
         }
         
@@ -320,60 +401,78 @@
             top: 50%;
             left: 0;
             right: 0;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
         }
         
         .separator-text {
             display: inline-block;
             background: white;
-            padding: 0 20px;
-            color: #64748b;
-            font-weight: 600;
-            font-size: 14px;
+            padding: 0 28px;
+            color: #4f46e5;
+            font-weight: 700;
+            font-size: 16px;
             position: relative;
             z-index: 1;
+            letter-spacing: 2px;
         }
         
-        /* LISTA DO RANKING (do 5º pra baixo) */
+        /* LISTA DO RANKING MODERNA */
         .ranking-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 24px;
         }
         
         .ranking-item {
             background: white;
-            border-radius: 12px;
-            padding: 18px 20px;
+            border-radius: 20px;
+            padding: 24px 28px;
             display: grid;
-            grid-template-columns: 60px 1fr auto;
-            gap: 15px;
+            grid-template-columns: 80px 1fr auto;
+            gap: 24px;
             align-items: center;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #f1f5f9;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
         
+        .ranking-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, transparent, #4f46e5, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
         .ranking-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
             border-color: #cbd5e1;
         }
         
+        .ranking-item:hover::before {
+            opacity: 1;
+        }
+        
         .ranking-item.sem-palpite {
-            background: #f8fafc;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             opacity: 0.9;
         }
         
         .posicao {
-            font-size: 20px;
-            font-weight: 800;
+            font-size: 28px;
+            font-weight: 900;
             color: #1e293b;
             text-align: center;
-            width: 60px;
+            width: 80px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .ranking-item.sem-palpite .posicao {
@@ -383,85 +482,106 @@
         .usuario-info {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
         }
         
         .usuario-nome {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 700;
             color: #1e293b;
+            letter-spacing: -0.3px;
         }
         
         .usuario-stats {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
         
-        /* ESTATÍSTICAS PEQUENAS NA LISTA */
         .stat-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            background: #f1f5f9;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 11px;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
         }
         
         .stat-badge.pe { 
-            background: #fef3c7; 
-            color: #92400e; 
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-color: rgba(245, 158, 11, 0.3);
         }
         
         .stat-badge.rc { 
-            background: #dbeafe; 
-            color: #1e40af; 
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        
+        .jogos-info {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border-radius: 12px;
         }
         
         .pontuacao {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 32px;
+            font-weight: 900;
             color: #4f46e5;
-            min-width: 70px;
+            min-width: 90px;
             text-align: right;
+            text-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
         }
         
         .sem-palpite-badge {
-            background: #e2e8f0;
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
             color: #64748b;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid #cbd5e1;
         }
         
         .empty-state {
             text-align: center;
-            padding: 60px 30px;
+            padding: 80px 40px;
             color: #64748b;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
+            font-size: 80px;
+            margin-bottom: 32px;
             opacity: 0.5;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
         }
         
         .empty-state h3 {
-            font-size: 22px;
-            margin-bottom: 12px;
+            font-size: 28px;
+            margin-bottom: 16px;
             color: #475569;
-            font-weight: 700;
+            font-weight: 800;
         }
         
         .footer {
             text-align: center;
-            padding: 25px;
+            padding: 28px;
             color: #64748b;
-            font-size: 13px;
+            font-size: 14px;
             border-top: 1px solid #e2e8f0;
             background: #f8fafc;
         }
@@ -470,10 +590,10 @@
             border: 4px solid rgba(99, 102, 241, 0.1);
             border-left-color: #6366f1;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            margin: 0 auto 24px;
         }
         
         @keyframes spin {
@@ -481,70 +601,148 @@
             100% { transform: rotate(360deg); }
         }
         
-        @media (max-width: 768px) {
+        .legend {
+            margin-top: 40px;
+            padding: 24px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 20px;
+            font-size: 14px;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .legend-title {
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #1e293b;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .pe-color { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .rc-color { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
+        .nopal-color { background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%); }
+        
+        /* RESPONSIVIDADE OTIMIZADA */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 95%;
+            }
+            
             .podium {
-                height: 240px;
-                gap: 10px;
+                height: 280px;
+                gap: 20px;
             }
             
             .podium-step {
-                min-width: 100px;
+                max-width: 180px;
             }
             
-            .podium-step.pos-1 { height: 200px; }
-            .podium-step.pos-2 { height: 170px; }
-            .podium-step.pos-3 { height: 150px; }
-            .podium-step.pos-4 { height: 130px; }
+            .podium-step.pos-1 { height: 240px; }
+            .podium-step.pos-2 { height: 210px; }
+            .podium-step.pos-3 { height: 190px; }
+            .podium-step.pos-4 { height: 170px; }
             
-            .pos-1 .podium-box { height: 170px; }
-            .pos-2 .podium-box { height: 140px; }
-            .pos-3 .podium-box { height: 120px; }
-            .pos-4 .podium-box { height: 100px; }
+            .pos-1 .podium-box { height: 210px; }
+            .pos-2 .podium-box { height: 180px; }
+            .pos-3 .podium-box { height: 160px; }
+            .pos-4 .podium-box { height: 140px; }
             
             .podium-name {
-                font-size: 12px;
-                min-height: 30px;
+                font-size: 16px;
+                min-height: 40px;
             }
             
             .podium-points {
-                font-size: 26px;
-            }
-            
-            .podium-place {
-                font-size: 20px;
-                top: -40px;
-            }
-            
-            .ranking-item {
-                grid-template-columns: 50px 1fr auto;
-                padding: 15px;
-            }
-            
-            .posicao {
-                font-size: 18px;
-                width: 50px;
-            }
-            
-            .usuario-nome {
-                font-size: 15px;
-            }
-            
-            .pontuacao {
-                font-size: 22px;
-                min-width: 60px;
+                font-size: 40px;
             }
         }
         
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .container {
+                border-radius: 20px;
+            }
+            
+            .header {
+                padding: 24px 32px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+            
+            .back-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                left: 20px;
+            }
+            
+            .content {
+                padding: 24px;
+            }
+            
+            .rodada-info {
+                padding: 24px;
+            }
+            
+            .rodada-info h2 {
+                font-size: 32px;
+            }
+            
+            .rodada-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .stat-item {
+                padding: 20px 16px;
+            }
+            
+            .stat-value {
+                font-size: 28px;
+            }
+            
             .podium {
                 flex-wrap: wrap;
                 height: auto;
                 gap: 20px;
+                margin-top: 40px;
             }
             
             .podium-step {
                 min-width: calc(50% - 20px);
                 height: auto !important;
+                margin-bottom: 40px;
             }
             
             .podium-step.pos-1 { order: 1; }
@@ -553,59 +751,89 @@
             .podium-step.pos-4 { order: 4; }
             
             .podium-box {
-                height: 140px !important;
+                height: 180px !important;
             }
             
-            .podium-title {
-                font-size: 16px;
-                margin-bottom: 20px;
+            .podium-place {
+                top: -50px;
+                font-size: 28px;
             }
             
             .ranking-item {
-                grid-template-columns: 45px 1fr;
-                padding: 12px;
+                grid-template-columns: 60px 1fr;
+                padding: 20px;
+                gap: 20px;
+            }
+            
+            .posicao {
+                font-size: 24px;
+                width: 60px;
+            }
+            
+            .usuario-nome {
+                font-size: 18px;
             }
             
             .pontuacao {
                 grid-column: 2;
                 text-align: left;
-                margin-top: 5px;
-                font-size: 20px;
+                margin-top: 10px;
+                font-size: 28px;
+                min-width: auto;
+            }
+            
+            .legend-items {
+                flex-direction: column;
+                gap: 12px;
             }
         }
         
         @media (max-width: 480px) {
-            .container {
-                border-radius: 16px;
+            .header {
+                padding: 20px 24px 20px 60px;
             }
             
-            .content {
-                padding: 20px;
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .back-btn {
+                left: 12px;
             }
             
             .rodada-stats {
-                gap: 10px;
-            }
-            
-            .stat-item {
-                min-width: calc(50% - 10px);
-                padding: 12px;
-            }
-            
-            .stat-value {
-                font-size: 22px;
-            }
-            
-            .stat-label {
-                font-size: 11px;
+                grid-template-columns: 1fr;
             }
             
             .podium-step {
-                min-width: calc(50% - 10px);
+                min-width: 100%;
             }
             
             .podium-box {
-                padding: 15px 10px;
+                padding: 24px 16px;
+            }
+            
+            .podium-name {
+                font-size: 14px;
+                min-height: 36px;
+            }
+            
+            .podium-points {
+                font-size: 36px;
+            }
+            
+            .ranking-item {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            .usuario-nome {
+                font-size: 16px;
+            }
+            
+            .stat-badge {
+                padding: 6px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -614,34 +842,38 @@
     <div class="container">
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
-            <h1>🏆 Ranking por Rodada</h1>
-            <div class="subtitle">Pontuação real dos participantes</div>
+            <div class="header-content">
+                <h1>🏆 Ranking por Rodada</h1>
+                <div class="subtitle">Pontuação real dos participantes</div>
+            </div>
         </div>
         
         <div class="content">
             <div id="loading" class="loading">
                 <div class="spinner"></div>
-                <div style="margin-top: 15px; font-size: 15px; color: #64748b;">
+                <div style="margin-top: 20px; font-size: 16px; color: #64748b; font-weight: 500;">
                     Carregando ranking...
                 </div>
             </div>
             
             <div id="error" class="error" style="display: none;">
-                <div style="font-size: 20px; margin-bottom: 10px;">⚠️</div>
-                <h3 style="margin-bottom: 8px;" id="errorTitle">Erro ao carregar ranking</h3>
-                <p id="errorMessage" style="font-size: 14px; margin-bottom: 15px;">
+                <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                <h3 style="margin-bottom: 12px; font-size: 20px;" id="errorTitle">Erro ao carregar ranking</h3>
+                <p id="errorMessage" style="font-size: 15px; margin-bottom: 24px; line-height: 1.5;">
                     Não foi possível carregar os dados do ranking.
                 </p>
                 <button onclick="window.location.reload()" style="
-                    margin-top: 10px;
-                    padding: 10px 20px;
-                    background: #dc2626;
+                    margin-top: 16px;
+                    padding: 14px 32px;
+                    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
                     color: white;
                     border: none;
-                    border-radius: 8px;
-                    font-weight: 600;
+                    border-radius: 12px;
+                    font-weight: 700;
                     cursor: pointer;
-                    transition: background 0.3s;
+                    transition: all 0.3s ease;
+                    font-size: 15px;
+                    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
                 ">Tentar novamente</button>
             </div>
             
@@ -669,19 +901,19 @@
                 </div>
                 
                 <!-- LEGENDA -->
-                <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 12px; color: #64748b;">
-                    <div style="font-weight: 700; margin-bottom: 10px; color: #1e293b; font-size: 13px;">Legenda:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="display: inline-block; width: 10px; height: 10px; background: #fbbf24; border-radius: 2px;"></span>
+                <div class="legend" id="legendArea" style="display: none;">
+                    <div class="legend-title">📊 Legenda:</div>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color pe-color"></div>
                             <span><strong>PE</strong> = Placar Exato (14 pontos)</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="display: inline-block; width: 10px; height: 10px; background: #60a5fa; border-radius: 2px;"></span>
+                        <div class="legend-item">
+                            <div class="legend-color rc-color"></div>
                             <span><strong>RC</strong> = Resultado Correto (4 pontos)</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="display: inline-block; width: 10px; height: 10px; background: #e2e8f0; border-radius: 2px;"></span>
+                        <div class="legend-item">
+                            <div class="legend-color nopal-color"></div>
                             <span><strong>Sem palpite:</strong> Participante não palpitou na rodada</span>
                         </div>
                     </div>
@@ -691,111 +923,67 @@
             <div id="emptyState" class="empty-state" style="display: none;">
                 <div class="empty-icon">📊</div>
                 <h3>Nenhum ranking disponível</h3>
-                <p id="emptyMessage">Esta rodada ainda não tem placares ou participantes.</p>
+                <p id="emptyMessage" style="font-size: 16px; max-width: 400px; line-height: 1.5;">
+                    Esta rodada ainda não tem placares ou participantes.
+                </p>
             </div>
         </div>
         
         <div class="footer">
-            <div>Bolão 2026 • Dados em tempo real</div>
-            <div style="margin-top: 5px; font-size: 12px; opacity: 0.8;">
+            <div style="font-weight: 600; margin-bottom: 4px;">Bolão 2026 • Dados em tempo real</div>
+            <div style="font-size: 13px; opacity: 0.8;">
                 Atualizado automaticamente
             </div>
         </div>
     </div>
 
     <script>
-        // Variável global para armazenar dados
-        let parsedData = null;
-        
-        // Função para debug
-        function logDebug(message) {
-            console.log(`[DEBUG] ${message}`);
-        }
-        
         // Função para descomprimir Gzip usando pako.js
         async function descomprimirDadosGzip(base64Data) {
-            console.log('=== DESCOMPRIMINDO DADOS GZIP ===');
-            
             try {
-                // 1. PRIMEIRO: Tenta como JSON simples (sem compressão)
+                // Tenta como JSON simples primeiro
                 try {
-                    console.log('🔍 Tentando como JSON direto...');
-                    
-                    // Decodifica Base64
                     let base64 = base64Data;
                     base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
                     
-                    // Adiciona padding se necessário
                     const pad = base64.length % 4;
                     if (pad) {
-                        if (pad === 1) {
-                            throw new Error('Base64 inválido (padding length 1)');
-                        }
+                        if (pad === 1) throw new Error('Base64 inválido');
                         base64 += '='.repeat(4 - pad);
                     }
                     
                     const jsonString = atob(base64);
-                    console.log(`✅ JSON decodificado: ${jsonString.substring(0, 100)}...`);
-                    
-                    const dados = JSON.parse(jsonString);
-                    console.log('🎉 Dados parseados como JSON direto (sem compressão)');
-                    return dados;
+                    return JSON.parse(jsonString);
                     
                 } catch (e1) {
-                    console.log(`❌ JSON direto falhou: ${e1.message}`);
-                }
-                
-                // 2. SEGUNDO: Tenta com Gzip usando pako.js
-                console.log('🔍 Tentando descompressão Gzip...');
-                
-                // Decodifica Base64
-                let base64 = base64Data;
-                base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-                
-                // Adiciona padding
-                const pad = base64.length % 4;
-                if (pad) {
-                    if (pad === 1) {
-                        throw new Error('Base64 inválido (padding length 1)');
-                    }
-                    base64 += '='.repeat(4 - pad);
-                }
-                
-                // Converte para bytes
-                const binaryString = atob(base64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                console.log(`📏 Bytes recebidos: ${bytes.length}`);
-                
-                // Verifica cabeçalho Gzip (0x1F 0x8B)
-                if (bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B) {
-                    console.log('✅ Cabeçalho Gzip detectado (0x1F 0x8B)');
+                    // Tenta com Gzip
+                    let base64 = base64Data;
+                    base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
                     
-                    // Usando pako.js
-                    if (typeof pako !== 'undefined') {
-                        console.log('🔄 Descomprimindo com pako.js...');
-                        try {
+                    const pad = base64.length % 4;
+                    if (pad) {
+                        if (pad === 1) throw new Error('Base64 inválido');
+                        base64 += '='.repeat(4 - pad);
+                    }
+                    
+                    const binaryString = atob(base64);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    if (bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B) {
+                        if (typeof pako !== 'undefined') {
                             const decompressed = pako.inflate(bytes, { to: 'string' });
-                            console.log(`✅ Descomprimido: ${decompressed.substring(0, 100)}...`);
-                            const dados = JSON.parse(decompressed);
-                            console.log('🎉 Dados parseados com sucesso!');
-                            return dados;
-                        } catch (pakoError) {
-                            console.log(`❌ pako.js falhou: ${pakoError.message}`);
-                            throw pakoError;
+                            return JSON.parse(decompressed);
                         }
                     }
-                } else {
-                    console.log('⚠️ Não é Gzip válido');
+                    
+                    throw new Error('Não foi possível decodificar os dados');
                 }
                 
-                throw new Error('Não foi possível decodificar os dados');
-                
             } catch (error) {
-                console.error('💥 ERRO CRÍTICO:', error);
+                console.error('Erro:', error);
                 throw error;
             }
         }
@@ -812,67 +1000,53 @@
         // Carregar dados da URL
         async function carregarDados() {
             try {
-                logDebug('Iniciando carregamento de dados...');
-                
                 // Obter dados da URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const dataParam = urlParams.get('data');
                 
                 if (!dataParam) {
-                    throw new Error('Nenhum dado encontrado na URL. Parâmetro "data" ausente.');
+                    throw new Error('Nenhum dado encontrado na URL');
                 }
                 
                 // Descomprimir dados
                 let dados;
                 try {
                     dados = await descomprimirDadosGzip(dataParam);
-                    parsedData = dados;
-                    logDebug('✅ Dados processados com sucesso');
                 } catch (e) {
-                    logDebug(`❌ Erro ao processar dados: ${e.message}`);
-                    throw new Error('Formato de dados inválido: ' + e.message);
+                    throw new Error('Formato de dados inválido');
                 }
                 
                 // Verificar se tem ranking
                 if (!dados.ranking || dados.ranking.length === 0) {
-                    logDebug('Ranking vazio ou não existe');
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('emptyState').style.display = 'block';
                     document.getElementById('emptyMessage').textContent = 
-                        `Esta rodada não tem participantes com pontos. Dados recebidos: ${JSON.stringify(dados.rodada_info || {})}`;
+                        `Esta rodada não tem participantes com pontos ainda.`;
                     return;
                 }
                 
-                // Aplicar critério de desempate Pontos → PE → RC
+                // Aplicar critério de desempate
                 aplicarCriterioDesempate(dados.ranking);
                 
                 // Extrair os primeiros 4 para o pódio
                 const top4 = dados.ranking.slice(0, 4);
                 
-                // Exibir ranking completo com pódio
+                // Exibir ranking
                 exibirRankingComPodio(dados, top4);
                 
             } catch (error) {
-                logDebug(`❌ ERRO: ${error.message}`);
-                console.error('Erro completo:', error);
-                
-                // Mostrar detalhes do erro
                 const errorDiv = document.getElementById('error');
-                
                 if (errorDiv) {
                     errorDiv.style.display = 'block';
                     document.getElementById('errorMessage').textContent = error.message;
                 }
-                
                 document.getElementById('loading').style.display = 'none';
             }
         }
         
-        // Aplicar critério de desempate: Pontos → PE → RC
+        // Aplicar critério de desempate
         function aplicarCriterioDesempate(ranking) {
-            logDebug('Aplicando critério de desempate Pontos → PE → RC...');
-            
-            // PRIMEIRO: Garantir que todos tenham os campos necessários
+            // Garantir campos necessários
             ranking.forEach(participante => {
                 if (!participante.estatisticas) {
                     participante.estatisticas = {};
@@ -882,51 +1056,34 @@
                 participante.total = participante.total || 0;
                 participante.jogos_palpitados = participante.jogos_palpitados || 0;
                 participante.total_jogos_rodada = participante.total_jogos_rodada || 0;
-                
-                // Identificar quem não palpitou
                 participante.sem_palpite = participante.jogos_palpitados === 0;
             });
             
-            // Ordena por: 
-            // 1. Pontuação total (decrescente)
-            // 2. PE (Placar Exato) - decrescente
-            // 3. RC (Resultado Correto) - decrescente
+            // Ordenar
             ranking.sort((a, b) => {
-                // 1. Pontuação total (decrescente)
-                if (b.total !== a.total) {
-                    return b.total - a.total;
-                }
+                if (b.total !== a.total) return b.total - a.total;
                 
-                // 2. Placar Exato (PE) - decrescente
                 const peA = a.estatisticas?.pe || 0;
                 const peB = b.estatisticas?.pe || 0;
-                if (peB !== peA) {
-                    return peB - peA;
-                }
+                if (peB !== peA) return peB - peA;
                 
-                // 3. Resultado Correto (RC) - decrescente
                 const rcA = a.estatisticas?.rc || 0;
                 const rcB = b.estatisticas?.rc || 0;
-                if (rcB !== rcA) {
-                    return rcB - rcA;
-                }
+                if (rcB !== rcA) return rcB - rcA;
                 
-                // 4. Ordem alfabética como último critério
                 return a.nome?.localeCompare(b.nome) || 0;
             });
             
-            // Atribuir posições considerando empates
+            // Atribuir posições com empates
             let posicao = 1;
             for (let i = 0; i < ranking.length; i++) {
                 if (i > 0) {
                     const prev = ranking[i - 1];
                     const current = ranking[i];
                     
-                    // Verifica se há empate (mesmos pontos, PE e RC)
                     if (prev.total === current.total &&
                         (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
                         (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
-                        // Mesma posição do anterior
                         ranking[i].posicao = ranking[i - 1].posicao;
                     } else {
                         ranking[i].posicao = posicao;
@@ -936,31 +1093,26 @@
                 }
                 posicao++;
             }
-            
-            logDebug('✅ Critério de desempate aplicado');
-            logDebug(`Total participantes: ${ranking.length}`);
         }
         
-        // Exibir ranking completo com pódio
+        // Exibir ranking completo
         function exibirRankingComPodio(dados, top4) {
             const ranking = dados.ranking || [];
             const rodadaInfo = dados.rodada_info || {};
-            
-            logDebug(`Exibindo ranking com ${ranking.length} participantes`);
             
             // Atualizar informações da rodada
             const rodadaInfoDiv = document.getElementById('rodadaInfo');
             if (rodadaInfoDiv) {
                 rodadaInfoDiv.innerHTML = `
                     <h2>Rodada ${rodadaInfo.numero || 'N/A'}</h2>
-                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">
+                    <div class="rodada-status">
                         ${rodadaInfo.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
-                        ${rodadaInfo.total_ocorrencias > 1 ? ` (${rodadaInfo.total_ocorrencias} dias)` : ''}
+                        ${rodadaInfo.total_ocorrencias > 1 ? ` • ${rodadaInfo.total_ocorrencias} dias` : ''}
                     </div>
                     <div class="rodada-stats">
                         <div class="stat-item">
                             <div class="stat-value">${ranking.length}</div>
-                            <div class="stat-label">TOTAL PARTICIPANTES</div>
+                            <div class="stat-label">PARTICIPANTES</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value">${ranking.filter(p => !p.sem_palpite).length}</div>
@@ -968,17 +1120,17 @@
                         </div>
                         <div class="stat-item">
                             <div class="stat-value">${ranking[0]?.total || 0}</div>
-                            <div class="stat-label">MÁXIMO PONTOS</div>
+                            <div class="stat-label">MÁXIMO</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value">${rodadaInfo.timestamp || dados.timestamp || 'N/A'}</div>
-                            <div class="stat-label">ATUALIZAÇÃO</div>
+                            <div class="stat-value">${rodadaInfo.timestamp?.split(' ')[0] || dados.timestamp?.split(' ')[0] || 'N/A'}</div>
+                            <div class="stat-label">ATUALIZADO</div>
                         </div>
                     </div>
                 `;
             }
             
-            // Exibir os 4 primeiros como pódio
+            // Exibir pódio
             if (top4.length > 0) {
                 const podiumArea = document.getElementById('podiumArea');
                 const podiumList = document.getElementById('podiumList');
@@ -989,20 +1141,14 @@
                     top4.forEach((participante) => {
                         const posicao = participante.posicao;
                         const estatisticas = participante.estatisticas || {};
-                        
-                        // Emojis de medalha
                         const medalhas = ['🥇', '🥈', '🥉', '🎖️'];
                         const medalhaEmoji = medalhas[posicao - 1] || '🎖️';
-                        
-                        // Nome e pontos
                         const nome = participante.nome || `Participante ${participante.usuario_id}`;
                         const pontos = participante.total || 0;
+                        const semPalpite = participante.sem_palpite;
                         
                         const podiumStep = document.createElement('div');
                         podiumStep.className = `podium-step pos-${posicao}`;
-                        
-                        // Verificar se o participante não palpitou
-                        const semPalpite = participante.sem_palpite;
                         
                         podiumStep.innerHTML = `
                             <div class="podium-place">${posicao}º</div>
@@ -1011,7 +1157,7 @@
                                 <div class="podium-name">${nome}</div>
                                 <div class="podium-points">${pontos}</div>
                                 ${semPalpite ? 
-                                    '<div class="sem-palpite-badge" style="margin-top: 8px;">SEM PALPITE</div>' : 
+                                    '<div class="sem-palpite-badge" style="margin-top: 12px;">SEM PALPITE</div>' : 
                                     (estatisticas.pe > 0 || estatisticas.rc > 0 ?
                                         `<div class="podium-stats">
                                             ${estatisticas.pe > 0 ? `<span class="podium-stat stat-pe">🏆 ${estatisticas.pe} PE</span>` : ''}
@@ -1030,31 +1176,24 @@
                 }
             }
             
-            // Exibir demais participantes (a partir da 5ª posição)
+            // Exibir demais participantes
             const demaisParticipantes = ranking.slice(4);
             const rankingList = document.getElementById('rankingList');
+            const legendArea = document.getElementById('legendArea');
             
             if (rankingList) {
                 rankingList.innerHTML = '';
                 
                 if (demaisParticipantes.length > 0) {
-                    // Mostrar separador
-                    const separatorArea = document.getElementById('separatorArea');
-                    if (separatorArea) {
-                        separatorArea.style.display = 'block';
-                    }
+                    document.getElementById('separatorArea').style.display = 'block';
+                    legendArea.style.display = 'block';
                     
-                    // Adicionar demais participantes
                     demaisParticipantes.forEach((participante) => {
                         const posicao = participante.posicao;
                         const estatisticas = participante.estatisticas || {};
                         const semPalpite = participante.sem_palpite;
-                        
-                        // Nome e pontos
                         const nome = participante.nome || `Participante ${participante.usuario_id}`;
                         const pontos = participante.total || 0;
-                        
-                        // Estatísticas
                         const temPE = estatisticas.pe > 0;
                         const temRC = estatisticas.rc > 0;
                         
@@ -1071,8 +1210,8 @@
                                         (temRC ? `<span class="stat-badge rc">✓ ${estatisticas.rc} RC</span>` : '')
                                     }
                                     ${participante.jogos_palpitados > 0 ? 
-                                        `<span style="color: #64748b; font-size: 11px; font-weight: 600;">
-                                            (${participante.jogos_palpitados}/${participante.total_jogos_rodada || '?'} jogos)
+                                        `<span class="jogos-info">
+                                            ${participante.jogos_palpitados}/${participante.total_jogos_rodada || '?'} jogos
                                         </span>` : ''}
                                 </div>
                             </div>
@@ -1084,34 +1223,23 @@
                         rankingList.appendChild(item);
                     });
                 } else if (ranking.length <= 4) {
-                    // Esconder separador se não houver demais participantes
-                    const separatorArea = document.getElementById('separatorArea');
-                    if (separatorArea) {
-                        separatorArea.style.display = 'none';
-                    }
+                    document.getElementById('separatorArea').style.display = 'none';
+                    legendArea.style.display = 'block';
                 }
             }
             
             // Mostrar conteúdo
             document.getElementById('loading').style.display = 'none';
             document.getElementById('rankingContent').style.display = 'block';
-            
-            logDebug('✅ Ranking exibido com sucesso');
         }
         
-        // Inicializar quando a página carregar
+        // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            // Expandir WebApp se estiver no Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                logDebug('✅ Telegram WebApp detectado');
-            } else {
-                logDebug('⚠️ Fora do Telegram (modo debug)');
             }
             
-            // Carregar dados
-            logDebug('🚀 Iniciando carregamento de dados...');
             setTimeout(carregarDados, 1000);
         });
     </script>
