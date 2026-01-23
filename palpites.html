@@ -8,18 +8,15 @@
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
         :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --secondary: #2c3e50;
-            --secondary-light: #34495e;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --danger-light: #ff6b6b;
-            --dark: #2d3748;
-            --light: #f8fafc;
-            --gray: #718096;
-            --light-gray: #e2e8f0;
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
             --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -30,39 +27,43 @@
             padding: 0; 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        body { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--dark);
-            min-height: 100vh;
+        html {
             width: 100%;
-            overflow-x: hidden;
-            padding: 15px;
+        }
+
+        body { 
+            background: white;
+            color: var(--dark);
+            min-height: 100vh; /* Permite expansão natural */
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: flex-start;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
         }
         
         .main-card {
             background: white;
-            padding: 20px;
+            border-radius: 0;
+            padding: 16px 12px;
             position: relative;
             overflow: hidden;
             animation: slideUp 0.5s ease-out;
             width: 100%;
+            min-height: 100vh;
+            padding-bottom: 80px; /* Espaço extra para scroll final */
         }
         
         @keyframes slideUp {
@@ -73,46 +74,44 @@
         /* ===== HEADER DA RODADA ===== */
         .header-section {
             text-align: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
             border-bottom: 2px solid var(--light-gray);
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 12px;
-            padding: 20px;
-            margin: 0 0 20px 0;
-            color: white;
+            padding: 15px;
+            margin: 0 0 15px 0;
         }
         
         .rodada-number {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
-            color: white;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 8px;
         }
         
         .rodada-icon {
-            font-size: 26px;
+            font-size: 22px;
         }
         
         /* ===== STATUS INFORMAÇÕES COMPACTAS ===== */
         .status-section {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            gap: 8px;
+            margin-bottom: 15px;
         }
         
         .status-card-compact {
             background: white;
             border-radius: 10px;
-            padding: 15px 12px;
+            padding: 10px 8px;
             border: 1px solid var(--light-gray);
             text-align: center;
             transition: var(--transition);
@@ -120,129 +119,119 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 85px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        
-        .status-card-compact:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-height: 70px;
         }
         
         .status-icon-compact {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
-            font-size: 16px;
+            margin-bottom: 6px;
+            font-size: 12px;
         }
         
         .status-card-compact.horario .status-icon-compact {
-            background: rgba(52, 152, 219, 0.15);
+            background: rgba(67, 97, 238, 0.1);
             color: var(--primary);
         }
         
         .status-card-compact.trunfo .status-icon-compact {
-            background: rgba(243, 156, 18, 0.15);
+            background: rgba(248, 150, 30, 0.1);
             color: var(--warning);
         }
         
         .status-card-compact.dobrada .status-icon-compact {
-            background: rgba(231, 76, 60, 0.15);
-            color: var(--danger);
+            background: rgba(76, 201, 240, 0.1);
+            color: var(--success);
         }
         
         .status-title-compact {
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--dark);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
         .status-content-compact {
-            font-size: 13px;
-            line-height: 1.3;
+            font-size: 11px;
+            line-height: 1.2;
             color: var(--gray);
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
-            height: 32px;
+            height: 24px;
         }
         
         .time-remaining-compact {
             display: inline-block;
-            margin-top: 5px;
-            padding: 4px 10px;
-            background: rgba(52, 152, 219, 0.15);
+            margin-top: 3px;
+            padding: 2px 6px;
+            background: rgba(67, 97, 238, 0.1);
             border-radius: 50px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--primary);
-            font-size: 12px;
+            font-size: 10px;
         }
         
         .status-badge-compact {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 2px 6px;
             border-radius: 50px;
-            font-size: 12px;
-            font-weight: 800;
-            margin-top: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 3px;
         }
         
         .status-badge-compact.active {
-            background: rgba(39, 174, 96, 0.15);
+            background: rgba(76, 201, 240, 0.1);
             color: var(--success);
         }
         
         .status-badge-compact.inactive {
-            background: rgba(113, 128, 150, 0.15);
+            background: rgba(108, 117, 125, 0.1);
             color: var(--gray);
         }
         
         .status-badge-compact.used {
-            background: rgba(231, 76, 60, 0.15);
+            background: rgba(247, 37, 133, 0.1);
             color: var(--danger);
         }
         
         .status-badge-compact.blocked {
-            background: rgba(113, 128, 150, 0.2);
+            background: rgba(108, 117, 125, 0.15);
             color: var(--gray);
         }
         
         /* ===== ALERTA DE PD JÁ USADA ===== */
         .pd-used-alert {
             background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
-            border: 2px solid rgba(231, 76, 60, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            border: 1px solid rgba(247, 37, 133, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.2); }
-            70% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
+            70% { box-shadow: 0 0 0 6px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
         }
         
         .pd-used-icon {
-            font-size: 24px;
+            font-size: 18px;
             color: var(--danger);
             flex-shrink: 0;
         }
@@ -252,168 +241,158 @@
         }
         
         .pd-used-title {
-            font-weight: 800;
+            font-weight: 700;
             color: var(--danger);
-            margin-bottom: 4px;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+            font-size: 13px;
         }
         
         .pd-used-info {
-            font-size: 13px;
+            font-size: 11px;
             color: #666;
-            line-height: 1.4;
+            line-height: 1.3;
         }
         
         .pd-used-game {
-            font-weight: 800;
+            font-weight: 700;
             color: var(--dark);
-            background: rgba(231, 76, 60, 0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
         }
         
-        /* ===== LISTA DE JOGOS ===== */
+        /* ===== LISTA DE JOGOS - NOVO LAYOUT ===== */
         .games-section {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
         .games-title {
-            font-size: 22px;
-            font-weight: 800;
+            font-size: 18px;
+            font-weight: 700;
             color: var(--dark);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 0 5px;
         }
         
         .games-title i {
             color: var(--primary);
-            font-size: 20px;
+            font-size: 16px;
         }
         
         /* ===== GAME CARD NOVO LAYOUT ===== */
         .game-card {
             background: white;
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 16px;
-            border: 2px solid var(--light-gray);
+            padding: 14px;
+            margin-bottom: 14px;
+            border: 1px solid var(--light-gray);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             width: 100%;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         
         .game-card:hover {
             border-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15);
         }
         
         .game-card.pd-blocked {
             background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
-            border-color: rgba(113, 128, 150, 0.3);
+            border-color: rgba(108, 117, 125, 0.2);
         }
         
         .game-card.pd-used {
             background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
-            border-color: rgba(231, 76, 60, 0.3);
-            border-style: solid;
+            border-color: rgba(247, 37, 133, 0.2);
         }
         
         /* CONTAINER PRINCIPAL DO JOGO - LAYOUT EM GRID */
         .game-content {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 20px;
+            gap: 14px;
             width: 100%;
             align-items: start;
         }
         
-        /* TIMES - LADO ESQUERDO (AUMENTADO) */
+        /* TIMES - LADO ESQUERDO */
         .teams-container {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 10px;
         }
         
         .team-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-        }
-        
-        .team-name {
-            font-size: 18px; /* AUMENTADO */
-            font-weight: 800;
-            padding: 16px 18px; /* AUMENTADO */
-            border-radius: 10px;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 100%;
-            min-height: 56px; /* AUMENTADO */
-            display: flex;
-            align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .team-home {
-            background: rgba(52, 152, 219, 0.15);
-            color: var(--primary);
-            border-left: 4px solid var(--primary);
-        }
-        
-        .team-away {
-            background: rgba(44, 62, 80, 0.15);
-            color: var(--secondary);
-            border-left: 4px solid var(--secondary);
-        }
-        
-        /* PLACARES E ESTRELA - LADO DIREITO */
-        .scores-pd-container {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            min-width: 140px;
-        }
-        
-        /* CONTÊINER DOS PLACARES (VERTICAL) */
-        .scores-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .score-row {
             display: flex;
             align-items: center;
             gap: 8px;
             width: 100%;
         }
         
+        .team-name {
+            font-size: 16px;
+            font-weight: 800;
+            padding: 12px 14px;
+            border-radius: 10px;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 100%;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .team-home {
+            background: rgba(67, 97, 238, 0.12);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .team-away {
+            background: rgba(58, 12, 163, 0.12);
+            color: var(--secondary);
+            border-left: 3px solid var(--secondary);
+        }
+        
+        /* PLACARES E ESTRELA - LADO DIREITO */
+        .scores-pd-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 100px;
+        }
+        
+        /* CONTÊINER DOS PLACARES (VERTICAL) */
+        .scores-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+        
         .score-input-container {
             position: relative;
-            width: 60px; /* AUMENTADO */
+            width: 44px;
         }
         
         .score-input {
             width: 100%;
-            height: 50px; /* AUMENTADO */
+            height: 40px;
             border: 2px solid #e0e7ff;
-            border-radius: 10px;
+            border-radius: 8px;
             text-align: center;
-            font-size: 24px; /* AUMENTADO */
+            font-size: 18px;
             font-weight: 800;
             outline: none;
             background: #f8faff;
@@ -433,13 +412,13 @@
         .score-input:focus {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
         
         .score-input::placeholder {
             color: #d0d7ff;
             font-weight: 400;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         .score-input:disabled {
@@ -450,48 +429,48 @@
         }
         
         .vs-symbol-small {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--gray);
-            margin: 0 4px;
+            margin: 0 2px;
         }
         
         /* ROTULO DO PLACAR (M / V) */
         .score-label {
-            font-size: 14px;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--gray);
             text-transform: uppercase;
-            margin-right: 4px;
-            min-width: 20px;
+            margin-right: 2px;
+            min-width: 16px;
         }
         
-        /* ESTRELA (AUMENTADA) */
+        /* ESTRELA */
         .pd-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 70px; /* AUMENTADO */
+            width: 52px;
             cursor: pointer;
             transition: var(--transition);
             position: relative;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 8px;
+            border-radius: 10px;
         }
         
         .pd-container.disabled {
             cursor: not-allowed;
-            opacity: 0.6;
+            opacity: 0.5;
         }
         
         .pd-container.clickable:hover:not(.disabled) {
-            background: rgba(255, 215, 0, 0.1);
-            transform: translateY(-4px);
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-2px);
         }
         
         .pd-star {
-            font-size: 38px; /* AUMENTADO */
+            font-size: 28px;
             color: #e0e0e0;
             transition: var(--transition);
             filter: grayscale(1);
@@ -502,8 +481,8 @@
         .pd-star.active {
             color: #ffd700;
             filter: grayscale(0);
-            transform: scale(1.2);
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            transform: scale(1.15);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
         }
         
         .pd-star.used {
@@ -517,12 +496,12 @@
         }
         
         .pd-label {
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 800;
-            margin-top: 8px;
+            margin-top: 6px;
             color: #999;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
             transition: var(--transition);
             text-align: center;
             white-space: nowrap;
@@ -542,46 +521,46 @@
         
         .pd-badge {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -2px;
+            right: -2px;
             background: var(--danger);
             color: white;
-            font-size: 10px;
-            padding: 4px 8px;
+            font-size: 8px;
+            padding: 2px 4px;
             border-radius: 50px;
-            font-weight: 800;
+            font-weight: 700;
             z-index: 2;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
         /* ===== FOOTER BOTÕES ===== */
         .footer-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-            padding: 20px 0 10px;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 10px 0;
+            position: sticky;
+            bottom: 0;
             background: white;
-            border-top: 2px solid var(--light-gray);
+            z-index: 100;
         }
         
         .action-btn {
-            padding: 18px 16px;
+            padding: 16px 12px;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
             width: 100%;
-            height: 56px;
+            height: 48px;
         }
         
         .action-btn:active {
@@ -589,44 +568,29 @@
         }
         
         .btn-cancel {
-            background: linear-gradient(135deg, #ff6b6b 0%, var(--danger) 100%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
-        }
-        
-        .btn-cancel:hover {
-            background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.3);
         }
         
         .btn-send {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
-        }
-        
-        .btn-send:hover:not(:disabled) {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a252f 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
         }
         
         .btn-send:disabled {
             background: linear-gradient(135deg, #cccccc 0%, #aaaaaa 100%);
             cursor: not-allowed;
             transform: none !important;
-            box-shadow: none;
         }
         
         .btn-icon {
-            font-size: 18px;
+            font-size: 16px;
         }
         
         /* ===== LOADING E ERROS ===== */
         .loading-container {
             text-align: center;
-            padding: 60px 20px;
+            padding: 60px 15px;
             width: 100%;
             min-height: 100vh;
             display: flex;
@@ -656,13 +620,13 @@
         
         .error-message {
             background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
-            border: 2px solid rgba(231, 76, 60, 0.3);
+            border: 1px solid rgba(247, 37, 133, 0.3);
             border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 12px;
+            margin-bottom: 15px;
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             animation: shake 0.5s ease-in-out;
             width: 100%;
         }
@@ -674,148 +638,134 @@
         }
         
         .error-icon {
-            font-size: 20px;
+            font-size: 18px;
             color: var(--danger);
             flex-shrink: 0;
         }
         
         .error-text {
-            font-weight: 800;
+            font-weight: 700;
             color: var(--danger);
-            font-size: 15px;
-            line-height: 1.4;
+            font-size: 13px;
         }
         
         /* ===== RESPONSIVIDADE ===== */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .app-container {
-                border-radius: 12px;
-            }
-            
+        @media (max-width: 380px) {
             .main-card {
-                padding: 15px;
-            }
-            
-            .rodada-number {
-                font-size: 24px;
+                padding: 12px 8px;
             }
             
             .status-section {
-                grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 6px;
             }
             
-            .game-content {
-                grid-template-columns: 1fr;
-                gap: 15px;
+            .status-card-compact {
+                padding: 8px 6px;
+                min-height: 65px;
             }
             
-            .scores-pd-container {
-                justify-content: space-between;
-                min-width: 100%;
+            .status-title-compact {
+                font-size: 11px;
+            }
+            
+            .status-content-compact {
+                font-size: 10px;
+                height: 22px;
             }
             
             .team-name {
-                font-size: 16px;
-                padding: 14px 16px;
-                min-height: 52px;
-            }
-            
-            .score-input {
-                height: 46px;
-                font-size: 20px;
+                font-size: 15px;
+                padding: 10px 12px;
+                min-height: 42px;
             }
             
             .score-input-container {
-                width: 54px;
+                width: 38px;
+            }
+            
+            .score-input {
+                height: 36px;
+                font-size: 16px;
             }
             
             .pd-star {
-                font-size: 34px;
+                font-size: 24px;
             }
             
-            .pd-container {
-                width: 65px;
-            }
-            
-            .footer-buttons {
-                grid-template-columns: 1fr;
-                gap: 12px;
+            .pd-label {
+                font-size: 9px;
             }
             
             .action-btn {
-                padding: 16px 14px;
-                font-size: 15px;
-                height: 52px;
+                padding: 14px 10px;
+                font-size: 14px;
+                height: 44px;
+            }
+            
+            .scores-pd-container {
+                gap: 10px;
+                min-width: 95px;
+            }
+            
+            .score-label {
+                font-size: 11px;
             }
         }
         
-        @media (max-width: 480px) {
-            .main-card {
-                padding: 12px;
+        @media (max-width: 320px) {
+            .team-name {
+                font-size: 14px;
+                padding: 9px 10px;
+                min-height: 40px;
             }
             
-            .header-section {
-                padding: 15px;
+            .score-input-container {
+                width: 34px;
+            }
+            
+            .score-input {
+                height: 34px;
+                font-size: 15px;
+            }
+            
+            .pd-star {
+                font-size: 22px;
+            }
+            
+            .pd-label {
+                font-size: 8px;
+            }
+            
+            .scores-pd-container {
+                min-width: 90px;
+                gap: 8px;
+            }
+            
+            .score-label {
+                font-size: 10px;
+            }
+            
+            .games-title {
+                font-size: 16px;
             }
             
             .rodada-number {
                 font-size: 22px;
             }
-            
-            .games-title {
-                font-size: 20px;
-            }
-            
-            .team-name {
-                font-size: 15px;
-                padding: 12px 14px;
-                min-height: 48px;
-            }
-            
-            .score-input {
-                height: 42px;
-                font-size: 18px;
-            }
-            
-            .score-input-container {
-                width: 48px;
-            }
-            
-            .pd-star {
-                font-size: 30px;
-            }
-            
-            .pd-container {
-                width: 60px;
-            }
-            
-            .status-title-compact {
-                font-size: 13px;
-            }
-            
-            .status-content-compact {
-                font-size: 12px;
-            }
         }
         
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 4px;
         }
         
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 10px;
         }
         
         ::-webkit-scrollbar-thumb {
             background: #c1c1c1;
-            border-radius: 10px;
+            border-radius: 4px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
@@ -834,7 +784,6 @@
         
         <div id="content" style="display: none;">
             <div class="main-card">
-                <!-- HEADER -->
                 <div class="header-section">
                     <div class="rodada-number">
                         <i class="fas fa-trophy rodada-icon"></i>
@@ -842,13 +791,11 @@
                     </div>
                 </div>
                 
-                <!-- MENSAGEM DE ERRO -->
                 <div id="error-box" class="error-message">
                     <i class="fas fa-exclamation-triangle error-icon"></i>
                     <div class="error-text" id="error-text"></div>
                 </div>
                 
-                <!-- STATUS INFO COMPACTA -->
                 <div class="status-section">
                     <div class="status-card-compact horario">
                         <div class="status-icon-compact">
@@ -884,7 +831,6 @@
                     </div>
                 </div>
                 
-                <!-- ALERTA DE PD JÁ USADA -->
                 <div id="pd-used-alert" class="pd-used-alert" style="display: none;">
                     <i class="fas fa-exclamation-circle pd-used-icon"></i>
                     <div class="pd-used-text">
@@ -896,7 +842,6 @@
                     </div>
                 </div>
                 
-                <!-- LISTA DE JOGOS -->
                 <div class="games-section">
                     <div class="games-title">
                         <i class="fas fa-list-ol"></i>
@@ -905,7 +850,6 @@
                     <div id="lista-jogos"></div>
                 </div>
                 
-                <!-- BOTÕES DE AÇÃO -->
                 <div class="footer-buttons">
                     <button class="action-btn btn-send" id="btn-confirmar" disabled>
                         <i class="fas fa-paper-plane btn-icon"></i>
@@ -936,22 +880,22 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - SIMPLIFICADA =====
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Configuração simples e funcional
+                // Configuração padrão limpa
+                tg.expand();
                 tg.ready();
-                tg.expand(); // APENAS UMA CHAMADA
                 
-                // Configurar cores para se integrar
+                // Configurar cores
                 tg.setHeaderColor('secondary_bg_color');
                 tg.setBackgroundColor('bg_color');
                 
-                console.log("✅ Web App inicializado");
+                console.log("✅ Web App inicializado e expandido");
             } else {
                 console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
             }
@@ -965,32 +909,17 @@
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
-            
             try {
-                if (str === null || str === undefined || str === 'null' || str === 'undefined') {
-                    return null;
-                }
-                
+                if (str === null || str === undefined || str === 'null' || str === 'undefined') return null;
                 if (str instanceof Date) return str;
-                
                 const dateStr = String(str).trim();
                 if (!dateStr) return null;
-                
                 let cleanedStr = dateStr;
-                if (dateStr.endsWith('-03:00')) {
-                    cleanedStr = dateStr.slice(0, -6);
-                }
-                
+                if (dateStr.endsWith('-03:00')) cleanedStr = dateStr.slice(0, -6);
                 const isoStr = cleanedStr.replace(' ', 'T') + '-03:00';
                 const dt = new Date(isoStr);
-                
-                if (isNaN(dt.getTime())) {
-                    console.error('❌ Data inválida:', dateStr);
-                    return null;
-                }
-                
+                if (isNaN(dt.getTime())) return null;
                 return dt;
-                
             } catch (e) {
                 console.error('❌ Erro ao parsear data:', str, e);
                 return null;
@@ -999,130 +928,80 @@
 
         function formatarDataHora(data) {
             if (!data) return 'Não definido';
-            
             const dt = parseDataBrasilia(data);
             if (!dt) return 'Horário não definido';
-            
             const dia = dt.getDate().toString().padStart(2, '0');
             const mes = (dt.getMonth() + 1).toString().padStart(2, '0');
             const hora = dt.getHours().toString().padStart(2, '0');
             const minutos = dt.getMinutes().toString().padStart(2, '0');
-            
             return `${dia}/${mes} ${hora}:${minutos}`;
         }
 
         function calcularTempoRestante(dataLimite) {
             if (!dataLimite) return null;
-            
             const agora = new Date();
             const limite = parseDataBrasilia(dataLimite);
-            
             if (!limite) return null;
-            
             const diffMs = limite - agora;
             if (diffMs <= 0) return null;
-            
             const horas = Math.floor(diffMs / (1000 * 60 * 60));
             const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (horas > 0) {
-                return `${horas}h ${minutos}m`;
-            } else if (minutos > 0) {
-                return `${minutos} min`;
-            } else {
-                return '<1 min';
-            }
+            if (horas > 0) return `${horas}h ${minutos}m`;
+            else if (minutos > 0) return `${minutos} min`;
+            else return '<1 min';
         }
 
         // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosRodada() {
             try {
                 console.log("🔄 Iniciando carregamento de dados...");
-                
                 const urlParams = new URLSearchParams(window.location.search);
                 let dadosBase64 = urlParams.get('data');
                 
                 if (!dadosBase64) {
                     const urlString = window.location.href;
                     const match = urlString.match(/data=([^&]+)/);
-                    if (match) {
-                        dadosBase64 = match[1];
-                    }
+                    if (match) dadosBase64 = match[1];
                 }
                 
-                if (!dadosBase64) {
-                    throw new Error("Parâmetro 'data' não encontrado na URL");
-                }
-                
-                console.log("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
+                if (!dadosBase64) throw new Error("Parâmetro 'data' não encontrado na URL");
                 
                 try {
                     let dadosJson;
-                    
                     try {
                         dadosJson = atob(dadosBase64);
                     } catch (e1) {
-                        console.log("⚠️ Tentando com decodeURIComponent...");
                         dadosBase64 = decodeURIComponent(dadosBase64);
                         dadosJson = atob(dadosBase64);
                     }
-                    
                     dadosOriginais = JSON.parse(dadosJson);
-                    console.log("📊 Dados recebidos com sucesso!");
-                    
                     ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
-                    
                     atualizarInterface();
-                    
                 } catch (decodeError) {
-                    console.error("❌ Erro ao decodificar dados:", decodeError);
-                    
                     try {
                         dadosBase64 = dadosBase64.trim().replace(/\s/g, '');
-                        
-                        while (dadosBase64.length % 4 !== 0) {
-                            dadosBase64 += '=';
-                        }
-                        
+                        while (dadosBase64.length % 4 !== 0) dadosBase64 += '=';
                         const dadosJson = atob(dadosBase64);
                         dadosOriginais = JSON.parse(dadosJson);
-                        
-                        console.log("✅ Dados decodificados com abordagem alternativa!");
-                        
                         ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                         atualizarInterface();
-                        
                     } catch (finalError) {
-                        console.error("❌ Falha total ao decodificar:", finalError);
                         throw new Error("Falha ao decodificar dados: " + finalError.message);
                     }
                 }
-                
             } catch (e) {
-                console.error("❌ Erro crítico ao carregar dados", e);
-                
-                let errorMsg = "Erro ao carregar dados da rodada: " + e.message;
-                errorMsg += "\n\nURL: " + window.location.href.substring(0, 100) + "...";
-                
+                console.error("❌ Erro crítico", e);
+                let errorMsg = "Erro ao carregar dados: " + e.message;
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('content').style.display = 'block';
-                    
                     const errorBox = document.getElementById('error-box');
                     const errorText = document.getElementById('error-text');
-                    
-                    errorMsg = errorMsg.replace(/\n/g, '<br>');
                     errorText.innerHTML = errorMsg;
                     errorBox.style.display = 'flex';
-                    
                     const btnSair = document.getElementById('btn-sair');
-                    btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar ao Bot';
-                    btnSair.onclick = () => {
-                        if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.close();
-                        }
-                    };
-                    
+                    btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar';
+                    btnSair.onclick = () => { if (tg) tg.close(); };
                 }, 1000);
             }
         }
@@ -1131,7 +1010,6 @@
         function atualizarInterface() {
             document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
             
-            // Configurar horário limite
             const horarioElem = document.getElementById('txt-horario');
             const horarioStr = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
             horarioElem.textContent = `${horarioStr}`;
@@ -1148,7 +1026,6 @@
             
             horarioLimite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
             
-            // Configurar trunfo
             const trunfoElem = document.getElementById('txt-trunfo');
             const trunfoBadge = document.getElementById('trunfo-badge');
             
@@ -1164,7 +1041,6 @@
                 trunfoBadge.style.display = 'inline-block';
             }
             
-            // Configurar PD
             const dobradaElem = document.getElementById('txt-dobrada');
             const pdBadge = document.getElementById('pd-badge');
             
@@ -1174,24 +1050,14 @@
             ehEdicao = dadosOriginais.eh_edicao || false;
             pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
             
-            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, JaUsouAnteriormente=${pdJaUsouAnteriormente}, EhEdicao=${ehEdicao}, PodeTrocar=${pdPodeTrocar}`);
-            
-            // ===== CONFIGURAR pdSelecionado INICIAL =====
             if (ehEdicao) {
-                // Modo edição: começa com a PD que já estava selecionada
                 pdSelecionado = dadosOriginais.pd_jogo_id;
-                console.log(`🔄 Modo edição: pdSelecionado inicial = ${pdSelecionado}`);
             } else if (pdJaUsada) {
-                // PD já foi usada: mostrar como usada
                 pdSelecionado = dadosOriginais.pd_jogo_id;
-                console.log(`🔒 PD já usada: pdSelecionado = ${pdSelecionado}`);
             } else {
-                // Modo normal: nenhuma PD selecionada ainda
                 pdSelecionado = null;
-                console.log(`🆕 Modo normal: pdSelecionado inicial = null`);
             }
             
-            // Texto do status da PD
             if (pdJaUsouAnteriormente) {
                 dobradaElem.textContent = "Já usou PD";
                 pdBadge.className = 'status-badge-compact used';
@@ -1221,44 +1087,29 @@
                 pdBadge.style.display = 'inline-block';
             }
             
-            // Inicializar array de palpites
             palpites = [];
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
-            // Restaurar palpites existentes
             if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
-                console.log("🔄 Restaurando palpites existentes");
-                
                 ordemOriginalJogos.forEach(jogoId => {
                     const jogoIdStr = String(jogoId);
                     if (dadosOriginais.palpites[jogoIdStr]) {
                         const palpite = dadosOriginais.palpites[jogoIdStr];
                         const novoPalpite = {
                             jogo_id: jogoId,
-                            mandante: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
-                            visitante: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : '',
+                            mandante: palpite.mandante !== null ? palpite.mandante : '',
+                            visitante: palpite.visitante !== null ? palpite.visitante : '',
                             pd: palpite.pd || false
                         };
-                        
                         palpites.push(novoPalpite);
-                        
-                        // Se este palpite tinha PD, garantir que pdSelecionado está correto
-                        if (palpite.pd && pdSelecionado !== jogoId) {
-                            console.log(`⚠️ Ajustando: palpite ${jogoId} tem PD=true, mas pdSelecionado=${pdSelecionado}`);
-                            pdSelecionado = jogoId;
-                        }
+                        if (palpite.pd && pdSelecionado !== jogoId) pdSelecionado = jogoId;
                     }
                 });
             }
             
-            console.log(`📊 Palpites carregados: ${palpites.length}`);
-            console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
-            
-            // Renderizar jogos e verificar
             renderizarJogos();
             verificarHorarioLimite();
             
-            // Mostrar conteúdo
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
@@ -1269,19 +1120,13 @@
         function mostrarAlertaPDUsada() {
             const alerta = document.getElementById('pd-used-alert');
             const infoElem = document.getElementById('pd-game-info');
-            
             if (dadosOriginais.pd_jogo_info) {
-                const info = dadosOriginais.pd_jogo_info;
-                infoElem.textContent = `${info.mandante} x ${info.visitante}`;
+                infoElem.textContent = `${dadosOriginais.pd_jogo_info.mandante} x ${dadosOriginais.pd_jogo_info.visitante}`;
             } else {
                 const jogoComPD = dadosOriginais.jogos.find(j => j.id == dadosOriginais.pd_jogo_id);
-                if (jogoComPD) {
-                    infoElem.textContent = `${jogoComPD.mandante} x ${jogoComPD.visitante}`;
-                } else {
-                    infoElem.textContent = "Jogo não encontrado";
-                }
+                if (jogoComPD) infoElem.textContent = `${jogoComPD.mandante} x ${jogoComPD.visitante}`;
+                else infoElem.textContent = "Jogo não encontrado";
             }
-            
             alerta.style.display = 'flex';
         }
 
@@ -1291,15 +1136,7 @@
             container.innerHTML = '';
             
             if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
-                container.innerHTML = `
-                    <div class="game-card">
-                        <div style="text-align: center; padding: 30px 20px; color: var(--gray); width: 100%;">
-                            <i class="fas fa-exclamation-circle" style="font-size: 40px; margin-bottom: 15px; color: var(--warning);"></i>
-                            <p style="font-size: 16px; font-weight: 600; color: var(--dark);">Nenhum jogo disponível para palpites.</p>
-                            <p style="font-size: 13px; margin-top: 8px; color: var(--gray);">Entre em contato com o administrador.</p>
-                        </div>
-                    </div>
-                `;
+                container.innerHTML = `<div class="game-card"><div style="text-align: center; padding: 20px;">Nenhum jogo disponível.</div></div>`;
                 return;
             }
             
@@ -1307,12 +1144,7 @@
             const horarioExpirado = (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo);
             
             dadosOriginais.jogos.forEach(jogo => {
-                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
-                    mandante: '', 
-                    visitante: '', 
-                    pd: false 
-                };
-                
+                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { mandante: '', visitante: '', pd: false };
                 const isOriginalPD = (pdOriginalId == jogo.id);
                 const isPDAtual = (pdSelecionado == jogo.id);
                 const tinhaPDOriginal = (pdJaUsada && isOriginalPD);
@@ -1325,39 +1157,18 @@
                 let showBadge = false;
                 let badgeText = '';
                 
-                // ===== LÓGICA DE ESTADO DA ESTRELA =====
-                
-                // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
-                if (pdBloqueadaAdm) {
-                    // PD bloqueada administrativamente
+                if (pdBloqueadaAdm || pdJaUsouAnteriormente) {
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADA';
                     isClickable = false;
                     isDisabled = true;
-                }
-                else if (pdJaUsouAnteriormente) {
-                    // PD já usada em rodada anterior - BLOQUEIO PERMANENTE
-                    cardClass += ' pd-blocked';
-                    starClass += ' blocked';
-                    pdLabel = 'BLOQUEADO';
+                } else if (horarioExpirado) {
                     isClickable = false;
-                    isDisabled = true;
-                }
-                // 2. HORÁRIO EXPIRADO (sem trunfo)
-                else if (horarioExpirado) {
-                    isClickable = false;
-                    if (!isDisabled) {
-                        starClass += ' blocked';
-                        pdLabel = 'EXPIRADO';
-                    }
-                }
-                // 3. MODO NORMAL (NÃO É EDIÇÃO)
-                else if (!ehEdicao) {
+                    if (!isDisabled) { starClass += ' blocked'; pdLabel = 'EXPIRADO'; }
+                } else if (!ehEdicao) {
                     if (pdJaUsada) {
-                        // PD já foi usada nesta rodada
                         if (isOriginalPD) {
-                            // Esta é a PD que foi usada
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1366,53 +1177,24 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Não é a PD usada - não pode selecionar outra
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
                             isDisabled = true;
                         }
                     } else {
-                        // PD ainda não foi usada - disponível para seleção
-                        if (isPDAtual) {
-                            // Esta é a PD selecionada
-                            starClass += ' active';
-                            pdLabel = 'SELECIONADA';
-                        } else {
-                            // Disponível para seleção
-                            pdLabel = 'SELECIONAR';
-                        }
+                        if (isPDAtual) { starClass += ' active'; pdLabel = 'SELECIONADA'; }
+                        else pdLabel = 'SELECIONAR';
                     }
-                }
-                // 4. MODO EDIÇÃO
-                else {
+                } else {
                     if (pdPodeTrocar) {
-                        // Pode trocar a PD durante edição
                         if (isPDAtual) {
-                            // Esta é a PD atualmente selecionada
                             starClass += ' active';
                             pdLabel = 'SELECIONADA';
-                            
-                            // Se era a PD original, mostrar badge
-                            if (tinhaPDOriginal) {
-                                showBadge = true;
-                                badgeText = 'ORIGINAL';
-                            }
-                        } else {
-                            // Não é a PD selecionada no momento
-                            if (tinhaPDOriginal) {
-                                // Era a PD original, mas não está mais selecionada
-                                // Mostrar como normal, disponível para seleção
-                                pdLabel = 'SELECIONAR';
-                            } else {
-                                // Nunca foi PD - disponível para seleção
-                                pdLabel = 'SELECIONAR';
-                            }
-                        }
+                            if (tinhaPDOriginal) { showBadge = true; badgeText = 'ORIGINAL'; }
+                        } else pdLabel = 'SELECIONAR';
                     } else {
-                        // Não pode trocar PD durante edição
                         if (tinhaPDOriginal) {
-                            // É a PD original e não pode trocar
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1421,7 +1203,6 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Nunca foi PD e não pode selecionar agora
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
@@ -1430,290 +1211,126 @@
                     }
                 }
                 
-                // Criar o elemento do jogo
                 const div = document.createElement('div');
                 div.className = cardClass;
-                
                 div.innerHTML = `
                     <div class="game-content">
-                        <!-- TIMES - LADO ESQUERDO -->
                         <div class="teams-container">
-                            <div class="team-row">
-                                <div class="team-name team-home" title="${jogo.mandante}">
-                                    ${jogo.mandante}
-                                </div>
-                            </div>
-                            
-                            <div class="team-row">
-                                <div class="team-name team-away" title="${jogo.visitante}">
-                                    ${jogo.visitante}
-                                </div>
-                            </div>
+                            <div class="team-row"><div class="team-name team-home">${jogo.mandante}</div></div>
+                            <div class="team-row"><div class="team-name team-away">${jogo.visitante}</div></div>
                         </div>
-                        
-                        <!-- PLACARES E ESTRELA - LADO DIREITO -->
                         <div class="scores-pd-container">
-                            <!-- PLACARES (VERTICAL) -->
                             <div class="scores-container">
-                                <!-- PLACAR MANDANTE -->
                                 <div class="score-row">
                                     <div class="score-label">M</div>
                                     <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.mandante}" 
-                                               oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                               placeholder="0"
-                                               ${horarioExpirado ? 'disabled' : ''}>
+                                        <input type="number" min="0" max="99" class="score-input" value="${palpiteAtual.mandante}" oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
-                                
-                                <!-- PLACAR VISITANTE -->
                                 <div class="score-row">
                                     <div class="score-label">V</div>
                                     <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.visitante}" 
-                                               oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                               placeholder="0"
-                                               ${horarioExpirado ? 'disabled' : ''}>
+                                        <input type="number" min="0" max="99" class="score-input" value="${palpiteAtual.visitante}" oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- ESTRELA -->
-                            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
-                                 onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
-                                <div class="${starClass}">
-                                    ⭐
-                                    ${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}
-                                </div>
+                            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                                <div class="${starClass}">⭐${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}</div>
                                 <div class="pd-label">${pdLabel}</div>
                             </div>
                         </div>
                     </div>
                 `;
-                
                 container.appendChild(div);
             });
         }
 
         // ===== FUNÇÕES DE INTERAÇÃO =====
         function togglePD(jogoId) {
-            console.log(`⭐ togglePD chamado para jogo ${jogoId}`);
-            console.log(`📊 Estado: ehEdicao=${ehEdicao}, pdJaUsada=${pdJaUsada}, pdPodeTrocar=${pdPodeTrocar}, pdSelecionado=${pdSelecionado}`);
-            
-            // Verificar bloqueios
-            if (pdBloqueadaAdm) {
-                mostrarErro("❌ PD atribuída administrativamente!");
-                return;
-            }
-            
-            if (pdJaUsouAnteriormente) {
-                mostrarErro("❌ PD já usada em rodada anterior!");
-                return;
-            }
-            
-            // Verificar horário limite (se não tem trunfo)
+            if (pdBloqueadaAdm || pdJaUsouAnteriormente) return;
             if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) {
                 mostrarErro("❌ Horário limite expirado!");
                 return;
             }
             
-            const pdOriginalId = dadosOriginais.pd_jogo_id;
-            const isOriginalPD = (pdOriginalId == jogoId);
             const isPDAtual = (pdSelecionado == jogoId);
             
-            console.log(`📊 Detalhes: isOriginalPD=${isOriginalPD}, isPDAtual=${isPDAtual}`);
-            
-            // CASO 1: Clicou na mesma estrela que já está selecionada
             if (isPDAtual) {
-                // Só permite remover se estiver em modo edição E puder trocar
-                if (ehEdicao && pdPodeTrocar) {
-                    if (confirm("⚠️ Remover pontuação dobrada deste jogo?\n\nSe remover, poderá selecionar outra estrela depois.")) {
-                        pdSelecionado = null;
-                        // Limpar PD de todos os palpites
-                        palpites.forEach(p => {
-                            if (p.jogo_id == jogoId) {
-                                p.pd = false;
-                            }
-                        });
-                        console.log("✅ PD removida do jogo:", jogoId);
-                    }
-                } else if (!ehEdicao && !pdJaUsada) {
-                    // Modo normal, PD não foi usada ainda - pode desselecionar
+                if ((ehEdicao && pdPodeTrocar) || (!ehEdicao && !pdJaUsada)) {
                     if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
                         pdSelecionado = null;
-                        palpites.forEach(p => {
-                            if (p.jogo_id == jogoId) {
-                                p.pd = false;
-                            }
-                        });
-                        console.log("✅ PD removida (modo normal)");
+                        palpites.forEach(p => { if (p.jogo_id == jogoId) p.pd = false; });
                     }
                 } else {
                     mostrarErro("❌ Não é possível remover a PD nesta situação!");
                 }
-            }
-            // CASO 2: Clicou em uma estrela diferente
-            else {
-                // 2A: Modo normal (não é edição) e PD já foi usada
+            } else {
                 if (!ehEdicao && pdJaUsada) {
                     mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
                     return;
                 }
-                
-                // 2B: Modo edição mas não pode trocar PD
                 if (ehEdicao && !pdPodeTrocar) {
                     mostrarErro("❌ Não é possível trocar a PD nesta situação!");
                     return;
                 }
                 
-                // 2C: Já tem uma PD selecionada (vai trocar/transferir)
                 if (pdSelecionado !== null) {
-                    const jogoAtual = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
-                    const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
-                    
-                    let mensagem = "⚠️ Transferir pontuação dobrada para este jogo?\n\n";
-                    if (jogoAtual) {
-                        mensagem += `De: ${jogoAtual.mandante} x ${jogoAtual.visitante}\n`;
-                    }
-                    if (jogoNovo) {
-                        mensagem += `Para: ${jogoNovo.mandante} x ${jogoNovo.visitante}`;
-                    }
-                    
-                    if (confirm(mensagem)) {
-                        // Limpar PD anterior de todos os palpites
-                        palpites.forEach(p => {
-                            if (p.jogo_id == pdSelecionado) {
-                                p.pd = false;
-                            }
-                        });
-                        
-                        // Definir nova PD
+                    if (confirm("⚠️ Transferir pontuação dobrada para este jogo?")) {
+                        palpites.forEach(p => { if (p.jogo_id == pdSelecionado) p.pd = false; });
                         pdSelecionado = jogoId;
-                        
-                        // Adicionar PD ao novo jogo
-                        let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
-                        if (palpiteIndex === -1) {
-                            // Criar novo palpite para este jogo
-                            palpites.push({
-                                jogo_id: jogoId,
-                                mandante: '',
-                                visitante: '',
-                                pd: true
-                            });
-                            console.log(`✅ Nova PD criada para jogo ${jogoId}`);
-                        } else {
-                            // Atualizar palpite existente
-                            palpites[palpiteIndex].pd = true;
-                            console.log(`✅ PD atualizada para jogo ${jogoId}`);
-                        }
-                    } else {
-                        console.log("❌ Transferência cancelada pelo usuário");
-                        return;
+                        atualizarOuCriarPalpitePD(jogoId);
                     }
-                }
-                // 2D: Primeira seleção (não tem PD selecionada ainda)
-                else {
+                } else {
                     pdSelecionado = jogoId;
-                    
-                    // Adicionar PD ao jogo
-                    let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
-                    if (palpiteIndex === -1) {
-                        palpites.push({
-                            jogo_id: jogoId,
-                            mandante: '',
-                            visitante: '',
-                            pd: true
-                        });
-                        console.log(`✅ PD selecionada pela primeira vez no jogo ${jogoId}`);
-                    } else {
-                        palpites[palpiteIndex].pd = true;
-                        console.log(`✅ PD adicionada ao jogo existente ${jogoId}`);
-                    }
+                    atualizarOuCriarPalpitePD(jogoId);
                 }
             }
-            
-            // Atualizar interface
             renderizarJogos();
             verificarEAtualizar();
-            
-            console.log(`📊 Estado final: pdSelecionado=${pdSelecionado}`);
-            console.log("📋 Palpites com PD:", palpites.filter(p => p.pd).map(p => p.jogo_id));
+        }
+
+        function atualizarOuCriarPalpitePD(jogoId) {
+            let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
+            if (palpiteIndex === -1) {
+                palpites.push({ jogo_id: jogoId, mandante: '', visitante: '', pd: true });
+            } else {
+                palpites[palpiteIndex].pd = true;
+            }
         }
 
         function salvarPlacar(jogoId, time, valor) {
-            // Limpar e validar valor
-            valor = valor.replace(/\D/g, '');
-            valor = valor.slice(0, 2);
+            valor = valor.replace(/\D/g, '').slice(0, 2);
             const valorNum = valor === '' ? '' : parseInt(valor) || 0;
+            if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) valor = '';
             
-            // Validar range
-            if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
-                valor = '';
-            }
-            
-            // Encontrar ou criar palpite
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
-            
             if (palpiteIndex === -1) {
-                // Criar novo palpite
-                palpites.push({
-                    jogo_id: jogoId,
-                    mandante: '',
-                    visitante: '',
-                    pd: false
-                });
+                palpites.push({ jogo_id: jogoId, mandante: '', visitante: '', pd: false });
                 palpiteIndex = palpites.length - 1;
             }
-            
-            // Atualizar placar
             palpites[palpiteIndex][time] = valorNum;
+            if (pdSelecionado === jogoId) palpites[palpiteIndex].pd = true;
             
-            // Se este jogo tem a PD selecionada, manter a PD
-            if (pdSelecionado === jogoId) {
-                palpites[palpiteIndex].pd = true;
-            }
-            
-            // Atualizar campo visualmente (opcional)
-            const inputSelector = `.score-input[oninput*="${jogoId}"]`;
-            const inputs = document.querySelectorAll(inputSelector);
-            inputs.forEach(input => {
-                if (input.oninput.toString().includes(`'${time}'`)) {
-                    input.value = valor;
-                }
-            });
-            
-            // Verificar se pode enviar
+            const inputs = document.querySelectorAll(`.score-input[oninput*="${jogoId}"]`);
+            inputs.forEach(input => { if (input.oninput.toString().includes(`'${time}'`)) input.value = valor; });
             verificarEAtualizar();
         }
 
-        // ===== VERIFICAÇÕES =====
         function verificarPalpitesCompletos() {
             let preenchidos = 0;
-            
             for (const palpite of palpites) {
-                if (palpite.mandante !== '' && palpite.visitante !== '') {
-                    preenchidos++;
-                }
+                if (palpite.mandante !== '' && palpite.visitante !== '') preenchidos++;
             }
-            
-            console.log(`📋 Palpites preenchidos: ${preenchidos}/${totalJogos}`);
             return preenchidos === totalJogos;
         }
 
         function verificarHorarioLimite() {
             if (!horarioLimite) return;
-            
             const agora = new Date();
-            
             if (agora > horarioLimite && !dadosOriginais.trunfo) {
-                mostrarErro("⚠️ HORÁRIO DE PALPITES ENCERRADO!");
-                
                 const btnConfirmar = document.getElementById('btn-confirmar');
                 btnConfirmar.disabled = true;
                 btnConfirmar.innerHTML = '<i class="fas fa-ban btn-icon"></i> Horário Encerrado';
-                
                 document.querySelectorAll('.score-input').forEach(input => {
                     input.disabled = true;
                     input.style.opacity = '0.6';
@@ -1724,52 +1341,26 @@
         function verificarEAtualizar() {
             const completo = verificarPalpitesCompletos();
             const btnConfirmar = document.getElementById('btn-confirmar');
-            
             btnConfirmar.disabled = !completo;
-            btnConfirmar.innerHTML = completo ? 
-                '<i class="fas fa-paper-plane btn-icon"></i> Enviar' :
-                '<i class="fas fa-lock btn-icon"></i> Preencher tudo';
+            btnConfirmar.innerHTML = completo ? '<i class="fas fa-paper-plane btn-icon"></i> Enviar' : '<i class="fas fa-lock btn-icon"></i> Preencher tudo';
         }
 
-        // ===== MANIPULAÇÃO DE ERROS =====
         function mostrarErro(mensagem) {
             const errorBox = document.getElementById('error-box');
-            const errorText = document.getElementById('error-text');
-            
-            errorText.textContent = mensagem;
+            document.getElementById('error-text').textContent = mensagem;
             errorBox.style.display = 'flex';
-            
-            setTimeout(() => {
-                errorBox.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { errorBox.style.display = 'none'; }, 5000);
         }
 
-        // ===== ENVIO DE PALPITES =====
+        // ===== EVENTOS =====
         document.getElementById('btn-confirmar').onclick = () => {
-            console.log("📤 Enviando palpites...");
-            
-            if (!verificarPalpitesCompletos()) {
-                mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
-                return;
-            }
-            
-            const agora = new Date();
-            if (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo) {
-                mostrarErro("❌ Horário limite expirado! Você não pode mais enviar palpites.");
-                return;
-            }
+            if (!verificarPalpitesCompletos()) return mostrarErro("⚠️ Preencha todos os palpites!");
+            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) return mostrarErro("❌ Horário limite expirado!");
             
             const dataToBot = {
                 tipo: 'enviar_palpites',
-                usuario: {
-                    id: dadosOriginais.usuario.id,
-                    nome: dadosOriginais.usuario.nome,
-                    telegram_id: dadosOriginais.usuario.telegram_id
-                },
-                rodada: {
-                    id: dadosOriginais.rodada.id,
-                    numero: dadosOriginais.rodada.numero
-                },
+                usuario: { id: dadosOriginais.usuario.id, nome: dadosOriginais.usuario.nome, telegram_id: dadosOriginais.usuario.telegram_id },
+                rodada: { id: dadosOriginais.rodada.id, numero: dadosOriginais.rodada.numero },
                 palpites: [],
                 pd_jogo_id: pdSelecionado
             };
@@ -1786,61 +1377,24 @@
                 }
             });
             
-            console.log("📦 Dados enviados:", dataToBot);
-            console.log(`📊 Total de palpites: ${dataToBot.palpites.length}`);
-            
-            if (dataToBot.palpites.length === 0) {
-                mostrarErro("❌ Nenhum palpite preenchido!");
-                return;
-            }
-            
             const btnConfirmar = document.getElementById('btn-confirmar');
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btnConfirmar.disabled = true;
             
             if (tg && tg.sendData) {
                 tg.sendData(JSON.stringify(dataToBot));
-                console.log("✅ Dados enviados para o bot");
-            } else {
-                console.log("📤 Dados simulados (Telegram não disponível):", dataToBot);
             }
-            
-            setTimeout(() => {
-                if (tg && tg.close) {
-                    tg.close();
-                }
-            }, 1500);
+            setTimeout(() => { if (tg && tg.close) tg.close(); }, 1500);
         };
 
         document.getElementById('btn-sair').onclick = () => {
             if (palpites.length > 0 && !verificarPalpitesCompletos()) {
-                if (confirm("⚠️ Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
-                    if (tg && tg.close) {
-                        tg.close();
-                    }
-                }
-            } else {
-                if (tg && tg.close) {
-                    tg.close();
-                }
-            }
+                if (confirm("⚠️ Tem certeza que deseja sair?")) if (tg) tg.close();
+            } else if (tg) tg.close();
         };
 
-        // ===== INICIALIZAÇÃO =====
-        window.addEventListener('DOMContentLoaded', function() {
-            // Inicializar Telegram WebApp
-            initTelegramWebApp();
-        });
-
-        // Backup: Se o Telegram não inicializar, tentar novamente
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (!tg && window.Telegram && window.Telegram.WebApp) {
-                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
-                    initTelegramWebApp();
-                }
-            }, 1000);
-        });
+        // Inicialização
+        window.addEventListener('DOMContentLoaded', initTelegramWebApp);
     </script>
 </body>
 </html>
