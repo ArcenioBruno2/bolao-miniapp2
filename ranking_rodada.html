@@ -95,19 +95,6 @@
             border: 1px solid #fecaca;
         }
         
-        .debug-info {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 12px;
-            color: #64748b;
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-        }
-        
         .rodada-info {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
@@ -154,188 +141,215 @@
             letter-spacing: 0.5px;
         }
         
-        /* DESTAQUES ESPECIAIS PARA OS 4 PRIMEIROS - FORMATO PÓDIO (25% do tamanho original) */
-        .ranking-destaques {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px; /* Reduzido de 15px */
-            margin-bottom: 20px; /* Reduzido de 40px */
-            align-items: end;
-            padding: 10px 0 20px; /* Reduzido de 20px 0 40px */
+        /* PÓDIO - FORMATO ESCADA */
+        .podium-container {
+            margin: 40px 0;
+            position: relative;
         }
         
-        .destaque-item {
-            background: white;
-            border-radius: 12px 12px 0 0; /* Reduzido de 16px */
-            padding: 15px 10px; /* Reduzido de 25px 15px */
+        .podium-title {
             text-align: center;
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+        
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            height: 280px;
             position: relative;
-            overflow: hidden;
-            border: 2px solid transparent; /* Reduzido de 3px */
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1); /* Reduzido */
+        }
+        
+        .podium-step {
+            position: relative;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            min-width: 130px;
+        }
+        
+        .podium-step:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* POSIÇÕES DO PÓDIO - Formato escada */
+        .podium-step.pos-1 {
+            order: 2; /* Centro */
+            height: 240px;
+        }
+        
+        .podium-step.pos-2 {
+            order: 1; /* Esquerda */
+            height: 200px;
+        }
+        
+        .podium-step.pos-3 {
+            order: 3; /* Direita */
+            height: 180px;
+        }
+        
+        .podium-step.pos-4 {
+            order: 4; /* Direita do 3º */
+            height: 160px;
+        }
+        
+        .podium-place {
+            position: absolute;
+            top: -45px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 900;
+            z-index: 10;
+        }
+        
+        .pos-1 .podium-place { color: #ffb300; }
+        .pos-2 .podium-place { color: #757575; }
+        .pos-3 .podium-place { color: #d84315; }
+        .pos-4 .podium-place { color: #00897b; }
+        
+        .podium-box {
+            width: 100%;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: flex-end;
-            min-height: 140px; /* Reduzido de 280px (50%) */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
         }
         
-        .destaque-item:hover {
-            transform: translateY(-3px); /* Reduzido de -5px */
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15); /* Reduzido */
-        }
-        
-        /* Alturas diferentes para simular o pódio (reduzidas para 25%) */
-        .destaque-item.pos-1 {
+        .pos-1 .podium-box {
             background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
             border-color: #ffd600;
-            height: 160px; /* Reduzido de 320px (50%) */
-            order: 2; /* 1º lugar no meio */
-            margin-bottom: -20px; /* Reduzido de -40px */
+            height: 200px;
         }
         
-        .destaque-item.pos-2 {
+        .pos-2 .podium-box {
             background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
             border-color: #9e9e9e;
-            height: 140px; /* Reduzido de 280px (50%) */
-            order: 1; /* 2º lugar à esquerda */
-            margin-bottom: -10px; /* Reduzido de -20px */
+            height: 160px;
         }
         
-        .destaque-item.pos-3 {
+        .pos-3 .podium-box {
             background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
             border-color: #ff9800;
-            height: 130px; /* Reduzido de 260px (50%) */
-            order: 3; /* 3º lugar à direita */
-            margin-bottom: 0;
+            height: 140px;
         }
         
-        .destaque-item.pos-4 {
+        .pos-4 .podium-box {
             background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
             border-color: #26a69a;
-            height: 120px; /* Reduzido de 240px (50%) */
-            order: 4; /* 4º lugar último */
-            margin-bottom: 0;
+            height: 120px;
         }
         
-        .destaque-pos {
-            font-size: 20px; /* Reduzido de 32px */
-            font-weight: 900;
-            margin-bottom: 8px; /* Reduzido de 15px */
-            line-height: 1;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .destaque-item.pos-1 .destaque-pos { color: #ffb300; }
-        .destaque-item.pos-2 .destaque-pos { color: #757575; }
-        .destaque-item.pos-3 .destaque-pos { color: #d84315; }
-        .destaque-item.pos-4 .destaque-pos { color: #00897b; }
-        
-        .destaque-nome {
-            font-size: 12px; /* Reduzido de 16px */
+        .podium-name {
+            font-size: 14px;
             font-weight: 800;
             color: #1e293b;
-            margin-bottom: 6px; /* Reduzido de 10px */
-            min-height: 30px; /* Reduzido de 40px */
+            text-align: center;
+            margin-bottom: 10px;
+            line-height: 1.2;
+            min-height: 34px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            z-index: 2;
         }
         
-        .destaque-pontos {
-            font-size: 24px; /* Reduzido de 38px */
+        .podium-points {
+            font-size: 32px;
             font-weight: 900;
             color: #1a237e;
-            margin: 8px 0; /* Reduzido de 15px 0 */
-            position: relative;
-            z-index: 2;
+            margin-bottom: 10px;
         }
         
-        .destaque-stats {
+        .podium-stats {
             display: flex;
             flex-direction: column;
-            gap: 4px; /* Reduzido de 8px */
-            margin-top: 8px; /* Reduzido de 15px */
-            position: relative;
-            z-index: 2;
+            gap: 5px;
+            width: 100%;
+            margin-top: 10px;
         }
         
-        .destaque-stat {
-            font-size: 9px; /* Reduzido de 12px */
+        /* ESTATÍSTICAS PEQUENAS */
+        .podium-stat {
+            font-size: 10px;
             font-weight: 600;
-            padding: 3px 6px; /* Reduzido de 5px 10px */
-            border-radius: 10px; /* Reduzido de 15px */
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-align: center;
             width: 100%;
         }
         
-        .destaque-pe {
+        .stat-pe {
             background: #fef3c7;
             color: #92400e;
         }
         
-        .destaque-rc {
+        .stat-rc {
             background: #dbeafe;
             color: #1e40af;
         }
         
-        .destaque-medalha {
+        .podium-medal {
             position: absolute;
-            top: 8px; /* Reduzido de 15px */
-            right: 8px; /* Reduzido de 15px */
-            font-size: 18px; /* Reduzido de 28px */
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
             opacity: 0.9;
+        }
+        
+        .separator {
+            text-align: center;
+            margin: 30px 0 20px;
+            position: relative;
+        }
+        
+        .separator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+        }
+        
+        .separator-text {
+            display: inline-block;
+            background: white;
+            padding: 0 20px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
             z-index: 1;
         }
         
-        /* Linhas do pódio (reduzidas) */
-        .destaque-item::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px; /* Reduzido de 8px */
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 2px; /* Reduzido de 4px */
-        }
-        
-        .destaque-item.pos-1::before {
-            background: linear-gradient(90deg, #ffd600, #ffb300);
-            height: 5px; /* Reduzido de 10px */
-        }
-        
-        .destaque-item.pos-2::before {
-            background: linear-gradient(90deg, #9e9e9e, #757575);
-            height: 4.5px; /* Reduzido de 9px */
-        }
-        
-        .destaque-item.pos-3::before {
-            background: linear-gradient(90deg, #ff9800, #d84315);
-            height: 4px; /* Reduzido de 8px */
-        }
-        
-        .destaque-item.pos-4::before {
-            background: linear-gradient(90deg, #26a69a, #00897b);
-            height: 3.5px; /* Reduzido de 7px */
-        }
-        
+        /* LISTA DO RANKING (do 5º pra baixo) */
         .ranking-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 20px;
         }
         
         .ranking-item {
             background: white;
-            border-radius: 16px;
-            padding: 22px;
+            border-radius: 12px;
+            padding: 18px 20px;
             display: grid;
-            grid-template-columns: 60px 1fr auto auto;
-            gap: 20px;
+            grid-template-columns: 60px 1fr auto;
+            gap: 15px;
             align-items: center;
             border: 1px solid #e2e8f0;
             transition: all 0.3s ease;
@@ -345,52 +359,17 @@
         
         .ranking-item:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
             border-color: #cbd5e1;
         }
         
-        .ranking-item.pos-5 {
-            border-left: 4px solid #4caf50;
-        }
-        
-        .ranking-item.pos-6 {
-            border-left: 4px solid #2196f3;
-        }
-        
-        .ranking-item.pos-7 {
-            border-left: 4px solid #9c27b0;
-        }
-        
-        .ranking-item.pos-8 {
-            border-left: 4px solid #ff9800;
-        }
-        
-        /* Estilo especial para quem não palpitou */
         .ranking-item.sem-palpite {
             background: #f8fafc;
-            opacity: 0.8;
-            border-left: 4px solid #94a3b8;
-        }
-        
-        .ranking-item.sem-palpite .usuario-nome {
-            color: #64748b;
-        }
-        
-        .ranking-item.sem-palpite .pontuacao {
-            color: #94a3b8;
-        }
-        
-        .sem-palpite-badge {
-            background: #e2e8f0;
-            color: #64748b;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
+            opacity: 0.9;
         }
         
         .posicao {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 800;
             color: #1e293b;
             text-align: center;
@@ -401,65 +380,62 @@
             color: #94a3b8;
         }
         
-        .posicao.destaque { color: #ffb300; }
-        .posicao.ouro { color: #ffb300; }
-        .posicao.prata { color: #757575; }
-        .posicao.bronze { color: #d84315; }
-        .posicao.quarto { color: #00897b; }
-        
         .usuario-info {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
         }
         
         .usuario-nome {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: #1e293b;
         }
         
         .usuario-stats {
             display: flex;
-            gap: 12px;
-            font-size: 14px;
-            color: #64748b;
+            gap: 8px;
+            align-items: center;
             flex-wrap: wrap;
         }
         
+        /* ESTATÍSTICAS PEQUENAS NA LISTA */
         .stat-badge {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             background: #f1f5f9;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 12px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
         }
         
-        .stat-badge.pe { background: #fef3c7; color: #92400e; }
-        .stat-badge.rc { background: #dbeafe; color: #1e40af; }
+        .stat-badge.pe { 
+            background: #fef3c7; 
+            color: #92400e; 
+        }
+        
+        .stat-badge.rc { 
+            background: #dbeafe; 
+            color: #1e40af; 
+        }
         
         .pontuacao {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 800;
             color: #4f46e5;
-            min-width: 80px;
+            min-width: 70px;
             text-align: right;
         }
         
-        .pd-indicator {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-weight: 800;
-            font-size: 12px;
-            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-            color: white;
+        .sem-palpite-badge {
+            background: #e2e8f0;
+            color: #64748b;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
         }
         
         .empty-state {
@@ -500,149 +476,136 @@
             margin: 0 auto 20px;
         }
         
-        .separator {
-            text-align: center;
-            margin: 20px 0 15px; /* Reduzido de 30px 0 20px */
-            position: relative;
-        }
-        
-        .separator::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(to right, transparent, #e2e8f0, transparent);
-        }
-        
-        .separator-text {
-            display: inline-block;
-            background: white;
-            padding: 0 20px;
-            color: #64748b;
-            font-weight: 600;
-            font-size: 14px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Debug styles */
-        .debug-section {
-            background: #1e293b;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 11px;
-            max-height: 300px;
-            overflow-y: auto;
-            display: none;
-        }
-        
-        .debug-toggle {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            margin: 10px 0;
-            display: inline-block;
-        }
-        
-        .data-raw {
-            background: #0f172a;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-size: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
-            .ranking-destaques {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px; /* Reduzido de 20px */
+            .podium {
+                height: 240px;
+                gap: 10px;
             }
             
-            .destaque-item {
-                min-height: 120px; /* Reduzido de 240px */
-                height: auto !important;
-                margin-bottom: 0 !important;
-                order: initial !important;
-                padding: 12px 8px; /* Reduzido de 20px */
+            .podium-step {
+                min-width: 100px;
             }
             
-            .destaque-nome {
-                font-size: 11px; /* Reduzido de 16px */
-                min-height: 25px; /* Reduzido de 40px */
+            .podium-step.pos-1 { height: 200px; }
+            .podium-step.pos-2 { height: 170px; }
+            .podium-step.pos-3 { height: 150px; }
+            .podium-step.pos-4 { height: 130px; }
+            
+            .pos-1 .podium-box { height: 170px; }
+            .pos-2 .podium-box { height: 140px; }
+            .pos-3 .podium-box { height: 120px; }
+            .pos-4 .podium-box { height: 100px; }
+            
+            .podium-name {
+                font-size: 12px;
+                min-height: 30px;
             }
             
-            .destaque-pontos {
-                font-size: 20px; /* Reduzido de 36px */
+            .podium-points {
+                font-size: 26px;
             }
             
-            .destaque-pos {
-                font-size: 16px; /* Reduzido */
-            }
-            
-            .destaque-medalha {
-                font-size: 14px; /* Reduzido */
-                top: 6px;
-                right: 6px;
+            .podium-place {
+                font-size: 20px;
+                top: -40px;
             }
             
             .ranking-item {
                 grid-template-columns: 50px 1fr auto;
-                gap: 15px;
-                padding: 18px;
+                padding: 15px;
             }
             
-            .pd-indicator {
-                display: none;
+            .posicao {
+                font-size: 18px;
+                width: 50px;
             }
             
-            .usuario-stats {
-                gap: 8px;
+            .usuario-nome {
+                font-size: 15px;
             }
             
-            .stat-badge {
-                font-size: 11px;
-                padding: 3px 8px;
+            .pontuacao {
+                font-size: 22px;
+                min-width: 60px;
             }
         }
         
-        @media (max-width: 480px) {
-            .ranking-destaques {
-                grid-template-columns: 1fr;
+        @media (max-width: 600px) {
+            .podium {
+                flex-wrap: wrap;
+                height: auto;
+                gap: 20px;
+            }
+            
+            .podium-step {
+                min-width: calc(50% - 20px);
+                height: auto !important;
+            }
+            
+            .podium-step.pos-1 { order: 1; }
+            .podium-step.pos-2 { order: 2; }
+            .podium-step.pos-3 { order: 3; }
+            .podium-step.pos-4 { order: 4; }
+            
+            .podium-box {
+                height: 140px !important;
+            }
+            
+            .podium-title {
+                font-size: 16px;
+                margin-bottom: 20px;
             }
             
             .ranking-item {
-                grid-template-columns: 40px 1fr;
+                grid-template-columns: 45px 1fr;
+                padding: 12px;
             }
             
             .pontuacao {
                 grid-column: 2;
                 text-align: left;
-                margin-top: 8px;
-                font-size: 28px;
+                margin-top: 5px;
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                border-radius: 16px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .rodada-stats {
+                gap: 10px;
             }
             
             .stat-item {
-                min-width: 100px;
-                padding: 14px 16px;
+                min-width: calc(50% - 10px);
+                padding: 12px;
+            }
+            
+            .stat-value {
+                font-size: 22px;
+            }
+            
+            .stat-label {
+                font-size: 11px;
+            }
+            
+            .podium-step {
+                min-width: calc(50% - 10px);
+            }
+            
+            .podium-box {
+                padding: 15px 10px;
             }
         }
     </style>
@@ -669,10 +632,6 @@
                 <p id="errorMessage" style="font-size: 14px; margin-bottom: 15px;">
                     Não foi possível carregar os dados do ranking.
                 </p>
-                <button onclick="toggleDebug()" class="debug-toggle">Mostrar Debug</button>
-                <div id="debugArea" class="debug-section" style="display: none;">
-                    <div id="debugContent"></div>
-                </div>
                 <button onclick="window.location.reload()" style="
                     margin-top: 10px;
                     padding: 10px 20px;
@@ -691,49 +650,39 @@
                     <!-- Informações da rodada serão inseridas aqui -->
                 </div>
                 
-                <!-- ÁREA DOS 4 PRIMEIROS EM FORMATO PÓDIO (REDUZIDO) -->
-                <div id="destaquesArea" style="display: none;">
-                    <h3 style="margin-bottom: 15px; color: #1e293b; font-size: 18px; text-align: center;">
-                        🏅 TOP 4 DO PÓDIO
-                    </h3>
-                    <div class="ranking-destaques" id="destaquesList">
-                        <!-- Destaques serão inseridos aqui -->
+                <!-- PÓDIO DOS 4 PRIMEIROS -->
+                <div class="podium-container" id="podiumArea" style="display: none;">
+                    <div class="podium-title">🏅 PÓDIO DA RODADA</div>
+                    <div class="podium" id="podiumList">
+                        <!-- Pódio será inserido aqui -->
                     </div>
                 </div>
                 
                 <!-- SEPARADOR -->
-                <div id="separatorArea" class="separator" style="display: none;">
-                    <span class="separator-text">DEMAIS PARTICIPANTES</span>
+                <div class="separator" id="separatorArea" style="display: none;">
+                    <span class="separator-text">D E M A I S  P A R T I C I P A N T E S</span>
                 </div>
                 
-                <!-- LISTA GERAL DO RANKING (UM ABAIXO DO OUTRO) -->
+                <!-- LISTA DO RANKING (do 5º pra baixo) -->
                 <div class="ranking-list" id="rankingList">
                     <!-- Ranking será inserido aqui a partir da 5ª posição -->
                 </div>
                 
-                <button onclick="toggleRawData()" class="debug-toggle" style="margin-top: 20px;">
-                    Mostrar Dados Brutos
-                </button>
-                <div id="rawData" class="data-raw" style="display: none;"></div>
-                
-                <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 13px; color: #64748b;">
-                    <div style="font-weight: 700; margin-bottom: 10px; color: #1e293b;">Legenda:</div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #fbbf24; border-radius: 2px;"></span>
+                <!-- LEGENDA -->
+                <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 12px; color: #64748b;">
+                    <div style="font-weight: 700; margin-bottom: 10px; color: #1e293b; font-size: 13px;">Legenda:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; background: #fbbf24; border-radius: 2px;"></span>
                             <span><strong>PE</strong> = Placar Exato (14 pontos)</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #60a5fa; border-radius: 2px;"></span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; background: #60a5fa; border-radius: 2px;"></span>
                             <span><strong>RC</strong> = Resultado Correto (4 pontos)</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #a78bfa; border-radius: 2px;"></span>
-                            <span><strong>Critério de Desempate:</strong> Pontos → PE → RC</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="display: inline-block; width: 12px; height: 12px; background: #e2e8f0; border-radius: 2px;"></span>
-                            <span><strong>Sem palpite:</strong> Participante não palpitou nesta rodada</span>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; background: #e2e8f0; border-radius: 2px;"></span>
+                            <span><strong>Sem palpite:</strong> Participante não palpitou na rodada</span>
                         </div>
                     </div>
                 </div>
@@ -743,10 +692,6 @@
                 <div class="empty-icon">📊</div>
                 <h3>Nenhum ranking disponível</h3>
                 <p id="emptyMessage">Esta rodada ainda não tem placares ou participantes.</p>
-                <button onclick="showRawData()" class="debug-toggle" style="margin-top: 15px;">
-                    Ver Dados Recebidos
-                </button>
-                <div id="emptyDebug" class="data-raw" style="display: none; margin-top: 15px;"></div>
             </div>
         </div>
         
@@ -759,8 +704,7 @@
     </div>
 
     <script>
-        // Variável global para armazenar dados brutos
-        let rawDataReceived = null;
+        // Variável global para armazenar dados
         let parsedData = null;
         
         // Função para debug
@@ -768,7 +712,7 @@
             console.log(`[DEBUG] ${message}`);
         }
         
-        // Função para descomprimir Gzip usando pako.js (recomendado)
+        // Função para descomprimir Gzip usando pako.js
         async function descomprimirDadosGzip(base64Data) {
             console.log('=== DESCOMPRIMINDO DADOS GZIP ===');
             
@@ -830,7 +774,7 @@
                 if (bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B) {
                     console.log('✅ Cabeçalho Gzip detectado (0x1F 0x8B)');
                     
-                    // Método 1: Usando pako.js (RECOMENDADO)
+                    // Usando pako.js
                     if (typeof pako !== 'undefined') {
                         console.log('🔄 Descomprimindo com pako.js...');
                         try {
@@ -841,47 +785,12 @@
                             return dados;
                         } catch (pakoError) {
                             console.log(`❌ pako.js falhou: ${pakoError.message}`);
+                            throw pakoError;
                         }
                     }
-                    
-                    // Método 2: Usando DecompressionStream (navegadores modernos)
-                    console.log('🔄 Tentando DecompressionStream...');
-                    try {
-                        const ds = new DecompressionStream('gzip');
-                        const writer = ds.writable.getWriter();
-                        writer.write(bytes);
-                        writer.close();
-                        
-                        const decompressed = await new Response(ds.readable).arrayBuffer();
-                        const decoder = new TextDecoder('utf-8');
-                        const jsonString = decoder.decode(decompressed);
-                        
-                        console.log(`✅ Descompressão nativa: ${jsonString.substring(0, 100)}...`);
-                        const dados = JSON.parse(jsonString);
-                        console.log('🎉 Dados parseados com DecompressionStream');
-                        return dados;
-                        
-                    } catch (streamError) {
-                        console.log(`❌ DecompressionStream falhou: ${streamError.message}`);
-                    }
-                    
                 } else {
                     console.log('⚠️ Não é Gzip válido');
                 }
-                
-                // 3. TERCEIRO: Tenta como string direta
-                console.log('🔍 Tentando como string direta...');
-                try {
-                    const dados = JSON.parse(base64Data);
-                    console.log('✅ Dados parseados como string direta');
-                    return dados;
-                } catch (e3) {
-                    console.log(`❌ String direta falhou: ${e3.message}`);
-                }
-                
-                // 4. SE TUDO FALHAR
-                console.error('❌ TODAS AS TENTATIVAS FALHARAM');
-                console.log(`Dados recebidos (primeiros 200 chars): ${base64Data.substring(0, 200)}...`);
                 
                 throw new Error('Não foi possível decodificar os dados');
                 
@@ -900,51 +809,6 @@
             }
         }
         
-        // Funções para debug
-        function toggleDebug() {
-            const debugArea = document.getElementById('debugArea');
-            debugArea.style.display = debugArea.style.display === 'none' ? 'block' : 'none';
-        }
-        
-        function toggleRawData() {
-            const rawDataDiv = document.getElementById('rawData');
-            if (rawDataDiv.style.display === 'none') {
-                rawDataDiv.innerHTML = JSON.stringify(parsedData, null, 2);
-                rawDataDiv.style.display = 'block';
-            } else {
-                rawDataDiv.style.display = 'none';
-            }
-        }
-        
-        function showRawData() {
-            const emptyDebug = document.getElementById('emptyDebug');
-            if (parsedData) {
-                emptyDebug.innerHTML = JSON.stringify(parsedData, null, 2);
-            } else if (rawDataReceived) {
-                emptyDebug.innerHTML = `Dados brutos: ${rawDataReceived.substring(0, 500)}...`;
-            }
-            emptyDebug.style.display = 'block';
-        }
-        
-        // Mostrar debug info
-        function mostrarDebug(info) {
-            const debugDiv = document.getElementById('debugInfo');
-            const debugContent = document.getElementById('debugContent');
-            
-            if (debugDiv && debugContent) {
-                debugContent.innerHTML = `
-                    <div><strong>URL:</strong> ${window.location.href.substring(0, 100)}...</div>
-                    <div><strong>Tem dados:</strong> ${new URLSearchParams(window.location.search).has('data') ? 'Sim' : 'Não'}</div>
-                    <div><strong>Tamanho dados:</strong> ${info.dataLength || 'N/A'} caracteres</div>
-                    <div><strong>Rodada:</strong> ${info.rodada_numero || 'N/A'}</div>
-                    <div><strong>Total participantes:</strong> ${info.total_participantes || 0}</div>
-                    <div><strong>Primeiros 4:</strong> ${JSON.stringify(info.top4 || [])}</div>
-                    <div><strong>Tipo dados:</strong> ${info.tipo || 'N/A'}</div>
-                `;
-                debugDiv.style.display = 'block';
-            }
-        }
-        
         // Carregar dados da URL
         async function carregarDados() {
             try {
@@ -954,16 +818,9 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const dataParam = urlParams.get('data');
                 
-                logDebug(`Parâmetros URL: ${Array.from(urlParams.entries())}`);
-                
                 if (!dataParam) {
                     throw new Error('Nenhum dado encontrado na URL. Parâmetro "data" ausente.');
                 }
-                
-                // Salvar dados brutos
-                rawDataReceived = dataParam;
-                logDebug(`Dados recebidos (tamanho): ${dataParam.length} caracteres`);
-                logDebug(`Primeiros 100 chars: ${dataParam.substring(0, 100)}...`);
                 
                 // Descomprimir dados
                 let dados;
@@ -974,16 +831,6 @@
                 } catch (e) {
                     logDebug(`❌ Erro ao processar dados: ${e.message}`);
                     throw new Error('Formato de dados inválido: ' + e.message);
-                }
-                
-                // Log da estrutura dos dados
-                logDebug(`Tipo de dados: ${dados.tipo || 'N/A'}`);
-                logDebug(`Rodada info: ${JSON.stringify(dados.rodada_info || {})}`);
-                logDebug(`Ranking existe: ${!!dados.ranking}`);
-                logDebug(`Tamanho ranking: ${dados.ranking ? dados.ranking.length : 0}`);
-                
-                if (dados.ranking && dados.ranking.length > 0) {
-                    logDebug(`Primeiro participante: ${JSON.stringify(dados.ranking[0])}`);
                 }
                 
                 // Verificar se tem ranking
@@ -999,20 +846,11 @@
                 // Aplicar critério de desempate Pontos → PE → RC
                 aplicarCriterioDesempate(dados.ranking);
                 
-                // Extrair os primeiros 4 para destaque
+                // Extrair os primeiros 4 para o pódio
                 const top4 = dados.ranking.slice(0, 4);
                 
-                // Mostrar debug
-                mostrarDebug({
-                    dataLength: dataParam.length,
-                    tipo: dados.tipo,
-                    rodada_numero: dados.rodada_info?.numero,
-                    total_participantes: dados.ranking.length,
-                    top4: top4.map(p => ({pos: p.posicao, nome: p.nome, pontos: p.total}))
-                });
-                
-                // Exibir ranking completo com destaques
-                exibirRankingComDestaques(dados, top4);
+                // Exibir ranking completo com pódio
+                exibirRankingComPodio(dados, top4);
                 
             } catch (error) {
                 logDebug(`❌ ERRO: ${error.message}`);
@@ -1020,29 +858,10 @@
                 
                 // Mostrar detalhes do erro
                 const errorDiv = document.getElementById('error');
-                const debugArea = document.getElementById('debugArea');
-                const debugContent = document.getElementById('debugContent');
                 
                 if (errorDiv) {
                     errorDiv.style.display = 'block';
                     document.getElementById('errorMessage').textContent = error.message;
-                }
-                
-                // Adicionar info de debug
-                if (debugArea && debugContent) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const hasData = urlParams.has('data');
-                    const dataLength = hasData ? urlParams.get('data').length : 0;
-                    
-                    debugContent.innerHTML = `
-                        <div><strong>Erro:</strong> ${error.message}</div>
-                        <div><strong>Stack:</strong> ${error.stack || 'Não disponível'}</div>
-                        <div><strong>URL:</strong> ${window.location.href.substring(0, 150)}...</div>
-                        <div><strong>Tem parâmetro data:</strong> ${hasData}</div>
-                        <div><strong>Tamanho data:</strong> ${dataLength} caracteres</div>
-                        <div><strong>User Agent:</strong> ${navigator.userAgent.substring(0, 100)}</div>
-                    `;
-                    debugArea.style.display = 'block';
                 }
                 
                 document.getElementById('loading').style.display = 'none';
@@ -1120,22 +939,14 @@
             
             logDebug('✅ Critério de desempate aplicado');
             logDebug(`Total participantes: ${ranking.length}`);
-            logDebug(`Com palpite: ${ranking.filter(p => !p.sem_palpite).length}`);
-            logDebug(`Sem palpite: ${ranking.filter(p => p.sem_palpite).length}`);
-            
-            ranking.slice(0, 8).forEach((p, i) => {
-                logDebug(`  ${p.posicao}º - ${p.nome}: ${p.total} pts (PE: ${p.estatisticas?.pe || 0}, RC: ${p.estatisticas?.rc || 0}, Jogos: ${p.jogos_palpitados}, Sem palpite: ${p.sem_palpite})`);
-            });
         }
         
-        // Exibir ranking completo com destaques
-        function exibirRankingComDestaques(dados, top4) {
+        // Exibir ranking completo com pódio
+        function exibirRankingComPodio(dados, top4) {
             const ranking = dados.ranking || [];
             const rodadaInfo = dados.rodada_info || {};
             
             logDebug(`Exibindo ranking com ${ranking.length} participantes`);
-            logDebug(`Com palpite: ${ranking.filter(p => !p.sem_palpite).length}`);
-            logDebug(`Sem palpite: ${ranking.filter(p => p.sem_palpite).length}`);
             
             // Atualizar informações da rodada
             const rodadaInfoDiv = document.getElementById('rodadaInfo');
@@ -1167,55 +978,59 @@
                 `;
             }
             
-            // Exibir os 4 primeiros como pódio (reduzido)
+            // Exibir os 4 primeiros como pódio
             if (top4.length > 0) {
-                const destaquesDiv = document.getElementById('destaquesArea');
-                const destaquesList = document.getElementById('destaquesList');
+                const podiumArea = document.getElementById('podiumArea');
+                const podiumList = document.getElementById('podiumList');
                 
-                if (destaquesDiv && destaquesList) {
-                    destaquesList.innerHTML = '';
+                if (podiumArea && podiumList) {
+                    podiumList.innerHTML = '';
                     
-                    top4.forEach((participante, index) => {
-                        const posicao = participante.posicao || (index + 1);
+                    top4.forEach((participante) => {
+                        const posicao = participante.posicao;
                         const estatisticas = participante.estatisticas || {};
                         
-                        // Emojis de medalha para os 4 primeiros
+                        // Emojis de medalha
                         const medalhas = ['🥇', '🥈', '🥉', '🎖️'];
                         const medalhaEmoji = medalhas[posicao - 1] || '🎖️';
                         
-                        // Garantir que temos os dados necessários
-                        const nome = participante.nome || `Participante ${participante.usuario_id || index + 1}`;
+                        // Nome e pontos
+                        const nome = participante.nome || `Participante ${participante.usuario_id}`;
                         const pontos = participante.total || 0;
                         
-                        const destaqueItem = document.createElement('div');
-                        destaqueItem.className = `destaque-item pos-${posicao}`;
+                        const podiumStep = document.createElement('div');
+                        podiumStep.className = `podium-step pos-${posicao}`;
                         
                         // Verificar se o participante não palpitou
                         const semPalpite = participante.sem_palpite;
                         
-                        destaqueItem.innerHTML = `
-                            <div class="destaque-medalha">${medalhaEmoji}</div>
-                            <div class="destaque-pos">${posicao}º</div>
-                            <div class="destaque-nome">${nome}</div>
-                            <div class="destaque-pontos">${pontos}</div>
-                            ${semPalpite ? 
-                                '<div class="sem-palpite-badge" style="margin-bottom: 5px; font-size: 8px;">SEM PALPITE</div>' : 
-                                '<div class="destaque-stats">' +
-                                (estatisticas.pe > 0 ? `<span class="destaque-stat destaque-pe" style="font-size: 8px;">🏆 ${estatisticas.pe} PE</span>` : '') +
-                                (estatisticas.rc > 0 ? `<span class="destaque-stat destaque-rc" style="font-size: 8px;">✓ ${estatisticas.rc} RC</span>` : '') +
-                                '</div>'
-                            }
-                            ${estatisticas.pd_usada ? '<div style="margin-top: 5px; font-size: 8px; color: #db2777; font-weight: bold;">🎯 PD</div>' : ''}
+                        podiumStep.innerHTML = `
+                            <div class="podium-place">${posicao}º</div>
+                            <div class="podium-box">
+                                <div class="podium-medal">${medalhaEmoji}</div>
+                                <div class="podium-name">${nome}</div>
+                                <div class="podium-points">${pontos}</div>
+                                ${semPalpite ? 
+                                    '<div class="sem-palpite-badge" style="margin-top: 8px;">SEM PALPITE</div>' : 
+                                    (estatisticas.pe > 0 || estatisticas.rc > 0 ?
+                                        `<div class="podium-stats">
+                                            ${estatisticas.pe > 0 ? `<span class="podium-stat stat-pe">🏆 ${estatisticas.pe} PE</span>` : ''}
+                                            ${estatisticas.rc > 0 ? `<span class="podium-stat stat-rc">✓ ${estatisticas.rc} RC</span>` : ''}
+                                        </div>` : 
+                                        '<div style="height: 20px;"></div>'
+                                    )
+                                }
+                            </div>
                         `;
                         
-                        destaquesList.appendChild(destaqueItem);
+                        podiumList.appendChild(podiumStep);
                     });
                     
-                    destaquesDiv.style.display = 'block';
+                    podiumArea.style.display = 'block';
                 }
             }
             
-            // Exibir demais participantes (a partir da 5ª posição) um abaixo do outro
+            // Exibir demais participantes (a partir da 5ª posição)
             const demaisParticipantes = ranking.slice(4);
             const rankingList = document.getElementById('rankingList');
             
@@ -1229,33 +1044,24 @@
                         separatorArea.style.display = 'block';
                     }
                     
-                    // Adicionar demais participantes (um abaixo do outro)
-                    demaisParticipantes.forEach((participante, index) => {
-                        const posicao = participante.posicao || (index + 5);
+                    // Adicionar demais participantes
+                    demaisParticipantes.forEach((participante) => {
+                        const posicao = participante.posicao;
                         const estatisticas = participante.estatisticas || {};
                         const semPalpite = participante.sem_palpite;
                         
-                        // Classes especiais para as próximas posições (5-8)
-                        let posClass = '';
-                        if (posicao === 5) posClass = 'pos-5';
-                        else if (posicao === 6) posClass = 'pos-6';
-                        else if (posicao === 7) posClass = 'pos-7';
-                        else if (posicao === 8) posClass = 'pos-8';
-                        
-                        // Nome do participante
-                        const nome = participante.nome || `Participante ${participante.usuario_id || index + 5}`;
+                        // Nome e pontos
+                        const nome = participante.nome || `Participante ${participante.usuario_id}`;
                         const pontos = participante.total || 0;
                         
-                        // Estatísticas para exibir
+                        // Estatísticas
                         const temPE = estatisticas.pe > 0;
                         const temRC = estatisticas.rc > 0;
                         
                         const item = document.createElement('div');
-                        item.className = `ranking-item ${posClass} ${semPalpite ? 'sem-palpite' : ''}`;
+                        item.className = `ranking-item ${semPalpite ? 'sem-palpite' : ''}`;
                         item.innerHTML = `
-                            <div class="posicao">
-                                ${posicao}
-                            </div>
+                            <div class="posicao">${posicao}º</div>
                             <div class="usuario-info">
                                 <div class="usuario-nome">${nome}</div>
                                 <div class="usuario-stats">
@@ -1265,7 +1071,7 @@
                                         (temRC ? `<span class="stat-badge rc">✓ ${estatisticas.rc} RC</span>` : '')
                                     }
                                     ${participante.jogos_palpitados > 0 ? 
-                                        `<span style="color: #64748b; font-size: 12px; font-weight: 600;">
+                                        `<span style="color: #64748b; font-size: 11px; font-weight: 600;">
                                             (${participante.jogos_palpitados}/${participante.total_jogos_rodada || '?'} jogos)
                                         </span>` : ''}
                                 </div>
@@ -1273,12 +1079,6 @@
                             <div class="pontuacao">
                                 ${pontos}
                             </div>
-                            ${semPalpite ? 
-                                '<div class="pd-indicator" style="background: #94a3b8; opacity: 0.5;">-</div>' : 
-                                (estatisticas.pd_usada ? 
-                                    '<div class="pd-indicator">2×</div>' : 
-                                    '<div class="pd-indicator" style="background: #94a3b8;">1×</div>')
-                            }
                         `;
                         
                         rankingList.appendChild(item);
@@ -1296,10 +1096,7 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('rankingContent').style.display = 'block';
             
-            // Log final
             logDebug('✅ Ranking exibido com sucesso');
-            logDebug(`Primeiro: ${ranking[0]?.nome} - ${ranking[0]?.total} pts`);
-            logDebug(`Sem palpite: ${ranking.filter(p => p.sem_palpite).length} participantes`);
         }
         
         // Inicializar quando a página carregar
