@@ -154,58 +154,58 @@
             letter-spacing: 0.5px;
         }
         
-        /* DESTAQUES ESPECIAIS PARA OS 4 PRIMEIROS - FORMATO PÓDIO */
+        /* DESTAQUES ESPECIAIS PARA OS 4 PRIMEIROS - FORMATO PÓDIO (25% do tamanho original) */
         .ranking-destaques {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 40px;
+            gap: 10px; /* Reduzido de 15px */
+            margin-bottom: 20px; /* Reduzido de 40px */
             align-items: end;
-            padding: 20px 0 40px;
+            padding: 10px 0 20px; /* Reduzido de 20px 0 40px */
         }
         
         .destaque-item {
             background: white;
-            border-radius: 16px 16px 0 0;
-            padding: 25px 15px;
+            border-radius: 12px 12px 0 0; /* Reduzido de 16px */
+            padding: 15px 10px; /* Reduzido de 25px 15px */
             text-align: center;
             position: relative;
             overflow: hidden;
-            border: 3px solid transparent;
+            border: 2px solid transparent; /* Reduzido de 3px */
             transition: all 0.3s ease;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1); /* Reduzido */
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            min-height: 280px;
+            min-height: 140px; /* Reduzido de 280px (50%) */
         }
         
         .destaque-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px); /* Reduzido de -5px */
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15); /* Reduzido */
         }
         
-        /* Alturas diferentes para simular o pódio */
+        /* Alturas diferentes para simular o pódio (reduzidas para 25%) */
         .destaque-item.pos-1 {
             background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
             border-color: #ffd600;
-            height: 320px;
+            height: 160px; /* Reduzido de 320px (50%) */
             order: 2; /* 1º lugar no meio */
-            margin-bottom: -40px;
+            margin-bottom: -20px; /* Reduzido de -40px */
         }
         
         .destaque-item.pos-2 {
             background: linear-gradient(135deg, #f5f5f5 0%, #eeeeee 100%);
             border-color: #9e9e9e;
-            height: 280px;
+            height: 140px; /* Reduzido de 280px (50%) */
             order: 1; /* 2º lugar à esquerda */
-            margin-bottom: -20px;
+            margin-bottom: -10px; /* Reduzido de -20px */
         }
         
         .destaque-item.pos-3 {
             background: linear-gradient(135deg, #ffcc80 0%, #ffb74d 100%);
             border-color: #ff9800;
-            height: 260px;
+            height: 130px; /* Reduzido de 260px (50%) */
             order: 3; /* 3º lugar à direita */
             margin-bottom: 0;
         }
@@ -213,15 +213,15 @@
         .destaque-item.pos-4 {
             background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 100%);
             border-color: #26a69a;
-            height: 240px;
+            height: 120px; /* Reduzido de 240px (50%) */
             order: 4; /* 4º lugar último */
             margin-bottom: 0;
         }
         
         .destaque-pos {
-            font-size: 32px;
+            font-size: 20px; /* Reduzido de 32px */
             font-weight: 900;
-            margin-bottom: 15px;
+            margin-bottom: 8px; /* Reduzido de 15px */
             line-height: 1;
             position: relative;
             z-index: 2;
@@ -233,11 +233,11 @@
         .destaque-item.pos-4 .destaque-pos { color: #00897b; }
         
         .destaque-nome {
-            font-size: 16px;
+            font-size: 12px; /* Reduzido de 16px */
             font-weight: 800;
             color: #1e293b;
-            margin-bottom: 10px;
-            min-height: 40px;
+            margin-bottom: 6px; /* Reduzido de 10px */
+            min-height: 30px; /* Reduzido de 40px */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -246,10 +246,10 @@
         }
         
         .destaque-pontos {
-            font-size: 38px;
+            font-size: 24px; /* Reduzido de 38px */
             font-weight: 900;
             color: #1a237e;
-            margin: 15px 0;
+            margin: 8px 0; /* Reduzido de 15px 0 */
             position: relative;
             z-index: 2;
         }
@@ -257,17 +257,17 @@
         .destaque-stats {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-top: 15px;
+            gap: 4px; /* Reduzido de 8px */
+            margin-top: 8px; /* Reduzido de 15px */
             position: relative;
             z-index: 2;
         }
         
         .destaque-stat {
-            font-size: 12px;
+            font-size: 9px; /* Reduzido de 12px */
             font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 3px 6px; /* Reduzido de 5px 10px */
+            border-radius: 10px; /* Reduzido de 15px */
             width: 100%;
         }
         
@@ -283,43 +283,43 @@
         
         .destaque-medalha {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            font-size: 28px;
+            top: 8px; /* Reduzido de 15px */
+            right: 8px; /* Reduzido de 15px */
+            font-size: 18px; /* Reduzido de 28px */
             opacity: 0.9;
             z-index: 1;
         }
         
-        /* Linhas do pódio */
+        /* Linhas do pódio (reduzidas) */
         .destaque-item::before {
             content: '';
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 8px;
+            height: 4px; /* Reduzido de 8px */
             background: rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+            border-radius: 2px; /* Reduzido de 4px */
         }
         
         .destaque-item.pos-1::before {
             background: linear-gradient(90deg, #ffd600, #ffb300);
-            height: 10px;
+            height: 5px; /* Reduzido de 10px */
         }
         
         .destaque-item.pos-2::before {
             background: linear-gradient(90deg, #9e9e9e, #757575);
-            height: 9px;
+            height: 4.5px; /* Reduzido de 9px */
         }
         
         .destaque-item.pos-3::before {
             background: linear-gradient(90deg, #ff9800, #d84315);
-            height: 8px;
+            height: 4px; /* Reduzido de 8px */
         }
         
         .destaque-item.pos-4::before {
             background: linear-gradient(90deg, #26a69a, #00897b);
-            height: 7px;
+            height: 3.5px; /* Reduzido de 7px */
         }
         
         .ranking-list {
@@ -502,7 +502,7 @@
         
         .separator {
             text-align: center;
-            margin: 30px 0 20px;
+            margin: 20px 0 15px; /* Reduzido de 30px 0 20px */
             position: relative;
         }
         
@@ -574,24 +574,34 @@
         @media (max-width: 768px) {
             .ranking-destaques {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                gap: 15px; /* Reduzido de 20px */
             }
             
             .destaque-item {
-                min-height: 240px;
+                min-height: 120px; /* Reduzido de 240px */
                 height: auto !important;
                 margin-bottom: 0 !important;
                 order: initial !important;
-                padding: 20px;
+                padding: 12px 8px; /* Reduzido de 20px */
             }
             
             .destaque-nome {
-                font-size: 16px;
-                min-height: 40px;
+                font-size: 11px; /* Reduzido de 16px */
+                min-height: 25px; /* Reduzido de 40px */
             }
             
             .destaque-pontos {
-                font-size: 36px;
+                font-size: 20px; /* Reduzido de 36px */
+            }
+            
+            .destaque-pos {
+                font-size: 16px; /* Reduzido */
+            }
+            
+            .destaque-medalha {
+                font-size: 14px; /* Reduzido */
+                top: 6px;
+                right: 6px;
             }
             
             .ranking-item {
@@ -681,9 +691,9 @@
                     <!-- Informações da rodada serão inseridas aqui -->
                 </div>
                 
-                <!-- ÁREA DOS 4 PRIMEIROS EM FORMATO PÓDIO -->
+                <!-- ÁREA DOS 4 PRIMEIROS EM FORMATO PÓDIO (REDUZIDO) -->
                 <div id="destaquesArea" style="display: none;">
-                    <h3 style="margin-bottom: 20px; color: #1e293b; font-size: 22px; text-align: center;">
+                    <h3 style="margin-bottom: 15px; color: #1e293b; font-size: 18px; text-align: center;">
                         🏅 TOP 4 DO PÓDIO
                     </h3>
                     <div class="ranking-destaques" id="destaquesList">
@@ -719,7 +729,7 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="display: inline-block; width: 12px; height: 12px; background: #a78bfa; border-radius: 2px;"></span>
-                            <span><strong>Critério de Desempate:</strong> PE → RC → Jogos Palpitados</span>
+                            <span><strong>Critério de Desempate:</strong> Pontos → PE → RC</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span style="display: inline-block; width: 12px; height: 12px; background: #e2e8f0; border-radius: 2px;"></span>
@@ -986,7 +996,7 @@
                     return;
                 }
                 
-                // Aplicar critério de desempate PE → RC → Jogos Palpitados
+                // Aplicar critério de desempate Pontos → PE → RC
                 aplicarCriterioDesempate(dados.ranking);
                 
                 // Extrair os primeiros 4 para destaque
@@ -1039,9 +1049,9 @@
             }
         }
         
-        // Aplicar critério de desempate: PE → RC → Jogos Palpitados
+        // Aplicar critério de desempate: Pontos → PE → RC
         function aplicarCriterioDesempate(ranking) {
-            logDebug('Aplicando critério de desempate PE → RC → Jogos Palpitados...');
+            logDebug('Aplicando critério de desempate Pontos → PE → RC...');
             
             // PRIMEIRO: Garantir que todos tenham os campos necessários
             ranking.forEach(participante => {
@@ -1059,42 +1069,30 @@
             });
             
             // Ordena por: 
-            // 1. Tem palpite? (quem palpitou vem primeiro)
-            // 2. Pontuação total (decrescente)
-            // 3. PE (Placar Exato) - decrescente
-            // 4. RC (Resultado Correto) - decrescente
-            // 5. Jogos Palpitados (decrescente)
+            // 1. Pontuação total (decrescente)
+            // 2. PE (Placar Exato) - decrescente
+            // 3. RC (Resultado Correto) - decrescente
             ranking.sort((a, b) => {
-                // 1. Quem palpitou vem primeiro
-                if (a.sem_palpite !== b.sem_palpite) {
-                    return a.sem_palpite ? 1 : -1;
-                }
-                
-                // 2. Pontuação total (decrescente)
+                // 1. Pontuação total (decrescente)
                 if (b.total !== a.total) {
                     return b.total - a.total;
                 }
                 
-                // 3. Placar Exato (PE) - decrescente
+                // 2. Placar Exato (PE) - decrescente
                 const peA = a.estatisticas?.pe || 0;
                 const peB = b.estatisticas?.pe || 0;
                 if (peB !== peA) {
                     return peB - peA;
                 }
                 
-                // 4. Resultado Correto (RC) - decrescente
+                // 3. Resultado Correto (RC) - decrescente
                 const rcA = a.estatisticas?.rc || 0;
                 const rcB = b.estatisticas?.rc || 0;
                 if (rcB !== rcA) {
                     return rcB - rcA;
                 }
                 
-                // 5. Jogos Palpitados (decrescente)
-                if (b.jogos_palpitados !== a.jogos_palpitados) {
-                    return b.jogos_palpitados - a.jogos_palpitados;
-                }
-                
-                // 6. Ordem alfabética como último critério
+                // 4. Ordem alfabética como último critério
                 return a.nome?.localeCompare(b.nome) || 0;
             });
             
@@ -1105,12 +1103,10 @@
                     const prev = ranking[i - 1];
                     const current = ranking[i];
                     
-                    // Verifica se há empate (mesmos critérios)
-                    if (prev.sem_palpite === current.sem_palpite &&
-                        prev.total === current.total &&
+                    // Verifica se há empate (mesmos pontos, PE e RC)
+                    if (prev.total === current.total &&
                         (prev.estatisticas?.pe || 0) === (current.estatisticas?.pe || 0) &&
-                        (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0) &&
-                        prev.jogos_palpitados === current.jogos_palpitados) {
+                        (prev.estatisticas?.rc || 0) === (current.estatisticas?.rc || 0)) {
                         // Mesma posição do anterior
                         ranking[i].posicao = ranking[i - 1].posicao;
                     } else {
@@ -1171,7 +1167,7 @@
                 `;
             }
             
-            // Exibir os 4 primeiros como pódio
+            // Exibir os 4 primeiros como pódio (reduzido)
             if (top4.length > 0) {
                 const destaquesDiv = document.getElementById('destaquesArea');
                 const destaquesList = document.getElementById('destaquesList');
@@ -1203,13 +1199,13 @@
                             <div class="destaque-nome">${nome}</div>
                             <div class="destaque-pontos">${pontos}</div>
                             ${semPalpite ? 
-                                '<div class="sem-palpite-badge" style="margin-bottom: 10px;">SEM PALPITE</div>' : 
+                                '<div class="sem-palpite-badge" style="margin-bottom: 5px; font-size: 8px;">SEM PALPITE</div>' : 
                                 '<div class="destaque-stats">' +
-                                (estatisticas.pe > 0 ? `<span class="destaque-stat destaque-pe">🏆 ${estatisticas.pe} PE</span>` : '') +
-                                (estatisticas.rc > 0 ? `<span class="destaque-stat destaque-rc">✓ ${estatisticas.rc} RC</span>` : '') +
+                                (estatisticas.pe > 0 ? `<span class="destaque-stat destaque-pe" style="font-size: 8px;">🏆 ${estatisticas.pe} PE</span>` : '') +
+                                (estatisticas.rc > 0 ? `<span class="destaque-stat destaque-rc" style="font-size: 8px;">✓ ${estatisticas.rc} RC</span>` : '') +
                                 '</div>'
                             }
-                            ${estatisticas.pd_usada ? '<div style="margin-top: 10px; font-size: 11px; color: #db2777; font-weight: bold;">🎯 PD USADA</div>' : ''}
+                            ${estatisticas.pd_usada ? '<div style="margin-top: 5px; font-size: 8px; color: #db2777; font-weight: bold;">🎯 PD</div>' : ''}
                         `;
                         
                         destaquesList.appendChild(destaqueItem);
@@ -1323,3 +1319,4 @@
         });
     </script>
 </body>
+</html>
