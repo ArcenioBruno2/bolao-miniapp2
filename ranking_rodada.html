@@ -411,11 +411,6 @@
             margin: 0 auto 20px;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
         .separator {
             text-align: center;
             margin: 30px 0 20px;
@@ -441,6 +436,50 @@
             font-size: 14px;
             position: relative;
             z-index: 1;
+        }
+        
+        /* Debug styles */
+        .debug-section {
+            background: #1e293b;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .debug-toggle {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .data-raw {
+            background: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -526,7 +565,10 @@
                 <p id="errorMessage" style="font-size: 14px; margin-bottom: 15px;">
                     Não foi possível carregar os dados do ranking.
                 </p>
-                <div id="debugArea" class="debug-info" style="display: none; margin-top: 15px;"></div>
+                <button onclick="toggleDebug()" class="debug-toggle">Mostrar Debug</button>
+                <div id="debugArea" class="debug-section" style="display: none;">
+                    <div id="debugContent"></div>
+                </div>
                 <button onclick="window.location.reload()" style="
                     margin-top: 10px;
                     padding: 10px 20px;
@@ -565,10 +607,10 @@
                     <!-- Ranking será inserido aqui a partir da 5ª posição -->
                 </div>
                 
-                <div id="debugInfo" class="debug-info" style="display: none;">
-                    <div style="font-weight: 700; margin-bottom: 10px;">Debug Info:</div>
-                    <div id="debugContent"></div>
-                </div>
+                <button onclick="toggleRawData()" class="debug-toggle" style="margin-top: 20px;">
+                    Mostrar Dados Brutos
+                </button>
+                <div id="rawData" class="data-raw" style="display: none;"></div>
                 
                 <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 13px; color: #64748b;">
                     <div style="font-weight: 700; margin-bottom: 10px; color: #1e293b;">Legenda:</div>
@@ -592,7 +634,11 @@
             <div id="emptyState" class="empty-state" style="display: none;">
                 <div class="empty-icon">📊</div>
                 <h3>Nenhum ranking disponível</h3>
-                <p>Esta rodada ainda não tem placares ou participantes.</p>
+                <p id="emptyMessage">Esta rodada ainda não tem placares ou participantes.</p>
+                <button onclick="showRawData()" class="debug-toggle" style="margin-top: 15px;">
+                    Ver Dados Recebidos
+                </button>
+                <div id="emptyDebug" class="data-raw" style="display: none; margin-top: 15px;"></div>
             </div>
         </div>
         
@@ -605,14 +651,36 @@
     </div>
 
     <script>
+        // Variável global para armazenar dados brutos
+        let rawDataReceived = null;
+        let parsedData = null;
+        
+        // Função para debug
+        function logDebug(message) {
+            console.log(`[DEBUG] ${message}`);
+        }
+        
         // Função para descomprimir dados Gzip
         async function descomprimirDadosGzip(base64Data) {
             try {
-                console.log('🔍 Tentando descomprimir dados Gzip...');
+                logDebug('Tentando descomprimir dados Gzip...');
+                logDebug(`Tamanho dos dados: ${base64Data.length} caracteres`);
+                logDebug(`Primeiros 50 chars: ${base64Data.substring(0, 50)}...`);
+                
+                // Primeiro, tenta como JSON direto (sem compressão)
+                try {
+                    logDebug('Tentando decodificar como JSON direto...');
+                    const jsonString = decodeURIComponent(escape(atob(base64Data)));
+                    const dados = JSON.parse(jsonString);
+                    logDebug('✅ Dados decodificados como JSON direto (sem compressão)');
+                    return dados;
+                } catch (e1) {
+                    logDebug(`JSON direto falhou: ${e1.message}`);
+                }
                 
                 // Verifica se o navegador suporta DecompressionStream
                 if (typeof DecompressionStream === 'undefined') {
-                    console.log('⚠️ DecompressionStream não suportado, usando fallback');
+                    logDebug('DecompressionStream não suportado, usando fallback manual');
                     throw new Error('Navegador não suporta descompressão Gzip');
                 }
                 
@@ -626,61 +694,46 @@
                     base64 += '='.repeat(4 - pad);
                 }
                 
-                const binaryString = atob(base64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
+                try {
+                    const binaryString = atob(base64);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    logDebug(`Dados comprimidos: ${bytes.length} bytes`);
+                    
+                    // Descomprime Gzip
+                    const ds = new DecompressionStream('gzip');
+                    const writer = ds.writable.getWriter();
+                    writer.write(bytes);
+                    writer.close();
+                    
+                    const decompressed = await new Response(ds.readable).arrayBuffer();
+                    const decoder = new TextDecoder('utf-8');
+                    const jsonString = decoder.decode(decompressed);
+                    
+                    logDebug(`✅ Descompressão Gzip bem-sucedida`);
+                    logDebug(`Tamanho descomprimido: ${jsonString.length} caracteres`);
+                    
+                    return JSON.parse(jsonString);
+                } catch (e2) {
+                    logDebug(`Gzip falhou: ${e2.message}`);
+                    throw e2;
                 }
                 
-                console.log('📦 Dados comprimidos:', bytes.length, 'bytes');
-                
-                // Descomprime Gzip
-                const ds = new DecompressionStream('gzip');
-                const writer = ds.writable.getWriter();
-                writer.write(bytes);
-                writer.close();
-                
-                const decompressed = await new Response(ds.readable).arrayBuffer();
-                const decoder = new TextDecoder('utf-8');
-                const jsonString = decoder.decode(decompressed);
-                
-                console.log('✅ Descompressão Gzip bem-sucedida');
-                console.log('📄 Tamanho descomprimido:', jsonString.length, 'caracteres');
-                
-                return JSON.parse(jsonString);
             } catch (error) {
-                console.error('❌ Erro ao descomprimir Gzip:', error);
+                logDebug(`❌ Erro na descompressão: ${error.message}`);
                 
-                // Fallback 1: Tenta como JSON simples (sem compressão)
+                // Última tentativa: tenta como string direta
                 try {
-                    console.log('🔄 Tentando fallback (JSON simples)...');
-                    
-                    // Tenta decodificar como Base64 normal
-                    let base64 = base64Data;
-                    base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-                    const pad = base64.length % 4;
-                    if (pad) {
-                        base64 += '='.repeat(4 - pad);
-                    }
-                    
-                    const jsonString = atob(base64);
-                    const dados = JSON.parse(jsonString);
-                    
-                    console.log('✅ Fallback bem-sucedido (JSON simples)');
+                    logDebug('Tentando como string direta...');
+                    const dados = JSON.parse(base64Data);
+                    logDebug('✅ Dados parseados como string direta');
                     return dados;
-                } catch (e2) {
-                    console.error('❌ Fallback também falhou:', e2);
-                    
-                    // Fallback 2: Tenta decode direto (pode ser que já esteja em texto)
-                    try {
-                        console.log('🔄 Tentando fallback 2 (decode direto)...');
-                        const dados = JSON.parse(base64Data);
-                        console.log('✅ Fallback 2 bem-sucedido');
-                        return dados;
-                    } catch (e3) {
-                        console.error('❌ Todos os fallbacks falharam');
-                        throw new Error('Não foi possível descomprimir os dados: ' + error.message);
-                    }
+                } catch (e3) {
+                    logDebug(`String direta falhou: ${e3.message}`);
+                    throw new Error('Não foi possível decodificar os dados: ' + error.message);
                 }
             }
         }
@@ -694,57 +747,99 @@
             }
         }
         
+        // Funções para debug
+        function toggleDebug() {
+            const debugArea = document.getElementById('debugArea');
+            debugArea.style.display = debugArea.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function toggleRawData() {
+            const rawDataDiv = document.getElementById('rawData');
+            if (rawDataDiv.style.display === 'none') {
+                rawDataDiv.innerHTML = JSON.stringify(parsedData, null, 2);
+                rawDataDiv.style.display = 'block';
+            } else {
+                rawDataDiv.style.display = 'none';
+            }
+        }
+        
+        function showRawData() {
+            const emptyDebug = document.getElementById('emptyDebug');
+            if (parsedData) {
+                emptyDebug.innerHTML = JSON.stringify(parsedData, null, 2);
+            } else if (rawDataReceived) {
+                emptyDebug.innerHTML = `Dados brutos: ${rawDataReceived.substring(0, 500)}...`;
+            }
+            emptyDebug.style.display = 'block';
+        }
+        
         // Mostrar debug info
         function mostrarDebug(info) {
             const debugDiv = document.getElementById('debugInfo');
             const debugContent = document.getElementById('debugContent');
             
-            debugContent.innerHTML = `
-                <div><strong>URL:</strong> ${window.location.href.substring(0, 100)}...</div>
-                <div><strong>Tem dados:</strong> ${new URLSearchParams(window.location.search).has('data') ? 'Sim' : 'Não'}</div>
-                <div><strong>Tamanho dados:</strong> ${info.dataLength || 'N/A'} caracteres</div>
-                <div><strong>Rodada:</strong> ${info.rodada_numero || 'N/A'}</div>
-                <div><strong>Total participantes:</strong> ${info.total_participantes || 0}</div>
-                <div><strong>Primeiros 4:</strong> ${JSON.stringify(info.top4 || [])}</div>
-            `;
-            debugDiv.style.display = 'block';
+            if (debugDiv && debugContent) {
+                debugContent.innerHTML = `
+                    <div><strong>URL:</strong> ${window.location.href.substring(0, 100)}...</div>
+                    <div><strong>Tem dados:</strong> ${new URLSearchParams(window.location.search).has('data') ? 'Sim' : 'Não'}</div>
+                    <div><strong>Tamanho dados:</strong> ${info.dataLength || 'N/A'} caracteres</div>
+                    <div><strong>Rodada:</strong> ${info.rodada_numero || 'N/A'}</div>
+                    <div><strong>Total participantes:</strong> ${info.total_participantes || 0}</div>
+                    <div><strong>Primeiros 4:</strong> ${JSON.stringify(info.top4 || [])}</div>
+                    <div><strong>Tipo dados:</strong> ${info.tipo || 'N/A'}</div>
+                `;
+                debugDiv.style.display = 'block';
+            }
         }
         
-        // Carregar dados da URL (com suporte a Gzip)
+        // Carregar dados da URL
         async function carregarDados() {
             try {
+                logDebug('Iniciando carregamento de dados...');
+                
                 // Obter dados da URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const dataParam = urlParams.get('data');
                 
+                logDebug(`Parâmetros URL: ${Array.from(urlParams.entries())}`);
+                
                 if (!dataParam) {
-                    throw new Error('Nenhum dado encontrado na URL');
+                    throw new Error('Nenhum dado encontrado na URL. Parâmetro "data" ausente.');
                 }
                 
-                console.log('📥 Dados recebidos (tamanho):', dataParam.length, 'caracteres');
+                // Salvar dados brutos
+                rawDataReceived = dataParam;
+                logDebug(`Dados recebidos (tamanho): ${dataParam.length} caracteres`);
+                logDebug(`Primeiros 100 chars: ${dataParam.substring(0, 100)}...`);
                 
-                // Descomprimir dados (com suporte a Gzip)
+                // Descomprimir dados
                 let dados;
                 try {
                     dados = await descomprimirDadosGzip(dataParam);
+                    parsedData = dados;
+                    logDebug('✅ Dados processados com sucesso');
                 } catch (e) {
-                    console.error('❌ Erro na descompressão:', e);
-                    // Última tentativa: tenta decodificar como Base64 normal
-                    try {
-                        const jsonString = atob(dataParam);
-                        dados = JSON.parse(jsonString);
-                        console.log('✅ Dados decodificados sem compressão');
-                    } catch (e2) {
-                        throw new Error('Não foi possível decodificar os dados: ' + e.message);
-                    }
+                    logDebug(`❌ Erro ao processar dados: ${e.message}`);
+                    throw new Error('Formato de dados inválido: ' + e.message);
                 }
                 
-                console.log('✅ Dados processados:', dados);
+                // Log da estrutura dos dados
+                logDebug(`Tipo de dados: ${dados.tipo || 'N/A'}`);
+                logDebug(`Rodada info: ${JSON.stringify(dados.rodada_info || {})}`);
+                logDebug(`Ranking existe: ${!!dados.ranking}`);
+                logDebug(`Tamanho ranking: ${dados.ranking ? dados.ranking.length : 0}`);
+                
+                if (dados.ranking && dados.ranking.length > 0) {
+                    logDebug(`Primeiro participante: ${JSON.stringify(dados.ranking[0])}`);
+                }
                 
                 // Verificar se tem ranking
                 if (!dados.ranking || dados.ranking.length === 0) {
+                    logDebug('Ranking vazio ou não existe');
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('emptyState').style.display = 'block';
+                    document.getElementById('emptyMessage').textContent = 
+                        `Esta rodada não tem participantes com pontos. Dados recebidos: ${JSON.stringify(dados.rodada_info || {})}`;
                     return;
                 }
                 
@@ -754,7 +849,7 @@
                 // Extrair os primeiros 4 para destaque
                 const top4 = dados.ranking.slice(0, 4);
                 
-                // Mostrar debug com info dos 4 primeiros
+                // Mostrar debug
                 mostrarDebug({
                     dataLength: dataParam.length,
                     tipo: dados.tipo,
@@ -767,22 +862,35 @@
                 exibirRankingComDestaques(dados, top4);
                 
             } catch (error) {
-                console.error('❌ Erro ao carregar dados:', error);
+                logDebug(`❌ ERRO: ${error.message}`);
+                console.error('Erro completo:', error);
                 
                 // Mostrar detalhes do erro
                 const errorDiv = document.getElementById('error');
                 const debugArea = document.getElementById('debugArea');
+                const debugContent = document.getElementById('debugContent');
                 
-                errorDiv.style.display = 'block';
-                document.getElementById('errorMessage').textContent = error.message;
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                    document.getElementById('errorMessage').textContent = error.message;
+                }
                 
                 // Adicionar info de debug
-                debugArea.style.display = 'block';
-                debugArea.innerHTML = `
-                    <div><strong>Erro:</strong> ${error.message}</div>
-                    <div><strong>Stack:</strong> ${error.stack || 'Não disponível'}</div>
-                    <div><strong>URL:</strong> ${window.location.href.substring(0, 150)}...</div>
-                `;
+                if (debugArea && debugContent) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const hasData = urlParams.has('data');
+                    const dataLength = hasData ? urlParams.get('data').length : 0;
+                    
+                    debugContent.innerHTML = `
+                        <div><strong>Erro:</strong> ${error.message}</div>
+                        <div><strong>Stack:</strong> ${error.stack || 'Não disponível'}</div>
+                        <div><strong>URL:</strong> ${window.location.href.substring(0, 150)}...</div>
+                        <div><strong>Tem parâmetro data:</strong> ${hasData}</div>
+                        <div><strong>Tamanho data:</strong> ${dataLength} caracteres</div>
+                        <div><strong>User Agent:</strong> ${navigator.userAgent.substring(0, 100)}</div>
+                    `;
+                    debugArea.style.display = 'block';
+                }
                 
                 document.getElementById('loading').style.display = 'none';
             }
@@ -790,7 +898,7 @@
         
         // Aplicar critério de desempate: PE → RC
         function aplicarCriterioDesempate(ranking) {
-            console.log('⚖️ Aplicando critério de desempate PE → RC...');
+            logDebug('Aplicando critério de desempate PE → RC...');
             
             // Ordena por: 1. Pontos, 2. PE (Placar Exato), 3. RC (Resultado Correto)
             ranking.sort((a, b) => {
@@ -839,10 +947,9 @@
                 posicao++;
             }
             
-            console.log('✅ Critério de desempate aplicado');
-            console.log('Primeiros 4 após desempate:');
+            logDebug('✅ Critério de desempate aplicado');
             ranking.slice(0, 4).forEach((p, i) => {
-                console.log(`  ${p.posicao}º - ${p.nome}: ${p.total} pts (PE: ${p.estatisticas?.pe || 0}, RC: ${p.estatisticas?.rc || 0})`);
+                logDebug(`  ${p.posicao}º - ${p.nome}: ${p.total} pts (PE: ${p.estatisticas?.pe || 0}, RC: ${p.estatisticas?.rc || 0})`);
             });
         }
         
@@ -851,123 +958,142 @@
             const ranking = dados.ranking || [];
             const rodadaInfo = dados.rodada_info || {};
             
-            console.log('📊 Exibindo ranking com', ranking.length, 'participantes');
-            console.log('🏅 Top 4 destacados:', top4.map(p => p.nome));
+            logDebug(`Exibindo ranking com ${ranking.length} participantes`);
+            logDebug(`Top 4: ${top4.map(p => p.nome).join(', ')}`);
             
             // Atualizar informações da rodada
             const rodadaInfoDiv = document.getElementById('rodadaInfo');
-            rodadaInfoDiv.innerHTML = `
-                <h2>Rodada ${rodadaInfo.numero || 'N/A'}</h2>
-                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">
-                    ${rodadaInfo.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
-                    ${rodadaInfo.total_ocorrencias > 1 ? ` (${rodadaInfo.total_ocorrencias} dias)` : ''}
-                </div>
-                <div class="rodada-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${ranking.length}</div>
-                        <div class="stat-label">PARTICIPANTES</div>
+            if (rodadaInfoDiv) {
+                rodadaInfoDiv.innerHTML = `
+                    <h2>Rodada ${rodadaInfo.numero || 'N/A'}</h2>
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">
+                        ${rodadaInfo.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
+                        ${rodadaInfo.total_ocorrencias > 1 ? ` (${rodadaInfo.total_ocorrencias} dias)` : ''}
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${ranking[0]?.total || 0}</div>
-                        <div class="stat-label">MÁXIMO PONTOS</div>
+                    <div class="rodada-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${ranking.length}</div>
+                            <div class="stat-label">PARTICIPANTES</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${ranking[0]?.total || 0}</div>
+                            <div class="stat-label">MÁXIMO PONTOS</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${rodadaInfo.timestamp || dados.timestamp || 'N/A'}</div>
+                            <div class="stat-label">ATUALIZAÇÃO</div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${rodadaInfo.timestamp || dados.timestamp || 'N/A'}</div>
-                        <div class="stat-label">ATUALIZAÇÃO</div>
-                    </div>
-                </div>
-            `;
+                `;
+            }
             
             // Exibir os 4 primeiros como destaques
             if (top4.length > 0) {
                 const destaquesDiv = document.getElementById('destaquesArea');
                 const destaquesList = document.getElementById('destaquesList');
-                destaquesList.innerHTML = '';
                 
-                top4.forEach((participante, index) => {
-                    const posicao = participante.posicao || (index + 1);
-                    const estatisticas = participante.estatisticas || {};
+                if (destaquesDiv && destaquesList) {
+                    destaquesList.innerHTML = '';
                     
-                    // Emojis de medalha para os 3 primeiros
-                    const medalhas = ['🥇', '🥈', '🥉', '🎖️'];
-                    const medalhaEmoji = medalhas[posicao - 1] || '🎖️';
+                    top4.forEach((participante, index) => {
+                        const posicao = participante.posicao || (index + 1);
+                        const estatisticas = participante.estatisticas || {};
+                        
+                        // Emojis de medalha para os 4 primeiros
+                        const medalhas = ['🥇', '🥈', '🥉', '🎖️'];
+                        const medalhaEmoji = medalhas[posicao - 1] || '🎖️';
+                        
+                        // Garantir que temos os dados necessários
+                        const nome = participante.nome || `Participante ${participante.usuario_id || index + 1}`;
+                        const pontos = participante.total || 0;
+                        
+                        const destaqueItem = document.createElement('div');
+                        destaqueItem.className = `destaque-item pos-${posicao}`;
+                        destaqueItem.innerHTML = `
+                            <div class="destaque-pos">${medalhaEmoji} ${posicao}º</div>
+                            <div class="destaque-medalha">${medalhaEmoji}</div>
+                            <div class="destaque-nome">${nome}</div>
+                            <div class="destaque-pontos">${pontos}</div>
+                            <div class="destaque-stats">
+                                ${estatisticas.pe > 0 ? `<span class="destaque-stat destaque-pe">🏆 ${estatisticas.pe} PE</span>` : ''}
+                                ${estatisticas.rc > 0 ? `<span class="destaque-stat destaque-rc">✓ ${estatisticas.rc} RC</span>` : ''}
+                            </div>
+                            ${estatisticas.pd_usada ? '<div style="margin-top: 10px; font-size: 11px; color: #db2777; font-weight: bold;">🎯 PD USADA</div>' : ''}
+                        `;
+                        
+                        destaquesList.appendChild(destaqueItem);
+                    });
                     
-                    const destaqueItem = document.createElement('div');
-                    destaqueItem.className = `destaque-item pos-${posicao}`;
-                    destaqueItem.innerHTML = `
-                        <div class="destaque-pos">${medalhaEmoji} ${posicao}º</div>
-                        <div class="destaque-medalha">${medalhaEmoji}</div>
-                        <div class="destaque-nome">${participante.nome || `Participante ${participante.usuario_id}`}</div>
-                        <div class="destaque-pontos">${participante.total || 0}</div>
-                        <div class="destaque-stats">
-                            ${estatisticas.pe > 0 ? `<span class="destaque-stat destaque-pe">🏆 ${estatisticas.pe} PE</span>` : ''}
-                            ${estatisticas.rc > 0 ? `<span class="destaque-stat destaque-rc">✓ ${estatisticas.rc} RC</span>` : ''}
-                        </div>
-                        ${estatisticas.pd_usada ? '<div style="margin-top: 10px; font-size: 11px; color: #db2777; font-weight: bold;">🎯 PD USADA</div>' : ''}
-                    `;
-                    
-                    destaquesList.appendChild(destaqueItem);
-                });
-                
-                destaquesDiv.style.display = 'block';
+                    destaquesDiv.style.display = 'block';
+                }
             }
             
             // Exibir demais participantes (a partir da 5ª posição)
             const demaisParticipantes = ranking.slice(4);
             const rankingList = document.getElementById('rankingList');
-            rankingList.innerHTML = '';
             
-            if (demaisParticipantes.length > 0) {
-                // Mostrar separador
-                document.getElementById('separatorArea').style.display = 'block';
+            if (rankingList) {
+                rankingList.innerHTML = '';
                 
-                // Adicionar demais participantes
-                demaisParticipantes.forEach((participante, index) => {
-                    const posicao = participante.posicao || (index + 5);
-                    const estatisticas = participante.estatisticas || {};
+                if (demaisParticipantes.length > 0) {
+                    // Mostrar separador
+                    const separatorArea = document.getElementById('separatorArea');
+                    if (separatorArea) {
+                        separatorArea.style.display = 'block';
+                    }
                     
-                    // Classes especiais para as próximas posições (5-8)
-                    let posClass = '';
-                    if (posicao === 5) posClass = 'pos-5';
-                    else if (posicao === 6) posClass = 'pos-6';
-                    else if (posicao === 7) posClass = 'pos-7';
-                    else if (posicao === 8) posClass = 'pos-8';
-                    
-                    let posicaoClass = '';
-                    if (posicao <= 4) posicaoClass = 'destaque';
-                    
-                    // Estatísticas para exibir
-                    const temPE = estatisticas.pe > 0;
-                    const temRC = estatisticas.rc > 0;
-                    
-                    const item = document.createElement('div');
-                    item.className = `ranking-item ${posClass}`;
-                    item.innerHTML = `
-                        <div class="posicao ${posicaoClass}">
-                            ${posicao}
-                        </div>
-                        <div class="usuario-info">
-                            <div class="usuario-nome">${participante.nome || `Participante ${participante.usuario_id}`}</div>
-                            <div class="usuario-stats">
-                                ${temPE ? `<span class="stat-badge pe">🏆 ${estatisticas.pe} PE</span>` : ''}
-                                ${temRC ? `<span class="stat-badge rc">✓ ${estatisticas.rc} RC</span>` : ''}
-                                ${participante.jogos_palpitados > 0 ? 
-                                    `<span style="color: #64748b; font-size: 12px; font-weight: 600;">
-                                        (${participante.jogos_palpitados}/${participante.total_jogos_rodada || '?'} jogos)
-                                    </span>` : ''}
+                    // Adicionar demais participantes
+                    demaisParticipantes.forEach((participante, index) => {
+                        const posicao = participante.posicao || (index + 5);
+                        const estatisticas = participante.estatisticas || {};
+                        
+                        // Classes especiais para as próximas posições (5-8)
+                        let posClass = '';
+                        if (posicao === 5) posClass = 'pos-5';
+                        else if (posicao === 6) posClass = 'pos-6';
+                        else if (posicao === 7) posClass = 'pos-7';
+                        else if (posicao === 8) posClass = 'pos-8';
+                        
+                        // Nome do participante
+                        const nome = participante.nome || `Participante ${participante.usuario_id || index + 5}`;
+                        const pontos = participante.total || 0;
+                        
+                        // Estatísticas para exibir
+                        const temPE = estatisticas.pe > 0;
+                        const temRC = estatisticas.rc > 0;
+                        
+                        const item = document.createElement('div');
+                        item.className = `ranking-item ${posClass}`;
+                        item.innerHTML = `
+                            <div class="posicao">
+                                ${posicao}
                             </div>
-                        </div>
-                        <div class="pontuacao">
-                            ${participante.total || 0}
-                        </div>
-                        ${estatisticas.pd_usada ? '<div class="pd-indicator">2×</div>' : '<div class="pd-indicator" style="background: #94a3b8;">1×</div>'}
-                    `;
-                    
-                    rankingList.appendChild(item);
-                });
-            } else if (ranking.length <= 4) {
-                // Esconder separador se não houver demais participantes
-                document.getElementById('separatorArea').style.display = 'none';
+                            <div class="usuario-info">
+                                <div class="usuario-nome">${nome}</div>
+                                <div class="usuario-stats">
+                                    ${temPE ? `<span class="stat-badge pe">🏆 ${estatisticas.pe} PE</span>` : ''}
+                                    ${temRC ? `<span class="stat-badge rc">✓ ${estatisticas.rc} RC</span>` : ''}
+                                    ${participante.jogos_palpitados > 0 ? 
+                                        `<span style="color: #64748b; font-size: 12px; font-weight: 600;">
+                                            (${participante.jogos_palpitados}/${participante.total_jogos_rodada || '?'} jogos)
+                                        </span>` : ''}
+                                </div>
+                            </div>
+                            <div class="pontuacao">
+                                ${pontos}
+                            </div>
+                            ${estatisticas.pd_usada ? '<div class="pd-indicator">2×</div>' : '<div class="pd-indicator" style="background: #94a3b8;">1×</div>'}
+                        `;
+                        
+                        rankingList.appendChild(item);
+                    });
+                } else if (ranking.length <= 4) {
+                    // Esconder separador se não houver demais participantes
+                    const separatorArea = document.getElementById('separatorArea');
+                    if (separatorArea) {
+                        separatorArea.style.display = 'none';
+                    }
+                }
             }
             
             // Mostrar conteúdo
@@ -975,15 +1101,9 @@
             document.getElementById('rankingContent').style.display = 'block';
             
             // Log final
-            console.log('✅ Ranking exibido com destaques');
-            console.log('Primeiro lugar:', ranking[0]?.nome, 
-                'Pontos:', ranking[0]?.total,
-                'PE:', ranking[0]?.estatisticas?.pe,
-                'RC:', ranking[0]?.estatisticas?.rc);
-            console.log('Quarto lugar:', ranking[3]?.nome, 
-                'Pontos:', ranking[3]?.total,
-                'PE:', ranking[3]?.estatisticas?.pe,
-                'RC:', ranking[3]?.estatisticas?.rc);
+            logDebug('✅ Ranking exibido com sucesso');
+            logDebug(`Primeiro: ${ranking[0]?.nome} - ${ranking[0]?.total} pts`);
+            logDebug(`Quarto: ${ranking[3]?.nome} - ${ranking[3]?.total} pts`);
         }
         
         // Inicializar quando a página carregar
@@ -992,13 +1112,13 @@
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                console.log('✅ Telegram WebApp detectado');
+                logDebug('✅ Telegram WebApp detectado');
             } else {
-                console.log('⚠️ Fora do Telegram (modo debug)');
+                logDebug('⚠️ Fora do Telegram (modo debug)');
             }
             
             // Carregar dados
-            console.log('🚀 Iniciando carregamento...');
+            logDebug('🚀 Iniciando carregamento de dados...');
             setTimeout(carregarDados, 1000);
         });
     </script>
