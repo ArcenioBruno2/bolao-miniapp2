@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Geral - Bolão</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .ranking-table {
+            background: white;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            background: #f8f9fa;
+            display: grid;
+            grid-template-columns: 60px 1fr 80px 70px 60px 60px 60px 80px 90px;
+            padding: 15px 20px;
+            font-weight: bold;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 80px 70px 60px 60px 60px 80px 90px;
+            padding: 15px 20px;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.3s;
+        }
+        
+        .table-row:hover {
+            background: #f8f9fa;
+        }
+        
+        .posicao {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .posicao-1 {
+            color: #FFD700;
+            background: #FFF9C4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .posicao-2 {
+            color: #C0C0C0;
+            background: #F5F5F5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .posicao-3 {
+            color: #CD7F32;
+            background: #FAEBD7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .nome {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .pontos {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            color: #667eea;
+        }
+        
+        .celula {
+            text-align: center;
+            color: #666;
+        }
+        
+        .rodadas {
+            text-align: center;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .loader {
+            text-align: center;
+            padding: 50px;
+            color: white;
+        }
+        
+        .update-info {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            background: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 50px 1fr 70px 60px 50px 50px 50px 70px 80px;
+                padding: 10px 15px;
+                font-size: 11px;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 40px 1fr 50px 40px 40px 40px 40px 60px 70px;
+                padding: 8px 10px;
+                font-size: 10px;
+            }
+            
+            .posicao {
+                font-size: 14px;
+            }
+            
+            .pontos {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 RANKING GERAL</h1>
+            <div id="stats" class="stats">
+                <!-- Stats serão carregadas via JavaScript -->
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterRanking('all')">TODOS</button>
+                <button class="filter-btn" onclick="filterRanking('top10')">TOP 10</button>
+                <button class="filter-btn" onclick="filterRanking('me')">EU</button>
+            </div>
+        </div>
+        
+        <div class="ranking-table">
+            <div class="table-header">
+                <div>POS</div>
+                <div>NOME</div>
+                <div>PONTOS</div>
+                <div>RODADAS</div>
+                <div>PE</div>
+                <div>RC</div>
+                <div>PD</div>
+                <div>MÉDIA</div>
+                <div>APROVEIT.</div>
+            </div>
+            
+            <div id="ranking-body">
+                <!-- Ranking será carregado via JavaScript -->
+            </div>
+        </div>
+        
+        <div class="update-info" id="update-info">
+            Carregando...
+        </div>
+    </div>
+    
+    <script>
+        let rankingData = null;
+        let tg = null;
+        
+        // Inicializa Telegram Web App
+        document.addEventListener('DOMContentLoaded', function() {
+            tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.BackButton.show();
+            tg.BackButton.onClick(() => {
+                tg.close();
+            });
+            
+            // Tenta obter dados da URL
+            loadDataFromURL();
+        });
+        
+        function loadDataFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            if (dataParam) {
+                try {
+                    // Decodifica Base64
+                    const decodedData = atob(dataParam);
+                    rankingData = JSON.parse(decodedData);
+                    renderRanking();
+                } catch (error) {
+                    console.error('Erro ao carregar dados:', error);
+                    showError('Erro ao carregar dados do ranking');
+                }
+            } else {
+                // Tenta via Telegram Web App
+                if (tg.initDataUnsafe.start_param) {
+                    // Se veio de um deep link
+                    const startParam = tg.initDataUnsafe.start_param;
+                    console.log('Start param:', startParam);
+                    // Você pode buscar dados adicionais aqui
+                }
+                showError('Nenhum dado encontrado na URL');
+            }
+        }
+        
+        function renderRanking() {
+            if (!rankingData || !rankingData.ranking) {
+                showError('Dados do ranking não disponíveis');
+                return;
+            }
+            
+            // Atualiza estatísticas
+            renderStats();
+            
+            // Renderiza o ranking
+            const rankingBody = document.getElementById('ranking-body');
+            rankingBody.innerHTML = '';
+            
+            rankingData.ranking.forEach((participante, index) => {
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                
+                // Classe especial para top 3
+                let posClass = '';
+                if (participante.posicao === 1) posClass = 'posicao-1';
+                if (participante.posicao === 2) posClass = 'posicao-2';
+                if (participante.posicao === 3) posClass = 'posicao-3';
+                
+                row.innerHTML = `
+                    <div class="posicao ${posClass}">
+                        ${participante.posicao}º
+                    </div>
+                    <div class="nome">
+                        ${participante.nome}
+                    </div>
+                    <div class="pontos">
+                        ${participante.total_pontos}
+                    </div>
+                    <div class="celula rodadas">
+                        ${participante.total_rodadas}
+                    </div>
+                    <div class="celula">
+                        ${participante.total_pe}
+                    </div>
+                    <div class="celula">
+                        ${participante.total_rc}
+                    </div>
+                    <div class="celula">
+                        ${participante.total_pd_usadas}
+                    </div>
+                    <div class="celula">
+                        ${participante.media_por_rodada.toFixed(1)}
+                    </div>
+                    <div class="celula">
+                        ${participante.aproveitamento.toFixed(1)}%
+                    </div>
+                `;
+                
+                rankingBody.appendChild(row);
+            });
+            
+            // Atualiza informação de data
+            const updateInfo = document.getElementById('update-info');
+            if (rankingData.config && rankingData.config.data_atualizacao) {
+                updateInfo.innerHTML = `🔄 Atualizado em: ${rankingData.config.data_atualizacao}`;
+            } else {
+                updateInfo.innerHTML = `🏆 ${rankingData.total_rodadas} rodadas consideradas`;
+            }
+        }
+        
+        function renderStats() {
+            if (!rankingData || !rankingData.ranking || rankingData.ranking.length === 0) {
+                return;
+            }
+            
+            const statsContainer = document.getElementById('stats');
+            const lider = rankingData.ranking[0];
+            const totalParticipantes = rankingData.ranking.length;
+            
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-value">${lider.nome.split(' ')[0]}</span>
+                    <span class="stat-label">Líder</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${lider.total_pontos}</span>
+                    <span class="stat-label">Pontos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${totalParticipantes}</span>
+                    <span class="stat-label">Participantes</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value">${rankingData.total_rodadas}</span>
+                    <span class="stat-label">Rodadas</span>
+                </div>
+            `;
+        }
+        
+        function filterRanking(filterType) {
+            // Atualiza botões ativos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Aqui você pode implementar filtros
+            // Por enquanto apenas mostra todos
+            renderRanking();
+        }
+        
+        function showError(message) {
+            document.getElementById('ranking-body').innerHTML = `
+                <div class="loader">
+                    ❌ ${message}
+                </div>
+            `;
+        }
+        
+        // Função para compartilhar
+        function shareRanking() {
+            if (tg && tg.share) {
+                const message = `🏆 Ranking Geral do Bolão!\n\n` +
+                               `Líder: ${rankingData.ranking[0].nome} com ${rankingData.ranking[0].total_pontos} pontos\n` +
+                               `Participantes: ${rankingData.ranking.length}\n` +
+                               `Rodadas: ${rankingData.total_rodadas}`;
+                
+                tg.share(message);
+            }
+        }
+    </script>
+</body>
+</html>
