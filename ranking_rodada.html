@@ -94,6 +94,19 @@
             border: 1px solid #fecaca;
         }
         
+        .debug-info {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 12px;
+            color: #64748b;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+        }
+        
         .rodada-info {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
@@ -356,6 +369,7 @@
                 <p id="errorMessage" style="font-size: 14px; margin-bottom: 15px;">
                     Não foi possível carregar os dados do ranking.
                 </p>
+                <div id="debugArea" class="debug-info" style="display: none; margin-top: 15px;"></div>
                 <button onclick="window.location.reload()" style="
                     margin-top: 10px;
                     padding: 10px 20px;
@@ -376,6 +390,11 @@
                 
                 <div class="ranking-list" id="rankingList">
                     <!-- Ranking será inserido aqui -->
+                </div>
+                
+                <div id="debugInfo" class="debug-info" style="display: none;">
+                    <div style="font-weight: 700; margin-bottom: 10px;">Debug Info:</div>
+                    <div id="debugContent"></div>
                 </div>
                 
                 <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 13px; color: #64748b;">
@@ -422,31 +441,17 @@
             }
         }
         
-        // Decodificar Base64 de forma segura
-        function decodeBase64(str) {
-            try {
-                // Remove espaços e caracteres especiais
-                str = str.replace(/\s/g, '');
-                
-                // Tenta decodificar normalmente
-                try {
-                    return atob(str);
-                } catch (e1) {
-                    // Se falhar, tenta URL-safe
-                    str = str.replace(/-/g, '+').replace(/_/g, '/');
-                    
-                    // Adiciona padding se necessário
-                    const pad = str.length % 4;
-                    if (pad) {
-                        str += '='.repeat(4 - pad);
-                    }
-                    
-                    return atob(str);
-                }
-            } catch (e) {
-                console.error('Erro ao decodificar Base64:', e);
-                throw new Error('Dados inválidos');
-            }
+        // Mostrar debug info
+        function mostrarDebug(info) {
+            const debugDiv = document.getElementById('debugInfo');
+            const debugContent = document.getElementById('debugContent');
+            
+            debugContent.innerHTML = `
+                <div><strong>URL:</strong> ${window.location.href.substring(0, 100)}...</div>
+                <div><strong>Tem dados:</strong> ${new URLSearchParams(window.location.search).has('data') ? 'Sim' : 'Não'}</div>
+                <div><strong>Dados brutos:</strong> ${JSON.stringify(info, null, 2)}</div>
+            `;
+            debugDiv.style.display = 'block';
         }
         
         // Carregar dados da URL
@@ -460,31 +465,44 @@
                     throw new Error('Nenhum dado encontrado na URL');
                 }
                 
-                console.log('📥 Dados recebidos (primeiros 100 chars):', dataParam.substring(0, 100));
+                console.log('📥 Dados recebidos (tamanho):', dataParam.length, 'caracteres');
                 
                 // Decodificar Base64
                 let dadosStr;
                 try {
-                    dadosStr = decodeBase64(dataParam);
-                    console.log('✅ Base64 decodificado com sucesso');
-                } catch (decodeError) {
-                    console.error('❌ Erro ao decodificar Base64:', decodeError);
-                    
-                    // Tenta como string direta (para debug)
-                    if (dataParam.includes('{') && dataParam.includes('}')) {
-                        console.log('⚠️ Tentando como JSON direto...');
-                        dadosStr = dataParam;
-                    } else {
-                        throw new Error('Formato de dados inválido');
+                    // Tenta decode normal
+                    dadosStr = atob(dataParam);
+                    console.log('✅ Base64 decodificado normalmente');
+                } catch (e1) {
+                    console.log('⚠️ Primeira tentativa falhou, tentando URL-safe...');
+                    // Tenta URL-safe
+                    let base64 = dataParam.replace(/-/g, '+').replace(/_/g, '/');
+                    const pad = base64.length % 4;
+                    if (pad) {
+                        base64 += '='.repeat(4 - pad);
                     }
+                    dadosStr = atob(base64);
                 }
+                
+                console.log('📄 Dados decodificados:', dadosStr.substring(0, 200));
                 
                 // Parse JSON
                 const dados = JSON.parse(dadosStr);
                 console.log('✅ JSON parseado:', dados);
                 
-                if (!dados.ranking) {
-                    throw new Error('Dados de ranking não encontrados');
+                // Mostrar debug
+                mostrarDebug({
+                    tipo: dados.tipo,
+                    rodada_numero: dados.rodada_info?.numero,
+                    total_participantes: dados.ranking?.length,
+                    ranking: dados.ranking?.slice(0, 3) // Mostra apenas os 3 primeiros
+                });
+                
+                // Verificar se tem ranking
+                if (!dados.ranking || dados.ranking.length === 0) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                    return;
                 }
                 
                 // Exibir ranking
@@ -492,26 +510,24 @@
                 
             } catch (error) {
                 console.error('❌ Erro ao carregar dados:', error);
-                mostrarErro(error.message);
+                
+                // Mostrar detalhes do erro
+                const errorDiv = document.getElementById('error');
+                const debugArea = document.getElementById('debugArea');
+                
+                errorDiv.style.display = 'block';
+                document.getElementById('errorMessage').textContent = error.message;
+                
+                // Adicionar info de debug
+                debugArea.style.display = 'block';
+                debugArea.innerHTML = `
+                    <div><strong>Erro:</strong> ${error.message}</div>
+                    <div><strong>URL completa:</strong> ${window.location.href.substring(0, 150)}...</div>
+                    <div><strong>User Agent:</strong> ${navigator.userAgent.substring(0, 100)}...</div>
+                `;
+                
+                document.getElementById('loading').style.display = 'none';
             }
-        }
-        
-        // Mostrar erro
-        function mostrarErro(mensagem) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('rankingContent').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-            
-            const errorDiv = document.getElementById('error');
-            errorDiv.style.display = 'block';
-            document.getElementById('errorMessage').textContent = mensagem;
-            
-            // Log detalhado para debug
-            console.error('Detalhes do erro:', {
-                url: window.location.href,
-                hasDataParam: new URLSearchParams(window.location.search).has('data'),
-                userAgent: navigator.userAgent
-            });
         }
         
         // Exibir ranking
@@ -519,11 +535,7 @@
             const ranking = dados.ranking || [];
             const rodadaInfo = dados.rodada_info || {};
             
-            if (ranking.length === 0) {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('emptyState').style.display = 'block';
-                return;
-            }
+            console.log('📊 Exibindo ranking com', ranking.length, 'participantes');
             
             // Atualizar informações da rodada
             const rodadaInfoDiv = document.getElementById('rodadaInfo');
@@ -542,7 +554,7 @@
                         <div class="stat-label">MÁXIMO PONTOS</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${dados.timestamp ? dados.timestamp.split(' ')[0] : 'N/A'}</div>
+                        <div class="stat-value">${dados.timestamp || 'N/A'}</div>
                         <div class="stat-label">DATA</div>
                     </div>
                 </div>
@@ -553,8 +565,10 @@
             rankingList.innerHTML = '';
             
             ranking.forEach((participante, index) => {
-                const posicao = index + 1;
+                const posicao = participante.posicao || (index + 1);
                 const estatisticas = participante.estatisticas || {};
+                
+                console.log(`Participante ${index + 1}:`, participante.nome, 'Pontos:', participante.total);
                 
                 // Classes do pódio
                 let podiumClass = '';
@@ -594,6 +608,11 @@
             // Mostrar conteúdo
             document.getElementById('loading').style.display = 'none';
             document.getElementById('rankingContent').style.display = 'block';
+            
+            // Log final
+            console.log('✅ Ranking exibido com sucesso');
+            console.log('Primeiro lugar:', ranking[0]?.nome, 'Pontos:', ranking[0]?.total);
+            console.log('Último lugar:', ranking[ranking.length - 1]?.nome, 'Pontos:', ranking[ranking.length - 1]?.total);
         }
         
         // Inicializar quando a página carregar
@@ -602,10 +621,14 @@
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
+                console.log('✅ Telegram WebApp detectado');
+            } else {
+                console.log('⚠️ Fora do Telegram (modo debug)');
             }
             
             // Carregar dados
-            setTimeout(carregarDados, 500);
+            console.log('🚀 Iniciando carregamento...');
+            setTimeout(carregarDados, 1000);
         });
     </script>
 </body>
