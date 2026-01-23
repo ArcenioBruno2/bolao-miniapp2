@@ -73,48 +73,9 @@
             transform: translateY(-50%) scale(1.05);
         }
         
-        .rodada-selector {
-            background: #f8fafc;
-            padding: 25px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .select-container {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .select-label {
-            font-weight: 600;
-            color: #1e293b;
-            white-space: nowrap;
-            font-size: 15px;
-        }
-        
-        .select-rodada {
-            flex: 1;
-            padding: 14px 18px;
-            font-size: 16px;
-            border: 2px solid #cbd5e1;
-            border-radius: 12px;
-            background: white;
-            color: #334155;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .select-rodada:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        
         .content {
             padding: 30px;
+            min-height: 400px;
         }
         
         .loading {
@@ -139,28 +100,22 @@
             padding: 25px;
             border-radius: 18px;
             margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 25px;
-            align-items: center;
+            text-align: center;
         }
         
-        .rodada-left h2 {
+        .rodada-info h2 {
             font-size: 32px;
             font-weight: 800;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
         
-        .rodada-data {
-            font-size: 15px;
-            opacity: 0.95;
-            font-weight: 500;
-        }
-        
         .rodada-stats {
             display: flex;
+            justify-content: center;
             gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .stat-item {
@@ -189,6 +144,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            margin-top: 30px;
         }
         
         .ranking-item {
@@ -252,9 +208,10 @@
         
         .usuario-stats {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             font-size: 14px;
             color: #64748b;
+            flex-wrap: wrap;
         }
         
         .stat-badge {
@@ -262,22 +219,22 @@
             align-items: center;
             gap: 6px;
             background: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 4px 10px;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 12px;
         }
         
         .stat-badge.pe { background: #fef3c7; color: #92400e; }
         .stat-badge.rc { background: #dbeafe; color: #1e40af; }
         .stat-badge.gm { background: #f3e8ff; color: #6b21a8; }
         .stat-badge.gv { background: #f0f9ff; color: #0c4a6e; }
-        .stat-badge.pd { background: #fce7f3; color: #9d174d; }
         
         .pontuacao {
             font-size: 32px;
             font-weight: 800;
             color: #4f46e5;
-            min-width: 100px;
+            min-width: 80px;
             text-align: right;
         }
         
@@ -285,55 +242,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             font-weight: 800;
-            font-size: 14px;
-        }
-        
-        .pd-sim {
+            font-size: 12px;
             background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
             color: white;
         }
         
-        .pd-nao {
-            background: #f1f5f9;
-            color: #94a3b8;
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: #64748b;
         }
         
-        .legend {
-            margin-top: 35px;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 16px;
-            font-size: 14px;
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            font-size: 22px;
+            margin-bottom: 12px;
             color: #475569;
-        }
-        
-        .legend-title {
             font-weight: 700;
-            margin-bottom: 15px;
-            color: #1e293b;
-            font-size: 16px;
-        }
-        
-        .legend-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
         }
         
         .footer {
@@ -360,61 +294,7 @@
             100% { transform: rotate(360deg); }
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 60px 30px;
-            color: #64748b;
-        }
-        
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        
-        .empty-state h3 {
-            font-size: 22px;
-            margin-bottom: 12px;
-            color: #475569;
-            font-weight: 700;
-        }
-        
-        .empty-state p {
-            font-size: 15px;
-            line-height: 1.5;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
         @media (max-width: 768px) {
-            .container {
-                border-radius: 0;
-            }
-            
-            .header {
-                padding: 25px 20px;
-            }
-            
-            .header h1 {
-                font-size: 22px;
-            }
-            
-            .select-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .rodada-info {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 20px;
-            }
-            
-            .rodada-stats {
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-            
             .ranking-item {
                 grid-template-columns: 50px 1fr auto;
                 gap: 15px;
@@ -426,18 +306,12 @@
             }
             
             .usuario-stats {
-                flex-wrap: wrap;
                 gap: 8px;
             }
             
             .stat-badge {
-                font-size: 13px;
-                padding: 4px 10px;
-            }
-            
-            .legend-items {
-                flex-direction: column;
-                gap: 12px;
+                font-size: 11px;
+                padding: 3px 8px;
             }
         }
         
@@ -468,31 +342,22 @@
             <div class="subtitle">Pontuação real dos participantes</div>
         </div>
         
-        <div class="rodada-selector">
-            <div class="select-container">
-                <div class="select-label">Rodada:</div>
-                <select class="select-rodada" id="selectRodada" onchange="carregarRanking()">
-                    <option value="">Carregando rodadas...</option>
-                </select>
-            </div>
-        </div>
-        
         <div class="content">
             <div id="loading" class="loading">
                 <div class="spinner"></div>
                 <div style="margin-top: 15px; font-size: 15px; color: #64748b;">
-                    Buscando dados do ranking...
+                    Carregando ranking...
                 </div>
             </div>
             
             <div id="error" class="error" style="display: none;">
                 <div style="font-size: 20px; margin-bottom: 10px;">⚠️</div>
-                <h3 style="margin-bottom: 8px;">Não foi possível carregar o ranking</h3>
-                <p id="errorMessage" style="font-size: 14px;">
-                    Verifique sua conexão e tente novamente.
+                <h3 style="margin-bottom: 8px;" id="errorTitle">Erro ao carregar ranking</h3>
+                <p id="errorMessage" style="font-size: 14px; margin-bottom: 15px;">
+                    Não foi possível carregar os dados do ranking.
                 </p>
-                <button onclick="carregarDadosIniciais()" style="
-                    margin-top: 15px;
+                <button onclick="window.location.reload()" style="
+                    margin-top: 10px;
                     padding: 10px 20px;
                     background: #dc2626;
                     color: white;
@@ -513,24 +378,20 @@
                     <!-- Ranking será inserido aqui -->
                 </div>
                 
-                <div class="legend">
-                    <div class="legend-title">Como funciona a pontuação?</div>
-                    <div class="legend-items">
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #fbbf24;"></div>
-                            <div><strong>PE</strong> = Placar Exato (14 pontos)</div>
+                <div style="margin-top: 30px; padding: 15px; background: #f8fafc; border-radius: 12px; font-size: 13px; color: #64748b;">
+                    <div style="font-weight: 700; margin-bottom: 10px; color: #1e293b;">Legenda:</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #fbbf24; border-radius: 2px;"></span>
+                            <span><strong>PE</strong> = Placar Exato (14 pontos)</span>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #60a5fa;"></div>
-                            <div><strong>RC</strong> = Resultado Correto (4 pontos)</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #60a5fa; border-radius: 2px;"></span>
+                            <span><strong>RC</strong> = Resultado Correto (4 pontos)</span>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #a78bfa;"></div>
-                            <div><strong>GM/GV</strong> = Gols Mandante/Visitante (2 pontos cada)</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background: #f472b6;"></div>
-                            <div><strong>PD</strong> = Pontuação Dobrada (multiplica todos os pontos)</div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="display: inline-block; width: 12px; height: 12px; background: #a78bfa; border-radius: 2px;"></span>
+                            <span><strong>GM/GV</strong> = Gols (2 pontos cada)</span>
                         </div>
                     </div>
                 </div>
@@ -538,8 +399,8 @@
             
             <div id="emptyState" class="empty-state" style="display: none;">
                 <div class="empty-icon">📊</div>
-                <h3>Nenhuma rodada disponível</h3>
-                <p>Os rankings aparecerão aqui após os placares reais serem preenchidos.</p>
+                <h3>Nenhum ranking disponível</h3>
+                <p>Esta rodada ainda não tem placares ou participantes.</p>
             </div>
         </div>
         
@@ -552,538 +413,200 @@
     </div>
 
     <script>
-        // Estado da aplicação
-        let rodadasDisponiveis = [];
-        let rankingAtual = null;
-        let rodadaAtual = null;
-        let dadosIniciais = null;
-        
-        // Função para voltar ao bot
+        // Função para voltar
         function goBack() {
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.close();
             } else {
-                alert('Para usar todas as funcionalidades, abra pelo Telegram');
+                history.back();
             }
         }
         
-        // Mostra estado de carregamento
-        function mostrarCarregando() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('rankingContent').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-        }
-        
-        // Mostra erro
-        function mostrarErro(mensagem) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'block';
-            document.getElementById('rankingContent').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('errorMessage').textContent = mensagem;
-        }
-        
-        // Mostra ranking
-        function mostrarRanking() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('rankingContent').style.display = 'block';
-            document.getElementById('emptyState').style.display = 'none';
-        }
-        
-        // Mostra estado vazio
-        function mostrarVazio() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('error').style.display = 'none';
-            document.getElementById('rankingContent').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'block';
-        }
-        
-        // Função para decodificar dados Gzip (se necessário)
-        function decodeGzipBase64(data) {
+        // Decodificar Base64 de forma segura
+        function decodeBase64(str) {
             try {
-                // Se não começa com "H4sI", não está comprimido
-                if (data && !data.startsWith('H4sI')) {
-                    return data;
-                }
+                // Remove espaços e caracteres especiais
+                str = str.replace(/\s/g, '');
                 
-                // Se for pequeno, provavelmente não está comprimido
-                if (data.length < 1000) {
-                    return data;
+                // Tenta decodificar normalmente
+                try {
+                    return atob(str);
+                } catch (e1) {
+                    // Se falhar, tenta URL-safe
+                    str = str.replace(/-/g, '+').replace(/_/g, '/');
+                    
+                    // Adiciona padding se necessário
+                    const pad = str.length % 4;
+                    if (pad) {
+                        str += '='.repeat(4 - pad);
+                    }
+                    
+                    return atob(str);
                 }
-                
-                // Tenta descomprimir
-                const binaryString = atob(data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                // Usa pako para descomprimir Gzip
-                if (typeof pako !== 'undefined') {
-                    const decompressed = pako.inflate(bytes, { to: 'string' });
-                    return decompressed;
-                }
-                
-                return binaryString;
             } catch (e) {
-                console.warn('Não foi possível descomprimir dados:', e);
-                return data;
+                console.error('Erro ao decodificar Base64:', e);
+                throw new Error('Dados inválidos');
             }
         }
         
-        // Carrega dados iniciais
-        async function carregarDadosIniciais() {
-            mostrarCarregando();
-            
+        // Carregar dados da URL
+        async function carregarDados() {
             try {
                 // Obter dados da URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const dataParam = urlParams.get('data');
                 
                 if (!dataParam) {
-                    throw new Error('Dados não encontrados na URL');
+                    throw new Error('Nenhum dado encontrado na URL');
                 }
                 
-                // Decodificar dados Base64
+                console.log('📥 Dados recebidos (primeiros 100 chars):', dataParam.substring(0, 100));
+                
+                // Decodificar Base64
                 let dadosStr;
                 try {
-                    // Tenta decode URL-safe primeiro
-                    dadosStr = decodeURIComponent(atob(dataParam));
-                } catch {
-                    // Se falhar, tenta decode normal
-                    dadosStr = atob(dataParam);
-                }
-                
-                // Tenta descomprimir se for Gzip
-                dadosStr = decodeGzipBase64(dataParam);
-                
-                // Parse dos dados
-                const dados = JSON.parse(dadosStr);
-                console.log('📥 Dados iniciais recebidos:', dados);
-                
-                dadosIniciais = dados;
-                
-                if (dados.tipo !== 'ranking_rodada') {
-                    // Se for tipo ranking direto, processa
-                    if (dados.ranking) {
-                        processarRankingDireto(dados);
-                        return;
-                    }
-                    throw new Error('Tipo de dados inválido: ' + dados.tipo);
-                }
-                
-                rodadasDisponiveis = dados.rodadas_disponiveis || [];
-                
-                // Popular dropdown de rodadas
-                const selectRodada = document.getElementById('selectRodada');
-                if (rodadasDisponiveis.length > 0) {
-                    selectRodada.innerHTML = '';
+                    dadosStr = decodeBase64(dataParam);
+                    console.log('✅ Base64 decodificado com sucesso');
+                } catch (decodeError) {
+                    console.error('❌ Erro ao decodificar Base64:', decodeError);
                     
-                    rodadasDisponiveis.forEach(rodadaNum => {
-                        const option = document.createElement('option');
-                        option.value = rodadaNum;
-                        option.textContent = `Rodada ${rodadaNum}`;
-                        selectRodada.appendChild(option);
-                    });
-                    
-                    // Seleciona a primeira rodada
-                    rodadaAtual = rodadasDisponiveis[0];
-                    selectRodada.value = rodadaAtual;
-                    
-                    // Se já tem ranking nos dados, exibe
-                    if (dados.ranking && dados.ranking.length > 0) {
-                        processarRankingDireto(dados);
+                    // Tenta como string direta (para debug)
+                    if (dataParam.includes('{') && dataParam.includes('}')) {
+                        console.log('⚠️ Tentando como JSON direto...');
+                        dadosStr = dataParam;
                     } else {
-                        // Carrega o ranking da primeira rodada
-                        await carregarRanking();
+                        throw new Error('Formato de dados inválido');
                     }
-                } else {
-                    mostrarVazio();
                 }
                 
-            } catch (err) {
-                console.error('❌ Erro ao carregar dados:', err);
-                mostrarErro(err.message || 'Erro ao carregar rodadas disponíveis');
+                // Parse JSON
+                const dados = JSON.parse(dadosStr);
+                console.log('✅ JSON parseado:', dados);
+                
+                if (!dados.ranking) {
+                    throw new Error('Dados de ranking não encontrados');
+                }
+                
+                // Exibir ranking
+                exibirRanking(dados);
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados:', error);
+                mostrarErro(error.message);
             }
         }
         
-        // Processa ranking que já veio nos dados iniciais
-        function processarRankingDireto(dados) {
-            console.log('✅ Processando ranking direto:', dados);
+        // Mostrar erro
+        function mostrarErro(mensagem) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('rankingContent').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
             
-            if (!dados || !dados.ranking || dados.ranking.length === 0) {
-                mostrarVazio();
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'block';
+            document.getElementById('errorMessage').textContent = mensagem;
+            
+            // Log detalhado para debug
+            console.error('Detalhes do erro:', {
+                url: window.location.href,
+                hasDataParam: new URLSearchParams(window.location.search).has('data'),
+                userAgent: navigator.userAgent
+            });
+        }
+        
+        // Exibir ranking
+        function exibirRanking(dados) {
+            const ranking = dados.ranking || [];
+            const rodadaInfo = dados.rodada_info || {};
+            
+            if (ranking.length === 0) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
                 return;
             }
-            
-            rankingAtual = dados;
             
             // Atualizar informações da rodada
-            atualizarInfoRodada();
-            
-            // Atualizar lista de ranking
-            atualizarListaRanking();
-            
-            mostrarRanking();
-        }
-        
-        // Carrega ranking da rodada selecionada
-        async function carregarRanking() {
-            const rodadaNum = document.getElementById('selectRodada').value;
-            if (!rodadaNum) {
-                mostrarVazio();
-                return;
-            }
-            
-            rodadaAtual = rodadaNum;
-            mostrarCarregando();
-            
-            try {
-                // Verifica se temos dados iniciais com ranking
-                if (dadosIniciais && dadosIniciais.ranking) {
-                    // Já tem ranking, apenas mostra
-                    processarRankingDireto(dadosIniciais);
-                    return;
-                }
-                
-                // Se estiver no Telegram WebApp, solicita dados do bot
-                if (window.Telegram && window.Telegram.WebApp) {
-                    console.log('📤 Solicitando ranking da rodada:', rodadaNum);
-                    
-                    // Envia solicitação para o bot via sendData
-                    const requestData = {
-                        action: 'buscar_ranking_rodada',
-                        rodada_numero: parseInt(rodadaNum),
-                        timestamp: Date.now(),
-                        usuario_id: Telegram.WebApp.initDataUnsafe.user?.id || 0
-                    };
-                    
-                    Telegram.WebApp.sendData(JSON.stringify(requestData));
-                    
-                    // Mostra mensagem de aguardo
-                    document.getElementById('loading').innerHTML = `
-                        <div class="spinner"></div>
-                        <div style="margin-top: 15px; font-size: 15px; color: #64748b;">
-                            Buscando ranking da Rodada ${rodadaNum}...
-                        </div>
-                    `;
-                    
-                } else {
-                    // Modo desenvolvimento - simula dados
-                    console.log('🧪 Modo desenvolvimento - simulando dados');
-                    
-                    setTimeout(() => {
-                        // Dados de exemplo para desenvolvimento
-                        const dadosExemplo = {
-                            tipo: 'ranking_rodada_dados',
-                            rodada_info: {
-                                numero: parseInt(rodadaNum),
-                                horario_fechamento: new Date().toISOString(),
-                                status: 'fechada',
-                                total_participantes: 5
-                            },
-                            ranking: [
-                                {
-                                    posicao: 1,
-                                    usuario_id: 1,
-                                    nome: "João Silva",
-                                    total: 42,
-                                    estatisticas: { pe: 2, rc: 3, gm: 4, gv: 2, pd_usada: true },
-                                    jogos_palpitados: 8
-                                },
-                                {
-                                    posicao: 2,
-                                    usuario_id: 2,
-                                    nome: "Maria Santos",
-                                    total: 38,
-                                    estatisticas: { pe: 1, rc: 4, gm: 3, gv: 3, pd_usada: false },
-                                    jogos_palpitados: 8
-                                },
-                                {
-                                    posicao: 3,
-                                    usuario_id: 3,
-                                    nome: "Pedro Costa",
-                                    total: 35,
-                                    estatisticas: { pe: 1, rc: 3, gm: 2, gv: 4, pd_usada: true },
-                                    jogos_palpitados: 8
-                                },
-                                {
-                                    posicao: 4,
-                                    usuario_id: 4,
-                                    nome: "Ana Oliveira",
-                                    total: 28,
-                                    estatisticas: { pe: 0, rc: 5, gm: 2, gv: 1, pd_usada: false },
-                                    jogos_palpitados: 8
-                                },
-                                {
-                                    posicao: 5,
-                                    usuario_id: 5,
-                                    nome: "Carlos Lima",
-                                    total: 24,
-                                    estatisticas: { pe: 0, rc: 4, gm: 1, gv: 2, pd_usada: false },
-                                    jogos_palpitados: 8
-                                }
-                            ]
-                        };
-                        
-                        processarDadosRanking(dadosExemplo);
-                        
-                    }, 1000);
-                }
-                
-            } catch (err) {
-                console.error('❌ Erro ao carregar ranking:', err);
-                mostrarErro(err.message || 'Erro ao buscar ranking');
-            }
-        }
-        
-        // Processa os dados de ranking recebidos do bot
-        function processarDadosRanking(dados) {
-            console.log('✅ Dados de ranking recebidos:', dados);
-            
-            if (!dados) {
-                mostrarErro('Nenhum dado recebido do bot');
-                return;
-            }
-            
-            if (dados.erro) {
-                mostrarErro(dados.erro);
-                return;
-            }
-            
-            if (!dados.ranking || dados.ranking.length === 0) {
-                mostrarVazio();
-                return;
-            }
-            
-            rankingAtual = dados;
-            
-            // Atualizar informações da rodada
-            atualizarInfoRodada();
-            
-            // Atualizar lista de ranking
-            atualizarListaRanking();
-            
-            mostrarRanking();
-        }
-        
-        // Atualiza informações da rodada
-        function atualizarInfoRodada() {
-            const rodadaInfo = document.getElementById('rodadaInfo');
-            
-            let rodadaData = rankingAtual.rodada_info || {};
-            if (!rodadaData.numero && rodadaAtual) {
-                rodadaData.numero = rodadaAtual;
-            }
-            
-            let totalParticipantes = rodadaData.total_participantes || 
-                                   (rankingAtual.ranking ? rankingAtual.ranking.length : 0);
-            
-            let maxPontos = 0;
-            if (rankingAtual.ranking && rankingAtual.ranking.length > 0) {
-                maxPontos = rankingAtual.ranking[0].total || 0;
-            }
-            
-            rodadaInfo.innerHTML = `
-                <div class="rodada-left">
-                    <h2>Rodada ${rodadaData.numero || rodadaAtual}</h2>
-                    <div class="rodada-data">
-                        ${rodadaData.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
-                        ${rodadaData.horario_fechamento ? ` • ${formatarData(rodadaData.horario_fechamento)}` : ''}
-                    </div>
+            const rodadaInfoDiv = document.getElementById('rodadaInfo');
+            rodadaInfoDiv.innerHTML = `
+                <h2>Rodada ${rodadaInfo.numero || 'N/A'}</h2>
+                <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px;">
+                    ${rodadaInfo.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
                 </div>
                 <div class="rodada-stats">
                     <div class="stat-item">
-                        <div class="stat-value">${totalParticipantes}</div>
+                        <div class="stat-value">${ranking.length}</div>
                         <div class="stat-label">PARTICIPANTES</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${maxPontos}</div>
+                        <div class="stat-value">${ranking[0]?.total || 0}</div>
                         <div class="stat-label">MÁXIMO PONTOS</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${dados.timestamp ? dados.timestamp.split(' ')[0] : 'N/A'}</div>
+                        <div class="stat-label">DATA</div>
                     </div>
                 </div>
             `;
-        }
-        
-        // Atualiza lista de ranking
-        function atualizarListaRanking() {
+            
+            // Criar lista de ranking
             const rankingList = document.getElementById('rankingList');
-            
-            if (!rankingAtual.ranking || rankingAtual.ranking.length === 0) {
-                rankingList.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #64748b;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
-                        <h3 style="margin-bottom: 10px;">Nenhum participante nesta rodada</h3>
-                        <p>Aguardando palpites dos participantes...</p>
-                    </div>
-                `;
-                return;
-            }
-            
             rankingList.innerHTML = '';
             
-            rankingAtual.ranking.forEach((participante, index) => {
-                const posicao = participante.posicao || (index + 1);
+            ranking.forEach((participante, index) => {
+                const posicao = index + 1;
                 const estatisticas = participante.estatisticas || {};
                 
-                // Determina classe do pódio
+                // Classes do pódio
                 let podiumClass = '';
                 if (posicao === 1) podiumClass = 'podium-1';
                 else if (posicao === 2) podiumClass = 'podium-2';
                 else if (posicao === 3) podiumClass = 'podium-3';
                 
-                // Cor da posição
                 let posicaoClass = '';
                 if (posicao === 1) posicaoClass = 'ouro';
                 else if (posicao === 2) posicaoClass = 'prata';
                 else if (posicao === 3) posicaoClass = 'bronze';
                 
-                const rankingItem = document.createElement('div');
-                rankingItem.className = `ranking-item ${podiumClass}`;
-                rankingItem.innerHTML = `
+                const item = document.createElement('div');
+                item.className = `ranking-item ${podiumClass}`;
+                item.innerHTML = `
                     <div class="posicao ${posicaoClass}">
                         ${posicao <= 3 ? ['🥇', '🥈', '🥉'][posicao - 1] : posicao}
                     </div>
                     <div class="usuario-info">
                         <div class="usuario-nome">${participante.nome || `Participante ${participante.usuario_id}`}</div>
                         <div class="usuario-stats">
-                            ${estatisticas.pe > 0 ? `
-                                <span class="stat-badge pe">
-                                    <span>🏆</span>
-                                    <span>${estatisticas.pe} PE</span>
-                                </span>
-                            ` : ''}
-                            ${estatisticas.rc > 0 ? `
-                                <span class="stat-badge rc">
-                                    <span>✓</span>
-                                    <span>${estatisticas.rc} RC</span>
-                                </span>
-                            ` : ''}
-                            ${(estatisticas.gm || 0) > 0 ? `
-                                <span class="stat-badge gm">
-                                    <span>⚽</span>
-                                    <span>${estatisticas.gm} GM</span>
-                                </span>
-                            ` : ''}
-                            ${(estatisticas.gv || 0) > 0 ? `
-                                <span class="stat-badge gv">
-                                    <span>⚽</span>
-                                    <span>${estatisticas.gv} GV</span>
-                                </span>
-                            ` : ''}
+                            ${estatisticas.pe > 0 ? `<span class="stat-badge pe">🏆 ${estatisticas.pe} PE</span>` : ''}
+                            ${estatisticas.rc > 0 ? `<span class="stat-badge rc">✓ ${estatisticas.rc} RC</span>` : ''}
+                            ${estatisticas.gm > 0 ? `<span class="stat-badge gm">⚽ ${estatisticas.gm} GM</span>` : ''}
+                            ${estatisticas.gv > 0 ? `<span class="stat-badge gv">⚽ ${estatisticas.gv} GV</span>` : ''}
                         </div>
                     </div>
                     <div class="pontuacao">
                         ${participante.total || 0}
                     </div>
-                    <div class="pd-indicator ${estatisticas.pd_usada ? 'pd-sim' : 'pd-nao'}">
-                        ${estatisticas.pd_usada ? '2×' : '1×'}
-                    </div>
+                    ${estatisticas.pd_usada ? '<div class="pd-indicator">2×</div>' : '<div class="pd-indicator" style="background: #94a3b8;">1×</div>'}
                 `;
                 
-                rankingList.appendChild(rankingItem);
+                rankingList.appendChild(item);
             });
-        }
-        
-        // Formata data
-        function formatarData(dataString) {
-            try {
-                if (!dataString) return '';
-                
-                // Remove timezone se existir
-                let dataStr = dataString;
-                if (dataStr.includes('-03:00')) {
-                    dataStr = dataStr.replace('-03:00', '');
-                }
-                
-                const data = new Date(dataStr + 'Z');
-                if (isNaN(data.getTime())) {
-                    return dataString;
-                }
-                
-                return data.toLocaleDateString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch {
-                return dataString || '';
-            }
+            
+            // Mostrar conteúdo
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('rankingContent').style.display = 'block';
         }
         
         // Inicializar quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
-            // Se estiver no Telegram WebApp
+            // Expandir WebApp se estiver no Telegram
             if (window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.ready();
                 Telegram.WebApp.expand();
-                
-                // Configurar para receber dados do bot
-                Telegram.WebApp.onEvent('webAppDataReceived', function(eventData) {
-                    try {
-                        console.log('📥 Dados recebidos do bot via webAppDataReceived:', eventData);
-                        
-                        let dados;
-                        if (typeof eventData === 'string') {
-                            dados = JSON.parse(eventData);
-                        } else if (eventData.data) {
-                            dados = JSON.parse(eventData.data);
-                        } else {
-                            dados = eventData;
-                        }
-                        
-                        // Processa resposta do bot
-                        if (dados.tipo === 'ranking_rodada_dados' || dados.ranking) {
-                            processarDadosRanking(dados);
-                        } else if (dados.tipo === 'erro') {
-                            mostrarErro(dados.mensagem || 'Erro ao buscar ranking');
-                        } else {
-                            console.warn('⚠️ Tipo de dados desconhecido:', dados.tipo);
-                            // Tenta processar mesmo sem tipo específico
-                            if (dados.ranking) {
-                                processarDadosRanking(dados);
-                            } else {
-                                mostrarErro('Formato de resposta inesperado do bot');
-                            }
-                        }
-                        
-                    } catch (err) {
-                        console.error('❌ Erro ao processar dados do bot:', err);
-                        mostrarErro('Erro ao processar resposta do bot');
-                    }
-                });
-                
-                // Configurar botão de fechar
-                Telegram.WebApp.onEvent('viewportChanged', function(e) {
-                    if (e.isStateStable) {
-                        Telegram.WebApp.expand();
-                    }
-                });
-                
-                // Iniciar carregamento
-                setTimeout(() => {
-                    carregarDadosIniciais();
-                }, 500);
-                
-            } else {
-                console.warn('⚠️ Telegram WebApp não detectado. Modo desenvolvimento.');
-                // Em modo desenvolvimento, carrega dados após 1 segundo
-                setTimeout(() => {
-                    carregarDadosIniciais();
-                }, 1000);
             }
+            
+            // Carregar dados
+            setTimeout(carregarDados, 500);
         });
-        
-        // Função para recarregar tudo
-        window.recarregar = function() {
-            carregarDadosIniciais();
-        };
     </script>
-    
-    <!-- Biblioteca para descompressão Gzip (opcional) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 </body>
 </html>
