@@ -491,7 +491,7 @@
                 <p id="errorMessage" style="font-size: 14px;">
                     Verifique sua conexão e tente novamente.
                 </p>
-                <button onclick="carregarRanking()" style="
+                <button onclick="carregarDadosIniciais()" style="
                     margin-top: 15px;
                     padding: 10px 20px;
                     background: #dc2626;
@@ -556,6 +556,7 @@
         let rodadasDisponiveis = [];
         let rankingAtual = null;
         let rodadaAtual = null;
+        let dadosIniciais = null;
         
         // Função para voltar ao bot
         function goBack() {
@@ -599,6 +600,39 @@
             document.getElementById('emptyState').style.display = 'block';
         }
         
+        // Função para decodificar dados Gzip (se necessário)
+        function decodeGzipBase64(data) {
+            try {
+                // Se não começa com "H4sI", não está comprimido
+                if (data && !data.startsWith('H4sI')) {
+                    return data;
+                }
+                
+                // Se for pequeno, provavelmente não está comprimido
+                if (data.length < 1000) {
+                    return data;
+                }
+                
+                // Tenta descomprimir
+                const binaryString = atob(data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Usa pako para descomprimir Gzip
+                if (typeof pako !== 'undefined') {
+                    const decompressed = pako.inflate(bytes, { to: 'string' });
+                    return decompressed;
+                }
+                
+                return binaryString;
+            } catch (e) {
+                console.warn('Não foi possível descomprimir dados:', e);
+                return data;
+            }
+        }
+        
         // Carrega dados iniciais
         async function carregarDadosIniciais() {
             mostrarCarregando();
@@ -612,12 +646,32 @@
                     throw new Error('Dados não encontrados na URL');
                 }
                 
-                // Decodificar dados
-                const dados = JSON.parse(atob(dataParam));
+                // Decodificar dados Base64
+                let dadosStr;
+                try {
+                    // Tenta decode URL-safe primeiro
+                    dadosStr = decodeURIComponent(atob(dataParam));
+                } catch {
+                    // Se falhar, tenta decode normal
+                    dadosStr = atob(dataParam);
+                }
+                
+                // Tenta descomprimir se for Gzip
+                dadosStr = decodeGzipBase64(dataParam);
+                
+                // Parse dos dados
+                const dados = JSON.parse(dadosStr);
                 console.log('📥 Dados iniciais recebidos:', dados);
                 
+                dadosIniciais = dados;
+                
                 if (dados.tipo !== 'ranking_rodada') {
-                    throw new Error('Tipo de dados inválido');
+                    // Se for tipo ranking direto, processa
+                    if (dados.ranking) {
+                        processarRankingDireto(dados);
+                        return;
+                    }
+                    throw new Error('Tipo de dados inválido: ' + dados.tipo);
                 }
                 
                 rodadasDisponiveis = dados.rodadas_disponiveis || [];
@@ -635,11 +689,16 @@
                     });
                     
                     // Seleciona a primeira rodada
-                    selectRodada.value = rodadasDisponiveis[0];
                     rodadaAtual = rodadasDisponiveis[0];
+                    selectRodada.value = rodadaAtual;
                     
-                    // Carrega o ranking da primeira rodada
-                    await carregarRanking();
+                    // Se já tem ranking nos dados, exibe
+                    if (dados.ranking && dados.ranking.length > 0) {
+                        processarRankingDireto(dados);
+                    } else {
+                        // Carrega o ranking da primeira rodada
+                        await carregarRanking();
+                    }
                 } else {
                     mostrarVazio();
                 }
@@ -648,6 +707,26 @@
                 console.error('❌ Erro ao carregar dados:', err);
                 mostrarErro(err.message || 'Erro ao carregar rodadas disponíveis');
             }
+        }
+        
+        // Processa ranking que já veio nos dados iniciais
+        function processarRankingDireto(dados) {
+            console.log('✅ Processando ranking direto:', dados);
+            
+            if (!dados || !dados.ranking || dados.ranking.length === 0) {
+                mostrarVazio();
+                return;
+            }
+            
+            rankingAtual = dados;
+            
+            // Atualizar informações da rodada
+            atualizarInfoRodada();
+            
+            // Atualizar lista de ranking
+            atualizarListaRanking();
+            
+            mostrarRanking();
         }
         
         // Carrega ranking da rodada selecionada
@@ -662,23 +741,96 @@
             mostrarCarregando();
             
             try {
+                // Verifica se temos dados iniciais com ranking
+                if (dadosIniciais && dadosIniciais.ranking) {
+                    // Já tem ranking, apenas mostra
+                    processarRankingDireto(dadosIniciais);
+                    return;
+                }
+                
                 // Se estiver no Telegram WebApp, solicita dados do bot
                 if (window.Telegram && window.Telegram.WebApp) {
                     console.log('📤 Solicitando ranking da rodada:', rodadaNum);
                     
-                    // Envia solicitação para o bot
-                    Telegram.WebApp.sendData(JSON.stringify({
+                    // Envia solicitação para o bot via sendData
+                    const requestData = {
                         action: 'buscar_ranking_rodada',
                         rodada_numero: parseInt(rodadaNum),
-                        timestamp: Date.now()
-                    }));
+                        timestamp: Date.now(),
+                        usuario_id: Telegram.WebApp.initDataUnsafe.user?.id || 0
+                    };
                     
-                    // Aguarda resposta (o bot responderá via webAppDataReceived)
-                    console.log('⏳ Aguardando resposta do bot...');
+                    Telegram.WebApp.sendData(JSON.stringify(requestData));
+                    
+                    // Mostra mensagem de aguardo
+                    document.getElementById('loading').innerHTML = `
+                        <div class="spinner"></div>
+                        <div style="margin-top: 15px; font-size: 15px; color: #64748b;">
+                            Buscando ranking da Rodada ${rodadaNum}...
+                        </div>
+                    `;
                     
                 } else {
-                    // Modo desenvolvimento - mostra mensagem
-                    mostrarErro('Abra este WebApp pelo Telegram para ver os rankings reais');
+                    // Modo desenvolvimento - simula dados
+                    console.log('🧪 Modo desenvolvimento - simulando dados');
+                    
+                    setTimeout(() => {
+                        // Dados de exemplo para desenvolvimento
+                        const dadosExemplo = {
+                            tipo: 'ranking_rodada_dados',
+                            rodada_info: {
+                                numero: parseInt(rodadaNum),
+                                horario_fechamento: new Date().toISOString(),
+                                status: 'fechada',
+                                total_participantes: 5
+                            },
+                            ranking: [
+                                {
+                                    posicao: 1,
+                                    usuario_id: 1,
+                                    nome: "João Silva",
+                                    total: 42,
+                                    estatisticas: { pe: 2, rc: 3, gm: 4, gv: 2, pd_usada: true },
+                                    jogos_palpitados: 8
+                                },
+                                {
+                                    posicao: 2,
+                                    usuario_id: 2,
+                                    nome: "Maria Santos",
+                                    total: 38,
+                                    estatisticas: { pe: 1, rc: 4, gm: 3, gv: 3, pd_usada: false },
+                                    jogos_palpitados: 8
+                                },
+                                {
+                                    posicao: 3,
+                                    usuario_id: 3,
+                                    nome: "Pedro Costa",
+                                    total: 35,
+                                    estatisticas: { pe: 1, rc: 3, gm: 2, gv: 4, pd_usada: true },
+                                    jogos_palpitados: 8
+                                },
+                                {
+                                    posicao: 4,
+                                    usuario_id: 4,
+                                    nome: "Ana Oliveira",
+                                    total: 28,
+                                    estatisticas: { pe: 0, rc: 5, gm: 2, gv: 1, pd_usada: false },
+                                    jogos_palpitados: 8
+                                },
+                                {
+                                    posicao: 5,
+                                    usuario_id: 5,
+                                    nome: "Carlos Lima",
+                                    total: 24,
+                                    estatisticas: { pe: 0, rc: 4, gm: 1, gv: 2, pd_usada: false },
+                                    jogos_palpitados: 8
+                                }
+                            ]
+                        };
+                        
+                        processarDadosRanking(dadosExemplo);
+                        
+                    }, 1000);
                 }
                 
             } catch (err) {
@@ -691,8 +843,14 @@
         function processarDadosRanking(dados) {
             console.log('✅ Dados de ranking recebidos:', dados);
             
-            if (!dados || dados.sucesso === false) {
-                throw new Error(dados?.erro || 'Dados de ranking inválidos');
+            if (!dados) {
+                mostrarErro('Nenhum dado recebido do bot');
+                return;
+            }
+            
+            if (dados.erro) {
+                mostrarErro(dados.erro);
+                return;
             }
             
             if (!dados.ranking || dados.ranking.length === 0) {
@@ -714,23 +872,35 @@
         // Atualiza informações da rodada
         function atualizarInfoRodada() {
             const rodadaInfo = document.getElementById('rodadaInfo');
-            const rodada = rankingAtual.rodada_info || {};
+            
+            let rodadaData = rankingAtual.rodada_info || {};
+            if (!rodadaData.numero && rodadaAtual) {
+                rodadaData.numero = rodadaAtual;
+            }
+            
+            let totalParticipantes = rodadaData.total_participantes || 
+                                   (rankingAtual.ranking ? rankingAtual.ranking.length : 0);
+            
+            let maxPontos = 0;
+            if (rankingAtual.ranking && rankingAtual.ranking.length > 0) {
+                maxPontos = rankingAtual.ranking[0].total || 0;
+            }
             
             rodadaInfo.innerHTML = `
                 <div class="rodada-left">
-                    <h2>Rodada ${rodadaAtual}</h2>
+                    <h2>Rodada ${rodadaData.numero || rodadaAtual}</h2>
                     <div class="rodada-data">
-                        ${rodada.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
-                        ${rodada.horario_fechamento ? ` • ${formatarData(rodada.horario_fechamento)}` : ''}
+                        ${rodadaData.status === 'fechada' ? '✅ Finalizada' : '⏳ Em andamento'}
+                        ${rodadaData.horario_fechamento ? ` • ${formatarData(rodadaData.horario_fechamento)}` : ''}
                     </div>
                 </div>
                 <div class="rodada-stats">
                     <div class="stat-item">
-                        <div class="stat-value">${rankingAtual.ranking.length}</div>
+                        <div class="stat-value">${totalParticipantes}</div>
                         <div class="stat-label">PARTICIPANTES</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">${rankingAtual.ranking[0]?.total || 0}</div>
+                        <div class="stat-value">${maxPontos}</div>
                         <div class="stat-label">MÁXIMO PONTOS</div>
                     </div>
                 </div>
@@ -740,10 +910,22 @@
         // Atualiza lista de ranking
         function atualizarListaRanking() {
             const rankingList = document.getElementById('rankingList');
+            
+            if (!rankingAtual.ranking || rankingAtual.ranking.length === 0) {
+                rankingList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #64748b;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
+                        <h3 style="margin-bottom: 10px;">Nenhum participante nesta rodada</h3>
+                        <p>Aguardando palpites dos participantes...</p>
+                    </div>
+                `;
+                return;
+            }
+            
             rankingList.innerHTML = '';
             
             rankingAtual.ranking.forEach((participante, index) => {
-                const posicao = index + 1;
+                const posicao = participante.posicao || (index + 1);
                 const estatisticas = participante.estatisticas || {};
                 
                 // Determina classe do pódio
@@ -779,10 +961,16 @@
                                     <span>${estatisticas.rc} RC</span>
                                 </span>
                             ` : ''}
-                            ${(estatisticas.gm || 0) + (estatisticas.gv || 0) > 0 ? `
+                            ${(estatisticas.gm || 0) > 0 ? `
                                 <span class="stat-badge gm">
                                     <span>⚽</span>
-                                    <span>${(estatisticas.gm || 0) + (estatisticas.gv || 0)} GM/GV</span>
+                                    <span>${estatisticas.gm} GM</span>
+                                </span>
+                            ` : ''}
+                            ${(estatisticas.gv || 0) > 0 ? `
+                                <span class="stat-badge gv">
+                                    <span>⚽</span>
+                                    <span>${estatisticas.gv} GV</span>
                                 </span>
                             ` : ''}
                         </div>
@@ -827,21 +1015,18 @@
         }
         
         // Inicializar quando a página carregar
-        document.addEventListener('DOMContentLoaded', carregarDadosIniciais);
-        
-        // Se estiver no Telegram WebApp
-        if (window.Telegram && window.Telegram.WebApp) {
-            Telegram.WebApp.ready();
-            Telegram.WebApp.expand();
-            
-            // Configurar para receber dados do bot
-            Telegram.WebApp.onEvent('webAppDataReceived', function(eventData) {
-                try {
-                    console.log('📥 Dados recebidos do bot:', eventData);
-                    
-                    let dados;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Se estiver no Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Configurar para receber dados do bot
+                Telegram.WebApp.onEvent('webAppDataReceived', function(eventData) {
                     try {
-                        // Tenta diferentes formatos de dados
+                        console.log('📥 Dados recebidos do bot via webAppDataReceived:', eventData);
+                        
+                        let dados;
                         if (typeof eventData === 'string') {
                             dados = JSON.parse(eventData);
                         } else if (eventData.data) {
@@ -849,49 +1034,56 @@
                         } else {
                             dados = eventData;
                         }
-                    } catch (parseError) {
-                        console.error('❌ Erro ao parsear dados:', parseError);
-                        mostrarErro('Formato de dados inválido do bot');
-                        return;
-                    }
-                    
-                    // Processa resposta do bot
-                    if (dados.tipo === 'ranking_rodada_dados' || dados.ranking) {
-                        processarDadosRanking(dados);
-                    } else if (dados.tipo === 'erro') {
-                        mostrarErro(dados.mensagem || 'Erro ao buscar ranking');
-                    } else {
-                        console.warn('⚠️ Tipo de dados desconhecido:', dados.tipo);
-                        // Tenta processar mesmo sem tipo específico
-                        if (dados.ranking) {
+                        
+                        // Processa resposta do bot
+                        if (dados.tipo === 'ranking_rodada_dados' || dados.ranking) {
                             processarDadosRanking(dados);
+                        } else if (dados.tipo === 'erro') {
+                            mostrarErro(dados.mensagem || 'Erro ao buscar ranking');
                         } else {
-                            mostrarErro('Formato de resposta inesperado do bot');
+                            console.warn('⚠️ Tipo de dados desconhecido:', dados.tipo);
+                            // Tenta processar mesmo sem tipo específico
+                            if (dados.ranking) {
+                                processarDadosRanking(dados);
+                            } else {
+                                mostrarErro('Formato de resposta inesperado do bot');
+                            }
                         }
+                        
+                    } catch (err) {
+                        console.error('❌ Erro ao processar dados do bot:', err);
+                        mostrarErro('Erro ao processar resposta do bot');
                     }
-                    
-                } catch (err) {
-                    console.error('❌ Erro ao processar dados do bot:', err);
-                    mostrarErro('Erro ao processar resposta do bot');
-                }
-            });
-            
-            // Configurar botão de fechar
-            Telegram.WebApp.onEvent('viewportChanged', function(e) {
-                if (e.isStateStable) {
-                    Telegram.WebApp.expand();
-                }
-            });
-            
-        } else {
-            console.warn('⚠️ Telegram WebApp não detectado. Use o botão no Telegram.');
-            // Em modo desenvolvimento, mostra mensagem após 2 segundos
-            setTimeout(() => {
-                if (document.getElementById('loading').style.display !== 'none') {
-                    mostrarErro('Para ver rankings reais, abra este WebApp pelo Telegram');
-                }
-            }, 2000);
-        }
+                });
+                
+                // Configurar botão de fechar
+                Telegram.WebApp.onEvent('viewportChanged', function(e) {
+                    if (e.isStateStable) {
+                        Telegram.WebApp.expand();
+                    }
+                });
+                
+                // Iniciar carregamento
+                setTimeout(() => {
+                    carregarDadosIniciais();
+                }, 500);
+                
+            } else {
+                console.warn('⚠️ Telegram WebApp não detectado. Modo desenvolvimento.');
+                // Em modo desenvolvimento, carrega dados após 1 segundo
+                setTimeout(() => {
+                    carregarDadosIniciais();
+                }, 1000);
+            }
+        });
+        
+        // Função para recarregar tudo
+        window.recarregar = function() {
+            carregarDadosIniciais();
+        };
     </script>
+    
+    <!-- Biblioteca para descompressão Gzip (opcional) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 </body>
 </html>
