@@ -2,8 +2,39 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚽ Bolão - Palpites</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // ===== CORREÇÃO AGRESSIVA DE TELA CHEIA =====
+        // Executa imediatamente antes de carregar o resto
+        if (window.Telegram && window.Telegram.WebApp) {
+            var tg = window.Telegram.WebApp;
+            
+            // 1. Expande imediatamente
+            tg.expand();
+            
+            // 2. Força expansão novamente a cada 100ms nos primeiros 2 segundos
+            // Isso garante que se o celular estiver lento, ele expande assim que possível
+            var expandInterval = setInterval(function() {
+                tg.expand();
+                if (tg.isExpanded) {
+                    // Se já expandiu, não para imediatamente, continua forçando um pouco mais por segurança
+                    // clearInterval(expandInterval); 
+                }
+            }, 100);
+            
+            // Para o loop após 3 segundos para economizar bateria
+            setTimeout(function() { clearInterval(expandInterval); }, 3000);
+
+            // 3. Evento para garantir que fique expandido
+            tg.onEvent('viewportChanged', function() {
+                if (!tg.isExpanded) tg.expand();
+            });
+        }
+    </script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
@@ -30,28 +61,35 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
+        /* ===== CSS CORRIGIDO PARA FULLSCREEN ===== */
         html {
-            width: 100%;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* Evita rolagem no html */
         }
 
         body { 
             background: white;
             color: var(--dark);
-            min-height: 100vh; /* Permite expansão natural */
+            height: 100vh;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            overflow-y: auto; /* Rolagem apenas no body */
             overflow-x: hidden;
-            padding-top: env(safe-area-inset-top);
+            display: flex;
+            flex-direction: column;
+            position: fixed; /* Isso ajuda a fixar o viewport no Android */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .main-card {
@@ -59,11 +97,9 @@
             border-radius: 0;
             padding: 16px 12px;
             position: relative;
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
             width: 100%;
-            min-height: 100vh;
-            padding-bottom: 80px; /* Espaço extra para scroll final */
+            flex: 1; /* Ocupa o espaço restante */
+            padding-bottom: 80px; 
         }
         
         @keyframes slideUp {
@@ -539,10 +575,11 @@
             gap: 10px;
             margin-top: 20px;
             padding: 10px 0;
+            background: white;
             position: sticky;
             bottom: 0;
-            background: white;
             z-index: 100;
+            padding-bottom: 20px; /* Espaço extra para segurança em mobile */
         }
         
         .action-btn {
@@ -592,12 +629,16 @@
             text-align: center;
             padding: 60px 15px;
             width: 100%;
-            min-height: 100vh;
+            height: 100%; /* Ocupa 100% do pai */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 999;
         }
         
         .loading-spinner {
@@ -651,107 +692,15 @@
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
-            .main-card {
-                padding: 12px 8px;
-            }
-            
-            .status-section {
-                gap: 6px;
-            }
-            
-            .status-card-compact {
-                padding: 8px 6px;
-                min-height: 65px;
-            }
-            
-            .status-title-compact {
-                font-size: 11px;
-            }
-            
-            .status-content-compact {
-                font-size: 10px;
-                height: 22px;
-            }
-            
             .team-name {
                 font-size: 15px;
                 padding: 10px 12px;
                 min-height: 42px;
             }
-            
-            .score-input-container {
-                width: 38px;
-            }
-            
-            .score-input {
-                height: 36px;
-                font-size: 16px;
-            }
-            
-            .pd-star {
-                font-size: 24px;
-            }
-            
-            .pd-label {
-                font-size: 9px;
-            }
-            
-            .action-btn {
-                padding: 14px 10px;
-                font-size: 14px;
-                height: 44px;
-            }
-            
-            .scores-pd-container {
-                gap: 10px;
-                min-width: 95px;
-            }
-            
-            .score-label {
-                font-size: 11px;
-            }
-        }
-        
-        @media (max-width: 320px) {
-            .team-name {
-                font-size: 14px;
-                padding: 9px 10px;
-                min-height: 40px;
-            }
-            
-            .score-input-container {
-                width: 34px;
-            }
-            
-            .score-input {
-                height: 34px;
-                font-size: 15px;
-            }
-            
-            .pd-star {
-                font-size: 22px;
-            }
-            
-            .pd-label {
-                font-size: 8px;
-            }
-            
-            .scores-pd-container {
-                min-width: 90px;
-                gap: 8px;
-            }
-            
-            .score-label {
-                font-size: 10px;
-            }
-            
-            .games-title {
-                font-size: 16px;
-            }
-            
-            .rodada-number {
-                font-size: 22px;
-            }
+            .score-input { height: 36px; font-size: 16px; }
+            .score-input-container { width: 38px; }
+            .pd-star { font-size: 24px; }
+            .pd-label { font-size: 9px; }
         }
         
         /* ===== SCROLLBAR ===== */
@@ -767,10 +716,6 @@
             background: #c1c1c1;
             border-radius: 4px;
         }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
     </style>
 </head>
 <body>
@@ -782,7 +727,7 @@
             <div class="loading-text">Carregando rodada...</div>
         </div>
         
-        <div id="content" style="display: none;">
+        <div id="content" style="display: none; width: 100%;">
             <div class="main-card">
                 <div class="header-section">
                     <div class="rodada-number">
@@ -798,35 +743,23 @@
                 
                 <div class="status-section">
                     <div class="status-card-compact horario">
-                        <div class="status-icon-compact">
-                            <i class="fas fa-clock"></i>
-                        </div>
+                        <div class="status-icon-compact"><i class="fas fa-clock"></i></div>
                         <div class="status-title-compact">Horário</div>
-                        <div class="status-content-compact" id="txt-horario">
-                            Carregando...
-                        </div>
+                        <div class="status-content-compact" id="txt-horario">Carregando...</div>
                         <div id="time-remaining" class="time-remaining-compact" style="display: none;"></div>
                     </div>
                     
                     <div class="status-card-compact trunfo">
-                        <div class="status-icon-compact">
-                            <i class="fas fa-club"></i>
-                        </div>
+                        <div class="status-icon-compact"><i class="fas fa-club"></i></div>
                         <div class="status-title-compact">Trunfo</div>
-                        <div class="status-content-compact" id="txt-trunfo">
-                            Verificando...
-                        </div>
+                        <div class="status-content-compact" id="txt-trunfo">Verificando...</div>
                         <div id="trunfo-badge" class="status-badge-compact inactive" style="display: none;"></div>
                     </div>
                     
                     <div class="status-card-compact dobrada">
-                        <div class="status-icon-compact">
-                            <i class="fas fa-star"></i>
-                        </div>
+                        <div class="status-icon-compact"><i class="fas fa-star"></i></div>
                         <div class="status-title-compact">PD</div>
-                        <div class="status-content-compact" id="txt-dobrada">
-                            Verificando...
-                        </div>
+                        <div class="status-content-compact" id="txt-dobrada">Verificando...</div>
                         <div id="pd-badge" class="status-badge-compact inactive" style="display: none;"></div>
                     </div>
                 </div>
@@ -864,10 +797,9 @@
         </div>
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // ===== VARIÁVEIS GLOBAIS =====
-        let tg = null;
+        let tg = window.Telegram.WebApp;
         let dadosOriginais = {};
         let pdSelecionado = null;
         let palpites = [];
@@ -880,31 +812,20 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
-        function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
-            
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                
-                // Configuração padrão limpa
-                tg.expand();
+        // ===== CONFIGURAÇÃO INICIAL JS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar cores do WebApp
+            if (tg) {
                 tg.ready();
-                
-                // Configurar cores
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
-                
-                console.log("✅ Web App inicializado e expandido");
-            } else {
-                console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
+                tg.setHeaderColor('#f8f9fa'); // Cor do cabeçalho
+                tg.setBackgroundColor('#ffffff'); // Cor de fundo
             }
             
             // Iniciar carregamento
             setTimeout(() => {
                 carregarDadosRodada();
             }, 300);
-        }
+        });
 
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
@@ -920,21 +841,14 @@
                 const dt = new Date(isoStr);
                 if (isNaN(dt.getTime())) return null;
                 return dt;
-            } catch (e) {
-                console.error('❌ Erro ao parsear data:', str, e);
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
         function formatarDataHora(data) {
             if (!data) return 'Não definido';
             const dt = parseDataBrasilia(data);
             if (!dt) return 'Horário não definido';
-            const dia = dt.getDate().toString().padStart(2, '0');
-            const mes = (dt.getMonth() + 1).toString().padStart(2, '0');
-            const hora = dt.getHours().toString().padStart(2, '0');
-            const minutos = dt.getMinutes().toString().padStart(2, '0');
-            return `${dia}/${mes} ${hora}:${minutos}`;
+            return `${dt.getDate().toString().padStart(2, '0')}/${(dt.getMonth() + 1).toString().padStart(2, '0')} ${dt.getHours().toString().padStart(2, '0')}:${dt.getMinutes().toString().padStart(2, '0')}`;
         }
 
         function calcularTempoRestante(dataLimite) {
@@ -954,55 +868,38 @@
         // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosRodada() {
             try {
-                console.log("🔄 Iniciando carregamento de dados...");
                 const urlParams = new URLSearchParams(window.location.search);
                 let dadosBase64 = urlParams.get('data');
                 
                 if (!dadosBase64) {
-                    const urlString = window.location.href;
-                    const match = urlString.match(/data=([^&]+)/);
+                    // Tenta achar na URL inteira se params falhar
+                    const match = window.location.href.match(/data=([^&]+)/);
                     if (match) dadosBase64 = match[1];
                 }
                 
-                if (!dadosBase64) throw new Error("Parâmetro 'data' não encontrado na URL");
-                
-                try {
-                    let dadosJson;
-                    try {
-                        dadosJson = atob(dadosBase64);
-                    } catch (e1) {
-                        dadosBase64 = decodeURIComponent(dadosBase64);
-                        dadosJson = atob(dadosBase64);
-                    }
-                    dadosOriginais = JSON.parse(dadosJson);
-                    ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
-                    atualizarInterface();
-                } catch (decodeError) {
-                    try {
-                        dadosBase64 = dadosBase64.trim().replace(/\s/g, '');
-                        while (dadosBase64.length % 4 !== 0) dadosBase64 += '=';
-                        const dadosJson = atob(dadosBase64);
-                        dadosOriginais = JSON.parse(dadosJson);
-                        ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
-                        atualizarInterface();
-                    } catch (finalError) {
-                        throw new Error("Falha ao decodificar dados: " + finalError.message);
-                    }
+                if (!dadosBase64) {
+                    throw new Error("Dados não encontrados");
                 }
+                
+                let dadosJson;
+                try {
+                    dadosJson = atob(dadosBase64);
+                } catch (e) {
+                    dadosBase64 = decodeURIComponent(dadosBase64);
+                    dadosJson = atob(dadosBase64);
+                }
+                
+                dadosOriginais = JSON.parse(dadosJson);
+                ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
+                atualizarInterface();
+                
             } catch (e) {
-                console.error("❌ Erro crítico", e);
-                let errorMsg = "Erro ao carregar dados: " + e.message;
-                setTimeout(() => {
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('content').style.display = 'block';
-                    const errorBox = document.getElementById('error-box');
-                    const errorText = document.getElementById('error-text');
-                    errorText.innerHTML = errorMsg;
-                    errorBox.style.display = 'flex';
-                    const btnSair = document.getElementById('btn-sair');
-                    btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar';
-                    btnSair.onclick = () => { if (tg) tg.close(); };
-                }, 1000);
+                console.error("Erro", e);
+                // Se der erro, mostra alerta mas deixa a interface abrir
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.getElementById('error-box').style.display = 'flex';
+                document.getElementById('error-text').innerHTML = "Erro ao carregar: " + e.message + "<br>Tente abrir novamente.";
             }
         }
 
@@ -1011,8 +908,7 @@
             document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
             
             const horarioElem = document.getElementById('txt-horario');
-            const horarioStr = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
-            horarioElem.textContent = `${horarioStr}`;
+            horarioElem.textContent = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
             
             const tempoRestante = calcularTempoRestante(dadosOriginais.rodada.horario_fechamento);
             const tempoElem = document.getElementById('time-remaining');
@@ -1026,9 +922,9 @@
             
             horarioLimite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
             
+            // Trunfo
             const trunfoElem = document.getElementById('txt-trunfo');
             const trunfoBadge = document.getElementById('trunfo-badge');
-            
             if (dadosOriginais.trunfo) {
                 trunfoElem.textContent = "Tem trunfo!";
                 trunfoBadge.className = 'status-badge-compact active';
@@ -1041,6 +937,7 @@
                 trunfoBadge.style.display = 'inline-block';
             }
             
+            // PD
             const dobradaElem = document.getElementById('txt-dobrada');
             const pdBadge = document.getElementById('pd-badge');
             
@@ -1050,43 +947,36 @@
             ehEdicao = dadosOriginais.eh_edicao || false;
             pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
             
-            if (ehEdicao) {
-                pdSelecionado = dadosOriginais.pd_jogo_id;
-            } else if (pdJaUsada) {
-                pdSelecionado = dadosOriginais.pd_jogo_id;
-            } else {
-                pdSelecionado = null;
-            }
+            if (ehEdicao) pdSelecionado = dadosOriginais.pd_jogo_id;
+            else if (pdJaUsada) pdSelecionado = dadosOriginais.pd_jogo_id;
+            else pdSelecionado = null;
             
             if (pdJaUsouAnteriormente) {
                 dobradaElem.textContent = "Já usou PD";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'BLOQUEADO';
-                pdBadge.style.display = 'inline-block';
                 mostrarAlertaPDUsada();
             } else if (pdBloqueadaAdm) {
                 dobradaElem.textContent = "PD atribuída";
                 pdBadge.className = 'status-badge-compact blocked';
                 pdBadge.textContent = 'BLOQUEADA';
-                pdBadge.style.display = 'inline-block';
             } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
                 dobradaElem.textContent = "PD editável";
                 pdBadge.className = 'status-badge-compact active';
                 pdBadge.textContent = 'EDITÁVEL';
-                pdBadge.style.display = 'inline-block';
             } else if (pdJaUsada) {
                 dobradaElem.textContent = "PD usada";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'UTILIZADA';
-                pdBadge.style.display = 'inline-block';
                 mostrarAlertaPDUsada();
             } else {
                 dobradaElem.textContent = "Disponível";
                 pdBadge.className = 'status-badge-compact active';
                 pdBadge.textContent = 'DISPONÍVEL';
-                pdBadge.style.display = 'inline-block';
             }
+            pdBadge.style.display = 'inline-block';
             
+            // Processar palpites
             palpites = [];
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
@@ -1095,13 +985,12 @@
                     const jogoIdStr = String(jogoId);
                     if (dadosOriginais.palpites[jogoIdStr]) {
                         const palpite = dadosOriginais.palpites[jogoIdStr];
-                        const novoPalpite = {
+                        palpites.push({
                             jogo_id: jogoId,
                             mandante: palpite.mandante !== null ? palpite.mandante : '',
                             visitante: palpite.visitante !== null ? palpite.visitante : '',
                             pd: palpite.pd || false
-                        };
-                        palpites.push(novoPalpite);
+                        });
                         if (palpite.pd && pdSelecionado !== jogoId) pdSelecionado = jogoId;
                     }
                 });
@@ -1110,11 +999,14 @@
             renderizarJogos();
             verificarHorarioLimite();
             
+            // MOSTRAR CONTEUDO
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
+                // Forçar repaint uma ultima vez ao mostrar conteudo
+                if (tg) tg.expand();
                 verificarEAtualizar();
-            }, 500);
+            }, 300);
         }
 
         function mostrarAlertaPDUsada() {
@@ -1224,13 +1116,13 @@
                                 <div class="score-row">
                                     <div class="score-label">M</div>
                                     <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" value="${palpiteAtual.mandante}" oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
+                                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" value="${palpiteAtual.mandante}" oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
                                 <div class="score-row">
                                     <div class="score-label">V</div>
                                     <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" value="${palpiteAtual.visitante}" oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
+                                        <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" value="${palpiteAtual.visitante}" oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" placeholder="0" ${horarioExpirado ? 'disabled' : ''}>
                                     </div>
                                 </div>
                             </div>
@@ -1245,13 +1137,10 @@
             });
         }
 
-        // ===== FUNÇÕES DE INTERAÇÃO =====
+        // ===== INTERAÇÕES =====
         function togglePD(jogoId) {
             if (pdBloqueadaAdm || pdJaUsouAnteriormente) return;
-            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) {
-                mostrarErro("❌ Horário limite expirado!");
-                return;
-            }
+            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) return mostrarErro("❌ Horário expirado!");
             
             const isPDAtual = (pdSelecionado == jogoId);
             
@@ -1261,18 +1150,10 @@
                         pdSelecionado = null;
                         palpites.forEach(p => { if (p.jogo_id == jogoId) p.pd = false; });
                     }
-                } else {
-                    mostrarErro("❌ Não é possível remover a PD nesta situação!");
-                }
+                } else mostrarErro("❌ Não é possível remover a PD nesta situação!");
             } else {
-                if (!ehEdicao && pdJaUsada) {
-                    mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
-                    return;
-                }
-                if (ehEdicao && !pdPodeTrocar) {
-                    mostrarErro("❌ Não é possível trocar a PD nesta situação!");
-                    return;
-                }
+                if (!ehEdicao && pdJaUsada) return mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
+                if (ehEdicao && !pdPodeTrocar) return mostrarErro("❌ Não é possível trocar a PD nesta situação!");
                 
                 if (pdSelecionado !== null) {
                     if (confirm("⚠️ Transferir pontuação dobrada para este jogo?")) {
@@ -1326,11 +1207,10 @@
 
         function verificarHorarioLimite() {
             if (!horarioLimite) return;
-            const agora = new Date();
-            if (agora > horarioLimite && !dadosOriginais.trunfo) {
+            if (new Date() > horarioLimite && !dadosOriginais.trunfo) {
                 const btnConfirmar = document.getElementById('btn-confirmar');
                 btnConfirmar.disabled = true;
-                btnConfirmar.innerHTML = '<i class="fas fa-ban btn-icon"></i> Horário Encerrado';
+                btnConfirmar.innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
                 document.querySelectorAll('.score-input').forEach(input => {
                     input.disabled = true;
                     input.style.opacity = '0.6';
@@ -1349,13 +1229,12 @@
             const errorBox = document.getElementById('error-box');
             document.getElementById('error-text').textContent = mensagem;
             errorBox.style.display = 'flex';
-            setTimeout(() => { errorBox.style.display = 'none'; }, 5000);
+            setTimeout(() => { errorBox.style.display = 'none'; }, 4000);
         }
 
-        // ===== EVENTOS =====
+        // ===== ENVIO DE DADOS =====
         document.getElementById('btn-confirmar').onclick = () => {
             if (!verificarPalpitesCompletos()) return mostrarErro("⚠️ Preencha todos os palpites!");
-            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) return mostrarErro("❌ Horário limite expirado!");
             
             const dataToBot = {
                 tipo: 'enviar_palpites',
@@ -1381,20 +1260,13 @@
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btnConfirmar.disabled = true;
             
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify(dataToBot));
-            }
-            setTimeout(() => { if (tg && tg.close) tg.close(); }, 1500);
+            if (tg) tg.sendData(JSON.stringify(dataToBot));
+            setTimeout(() => { if (tg) tg.close(); }, 1000);
         };
 
         document.getElementById('btn-sair').onclick = () => {
-            if (palpites.length > 0 && !verificarPalpitesCompletos()) {
-                if (confirm("⚠️ Tem certeza que deseja sair?")) if (tg) tg.close();
-            } else if (tg) tg.close();
+            if (tg) tg.close();
         };
-
-        // Inicialização
-        window.addEventListener('DOMContentLoaded', initTelegramWebApp);
     </script>
 </body>
 </html>
