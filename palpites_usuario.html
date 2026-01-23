@@ -788,7 +788,7 @@
             const totalRodada = rodada.jtf || rodada.t || 0;
             const usadosAdm = rodada.jub || rodada.u || 0;
             const meusPalpites = rodada.jp || rodada.j || 0;
-            const comPlacar = rodada.jcp || rodada.c || 0;
+            const acertosresultados = rodada.est?.rc || 0;
             const pontos = rodada.tp || rodada.p || 0;
             const placarExato = rodada.est?.pe || 0;
             
@@ -796,7 +796,7 @@
                 totalRodada,
                 usadosAdm,
                 meusPalpites,
-                comPlacar,
+                acertosresultados,
                 pontos,
                 placarExato
             });
@@ -805,7 +805,7 @@
             document.getElementById('statTotalRodada').textContent = totalRodada;
             document.getElementById('statUsadosAdm').textContent = usadosAdm;
             document.getElementById('statMeusPalpites').textContent = meusPalpites;
-            document.getElementById('statComPlacar').textContent = comPlacar;
+            document.getElementById('statRC').textContent = acertosresultados;
             document.getElementById('statPontos').textContent = pontos;
             document.getElementById('statPE').textContent = placarExato;
             
