@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚽ Bolão - Palpites</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -30,14 +30,6 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        html, body {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        
         body { 
             background: white;
             color: var(--dark);
@@ -47,6 +39,7 @@
             justify-content: center;
             align-items: flex-start;
             overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
@@ -55,7 +48,6 @@
             max-width: 100%;
             margin: 0;
             padding: 0;
-            min-height: 100vh;
         }
         
         .main-card {
@@ -756,6 +748,23 @@
             }
         }
         
+        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
+        html, body {
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow-x: hidden !important;
+            position: fixed !important;
+        }
+        
+        #content {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        #lista-jogos {
+            width: 100% !important;
+        }
+        
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 4px;
@@ -888,26 +897,44 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA PARA ANDROID =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            
+            // PRIMEIRO: Garantir que a página ocupa 100% da tela
+            document.documentElement.style.height = '100%';
+            document.body.style.height = '100%';
+            document.body.style.width = '100%';
+            document.body.style.position = 'fixed';
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Expansão IMEDIATA - igual ao ranking_rodada.html
+                // CONFIGURAÇÕES CRÍTICAS PARA ANDROID
                 tg.ready();
-                tg.expand();
                 
-                // Configurar cores para melhor integração
-                tg.setHeaderColor('#1a237e');
-                tg.setBackgroundColor('#ffffff');
+                // Expansão forçada - tela cheia
+                try {
+                    tg.expand();
+                    
+                    // Garantir expansão completa
+                    setTimeout(() => {
+                        tg.expand();
+                    }, 100);
+                    
+                    setTimeout(() => {
+                        tg.expand();
+                    }, 500);
+                    
+                } catch (error) {
+                    console.log("⚠️ Expand já foi chamado");
+                }
                 
-                console.log("✅ Web App inicializado e expandido");
-                console.log("Telegram WebApp Version:", tg.version);
-                console.log("Is Expanded:", tg.isExpanded);
-                console.log("Viewport Height:", tg.viewportHeight);
+                // Configurar cores para se integrar
+                tg.setHeaderColor('secondary_bg_color');
+                tg.setBackgroundColor('bg_color');
                 
+                console.log("✅ Web App inicializado");
             } else {
                 console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
             }
@@ -1781,23 +1808,26 @@
             }
         };
 
-        // ===== INICIALIZAÇÃO =====
+        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
         window.addEventListener('DOMContentLoaded', function() {
-            // Inicializar Telegram WebApp de forma simples e robusta
-            if (window.Telegram && window.Telegram.WebApp) {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-                
-                // Configurar cores para melhor integração
-                Telegram.WebApp.setHeaderColor('#1a237e');
-                Telegram.WebApp.setBackgroundColor('#ffffff');
-                
-                console.log("✅ Telegram WebApp inicializado e expandido");
-            }
+            // Primeiro garantir que o corpo ocupa 100%
+            document.documentElement.style.width = '100%';
+            document.documentElement.style.height = '100%';
+            document.body.style.width = '100%';
+            document.body.style.height = '100%';
             
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 500);
+            // Inicializar Telegram WebApp
+            initTelegramWebApp();
+        });
+
+        // Backup: Se o Telegram não inicializar, tentar novamente
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (!tg && window.Telegram && window.Telegram.WebApp) {
+                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
+                    initTelegramWebApp();
+                }
+            }, 1000);
         });
     </script>
 </body>
