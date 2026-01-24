@@ -554,52 +554,88 @@
         
         // Função para decodificar dados Gzip
         async function decompressGzip(base64Data) {
-            try {
-                // Decodifica Base64
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                // Tenta descomprimir Gzip
-                const decompressed = await new Response(
-                    new Blob([bytes], { type: 'application/gzip' })
-                        .stream()
-                        .pipeThrough(new DecompressionStream('gzip'))
-                ).arrayBuffer();
-                
-                return new TextDecoder().decode(decompressed);
-            } catch (error) {
-                console.warn('Não foi possível descomprimir Gzip, usando dados brutos:', error);
-                // Fallback: assume que é JSON puro em Base64
-                return atob(base64Data);
-            }
+    try {
+        // Decodifica Base64
+        const binaryString = atob(base64Data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
         }
+        
+        // Verifica se é Gzip pelos primeiros bytes (0x1F 0x8B)
+        if (bytes[0] === 0x1F && bytes[1] === 0x8B) {
+            // É Gzip, descomprime
+            const decompressedStream = new Response(
+                new Blob([bytes], { type: 'application/gzip' })
+                    .stream()
+                    .pipeThrough(new DecompressionStream('gzip'))
+            );
+            
+            const decompressedArrayBuffer = await decompressedStream.arrayBuffer();
+            return new TextDecoder().decode(decompressedArrayBuffer);
+        } else {
+            // Não é Gzip, retorna como string
+            return new TextDecoder().decode(bytes);
+        }
+    } catch (error) {
+        console.warn('Erro ao descomprimir Gzip:', error);
+        // Fallback: tenta como string simples
+        try {
+            return atob(base64Data);
+        } catch (e) {
+            throw new Error('Não foi possível decodificar os dados');
+        }
+    }
+}
         
         // Função para obter dados da URL
         async function getDataFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const dataParam = urlParams.get('data');
+    const urlParams = new URLSearchParams(window.location.search);
+    const dataParam = urlParams.get('data');
+    
+    if (!dataParam) {
+        throw new Error('Nenhum dado encontrado na URL');
+    }
+    
+    try {
+        // 1. Primeiro, decodifica Base64
+        const binaryString = atob(dataParam);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        // 2. Tenta descomprimir como Gzip
+        try {
+            const decompressedStream = new Response(
+                new Blob([bytes], { type: 'application/gzip' })
+                    .stream()
+                    .pipeThrough(new DecompressionStream('gzip'))
+            );
             
-            if (!dataParam) {
-                throw new Error('Nenhum dado encontrado na URL');
-            }
+            const decompressedArrayBuffer = await decompressedStream.arrayBuffer();
+            const jsonString = new TextDecoder().decode(decompressedArrayBuffer);
+            return JSON.parse(jsonString);
             
+        } catch (gzipError) {
+            console.log('Não é Gzip, tentando como Base64 simples...');
+            
+            // 3. Fallback: tenta decodificar como string UTF-8 direta
             try {
-                // Tenta descomprimir Gzip
-                const jsonString = await decompressGzip(dataParam);
-                return JSON.parse(jsonString);
-            } catch (error) {
-                // Fallback: tenta decodificar como Base64 simples
-                try {
-                    const jsonString = atob(dataParam);
-                    return JSON.parse(jsonString);
-                } catch (e) {
-                    throw new Error('Não foi possível decodificar os dados: ' + e.message);
-                }
+                const text = new TextDecoder().decode(bytes);
+                return JSON.parse(text);
+            } catch (jsonError) {
+                // 4. Último fallback: tenta como string ASCII
+                const asciiString = String.fromCharCode.apply(null, bytes);
+                return JSON.parse(asciiString);
             }
         }
+        
+    } catch (error) {
+        console.error('Erro ao processar dados:', error);
+        throw new Error('Não foi possível decodificar os dados: ' + error.message);
+    }
+}
         
         // Função para formatar data
         function formatarData(dataString) {
@@ -745,53 +781,75 @@
         }
         
         // Função principal
-        async function init() {
-            try {
-                // Mostra loading
-                document.getElementById('loading').style.display = 'block';
-                
-                // Obtém dados da URL
-                const dados = await getDataFromUrl();
-                
-                // Verifica tipo de dados
-                if (dados.tipo !== 'ranking_tabela') {
-                    throw new Error(`Tipo de dados inválido: ${dados.tipo}`);
-                }
-                
-                // Configura
-                CONFIG.webappUsuarioUrl = dados.config.webapp_usuario_url;
-                CONFIG.botUsername = dados.config.bot_username;
-                CONFIG.rodadaNumero = dados.rodada.numero;
-                rankingData = dados.ranking;
-                
-                // Renderiza
-                renderizarTabela();
-                calcularEstatisticas();
-                atualizarCabecalho(dados);
-                
-                // Esconde loading
-                document.getElementById('loading').style.display = 'none';
-                
-                console.log('✅ Ranking carregado com sucesso!', {
-                    rodada: dados.rodada.numero,
-                    participantes: dados.rodada.total_participantes,
-                    top3: rankingData.slice(0, 3).map(u => u.nome)
-                });
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar ranking:', error);
-                document.getElementById('loading').innerHTML = `
-                    <div style="color: #e74c3c;">
-                        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
-                        <h4>Erro ao carregar ranking</h4>
-                        <p>${error.message}</p>
-                        <button class="btn btn-voltar" onclick="location.reload()" style="margin-top: 20px;">
-                            <i class="fas fa-redo"></i> Tentar novamente
-                        </button>
-                    </div>
-                `;
-            }
+        // Função principal
+async function init() {
+    try {
+        // Mostra loading
+        document.getElementById('loading').style.display = 'block';
+        
+        // Obtém dados da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataParam = urlParams.get('data');
+        
+        console.log('🔍 Parâmetro data da URL (primeiros 100 chars):', dataParam ? dataParam.substring(0, 100) : 'N/A');
+        console.log('🔍 Tamanho do parâmetro data:', dataParam ? dataParam.length : 0);
+        
+        const dados = await getDataFromUrl();
+        
+        console.log('✅ Dados decodificados:', {
+            tipo: dados.tipo,
+            rodada: dados.rodada?.numero,
+            participantes: dados.ranking?.length
+        });
+        
+        // Verifica tipo de dados
+        if (dados.tipo !== 'ranking_tabela') {
+            throw new Error(`Tipo de dados inválido: ${dados.tipo}`);
         }
+        
+        // Configura
+        CONFIG.webappUsuarioUrl = dados.config.webapp_usuario_url;
+        CONFIG.botUsername = dados.config.bot_username;
+        CONFIG.rodadaNumero = dados.rodada.numero;
+        rankingData = dados.ranking;
+        
+        // Renderiza
+        renderizarTabela();
+        calcularEstatisticas();
+        atualizarCabecalho(dados);
+        
+        // Esconde loading
+        document.getElementById('loading').style.display = 'none';
+        
+        console.log('✅ Ranking carregado com sucesso!', {
+            rodada: dados.rodada.numero,
+            participantes: dados.rodada.total_participantes,
+            top3: rankingData.slice(0, 3).map(u => u.nome)
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar ranking:', error);
+        console.error('Stack trace:', error.stack);
+        
+        document.getElementById('loading').innerHTML = `
+            <div style="color: #e74c3c;">
+                <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                <h4>Erro ao carregar ranking</h4>
+                <p><strong>${error.message}</strong></p>
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 0.9em;">
+                    <strong>Detalhes técnicos:</strong><br>
+                    ${error.stack || 'Nenhum detalhe adicional'}
+                </div>
+                <button class="btn btn-voltar" onclick="location.reload()" style="margin-top: 20px;">
+                    <i class="fas fa-redo"></i> Tentar novamente
+                </button>
+                <button class="btn btn-secondary" onclick="voltarParaMenu()" style="margin-top: 10px;">
+                    <i class="fas fa-arrow-left"></i> Voltar ao Bot
+                </button>
+            </div>
+        `;
+    }
+}
         
         // Inicializa quando a página carrega
         document.addEventListener('DOMContentLoaded', init);
