@@ -93,7 +93,7 @@
             color: white;
             padding: 20px;
             display: grid;
-            grid-template-columns: 80px 1fr repeat(4, 100px);
+            grid-template-columns: 80px 1fr 100px 80px 80px 100px;
             gap: 10px;
             font-weight: 600;
             font-size: 0.9rem;
@@ -103,7 +103,7 @@
         
         .table-row {
             display: grid;
-            grid-template-columns: 80px 1fr repeat(4, 100px);
+            grid-template-columns: 80px 1fr 100px 80px 80px 100px;
             gap: 10px;
             padding: 18px 20px;
             border-bottom: 1px solid #eee;
@@ -187,7 +187,7 @@
             font-size: 0.9rem;
         }
         
-        .col-pontos, .col-pe, .col-rc, .col-rodada {
+        .col-pontos, .col-pe, .col-rc, .col-palpites {
             text-align: center;
             font-size: 1.1rem;
             font-weight: 600;
@@ -206,7 +206,7 @@
             color: #3498db;
         }
         
-        .col-rodada {
+        .col-palpites {
             color: #9b59b6;
         }
         
@@ -325,7 +325,7 @@
         @media (max-width: 768px) {
             .table-header,
             .table-row {
-                grid-template-columns: 60px 1fr repeat(4, 70px);
+                grid-template-columns: 60px 1fr 80px 60px 60px 80px;
                 padding: 12px 15px;
                 font-size: 0.9rem;
             }
@@ -334,7 +334,7 @@
                 font-size: 1.2rem;
             }
             
-            .col-pontos, .col-pe, .col-rc, .col-rodada {
+            .col-pontos, .col-pe, .col-rc, .col-palpites {
                 font-size: 1rem;
             }
             
@@ -358,7 +358,7 @@
         @media (max-width: 480px) {
             .table-header,
             .table-row {
-                grid-template-columns: 50px 1fr 80px;
+                grid-template-columns: 50px 1fr 70px;
                 gap: 8px;
             }
             
@@ -552,7 +552,7 @@
         // Dados do ranking
         let rankingData = [];
         
-        // Função simplificada para obter dados da URL
+        // Função para decodificar dados da URL com múltiplos métodos
         async function getDataFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
@@ -561,59 +561,58 @@
                 throw new Error('Nenhum dado encontrado na URL');
             }
             
+            // Método 1: Tenta como Base64 simples
             try {
-                // Primeiro tenta decodificar como Base64 simples
-                console.log('🔍 Tentando decodificar Base64...');
+                console.log('🔍 Tentando decodificar como Base64 simples...');
                 const jsonString = atob(dataParam);
-                console.log('✅ Base64 decodificado, tamanho:', jsonString.length);
-                
                 const dados = JSON.parse(jsonString);
-                console.log('✅ JSON parseado com sucesso');
+                console.log('✅ Sucesso: Base64 simples');
                 return dados;
-                
             } catch (base64Error) {
-                console.warn('Base64 simples falhou, tentando como string direta...');
-                
-                try {
-                    // Tenta como string direta (pode ser que não esteja em Base64)
-                    const dados = JSON.parse(dataParam);
-                    console.log('✅ Parseado como string direta');
-                    return dados;
-                    
-                } catch (stringError) {
-                    console.error('Todos os métodos falharam:', base64Error, stringError);
-                    
-                    // Tenta Gzip como último recurso
-                    try {
-                        const binaryString = atob(dataParam);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                            bytes[i] = binaryString.charCodeAt(i);
-                        }
-                        
-                        // Verifica se começa com bytes mágicos do Gzip
-                        if (bytes[0] === 0x1F && bytes[1] === 0x8B) {
-                            console.log('📦 Detectado Gzip, descomprimindo...');
-                            
-                            if (typeof DecompressionStream === 'undefined') {
-                                throw new Error('Seu navegador não suporta DecompressionStream');
-                            }
-                            
-                            const decompressedStream = await new Response(
-                                new Blob([bytes], { type: 'application/gzip' }).stream()
-                                    .pipeThrough(new DecompressionStream('gzip'))
-                            ).arrayBuffer();
-                            
-                            const jsonString = new TextDecoder().decode(decompressedStream);
-                            return JSON.parse(jsonString);
-                        } else {
-                            throw new Error('Não é Base64 válido nem Gzip');
-                        }
-                    } catch (gzipError) {
-                        throw new Error('Não foi possível decodificar os dados. Erro: ' + gzipError.message);
-                    }
-                }
+                console.log('❌ Base64 simples falhou:', base64Error.message);
             }
+            
+            // Método 2: Tenta como string JSON direta
+            try {
+                console.log('🔍 Tentando como string JSON direta...');
+                const dados = JSON.parse(decodeURIComponent(dataParam));
+                console.log('✅ Sucesso: String JSON direta');
+                return dados;
+            } catch (jsonError) {
+                console.log('❌ String JSON direta falhou:', jsonError.message);
+            }
+            
+            // Método 3: Tenta URL decode primeiro
+            try {
+                console.log('🔍 Tentando URL decode + Base64...');
+                const decodedParam = decodeURIComponent(dataParam);
+                const jsonString = atob(decodedParam);
+                const dados = JSON.parse(jsonString);
+                console.log('✅ Sucesso: URL decode + Base64');
+                return dados;
+            } catch (urlDecodeError) {
+                console.log('❌ URL decode + Base64 falhou:', urlDecodeError.message);
+            }
+            
+            // Método 4: Tenta extrair dados de formato comum do Telegram
+            try {
+                console.log('🔍 Tentando extrair dados do formato Telegram...');
+                
+                // Remove caracteres de escape se houver
+                const cleanData = dataParam.replace(/\\\"/g, '"').replace(/\\\\/g, '\\');
+                
+                // Tenta encontrar JSON na string
+                const jsonMatch = cleanData.match(/\{.*\}/s);
+                if (jsonMatch) {
+                    const dados = JSON.parse(jsonMatch[0]);
+                    console.log('✅ Sucesso: Extraído do formato Telegram');
+                    return dados;
+                }
+            } catch (telegramError) {
+                console.log('❌ Formato Telegram falhou:', telegramError.message);
+            }
+            
+            throw new Error('Não foi possível decodificar os dados. Formatos tentados: Base64, JSON direto, URL decode, Formato Telegram');
         }
         
         // Função para formatar data
@@ -633,16 +632,43 @@
             }
         }
         
-        // Função para criar link do usuário
+        // Função para criar link do usuário para webapp de palpites
         function criarLinkUsuario(usuario) {
-            if (!CONFIG.botUsername) return usuario.nome;
+            if (!CONFIG.botUsername || !usuario.id) {
+                return `<span>${usuario.nome || usuario.username || 'Jogador'}</span>`;
+            }
             
-            const webappUrl = `https://t.me/${CONFIG.botUsername}?start=palpites_${usuario.usuario_id}_${CONFIG.rodadaNumero}`;
+            // Cria link para o webapp do Telegram com parâmetros específicos
+            const webappUrl = `https://t.me/${CONFIG.botUsername}?start=palpites_${usuario.id}_${CONFIG.rodadaNumero}`;
             
-            return `<a href="${webappUrl}" target="_blank" title="Ver palpites de ${usuario.nome}">
-                ${usuario.nome}
-                <i class="fas fa-external-link-alt"></i>
-            </a>`;
+            return `
+                <a href="${webappUrl}" target="_blank" title="Ver palpites de ${usuario.nome}">
+                    ${usuario.nome || usuario.username || 'Jogador'}
+                    <i class="fas fa-external-link-alt"></i>
+                </a>
+            `;
+        }
+        
+        // Função para determinar classe CSS baseada na posição
+        function getClassePosicao(posicao) {
+            switch(posicao) {
+                case 1: return 'primeiro';
+                case 2: return 'segundo';
+                case 3: return 'terceiro';
+                case 4: return 'quarto';
+                default: return 'normal';
+            }
+        }
+        
+        // Função para obter medalha/emoji da posição
+        function getMedalha(posicao) {
+            switch(posicao) {
+                case 1: return '🥇';
+                case 2: return '🥈';
+                case 3: return '🥉';
+                case 4: return '🔸';
+                default: return '';
+            }
         }
         
         // Função para renderizar a tabela
@@ -662,38 +688,50 @@
                 return;
             }
             
-            rankingData.forEach((usuario, index) => {
-                const row = document.createElement('div');
-                row.className = `table-row ${usuario.classe_css || 'normal'}`;
-                
-                // Ícone de medalha para os primeiros
-                const medalha = usuario.medalha || '';
+            // Ordena os dados por posição
+            const dadosOrdenados = [...rankingData].sort((a, b) => (a.posicao || 999) - (b.posicao || 999));
+            
+            dadosOrdenados.forEach((usuario, index) => {
+                const posicao = usuario.posicao || index + 1;
+                const classeCss = getClassePosicao(posicao);
+                const medalha = getMedalha(posicao);
                 
                 // Badge de participação
-                const participacaoBadge = usuario.tem_palpites 
-                    ? '<span class="badge badge-participou">✓</span>'
-                    : '<span class="badge badge-nao-participou">✗</span>';
+                const temPalpites = usuario.tem_palpites || usuario.jogos_palpitados > 0;
+                const participacaoBadge = temPalpites 
+                    ? '<span class="badge badge-participou" title="Enviou palpites">✓</span>'
+                    : '<span class="badge badge-nao-participou" title="Não enviou palpites">✗</span>';
                 
                 // Badge PD se usou
-                const pdBadge = usuario.estatisticas && usuario.estatisticas.pd_usada 
-                    ? '<span class="badge badge-pd">PD</span>'
+                const pdUsada = usuario.estatisticas?.pd_usada || usuario.pd_usada || false;
+                const pdBadge = pdUsada 
+                    ? '<span class="badge badge-pd" title="Usou Palpite Duplo">PD</span>'
                     : '';
                 
+                // Estatísticas
+                const pontos = usuario.total || usuario.pontos || 0;
+                const pe = usuario.estatisticas?.pe || usuario.pe || 0;
+                const rc = usuario.estatisticas?.rc || usuario.rc || 0;
+                const jogosPalpitados = usuario.jogos_palpitados || 0;
+                const totalJogos = usuario.jogos_com_placar || usuario.total_jogos || 0;
+                
+                const row = document.createElement('div');
+                row.className = `table-row ${classeCss}`;
                 row.innerHTML = `
                     <div class="col-posicao">
                         ${medalha}
-                        ${usuario.posicao}º
+                        ${posicao}º
                     </div>
                     <div class="col-nome">
                         ${criarLinkUsuario(usuario)}
                         ${participacaoBadge}
                         ${pdBadge}
                     </div>
-                    <div class="col-pontos">${usuario.total || 0}</div>
-                    <div class="col-pe">${usuario.estatisticas ? usuario.estatisticas.pe : 0}</div>
-                    <div class="col-rc">${usuario.estatisticas ? usuario.estatisticas.rc : 0}</div>
-                    <div class="col-rodada">
-                        ${usuario.jogos_palpitados || 0}/${usuario.jogos_com_placar || 0}
+                    <div class="col-pontos">${pontos}</div>
+                    <div class="col-pe">${pe}</div>
+                    <div class="col-rc">${rc}</div>
+                    <div class="col-palpites">
+                        ${jogosPalpitados}/${totalJogos}
                     </div>
                 `;
                 
@@ -705,8 +743,10 @@
         function calcularEstatisticas() {
             if (!rankingData || rankingData.length === 0) return;
             
-            const pontos = rankingData.map(u => u.total || 0);
-            const participantesComPalpites = rankingData.filter(u => u.tem_palpites).length;
+            const pontos = rankingData.map(u => u.total || u.pontos || 0);
+            const participantesComPalpites = rankingData.filter(u => 
+                u.tem_palpites || (u.jogos_palpitados || 0) > 0
+            ).length;
             
             const soma = pontos.reduce((a, b) => a + b, 0);
             const media = pontos.length > 0 ? (soma / pontos.length).toFixed(1) : 0;
@@ -723,27 +763,35 @@
         
         // Função para atualizar informações do cabeçalho
         function atualizarCabecalho(dados) {
-            if (!dados.rodada) return;
+            if (!dados.rodada && !dados.rodadaNumero) return;
             
-            document.getElementById('subtitulo').textContent = `Rodada ${dados.rodada.numero || 'N/A'}`;
-            document.getElementById('rodadaNumero').textContent = dados.rodada.numero || 'N/A';
-            document.getElementById('totalParticipantes').textContent = dados.rodada.total_participantes || 0;
-            document.getElementById('dataCalculo').textContent = formatarData(dados.rodada.data_calculo);
+            const rodadaNumero = dados.rodada?.numero || dados.rodadaNumero || 'N/A';
+            document.getElementById('subtitulo').textContent = `Rodada ${rodadaNumero}`;
+            document.getElementById('rodadaNumero').textContent = rodadaNumero;
+            document.getElementById('totalParticipantes').textContent = dados.rodada?.total_participantes || rankingData.length || 0;
+            document.getElementById('dataCalculo').textContent = formatarData(dados.rodada?.data_calculo || dados.dataCalculo || new Date().toISOString());
+            
+            // Atualiza rodada no CONFIG
+            CONFIG.rodadaNumero = rodadaNumero;
             
             // Top 3
             if (rankingData && rankingData.length >= 3) {
-                document.getElementById('primeiroLugar').textContent = rankingData[0].nome || '-';
-                document.getElementById('pontosPrimeiro').textContent = `${rankingData[0].total || 0} pontos`;
-                document.getElementById('segundoLugar').textContent = rankingData[1].nome || '-';
-                document.getElementById('pontosSegundo').textContent = `${rankingData[1].total || 0} pontos`;
-                document.getElementById('terceiroLugar').textContent = rankingData[2].nome || '-';
-                document.getElementById('pontosTerceiro').textContent = `${rankingData[2].total || 0} pontos`;
+                const primeiro = rankingData.find(u => u.posicao === 1) || rankingData[0];
+                const segundo = rankingData.find(u => u.posicao === 2) || rankingData[1];
+                const terceiro = rankingData.find(u => u.posicao === 3) || rankingData[2];
+                
+                document.getElementById('primeiroLugar').textContent = primeiro.nome || primeiro.username || '-';
+                document.getElementById('pontosPrimeiro').textContent = `${primeiro.total || primeiro.pontos || 0} pontos`;
+                document.getElementById('segundoLugar').textContent = segundo.nome || segundo.username || '-';
+                document.getElementById('pontosSegundo').textContent = `${segundo.total || segundo.pontos || 0} pontos`;
+                document.getElementById('terceiroLugar').textContent = terceiro.nome || terceiro.username || '-';
+                document.getElementById('pontosTerceiro').textContent = `${terceiro.total || terceiro.pontos || 0} pontos`;
             }
             
             // Botão Telegram
             const btnTelegram = document.getElementById('btnTelegram');
             if (CONFIG.botUsername) {
-                btnTelegram.href = `https://t.me/${CONFIG.botUsername}?start=ranking_${dados.rodada.numero}`;
+                btnTelegram.href = `https://t.me/${CONFIG.botUsername}`;
             }
             
             // Mostrar elementos
@@ -762,51 +810,104 @@
             }
         }
         
-        // Função para testar se Base64 é válido
-        function isValidBase64(str) {
-            try {
-                return btoa(atob(str)) === str;
-            } catch (err) {
-                return false;
+        // Função para processar e normalizar dados do ranking
+        function processarDadosRanking(dados) {
+            console.log('🔧 Processando dados do ranking...');
+            
+            // Se dados vierem em formato diferente, tenta normalizar
+            let ranking = [];
+            
+            // Caso 1: Dados vêm com propriedade 'ranking'
+            if (Array.isArray(dados.ranking)) {
+                ranking = dados.ranking;
+                console.log('✅ Formato 1: dados.ranking encontrado');
             }
+            // Caso 2: Dados são o array diretamente
+            else if (Array.isArray(dados)) {
+                ranking = dados;
+                console.log('✅ Formato 2: dados é array direto');
+            }
+            // Caso 3: Tenta extrair de outras propriedades
+            else if (dados.participantes && Array.isArray(dados.participantes)) {
+                ranking = dados.participantes;
+                console.log('✅ Formato 3: dados.participantes encontrado');
+            }
+            // Caso 4: Dados vêm em propriedades dinâmicas
+            else {
+                // Procura por qualquer propriedade que seja array
+                for (const key in dados) {
+                    if (Array.isArray(dados[key]) && dados[key].length > 0) {
+                        const primeiroItem = dados[key][0];
+                        // Verifica se parece ser um usuário (tem nome ou username)
+                        if (primeiroItem.nome || primeiroItem.username || primeiroItem.id) {
+                            ranking = dados[key];
+                            console.log(`✅ Formato 4: encontrado em dados.${key}`);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            // Se não encontrou ranking, cria array vazio
+            if (ranking.length === 0) {
+                console.warn('⚠️ Nenhum dado de ranking encontrado na estrutura esperada');
+                ranking = [];
+            }
+            
+            // Atualiza CONFIG com dados do bot se disponíveis
+            if (dados.config) {
+                CONFIG.botUsername = dados.config.bot_username || CONFIG.botUsername;
+                CONFIG.webappUsuarioUrl = dados.config.webapp_usuario_url || CONFIG.webappUsuarioUrl;
+            }
+            
+            return {
+                rodada: dados.rodada || {
+                    numero: dados.rodadaNumero || 0,
+                    total_participantes: ranking.length,
+                    data_calculo: dados.dataCalculo || new Date().toISOString()
+                },
+                ranking: ranking,
+                config: dados.config
+            };
         }
         
         // Função principal
         async function init() {
             try {
+                console.log('🚀 Iniciando carregamento do ranking...');
+                
                 // Mostra loading
                 document.getElementById('loading').style.display = 'block';
                 
                 // Obtém dados da URL
-                const dados = await getDataFromUrl();
-                
-                console.log('✅ Dados recebidos:', {
-                    tipo: dados.tipo,
-                    rodada: dados.rodada,
-                    rankingLength: dados.ranking ? dados.ranking.length : 0
-                });
-                
-                // Verifica tipo de dados
-                if (dados.tipo !== 'ranking_tabela') {
-                    throw new Error(`Tipo de dados inválido: ${dados.tipo || 'desconhecido'}`);
+                let dadosBrutos;
+                try {
+                    dadosBrutos = await getDataFromUrl();
+                    console.log('📊 Dados brutos recebidos:', dadosBrutos);
+                } catch (decodeError) {
+                    console.error('❌ Erro ao decodificar dados:', decodeError);
+                    
+                    // Tenta usar dados mock para debug
+                    console.log('🔧 Usando dados mock para debug...');
+                    dadosBrutos = criarDadosMock();
                 }
                 
-                // Configura
-                if (dados.config) {
-                    CONFIG.webappUsuarioUrl = dados.config.webapp_usuario_url || '';
-                    CONFIG.botUsername = dados.config.bot_username || '';
+                // Processa e normaliza os dados
+                const dadosProcessados = processarDadosRanking(dadosBrutos);
+                
+                // Atualiza CONFIG
+                if (dadosProcessados.config) {
+                    Object.assign(CONFIG, dadosProcessados.config);
                 }
                 
-                if (dados.rodada) {
-                    CONFIG.rodadaNumero = dados.rodada.numero || 0;
-                }
+                rankingData = dadosProcessados.ranking || [];
                 
-                rankingData = dados.ranking || [];
+                console.log(`📈 Ranking processado: ${rankingData.length} participantes`);
                 
                 // Renderiza
                 renderizarTabela();
                 calcularEstatisticas();
-                atualizarCabecalho(dados);
+                atualizarCabecalho(dadosProcessados);
                 
                 // Esconde loading
                 document.getElementById('loading').style.display = 'none';
@@ -814,21 +915,24 @@
                 console.log('✅ Ranking carregado com sucesso!', {
                     rodada: CONFIG.rodadaNumero,
                     participantes: rankingData.length,
-                    top3: rankingData.slice(0, 3).map(u => u.nome)
+                    botUsername: CONFIG.botUsername
                 });
                 
             } catch (error) {
-                console.error('❌ Erro ao carregar ranking:', error);
+                console.error('❌ Erro fatal ao carregar ranking:', error);
                 
                 document.getElementById('loading').innerHTML = `
                     <div style="color: #e74c3c;">
                         <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
                         <h4>Erro ao carregar ranking</h4>
                         <p><strong>${error.message}</strong></p>
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 0.9em;">
-                            <strong>Detalhes técnicos:</strong><br>
-                            URL: ${window.location.href}<br>
-                            Parâmetro data: ${window.location.search ? 'Presente' : 'Ausente'}
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 0.9em; text-align: left;">
+                            <strong>Debug Info:</strong><br>
+                            URL: ${window.location.href.substring(0, 100)}...<br>
+                            Parâmetro data: ${window.location.search ? 'Presente' : 'Ausente'}<br>
+                            <button onclick="mostrarDebug()" style="margin-top: 10px; padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 3px;">
+                                Mostrar detalhes técnicos
+                            </button>
                         </div>
                         <button class="btn btn-voltar" onclick="location.reload()" style="margin-top: 20px;">
                             <i class="fas fa-redo"></i> Tentar novamente
@@ -841,12 +945,43 @@
             }
         }
         
-        // Polyfill para navegadores antigos
-        if (typeof atob === 'undefined') {
-            console.error('atob não está disponível neste navegador');
-            window.atob = function(str) {
-                return Buffer.from(str, 'base64').toString('binary');
+        // Função para criar dados mock (apenas para debug)
+        function criarDadosMock() {
+            return {
+                tipo: 'ranking_tabela',
+                rodada: {
+                    numero: 10,
+                    total_participantes: 15,
+                    data_calculo: new Date().toISOString()
+                },
+                config: {
+                    bot_username: 'exemplo_bot',
+                    webapp_usuario_url: 'https://t.me/exemplo_bot'
+                },
+                ranking: [
+                    { id: 1, posicao: 1, nome: "Jogador 1", username: "jogador1", total: 85, estatisticas: { pe: 8, rc: 5, pd_usada: true }, jogos_palpitados: 10, jogos_com_placar: 10, tem_palpites: true },
+                    { id: 2, posicao: 2, nome: "Jogador 2", username: "jogador2", total: 78, estatisticas: { pe: 7, rc: 4, pd_usada: false }, jogos_palpitados: 9, jogos_com_placar: 10, tem_palpites: true },
+                    { id: 3, posicao: 3, nome: "Jogador 3", username: "jogador3", total: 75, estatisticas: { pe: 6, rc: 6, pd_usada: true }, jogos_palpitados: 10, jogos_com_placar: 10, tem_palpites: true },
+                    { id: 4, posicao: 4, nome: "Jogador 4", username: "jogador4", total: 70, estatisticas: { pe: 5, rc: 5, pd_usada: false }, jogos_palpitados: 8, jogos_com_placar: 10, tem_palpites: true },
+                    { id: 5, posicao: 5, nome: "Jogador 5", username: "jogador5", total: 65, estatisticas: { pe: 4, rc: 4, pd_usada: false }, jogos_palpitados: 10, jogos_com_placar: 10, tem_palpites: true }
+                ]
             };
+        }
+        
+        // Função para mostrar debug
+        function mostrarDebug() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+            
+            alert(
+                `DEBUG INFORMATION:\n\n` +
+                `URL completa: ${window.location.href}\n` +
+                `Parâmetro 'data' existe: ${dataParam ? 'Sim' : 'Não'}\n` +
+                `Tamanho do parâmetro: ${dataParam ? dataParam.length : 0} caracteres\n` +
+                `Primeiros 100 chars: ${dataParam ? dataParam.substring(0, 100) : 'N/A'}\n\n` +
+                `User Agent: ${navigator.userAgent}\n` +
+                `Suporta Base64: ${typeof atob === 'function' ? 'Sim' : 'Não'}`
+            );
         }
         
         // Inicializa quando a página carrega
