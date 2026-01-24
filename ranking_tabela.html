@@ -614,28 +614,43 @@
         }
 
         // Função para abrir palpites do usuário
-        function abrirPalpitesUsuario(usuarioId, rodadaNum) {
-            if (!webappUsuarioUrl) return;
-            
-            // Cria URL para Web App de palpites do usuário
-            const dadosUsuario = {
-                usuario_id: usuarioId,
-                rodada_num: rodadaNum,
-                action: 'carregar_rodada'
-            };
-            
-            const dadosString = JSON.stringify(dadosUsuario);
-            const dadosBase64 = btoa(dadosString);
-            const url = `${webappUsuarioUrl}?data=${encodeURIComponent(dadosBase64)}`;
-            
-            // Abre no Telegram Web App
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.openLink(url);
-            } else {
-                window.open(url, '_blank');
-            }
+         function abrirPalpitesUsuario(usuarioId, rodadaNum) {
+        if (!window.Telegram || !window.Telegram.WebApp) {
+            alert("Por favor, abra pelo Telegram!");
+            return;
         }
-
+        
+        // Prepara dados para enviar ao bot
+        const dadosParaBot = {
+            action: 'carregar_rodada',
+            usuario_id: usuarioId,
+            rodada_num: rodadaNum,
+            chat_id: window.Telegram.WebApp.initDataUnsafe.user?.id || null,
+            timestamp: Date.now()
+        };
+        
+        // Envia dados para o bot via Web App Data
+        try {
+            // Método 1: Envia dados e fecha Web App
+            window.Telegram.WebApp.sendData(JSON.stringify(dadosParaBot));
+            
+            // Aguarda um pouco e fecha
+            setTimeout(() => {
+                window.Telegram.WebApp.close();
+            }, 300);
+            
+        } catch (error) {
+            console.error('Erro ao enviar dados:', error);
+            
+            // Método alternativo: Abre URL do bot com parâmetros
+            const botUsername = 'seu_bot_username'; // Substitua pelo username real do bot
+            const params = `start=palpites_${usuarioId}_${rodadaNum}`;
+            const telegramUrl = `https://t.me/${botUsername}?${params}`;
+            
+            window.Telegram.WebApp.openTelegramLink(telegramUrl);
+            window.Telegram.WebApp.close();
+        }
+    }
         // Função para atualizar ranking
         function atualizarRanking() {
             location.reload();
