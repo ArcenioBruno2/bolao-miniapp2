@@ -418,6 +418,8 @@
         tbody tr:nth-child(n+11) { animation-delay: 1.1s; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Biblioteca pako para descompressão Gzip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -490,150 +492,203 @@
     </div>
 
     <script>
-        // Função para descomprimir dados (mesma do ranking_rodada.html)
-        function decompressData(compressedData) {
+        // Função para decodificar dados da URL
+        function decodeDataFromURL() {
             try {
-                // Adiciona padding se necessário
-                while (compressedData.length % 4) {
-                    compressedData += '=';
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataParam = urlParams.get('data');
+                
+                if (!dataParam) {
+                    console.error('Nenhum parâmetro "data" encontrado na URL');
+                    return null;
                 }
+
+                console.log('Dados recebidos (primeiros 100 chars):', dataParam.substring(0, 100));
+
+                // Tenta diferentes métodos de decodificação
                 
-                // Decodifica Base64
-                const binaryData = atob(compressedData.replace(/-/g, '+').replace(/_/g, '/'));
-                
-                // Converte para Uint8Array
-                const bytes = new Uint8Array(binaryData.length);
-                for (let i = 0; i < binaryData.length; i++) {
-                    bytes[i] = binaryData.charCodeAt(i);
-                }
-                
-                // Descomprime Gzip
-                const decompressed = pako.inflate(bytes, { to: 'string' });
-                return JSON.parse(decompressed);
-            } catch (error) {
-                console.error('Erro ao descomprimir:', error);
-                
-                // Fallback: tenta como JSON simples
+                // Método 1: Descompressão Gzip + Base64
                 try {
-                    return JSON.parse(decompressed);
-                } catch {
-                    // Se falhar, tenta decodificar Base64 direto
-                    try {
-                        const decoded = atob(compressedData);
-                        return JSON.parse(decoded);
-                    } catch (e) {
-                        console.error('Todos os métodos de descompressão falharam:', e);
-                        return null;
+                    // Adiciona padding se necessário
+                    let base64Data = dataParam;
+                    while (base64Data.length % 4) {
+                        base64Data += '=';
                     }
+                    
+                    // Decodifica Base64 para string binária
+                    const binaryString = atob(base64Data.replace(/-/g, '+').replace(/_/g, '/'));
+                    
+                    // Converte para Uint8Array
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    // Descomprime Gzip
+                    const decompressed = pako.inflate(bytes, { to: 'string' });
+                    const dados = JSON.parse(decompressed);
+                    console.log('✅ Dados descomprimidos via Gzip:', dados);
+                    return dados;
+                } catch (gzipError) {
+                    console.log('Gzip falhou, tentando método 2...');
                 }
-            }
-        }
 
-        // Função para carregar dados da URL
-        async function loadRankingData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const compressedData = urlParams.get('data');
-            
-            if (!compressedData) {
-                showError('Nenhum dado de ranking encontrado na URL.');
-                return;
-            }
-            
-            try {
-                // Carrega a biblioteca pako para descompressão Gzip
-                if (typeof pako === 'undefined') {
-                    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js');
+                // Método 2: Base64 direto
+                try {
+                    const decoded = atob(dataParam);
+                    const dados = JSON.parse(decoded);
+                    console.log('✅ Dados decodificados via Base64 direto:', dados);
+                    return dados;
+                } catch (base64Error) {
+                    console.log('Base64 direto falhou, tentando método 3...');
                 }
-                
-                // Descomprime dados
-                const dados = decompressData(compressedData);
-                
-                if (!dados) {
-                    showError('Não foi possível carregar os dados do ranking.');
-                    return;
+
+                // Método 3: URL decode + JSON parse
+                try {
+                    const decoded = decodeURIComponent(dataParam);
+                    const dados = JSON.parse(decoded);
+                    console.log('✅ Dados decodificados via URL decode:', dados);
+                    return dados;
+                } catch (urlError) {
+                    console.log('URL decode falhou...');
                 }
-                
-                // Verifica se é ranking geral
-                if (dados.t === 'rg' || (dados.tipo && dados.tipo === 'ranking_geral')) {
-                    displayRankingGeral(dados);
-                } else {
-                    showError('Tipo de ranking não reconhecido.');
+
+                // Método 4: Tenta como JSON direto (pode já estar decodificado)
+                try {
+                    const dados = JSON.parse(dataParam);
+                    console.log('✅ Dados parseados como JSON direto:', dados);
+                    return dados;
+                } catch (jsonError) {
+                    console.log('JSON direto falhou...');
                 }
+
+                return null;
                 
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                showError('Erro ao processar dados do ranking.');
+                console.error('Erro ao decodificar dados:', error);
+                return null;
             }
         }
 
-        // Função para carregar script dinamicamente
-        function loadScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-
-        // Função para exibir ranking geral
-        function displayRankingGeral(dados) {
+        // Função para exibir ranking
+        function displayRanking(dados) {
             const loader = document.getElementById('loader');
             const container = document.getElementById('ranking-container');
             const noParticipants = document.getElementById('no-participants');
             
+            // Verifica se tem dados válidos
+            if (!dados || (!dados.ranking && !dados.rk)) {
+                loader.style.display = 'none';
+                noParticipants.style.display = 'block';
+                noParticipants.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Erro nos dados</h3>
+                    <p>Não foi possível carregar o ranking. Dados inválidos.</p>
+                    <p><small>${JSON.stringify(dados).substring(0, 100)}...</small></p>
+                `;
+                return;
+            }
+
             // Determina estrutura dos dados
             let ranking = [];
             let info = {};
-            
+            let formato = '';
+
             if (dados.t === 'rg') {
-                // Formato otimizado
+                // Formato otimizado para ranking geral
+                formato = 'otimizado';
                 ranking = dados.rk || [];
-                info = dados.info || {};
-            } else {
+                info = dados.rg || {};
+            } else if (dados.ranking) {
                 // Formato completo
-                ranking = dados.ranking || [];
-                info = dados.info || {};
+                formato = 'completo';
+                ranking = dados.ranking;
+                info = dados.rodada_info || {};
+            } else {
+                // Formato desconhecido - tenta processar de qualquer maneira
+                formato = 'desconhecido';
+                if (Array.isArray(dados)) {
+                    ranking = dados;
+                } else if (dados.rk) {
+                    ranking = dados.rk;
+                    info = dados.rg || {};
+                }
             }
-            
+
+            console.log(`Formato: ${formato}, Ranking length: ${ranking.length}`);
+
             if (!ranking || ranking.length === 0) {
                 loader.style.display = 'none';
                 noParticipants.style.display = 'block';
+                noParticipants.innerHTML = `
+                    <i class="fas fa-users-slash"></i>
+                    <h3>Nenhum participante encontrado</h3>
+                    <p>Ainda não há dados para exibir o ranking.</p>
+                `;
                 return;
             }
-            
+
             // Atualiza estatísticas
             updateStats(ranking, info);
-            
+
             // Exibe tabela
             loader.style.display = 'none';
             container.style.display = 'block';
-            
+
             // Preenche tabela
             const tbody = document.getElementById('ranking-body');
             tbody.innerHTML = '';
-            
+
             ranking.forEach((participante, index) => {
                 let posicao, nome, pontos, pe, rc;
                 
                 // Detecta formato dos dados
                 if (Array.isArray(participante)) {
-                    // Formato otimizado: [posicao, nome, pontos, pe, rc, total_palpites]
-                    posicao = participante[0];
-                    nome = participante[1];
-                    pontos = participante[2];
-                    pe = participante[3];
-                    rc = participante[4];
-                } else {
+                    // Formato otimizado: [posicao, nome, pontos, pe, rc, ...]
+                    // Verifica se é o formato correto para ranking geral
+                    if (participante.length >= 5) {
+                        posicao = participante[0] || (index + 1);
+                        nome = participante[1] || `Participante ${index + 1}`;
+                        pontos = participante[2] || 0;
+                        pe = participante[3] || 0;
+                        rc = participante[4] || 0;
+                    } else {
+                        // Formato diferente do esperado
+                        posicao = index + 1;
+                        nome = `Participante ${index + 1}`;
+                        pontos = participante[0] || 0;
+                        pe = 0;
+                        rc = 0;
+                    }
+                } else if (typeof participante === 'object') {
                     // Formato completo
-                    posicao = participante.posicao || index + 1;
-                    nome = participante.nome || 'Participante';
-                    pontos = participante.total_geral || 0;
-                    pe = participante.estatisticas_gerais?.pe || 0;
-                    rc = participante.estatisticas_gerais?.rc || 0;
+                    posicao = participante.posicao || (index + 1);
+                    nome = participante.nome || `Participante ${index + 1}`;
+                    pontos = participante.total || participante.total_geral || 0;
+                    
+                    // Extrai estatísticas
+                    if (participante.estatisticas) {
+                        pe = participante.estatisticas.pe || 0;
+                        rc = participante.estatisticas.rc || 0;
+                    } else if (participante.estatisticas_gerais) {
+                        pe = participante.estatisticas_gerais.pe || 0;
+                        rc = participante.estatisticas_gerais.rc || 0;
+                    } else if (participante.e) {
+                        pe = participante.e.pe || 0;
+                        rc = participante.e.rc || 0;
+                    } else {
+                        pe = 0;
+                        rc = 0;
+                    }
+                } else {
+                    // Formato inesperado
+                    posicao = index + 1;
+                    nome = `Participante ${index + 1}`;
+                    pontos = participante || 0;
+                    pe = 0;
+                    rc = 0;
                 }
-                
+
                 const row = document.createElement('tr');
                 
                 // Adiciona classes para top 4
@@ -652,6 +707,8 @@
                     posicaoHTML = '<div class="medal bronze">🥉</div>';
                 } else if (posicao === 4) {
                     posicaoHTML = '<div class="medal fourth">4</div>';
+                } else {
+                    posicaoHTML = `<div style="font-weight: 800; color: #2c3e50;">${posicao}º</div>`;
                 }
                 
                 row.innerHTML = `
@@ -670,10 +727,11 @@
         function updateStats(ranking, info) {
             // Timestamp
             const timestampEl = document.getElementById('timestamp');
-            if (info.ts) {
-                timestampEl.textContent = info.ts;
+            if (info.ts || info.timestamp) {
+                timestampEl.textContent = info.ts || info.timestamp;
             } else {
-                timestampEl.textContent = new Date().toLocaleString('pt-BR');
+                const now = new Date();
+                timestampEl.textContent = now.toLocaleString('pt-BR');
             }
             
             // Total de participantes
@@ -683,7 +741,12 @@
             // Com pontos
             const withPointsEl = document.getElementById('with-points');
             const withPoints = ranking.filter(p => {
-                const pontos = Array.isArray(p) ? p[2] : (p.total_geral || 0);
+                let pontos = 0;
+                if (Array.isArray(p)) {
+                    pontos = p[2] || 0;
+                } else if (typeof p === 'object') {
+                    pontos = p.total || p.total_geral || 0;
+                }
                 return pontos > 0;
             }).length;
             withPointsEl.textContent = withPoints;
@@ -691,24 +754,35 @@
             // Maior pontuação
             const topScoreEl = document.getElementById('top-score');
             if (ranking.length > 0) {
-                const primeiro = ranking[0];
-                const topScore = Array.isArray(primeiro) ? primeiro[2] : (primeiro.total_geral || 0);
+                let primeiro = ranking[0];
+                let topScore = 0;
+                
+                if (Array.isArray(primeiro)) {
+                    topScore = primeiro[2] || 0;
+                } else if (typeof primeiro === 'object') {
+                    topScore = primeiro.total || primeiro.total_geral || 0;
+                }
+                
                 topScoreEl.textContent = topScore;
             } else {
                 topScoreEl.textContent = '0';
             }
         }
 
-        // Função para exibir erro
+        // Função para escapar HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Função para mostrar erro
         function showError(message) {
             const loader = document.getElementById('loader');
-            const container = document.getElementById('ranking-container');
             const noParticipants = document.getElementById('no-participants');
             
             loader.style.display = 'none';
-            container.style.display = 'none';
             noParticipants.style.display = 'block';
-            
             noParticipants.innerHTML = `
                 <i class="fas fa-exclamation-triangle"></i>
                 <h3>Erro ao carregar ranking</h3>
@@ -721,15 +795,32 @@
             `;
         }
 
-        // Função para escapar HTML (segurança)
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        // Função principal para carregar os dados
+        function loadRanking() {
+            try {
+                console.log('Iniciando carregamento do ranking...');
+                
+                // Decodifica dados da URL
+                const dados = decodeDataFromURL();
+                
+                if (!dados) {
+                    showError('Não foi possível carregar os dados do ranking.');
+                    return;
+                }
+                
+                console.log('Dados decodificados:', dados);
+                
+                // Exibe os dados
+                displayRanking(dados);
+                
+            } catch (error) {
+                console.error('Erro ao carregar ranking:', error);
+                showError('Erro ao processar os dados do ranking: ' + error.message);
+            }
         }
 
         // Inicializa quando a página carrega
-        document.addEventListener('DOMContentLoaded', loadRankingData);
+        document.addEventListener('DOMContentLoaded', loadRanking);
     </script>
 </body>
 </html>
