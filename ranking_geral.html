@@ -513,6 +513,48 @@
         // ==============================================
         // FUNÇÕES DE UTILIDADE
         // ==============================================
+
+        async function carregarDadosDaSessao(sessionId, userId) {
+    try {
+        console.log(`🔄 Tentando carregar dados da sessão: ${sessionId}`);
+        
+        // Envia requisição para o bot via Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            
+            // Envia solicitação para obter dados da sessão
+            webApp.sendData(JSON.stringify({
+                action: 'get_ranking_session',
+                session_id: sessionId,
+                user_id: userId
+            }));
+            
+            // Aguarda resposta (será tratada no bot)
+            return new Promise((resolve) => {
+                webApp.onEvent('message', (data) => {
+                    try {
+                        const response = JSON.parse(data);
+                        if (response.action === 'ranking_data' && response.session_id === sessionId) {
+                            resolve(response.data);
+                        }
+                    } catch (e) {
+                        console.error('Erro ao processar resposta:', e);
+                        resolve(null);
+                    }
+                });
+                
+                // Timeout após 5 segundos
+                setTimeout(() => resolve(null), 5000);
+            });
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Erro ao carregar sessão:', error);
+        return null;
+    }
+}
+
         
         function formatNumber(num) {
             if (num === undefined || num === null) return '0';
@@ -821,36 +863,58 @@
         }
         
         async function loadRankingData() {
-            try {
-                console.log("🚀 Iniciando carregamento do ranking geral...");
-                
-                // 1. Tenta obter dados do Telegram Web App
-                const telegramData = await loadDataFromTelegram();
-                
-                // 2. Processa os dados
-                const processedData = await processData(telegramData);
-                rankingData = processedData;
-                
-                // 3. Ordena por posição
-                const ranking = processedData.rk || [];
-                ranking.sort((a, b) => a.p - b.p);
-                
-                // 4. Renderiza tudo
-                const top3 = ranking.slice(0, 3);
-                renderPodium(top3);
-                renderStats(ranking, processedData);
-                renderRankingList(ranking);
-                
-                console.log("✅ Ranking carregado e renderizado com sucesso!");
-                
-                // 5. Adiciona botão de atualização
-                addUpdateButton();
-                
-            } catch (error) {
-                console.error('❌ Erro fatal:', error);
-                renderError(error.message || 'Não foi possível carregar o ranking geral. Tente novamente mais tarde.');
+    try {
+        console.log("🚀 Iniciando carregamento do ranking geral...");
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session');
+        const userId = urlParams.get('user');
+        
+        let dadosProcessados = null;
+        
+        // 1. Tenta carregar por sessão primeiro
+        if (sessionId && userId) {
+            console.log(`📥 Modo sessão ativado: ${sessionId}`);
+            dadosProcessados = await carregarDadosDaSessao(sessionId, userId);
+        }
+        
+        // 2. Se não conseguiu por sessão, tenta dados diretos da URL
+        if (!dadosProcessados) {
+            const dataParam = urlParams.get('data');
+            if (dataParam) {
+                console.log("📥 Modo URL direta ativado");
+                dadosProcessados = await processData({ data: dataParam });
             }
         }
+        
+        // 3. Se ainda não tem dados, tenta Telegram Web App
+        if (!dadosProcessados && window.Telegram && window.Telegram.WebApp) {
+            console.log("📥 Modo Telegram Web App ativado");
+            const telegramData = await loadDataFromTelegram();
+            dadosProcessados = await processData(telegramData);
+        }
+        
+        // 4. Se conseguiu dados, renderiza
+        if (dadosProcessados) {
+            const ranking = dadosProcessados.rk || [];
+            ranking.sort((a, b) => a.p - b.p);
+            
+            const top3 = ranking.slice(0, 3);
+            renderPodium(top3);
+            renderStats(ranking, dadosProcessados);
+            renderRankingList(ranking);
+            addUpdateButton();
+            
+            console.log("✅ Ranking carregado e renderizado!");
+        } else {
+            throw new Error('Não foi possível carregar os dados do ranking');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro fatal:', error);
+        renderError(error.message || 'Não foi possível carregar o ranking geral. Tente novamente mais tarde.');
+    }
+}
         
         function addUpdateButton() {
             // Remove botão anterior se existir
