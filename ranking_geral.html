@@ -6,6 +6,7 @@
     <title>🏆 Ranking Geral - Bolão</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -260,16 +261,6 @@
             opacity: 0.5;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
         .podium {
             display: flex;
             justify-content: center;
@@ -324,6 +315,55 @@
             font-size: 1.5rem;
             font-weight: bold;
             color: #000;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error-container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            margin: 20px 0;
+        }
+        
+        .error-container h3 {
+            color: #ff5555;
+            margin-bottom: 15px;
+        }
+        
+        .error-container p {
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 12px 24px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
         /* Responsividade */
@@ -434,7 +474,7 @@
             </div>
         </div>
         
-        <div class="podium" id="podium"></div>
+        <div id="podiumContainer"></div>
         
         <div class="ranking-container">
             <div class="ranking-header">
@@ -463,48 +503,22 @@
     </div>
 
     <script>
-        // Função para descomprimir dados Gzip
-        function decompressData(base64Data) {
-            try {
-                // Remove padding se existir
-                base64Data = base64Data.replace(/-/g, '+').replace(/_/g, '/');
-                while (base64Data.length % 4) {
-                    base64Data += '=';
-                }
-                
-                // Decodifica Base64
-                const binaryString = atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                // Descomprime Gzip
-                const decompressed = pako.inflate(bytes, { to: 'string' });
-                return JSON.parse(decompressed);
-            } catch (error) {
-                console.error('Erro ao descomprimir:', error);
-                // Tenta interpretar como JSON direto (fallback)
-                try {
-                    return JSON.parse(atob(base64Data));
-                } catch (e) {
-                    throw new Error('Não foi possível descomprimir os dados');
-                }
-            }
-        }
+        // ==============================================
+        // CONFIGURAÇÃO INICIAL
+        // ==============================================
         
-        // Função para obter parâmetros da URL
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
+        let telegramWebApp = null;
+        let rankingData = null;
         
-        // Função para formatar número com separador de milhar
+        // ==============================================
+        // FUNÇÕES DE UTILIDADE
+        // ==============================================
+        
         function formatNumber(num) {
+            if (num === undefined || num === null) return '0';
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
         
-        // Função para obter classe CSS da posição
         function getPositionClass(position) {
             if (position === 1) return 'position-1';
             if (position === 2) return 'position-2';
@@ -513,12 +527,77 @@
             return 'position-other';
         }
         
-        // Função para renderizar o pódio
+        // ==============================================
+        // FUNÇÕES DE DESCOMPRESSÃO
+        // ==============================================
+        
+        function decompressGzipData(base64Data) {
+            try {
+                console.log("Iniciando descompressão Gzip...");
+                
+                // Remove padding se existir
+                let dataToDecode = base64Data.replace(/-/g, '+').replace(/_/g, '/');
+                while (dataToDecode.length % 4) {
+                    dataToDecode += '=';
+                }
+                
+                console.log("Tamanho dos dados Base64:", dataToDecode.length);
+                
+                // Decodifica Base64
+                const binaryString = atob(dataToDecode);
+                
+                // Converte para Uint8Array
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                console.log("Bytes para descompressão:", bytes.length);
+                
+                // Descomprime Gzip
+                const decompressed = pako.inflate(bytes, { to: 'string' });
+                console.log("✅ Dados descomprimidos com sucesso");
+                
+                return JSON.parse(decompressed);
+                
+            } catch (error) {
+                console.error('Erro na descompressão Gzip:', error);
+                throw new Error('Falha na descompressão dos dados');
+            }
+        }
+        
+        function decodeBase64Data(base64Data) {
+            try {
+                console.log("Tentando decodificar Base64 simples...");
+                
+                let dataToDecode = base64Data.replace(/-/g, '+').replace(/_/g, '/');
+                while (dataToDecode.length % 4) {
+                    dataToDecode += '=';
+                }
+                
+                const decodedString = atob(dataToDecode);
+                console.log("✅ Dados Base64 decodificados");
+                
+                return JSON.parse(decodedString);
+                
+            } catch (error) {
+                console.error('Erro na decodificação Base64:', error);
+                throw new Error('Falha na decodificação dos dados');
+            }
+        }
+        
+        // ==============================================
+        // FUNÇÕES DE RENDERIZAÇÃO
+        // ==============================================
+        
         function renderPodium(top3) {
-            const podiumContainer = document.getElementById('podium');
-            if (!podiumContainer || !top3 || top3.length === 0) return;
+            const container = document.getElementById('podiumContainer');
+            if (!container || !top3 || top3.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
             
-            let podiumHTML = '';
+            let podiumHTML = '<div class="podium">';
             
             // Ordena para posicionamento visual: 2º -> 1º -> 3º
             const podiumOrder = [];
@@ -530,21 +609,32 @@
                 podiumHTML += `
                     <div class="podium-item podium-${participant.position}">
                         <div class="podium-position">${participant.position}º</div>
-                        <div class="podium-name" title="${participant.n}">${participant.n.length > 15 ? participant.n.substring(0, 12) + '...' : participant.n}</div>
+                        <div class="podium-name" title="${participant.n}">
+                            ${participant.n.length > 15 ? participant.n.substring(0, 12) + '...' : participant.n}
+                        </div>
                         <div class="podium-points">${formatNumber(participant.tg)}</div>
                     </div>
                 `;
             });
             
-            podiumContainer.innerHTML = podiumHTML;
+            podiumHTML += '</div>';
+            container.innerHTML = podiumHTML;
         }
         
-        // Função para renderizar estatísticas gerais
         function renderStats(ranking, data) {
+            if (!ranking || ranking.length === 0) {
+                document.getElementById('totalParticipantes').textContent = '0';
+                document.getElementById('totalRodadas').textContent = '0';
+                document.getElementById('melhorPontuacao').textContent = '0';
+                document.getElementById('totalPE').textContent = '0';
+                document.getElementById('dataAtualizacao').textContent = '--/--/---- --:--';
+                return;
+            }
+            
             const stats = {
                 totalParticipantes: ranking.length,
-                totalRodadas: data?.rg?.tp || 0,
-                melhorPontuacao: ranking.length > 0 ? ranking[0].tg : 0,
+                totalRodadas: data?.rg?.tp || ranking[0]?.tr || 0,
+                melhorPontuacao: ranking[0]?.tg || 0,
                 totalPE: ranking.reduce((sum, p) => sum + (p.e?.pe || 0), 0),
                 dataAtualizacao: data?.rg?.ts || new Date().toLocaleString('pt-BR')
             };
@@ -556,7 +646,6 @@
             document.getElementById('dataAtualizacao').textContent = stats.dataAtualizacao;
         }
         
-        // Função para renderizar a lista de ranking
         function renderRankingList(ranking) {
             const container = document.getElementById('rankingList');
             
@@ -564,7 +653,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-chart-line"></i>
-                        <h3>Nenhum dado disponível</h3>
+                        <h3>Nenhum participante encontrado</h3>
                         <p>O ranking geral será gerado quando houver rodadas com placares.</p>
                     </div>
                 `;
@@ -573,7 +662,7 @@
             
             let html = '';
             
-            ranking.forEach(participant => {
+            ranking.forEach((participant, index) => {
                 const positionClass = getPositionClass(participant.p);
                 const peCount = participant.e?.pe || 0;
                 const rcCount = participant.e?.rc || 0;
@@ -582,11 +671,15 @@
                 const pdCount = participant.e?.pd || 0;
                 
                 html += `
-                    <div class="ranking-row ${positionClass}">
+                    <div class="ranking-row ${positionClass}" style="animation-delay: ${index * 0.05}s">
                         <div class="position-number">${participant.p}º</div>
                         <div class="player-name" title="${participant.n}">
                             ${participant.n}
-                            ${pdCount > 0 ? `<span style="color:#fc00ff; font-size:0.8rem; margin-left:8px;" title="${pdCount} PD usada(s)"><i class="fas fa-bolt"></i> ${pdCount}</span>` : ''}
+                            ${pdCount > 0 ? 
+                                `<span style="color:#fc00ff; font-size:0.8rem; margin-left:8px;" title="${pdCount} PD usada(s)">
+                                    <i class="fas fa-bolt"></i> ${pdCount}
+                                </span>` 
+                                : ''}
                         </div>
                         <div class="stats">
                             <div class="points">${formatNumber(participant.tg)}</div>
@@ -612,76 +705,236 @@
             container.innerHTML = html;
         }
         
-        // Função principal para carregar e exibir os dados
-        async function loadRankingData() {
+        function renderError(message) {
+            const container = document.getElementById('rankingList');
+            container.innerHTML = `
+                <div class="error-container">
+                    <i class="fas fa-exclamation-triangle fa-2x" style="color:#ff5555; margin-bottom:15px;"></i>
+                    <h3>Erro ao carregar ranking</h3>
+                    <p>${message}</p>
+                    <button class="retry-btn" onclick="location.reload()">
+                        <i class="fas fa-redo"></i> Tentar Novamente
+                    </button>
+                </div>
+            `;
+        }
+        
+        // ==============================================
+        // FUNÇÕES PRINCIPAIS
+        // ==============================================
+        
+        async function loadDataFromTelegram() {
             try {
-                const encodedData = getUrlParameter('data');
+                console.log("🔄 Tentando obter dados do Telegram Web App...");
                 
-                if (!encodedData) {
-                    throw new Error('Nenhum dado fornecido na URL');
+                if (!window.Telegram || !window.Telegram.WebApp) {
+                    throw new Error('Telegram Web App não disponível');
                 }
                 
-                // Descomprime e processa os dados
-                const data = decompressData(encodedData);
+                telegramWebApp = window.Telegram.WebApp;
+                telegramWebApp.ready();
+                telegramWebApp.expand();
                 
-                // Verifica se é ranking geral
-                if (data.t !== 'ranking_geral') {
-                    throw new Error('Tipo de dados inválido');
-                }
+                console.log("✅ Telegram Web App inicializado");
                 
-                const ranking = data.rk || [];
-                
-                // Ordena por posição (já deve vir ordenado do backend, mas garantimos)
-                ranking.sort((a, b) => a.p - b.p);
-                
-                // Renderiza pódio com os 3 primeiros
-                const top3 = ranking.slice(0, 3);
-                renderPodium(top3);
-                
-                // Renderiza estatísticas
-                renderStats(ranking, data);
-                
-                // Renderiza lista completa
-                renderRankingList(ranking);
-                
-                // Adiciona efeito de scroll suave
-                document.querySelectorAll('.ranking-row').forEach((row, index) => {
-                    row.style.animationDelay = `${index * 0.05}s`;
+                // Aguarda os dados do Telegram
+                return new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Timeout aguardando dados do Telegram'));
+                    }, 5000);
+                    
+                    // Telegram Web App envia dados via initData
+                    if (telegramWebApp.initData) {
+                        clearTimeout(timeout);
+                        console.log("📥 Dados recebidos do Telegram");
+                        resolve(telegramWebApp.initData);
+                    } else {
+                        // Fallback: tenta obter da URL
+                        clearTimeout(timeout);
+                        console.log("⚠️ Sem initData, tentando URL...");
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const dataParam = urlParams.get('data');
+                        
+                        if (dataParam) {
+                            console.log("✅ Dados encontrados na URL");
+                            resolve({ data: dataParam });
+                        } else {
+                            reject(new Error('Nenhum dado encontrado'));
+                        }
+                    }
                 });
                 
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                document.getElementById('rankingList').innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Erro ao carregar ranking</h3>
-                        <p>${error.message || 'Não foi possível carregar os dados do ranking geral.'}</p>
-                        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:#00dbde; border:none; border-radius:10px; color:white; cursor:pointer;">
-                            <i class="fas fa-redo"></i> Tentar Novamente
-                        </button>
-                    </div>
-                `;
+                console.error('Erro no Telegram Web App:', error);
+                throw error;
             }
         }
         
-        // Inicializa quando o DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', loadRankingData);
+        async function processData(data) {
+            try {
+                console.log("🔄 Processando dados...");
+                
+                let decodedData;
+                let dataString = '';
+                
+                // Extrai os dados
+                if (typeof data === 'string') {
+                    dataString = data;
+                } else if (data.data) {
+                    dataString = data.data;
+                } else if (data.initData) {
+                    // Telegram envia como initData
+                    const params = new URLSearchParams(data.initData);
+                    dataString = params.get('data') || '';
+                }
+                
+                if (!dataString || dataString.trim() === '') {
+                    throw new Error('Nenhum dado recebido para processar');
+                }
+                
+                console.log("Dados recebidos (primeiros 200 chars):", dataString.substring(0, 200));
+                
+                // Tenta descomprimir como Gzip primeiro
+                try {
+                    decodedData = decompressGzipData(dataString);
+                } catch (gzipError) {
+                    console.log("⚠️ Não é Gzip, tentando Base64 simples...");
+                    decodedData = decodeBase64Data(dataString);
+                }
+                
+                // Valida a estrutura dos dados
+                if (!decodedData || decodedData.t !== 'ranking_geral') {
+                    throw new Error('Estrutura de dados inválida');
+                }
+                
+                if (!decodedData.rk || !Array.isArray(decodedData.rk)) {
+                    throw new Error('Lista de ranking inválida');
+                }
+                
+                console.log(`✅ Dados processados: ${decodedData.rk.length} participantes`);
+                return decodedData;
+                
+            } catch (error) {
+                console.error('Erro no processamento:', error);
+                throw error;
+            }
+        }
         
-        // Atualiza a cada 2 minutos (opcional)
-        setInterval(() => {
+        async function loadRankingData() {
+            try {
+                console.log("🚀 Iniciando carregamento do ranking geral...");
+                
+                // 1. Tenta obter dados do Telegram Web App
+                const telegramData = await loadDataFromTelegram();
+                
+                // 2. Processa os dados
+                const processedData = await processData(telegramData);
+                rankingData = processedData;
+                
+                // 3. Ordena por posição
+                const ranking = processedData.rk || [];
+                ranking.sort((a, b) => a.p - b.p);
+                
+                // 4. Renderiza tudo
+                const top3 = ranking.slice(0, 3);
+                renderPodium(top3);
+                renderStats(ranking, processedData);
+                renderRankingList(ranking);
+                
+                console.log("✅ Ranking carregado e renderizado com sucesso!");
+                
+                // 5. Adiciona botão de atualização
+                addUpdateButton();
+                
+            } catch (error) {
+                console.error('❌ Erro fatal:', error);
+                renderError(error.message || 'Não foi possível carregar o ranking geral. Tente novamente mais tarde.');
+            }
+        }
+        
+        function addUpdateButton() {
+            // Remove botão anterior se existir
+            const existingBtn = document.querySelector('.update-btn');
+            if (existingBtn) existingBtn.remove();
+            
             const reloadBtn = document.createElement('button');
-            reloadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar Ranking';
-            reloadBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; padding:10px 20px; background:rgba(0,219,222,0.9); border:none; border-radius:50px; color:white; cursor:pointer; z-index:1000; box-shadow:0 5px 15px rgba(0,0,0,0.3);';
-            reloadBtn.onclick = () => {
-                reloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
-                setTimeout(() => location.reload(), 500);
+            reloadBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar';
+            reloadBtn.className = 'update-btn';
+            reloadBtn.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 24px;
+                background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+                border: none;
+                border-radius: 50px;
+                color: white;
+                cursor: pointer;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                font-weight: bold;
+                transition: all 0.3s ease;
+            `;
+            
+            reloadBtn.onmouseover = () => {
+                reloadBtn.style.transform = 'scale(1.05)';
+                reloadBtn.style.boxShadow = '0 8px 20px rgba(0,0,0,0.4)';
             };
             
-            if (!document.querySelector('.update-btn')) {
-                reloadBtn.classList.add('update-btn');
-                document.body.appendChild(reloadBtn);
+            reloadBtn.onmouseout = () => {
+                reloadBtn.style.transform = 'scale(1)';
+                reloadBtn.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+            };
+            
+            reloadBtn.onclick = () => {
+                reloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Atualizando...';
+                reloadBtn.disabled = true;
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            };
+            
+            document.body.appendChild(reloadBtn);
+        }
+        
+        // ==============================================
+        // INICIALIZAÇÃO
+        // ==============================================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("📊 Ranking Geral - Inicializando...");
+            loadRankingData();
+        });
+        
+        // Fallback: se não conseguir pelo Telegram, tenta pela URL após 3 segundos
+        setTimeout(() => {
+            const loadingElement = document.querySelector('.loading');
+            if (loadingElement && loadingElement.style.display !== 'none') {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dataParam = urlParams.get('data');
+                
+                if (dataParam && !rankingData) {
+                    console.log("🔄 Tentando carregar dados da URL como fallback...");
+                    processData({ data: dataParam })
+                        .then(data => {
+                            rankingData = data;
+                            const ranking = data.rk || [];
+                            ranking.sort((a, b) => a.p - b.p);
+                            
+                            const top3 = ranking.slice(0, 3);
+                            renderPodium(top3);
+                            renderStats(ranking, data);
+                            renderRankingList(ranking);
+                            addUpdateButton();
+                        })
+                        .catch(error => {
+                            console.error('Erro no fallback:', error);
+                            renderError('Dados inválidos ou corrompidos. Por favor, abra novamente pelo bot do Telegram.');
+                        });
+                }
             }
-        }, 120000); // 2 minutos
+        }, 3000);
+        
     </script>
 </body>
 </html>
