@@ -614,25 +614,22 @@
         }
 
         // Função para abrir palpites do usuário
-         function abrirPalpitesUsuario(usuarioId, usuarioNome) {
-    console.log(`👤 Abrindo palpites de ${usuarioNome} (ID: ${usuarioId})`);
+         // Função para abrir palpites do usuário
+function abrirPalpitesUsuario(usuarioId, rodadaNum) {
+    console.log(`👤 Abrindo palpites do usuário ID: ${usuarioId} - Rodada: ${rodadaNum}`);
     
     if (window.Telegram && Telegram.WebApp) {
-        // Enviar comando para o bot
         Telegram.WebApp.sendData(JSON.stringify({
             tipo: 'ver_palpites_usuario',
             usuario_id: usuarioId,
-            usuario_nome: usuarioNome,
+            rodada_num: rodadaNum,  // ← Adiciona rodada!
             timestamp: Date.now()
         }));
         
-        // Fechar web app atual
         Telegram.WebApp.close();
-    } else {
-        // Para desenvolvimento
-        alert(`Clique no usuário ${usuarioNome} (ID: ${usuarioId})`);
     }
 }
+
         // Função para atualizar ranking
         function atualizarRanking() {
             location.reload();
