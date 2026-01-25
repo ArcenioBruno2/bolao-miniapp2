@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Teste Mini App Ranking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 18px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e2e8f0;
+        }
+        
+        .tab.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+            background: white;
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .ranking-table th {
+            background: #f8fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .ranking-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .ranking-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .posicao {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4f46e5;
+            width: 60px;
+        }
+        
+        .medalha-ouro { color: #fbbf24; }
+        .medalha-prata { color: #9ca3af; }
+        .medalha-bronze { color: #d97706; }
+        
+        .btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #94a3b8;
+        }
+        
+        .btn-secondary:hover {
+            background: #64748b;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #dc2626;
+        }
+        
+        .success {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #16a34a;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .rodada-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .rodada-btn {
+            background: #e0e7ff;
+            color: #4f46e5;
+            border: 2px solid #c7d2fe;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .rodada-btn:hover {
+            background: #c7d2fe;
+        }
+        
+        .rodada-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+        }
+        
+        .status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .status.online { color: #16a34a; }
+        .status.offline { color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Teste Mini App Ranking</h1>
+            <p>API Local: http://localhost:8001</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="mudarAba(0)">📊 Ranking Geral</div>
+            <div class="tab" onclick="mudarAba(1)">📅 Por Rodada</div>
+            <div class="tab" onclick="mudarAba(2)">👤 Buscar Usuário</div>
+        </div>
+        
+        <div class="content">
+            <!-- ABA 1: RANKING GERAL -->
+            <div class="tab-content active" id="aba-geral">
+                <div class="controls">
+                    <button class="btn" onclick="carregarRankingGeral()">
+                        🔄 Atualizar Ranking
+                    </button>
+                    <button class="btn btn-secondary" onclick="testarAPI()">
+                        🧪 Testar Conexão
+                    </button>
+                </div>
+                
+                <div id="loading-geral" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Carregando ranking geral...</p>
+                </div>
+                
+                <div id="conteudo-geral" style="display: none;">
+                    <table class="ranking-table" id="tabela-geral">
+                        <thead>
+                            <tr>
+                                <th width="80">Posição</th>
+                                <th>Usuário</th>
+                                <th width="120">Pontos</th>
+                                <th width="120">Rodadas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-geral">
+                            <!-- Dados carregados via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- ABA 2: POR RODADA -->
+            <div class="tab-content" id="aba-rodada">
+                <div class="rodada-selector">
+                    <button class="rodada-btn active" onclick="carregarRodada(1)">Rodada 1</button>
+                    <button class="rodada-btn" onclick="carregarRodada(2)">Rodada 2</button>
+                    <button class="rodada-btn" onclick="carregarRodada(3)">Rodada 3</button>
+                    <button class="rodada-btn" onclick="carregarRodada(4)">Rodada 4</button>
+                    <button class="rodada-btn" onclick="carregarRodada(5)">Rodada 5</button>
+                </div>
+                
+                <div id="loading-rodada" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Carregando rodada...</p>
+                </div>
+                
+                <div id="conteudo-rodada" style="display: none;">
+                    <h3 style="margin-bottom: 20px;" id="titulo-rodada">Rodada X</h3>
+                    <table class="ranking-table" id="tabela-rodada">
+                        <thead>
+                            <tr>
+                                <th width="80">Posição</th>
+                                <th>Usuário</th>
+                                <th width="120">Pontos</th>
+                                <th width="150">Estatísticas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-rodada">
+                            <!-- Dados carregados via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- ABA 3: BUSCAR USUÁRIO -->
+            <div class="tab-content" id="aba-usuario">
+                <div style="margin-bottom: 25px;">
+                    <input type="number" 
+                           id="telegram-id" 
+                           placeholder="Digite o Telegram ID (ex: 6415425994)"
+                           style="width: 100%; padding: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px; margin-bottom: 15px;">
+                    <button class="btn" onclick="buscarUsuario()">🔍 Buscar Usuário</button>
+                </div>
+                
+                <div id="loading-usuario" class="loading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <p>Buscando usuário...</p>
+                </div>
+                
+                <div id="resultado-usuario">
+                    <!-- Resultado será inserido aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="status offline" id="status-api">
+        🔴 API OFFLINE
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        let rodadaAtual = 1;
+        
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            testarConexao();
+            carregarRankingGeral();
+        });
+        
+        // ==================== FUNÇÕES DE CONTROLE ====================
+        function mudarAba(abaIndex) {
+            // Remover active de todas as tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Ativar tab selecionada
+            document.querySelectorAll('.tab')[abaIndex].classList.add('active');
+            document.querySelectorAll('.tab-content')[abaIndex].classList.add('active');
+            
+            // Se for aba de rodada, carregar primeira rodada
+            if (abaIndex === 1) {
+                carregarRodada(1);
+            }
+        }
+        
+        function testarConexao() {
+            fetch(`${API_BASE}/`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status-api').className = 'status online';
+                    document.getElementById('status-api').innerHTML = '✅ API ONLINE';
+                    console.log('API conectada:', data);
+                })
+                .catch(error => {
+                    document.getElementById('status-api').className = 'status offline';
+                    document.getElementById('status-api').innerHTML = '🔴 API OFFLINE';
+                    console.error('Erro na conexão:', error);
+                });
+        }
+        
+        // ==================== ABA 1: RANKING GERAL ====================
+        function carregarRankingGeral() {
+            const loading = document.getElementById('loading-geral');
+            const conteudo = document.getElementById('conteudo-geral');
+            const tbody = document.getElementById('tbody-geral');
+            
+            loading.style.display = 'block';
+            conteudo.style.display = 'none';
+            tbody.innerHTML = '';
+            
+            fetch(`${API_BASE}/api/ranking-geral?limit=20`)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    if (data.erro || data.aviso) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">📊</div>
+                                    <h3>${data.aviso || data.erro}</h3>
+                                    <p style="margin-top: 10px;">Execute primeiro: <code>python ranking_system.py --calcular</code></p>
+                                </td>
+                            </tr>
+                        `;
+                        conteudo.style.display = 'block';
+                        return;
+                    }
+                    
+                    if (data.ranking && data.ranking.length > 0) {
+                        data.ranking.forEach((usuario, index) => {
+                            const tr = document.createElement('tr');
+                            
+                            // Emoji da posição
+                            let emoji = '🔸';
+                            if (usuario.posicao === 1) emoji = '🥇';
+                            else if (usuario.posicao === 2) emoji = '🥈';
+                            else if (usuario.posicao === 3) emoji = '🥉';
+                            
+                            tr.innerHTML = `
+                                <td class="posicao">${emoji} ${usuario.posicao}º</td>
+                                <td><strong>${usuario.usuario}</strong></td>
+                                <td><strong>${usuario.pontos}</strong> pts</td>
+                                <td>${usuario.rodadas || 0} rodadas</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        conteudo.style.display = 'block';
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
+                                    Nenhum dado disponível
+                                </td>
+                            </tr>
+                        `;
+                        conteudo.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #dc2626;">
+                                <h3>❌ Erro ao carregar ranking</h3>
+                                <p>${error.message}</p>
+                                <p style="margin-top: 20px;">Verifique se a API está rodando:</p>
+                                <p><code>python ranking_system.py</code></p>
+                            </td>
+                        </tr>
+                    `;
+                    conteudo.style.display = 'block';
+                });
+        }
+        
+        // ==================== ABA 2: POR RODADA ====================
+        function carregarRodada(numero) {
+            rodadaAtual = numero;
+            
+            // Ativar botão da rodada
+            document.querySelectorAll('.rodada-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const loading = document.getElementById('loading-rodada');
+            const conteudo = document.getElementById('conteudo-rodada');
+            const titulo = document.getElementById('titulo-rodada');
+            const tbody = document.getElementById('tbody-rodada');
+            
+            loading.style.display = 'block';
+            conteudo.style.display = 'none';
+            titulo.textContent = `Rodada ${numero}`;
+            tbody.innerHTML = '';
+            
+            fetch(`${API_BASE}/api/rodada/${numero}?limit=15`)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    if (data.erro) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">📅</div>
+                                    <h3>${data.erro}</h3>
+                                    ${data.possiveis_causas ? `<p>Possíveis causas:</p><ul style="text-align: left; margin-top: 10px;">${data.possiveis_causas.map(c => `<li>${c}</li>`).join('')}</ul>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                        conteudo.style.display = 'block';
+                        return;
+                    }
+                    
+                    if (data.ranking && data.ranking.length > 0) {
+                        data.ranking.forEach(usuario => {
+                            const tr = document.createElement('tr');
+                            
+                            // Emoji da posição
+                            let emoji = '🔸';
+                            if (usuario.posicao === 1) emoji = '🥇';
+                            else if (usuario.posicao === 2) emoji = '🥈';
+                            else if (usuario.posicao === 3) emoji = '🥉';
+                            
+                            // Estatísticas formatadas
+                            const stats = usuario.estatisticas || {};
+                            const statsText = `
+                                PE: ${stats.pe || 0} | 
+                                RC: ${stats.rc || 0} | 
+                                GM: ${stats.gm || 0} | 
+                                GV: ${stats.gv || 0}
+                            `;
+                            
+                            tr.innerHTML = `
+                                <td class="posicao">${emoji} ${usuario.posicao}º</td>
+                                <td><strong>${usuario.usuario}</strong></td>
+                                <td><strong>${usuario.pontos}</strong> pts</td>
+                                <td style="font-size: 13px; color: #64748b;">${statsText}</td>
+                            `;
+                            tbody.appendChild(tr);
+                        });
+                        
+                        conteudo.style.display = 'block';
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #64748b;">
+                                    Nenhum dado para esta rodada
+                                </td>
+                            </tr>
+                        `;
+                        conteudo.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: #dc2626;">
+                                <h3>❌ Erro ao carregar rodada</h3>
+                                <p>${error.message}</p>
+                            </td>
+                        </tr>
+                    `;
+                    conteudo.style.display = 'block';
+                });
+        }
+        
+        // ==================== ABA 3: BUSCAR USUÁRIO ====================
+        function buscarUsuario() {
+            const telegramId = document.getElementById('telegram-id').value;
+            
+            if (!telegramId) {
+                alert('Digite um Telegram ID');
+                return;
+            }
+            
+            const loading = document.getElementById('loading-usuario');
+            const resultado = document.getElementById('resultado-usuario');
+            
+            loading.style.display = 'block';
+            resultado.innerHTML = '';
+            
+            fetch(`${API_BASE}/api/usuario/${telegramId}`)
+                .then(response => response.json())
+                .then(data => {
+                    loading.style.display = 'none';
+                    
+                    if (data.erro) {
+                        resultado.innerHTML = `
+                            <div class="error">
+                                <h3>❌ Usuário não encontrado</h3>
+                                <p>Telegram ID: ${telegramId}</p>
+                                <p>Erro: ${data.erro}</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    const usuario = data.usuario;
+                    const historico = data.historico || [];
+                    
+                    let historicoHTML = '';
+                    if (historico.length > 0) {
+                        historicoHTML = `
+                            <h4 style="margin-top: 25px; margin-bottom: 15px;">📈 Histórico Recente</h4>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0;">Rodada</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0;">Pontos</th>
+                                        <th style="padding: 10px; text-align: left; border-bottom: 2px solid #e2e8f0;">Posição</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${historico.map(item => `
+                                        <tr>
+                                            <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;">${item.rodada}</td>
+                                            <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;"><strong>${item.pontos}</strong> pts</td>
+                                            <td style="padding: 10px; border-bottom: 1px solid #f1f5f9;">${item.posicao}º</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    }
+                    
+                    resultado.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Usuário encontrado</h3>
+                            <div style="margin-top: 15px;">
+                                <p><strong>Nome:</strong> ${usuario.nome}</p>
+                                <p><strong>Username:</strong> @${usuario.username || 'N/A'}</p>
+                                <p><strong>Posição Geral:</strong> ${usuario.posicao_geral}º</p>
+                                <p><strong>Pontos Totais:</strong> ${usuario.pontos_geral}</p>
+                            </div>
+                            ${historicoHTML}
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    loading.style.display = 'none';
+                    resultado.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Erro na busca</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // ==================== TESTES ADICIONAIS ====================
+        function testarAPI() {
+            fetch(`${API_BASE}/api/rodadas`)
+                .then(response => response.json())
+                .then(data => {
+                    alert(`✅ API Funcionando!\n\nRodadas: ${data.rodadas ? data.rodadas.length : 0}\nStatus: OK`);
+                })
+                .catch(error => {
+                    alert(`❌ API Não Respondendo!\n\nErro: ${error.message}`);
+                });
+        }
+    </script>
+</body>
+</html>
