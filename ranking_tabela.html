@@ -989,30 +989,7 @@ function isTelegramWebApp() {
         document.addEventListener('DOMContentLoaded', () => {
             logDetalhado('🚀 Inicializando ranking...');
             logDetalhado('Telegram Web App disponível:', !!TELEGRAM_WEBAPP);
-function debugTelegramEnvironment() {
-    console.log('🔍 DEBUG Telegram Environment:');
-    console.log('  User Agent:', navigator.userAgent);
-    console.log('  URL:', window.location.href);
-    console.log('  Search Params:', window.location.search);
-    console.log('  Telegram object:', window.Telegram);
-    console.log('  Telegram.WebApp:', window.Telegram && window.Telegram.WebApp);
-    console.log('  TelegramWebviewProxy:', window.TelegramWebviewProxy);
-    console.log('  window.external:', window.external);
-    console.log('  window.parent:', window.parent !== window);
-    
-    // Verificar parâmetros específicos do Telegram
-    const params = new URLSearchParams(window.location.search);
-    console.log('  tgWebAppPlatform:', params.get('tgWebAppPlatform'));
-    console.log('  tgWebAppVersion:', params.get('tgWebAppVersion'));
-    console.log('  tgWebAppThemeParams:', params.get('tgWebAppThemeParams'));
-}
 
-// Chame a função de debug na inicialização
-document.addEventListener('DOMContentLoaded', () => {
-    logDetalhado('🚀 Inicializando ranking...');
-    
-    // DEBUG
-    debugTelegramEnvironment();
 
             
             if (TELEGRAM_WEBAPP) {
