@@ -480,105 +480,30 @@
         }
 
         // Função para gerar link de navegação para palpites do usuário
-        // FUNÇÃO CORRIGIDA para gerar link de navegação
-function generateUserLink(userId, rodadaNum, userName) {
-    // IMPORTANTE: O formato deve ser EXATAMENTE como o bot espera
-    return `palpites_${userId}_${rodadaNum}`;
-}
+        function generateUserLink(userId, rodadaNum, userName) {
+            // Usa o método Telegram WebApp para navegação
+            if (window.Telegram && window.Telegram.WebApp) {
+                return `https://t.me/${window.Telegram.WebApp.initDataUnsafe.user?.username || 'bot'}?start=palpites_${userId}_${rodadaNum}`;
+            }
+            
+            // Fallback para navegador normal (para testes)
+            return `#user-${userId}-rodada-${rodadaNum}`;
+        }
 
-// FUNÇÃO CORRIGIDA para navegar para palpites do usuário
-function navigateToUserPalpites(userId, rodadaNum, userName) {
-    console.log(`Navegando para: usuário=${userId}, rodada=${rodadaNum}, nome=${userName}`);
-    
-    if (window.Telegram && window.Telegram.WebApp) {
-        // Método 1: Usando o método oficial do Telegram WebApp
-        try {
-            // Envia dados para o bot (formato que o bot espera)
-            const dadosNavegacao = {
-                tipo: 'ver_palpites_usuario',
-                action: 'carregar_rodada',  // ← ESSE É O CAMPO QUE O BOT VERIFICA!
-                usuario_id: userId,
-                rodada_num: rodadaNum,
-                timestamp: Date.now()
-            };
+        // Função para navegar para palpites do usuário
+        function navigateToUserPalpites(userId, rodadaNum, userName) {
+            const link = generateUserLink(userId, rodadaNum, userName);
             
-            console.log('Enviando dados para o bot:', dadosNavegacao);
-            window.Telegram.WebApp.sendData(JSON.stringify(dadosNavegacao));
-            
-            // Fecha o WebApp para retornar ao bot
-            setTimeout(() => {
-                window.Telegram.WebApp.close();
-            }, 100);
-            
-        } catch (error) {
-            console.error('Erro ao enviar dados via WebApp:', error);
-            
-            // Fallback: Tenta abrir via start parameters
-            try {
-                const startParams = `palpites_${userId}_${rodadaNum}`;
-                window.Telegram.WebApp.openTelegramLink(`https://t.me/${window.Telegram.WebApp.initDataUnsafe.user?.username || 'bot'}?start=${startParams}`);
-            } catch (fallbackError) {
-                console.error('Fallback também falhou:', fallbackError);
+            if (window.Telegram && window.Telegram.WebApp) {
+                // No Telegram WebApp, abre o link externamente
+                window.Telegram.WebApp.openLink(link);
+            } else {
+                // Em navegador normal, mostra mensagem
+                alert(`Abrindo palpites de ${userName} para a rodada ${rodadaNum}`);
+                window.open(link, '_blank');
             }
         }
-    } else {
-        // Modo de teste (fora do Telegram)
-        alert(`TESTE: Navegaria para palpites de ${userName}\nUsuário ID: ${userId}\nRodada: ${rodadaNum}\n\nNo Telegram, isso abriria o bot com os parâmetros: /start palpites_${userId}_${rodadaNum}`);
-        
-        // Para testes locais, simula o envio de dados
-        if (window.parent && window.parent.postMessage) {
-            window.parent.postMessage({
-                type: 'telegram_web_app_data',
-                data: JSON.stringify({
-                    tipo: 'ver_palpites_usuario',
-                    action: 'carregar_rodada',
-                    usuario_id: userId,
-                    rodada_num: rodadaNum
-                })
-            }, '*');
-        }
-    }
-}
 
-// FUNÇÃO CORRIGIDA para criar célula do nome
-function createNomeCell(user, rodadaNum) {
-    const nomeCell = document.createElement('td');
-    nomeCell.className = 'nome-cell';
-    
-    const nomeContainer = document.createElement('div');
-    nomeContainer.className = 'nome-link';
-    nomeContainer.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        navigateToUserPalpites(user.u, rodadaNum, user.n);
-    };
-    nomeContainer.style.cursor = 'pointer';
-    nomeContainer.title = `Ver palpites de ${user.n} na rodada ${rodadaNum}`;
-    
-    // Adiciona feedback visual ao clicar
-    nomeContainer.addEventListener('mousedown', () => {
-        nomeContainer.style.transform = 'scale(0.98)';
-    });
-    nomeContainer.addEventListener('mouseup', () => {
-        nomeContainer.style.transform = 'scale(1)';
-    });
-    nomeContainer.addEventListener('mouseleave', () => {
-        nomeContainer.style.transform = 'scale(1)';
-    });
-    
-    nomeContainer.innerHTML = `
-        <div class="user-icon">${getInitials(user.n)}</div>
-        <div>
-            <div class="user-name">${user.n}</div>
-            <div style="font-size: 0.8rem; color: var(--gray); margin-top: 2px;">
-                <i class="fas fa-external-link-alt"></i> Clique para ver palpites
-            </div>
-        </div>
-    `;
-    
-    nomeCell.appendChild(nomeContainer);
-    return nomeCell;
-}
         // Função para criar elemento HTML do ranking
         function createRankingRow(user, index, rodadaNum) {
             const row = document.createElement('tr');
