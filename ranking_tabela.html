@@ -808,4 +808,53 @@
                                 <tr>
                                     <th>Posição</th>
                                     <th>Participante</th>
-                                    <
+                                    <th>Pontuação</th>
+                                    <th>Estatísticas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="actions" id="actionsContainer"></div>
+
+                    <div class="footer">
+                        <p>© 2024 Bolão - Sistema de Ranking</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7;">Clique em um nome para ver os palpites</p>
+                    </div>
+                </div>
+            `;
+            
+            // Preenche dados
+            createRodadaInfo(rankingData.r);
+            
+            const rankingBody = document.getElementById('rankingBody');
+            rankingData.k.forEach((user, index) => {
+                const row = createRankingRow(user, index, rankingData.r.n);
+                rankingBody.appendChild(row);
+            });
+            
+            createActionButtons(rankingData.r.n, rankingData.r.p);
+            
+            debugLog(`Ranking renderizado: ${rankingData.k.length} participantes`);
+        }
+
+        // ==================== INICIALIZAÇÃO ====================
+        
+        document.addEventListener('DOMContentLoaded', loadRanking);
+        
+        // Suporte para teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.close();
+            }
+        });
+
+        // Exporta funções para debug
+        window.debugLog = debugLog;
+        window.refreshRanking = refreshRanking;
+        window.shareRanking = shareRanking;
+        
+    </script>
+</body>
+</html>
