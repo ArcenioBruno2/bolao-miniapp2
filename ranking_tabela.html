@@ -120,7 +120,7 @@
         /* TABELA DE RANKING */
         .ranking-container {
             width: 100%;
-            padding: 0;
+            padding: 0 20px;
         }
 
         .ranking-table {
@@ -156,20 +156,22 @@
 
         /* COLUNAS COM LARGURAS FIXAS */
         .posicao-cell {
-            width: 80px;
+            width: 60px; /* Reduzida */
             text-align: center;
             font-weight: 700;
             color: #374151;
+            padding-left: 5px; /* Empurra mais para direita */
         }
 
         .nome-cell {
             text-align: left;
             font-weight: 600;
             color: #111827;
+            padding-left: 25px; /* Empurra mais para direita */
         }
 
         .pontos-cell {
-            width: 100px;
+            width: 80px; /* Reduzida */
             text-align: center;
             font-weight: 700;
             font-size: 1.1rem;
@@ -179,6 +181,7 @@
         .estatisticas-cell {
             width: 150px;
             text-align: center;
+            padding-right: 10px;
         }
 
         /* MEDALHAS */
@@ -199,11 +202,14 @@
             align-items: center;
             gap: 6px;
             font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
         }
 
         .nome-link:hover {
             color: #3730a3;
-            text-decoration: underline;
+            background-color: #f3f4f6;
+            text-decoration: none;
         }
 
         .user-icon {
@@ -363,6 +369,10 @@
                 flex-wrap: wrap;
             }
             
+            .ranking-container {
+                padding: 0 15px;
+            }
+            
             .ranking-table {
                 font-size: 0.9rem;
             }
@@ -373,16 +383,22 @@
             }
             
             .posicao-cell {
-                width: 70px;
+                width: 50px;
+                padding-left: 3px;
+            }
+            
+            .nome-cell {
+                padding-left: 15px;
             }
             
             .pontos-cell {
-                width: 90px;
+                width: 70px;
                 font-size: 1rem;
             }
             
             .estatisticas-cell {
                 width: 130px;
+                padding-right: 5px;
             }
             
             .estatistica-badge {
@@ -407,6 +423,10 @@
                 font-size: 0.85rem;
             }
             
+            .ranking-container {
+                padding: 0 10px;
+            }
+            
             .ranking-table {
                 font-size: 0.85rem;
             }
@@ -417,15 +437,21 @@
             }
             
             .posicao-cell {
-                width: 60px;
+                width: 45px;
+                padding-left: 2px;
+            }
+            
+            .nome-cell {
+                padding-left: 10px;
             }
             
             .pontos-cell {
-                width: 80px;
+                width: 60px;
             }
             
             .estatisticas-cell {
-                width: 120px;
+                width: 110px;
+                padding-right: 3px;
             }
             
             .estatisticas-badges {
@@ -507,8 +533,8 @@
             <table class="ranking-table">
                 <thead>
                     <tr>
-                        <th class="posicao-cell">Posição</th>
-                        <th class="nome-cell">Participante</th>
+                        <th class="posicao-cell">P</th> <!-- Alterado para P -->
+                        <th class="nome-cell">Participantes</th>
                         <th class="pontos-cell">Pontos</th>
                         <th class="estatisticas-cell">Estatísticas</th>
                     </tr>
@@ -575,8 +601,13 @@
         let rodadaAtual = 0;
 
         // CONFIGURAÇÕES
-        const BOT_USERNAME = 'ArcBolaoBot';
+        const BOT_USERNAME = 'BolaoFutebolBot';
         const TELEGRAM_WEBAPP = window.Telegram && window.Telegram.WebApp;
+
+        // VERIFICAR SE É TELEGRAM WEB APP
+        function isTelegramWebApp() {
+            return TELEGRAM_WEBAPP && TELEGRAM_WEBAPP.initData;
+        }
 
         // FUNÇÃO PARA DECODIFICAR BASE64
         function decodeBase64(base64) {
@@ -712,7 +743,7 @@
                         <strong>${index + 1}º</strong>
                     </td>
                     <td class="nome-cell">
-                        <a href="javascript:void(0)" class="nome-link" onclick="abrirPalpitesUsuario(${participante.u}, ${rodada.n})">
+                        <a href="javascript:void(0)" class="nome-link" onclick="abrirPalpitesUsuario(${participante.u}, ${rodada.n}, '${participante.n.replace(/'/g, "\\'")}')">
                             <span class="user-icon">👤</span>
                             ${participante.n}
                         </a>
@@ -730,28 +761,63 @@
             });
         }
 
-        // ABRIR PALPITES DO USUÁRIO
-        function abrirPalpitesUsuario(usuarioId, rodadaNum) {
+        // ABRIR PALPITES DO USUÁRIO - CORRIGIDO
+        async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
             try {
-                if (TELEGRAM_WEBAPP) {
+                console.log('Abrindo palpites para:', { usuarioId, rodadaNum, nomeUsuario });
+                
+                // Se estiver no Telegram Web App
+                if (isTelegramWebApp()) {
+                    console.log('Enviando dados via Telegram Web App...');
+                    
+                    // Método 1: Usar sendData (funciona melhor)
                     TELEGRAM_WEBAPP.sendData(JSON.stringify({
                         action: 'carregar_rodada',
                         usuario_id: usuarioId,
-                        rodada_num: rodadaNum
+                        rodada_num: rodadaNum,
+                        nome_usuario: nomeUsuario,
+                        timestamp: Date.now()
                     }));
-                    TELEGRAM_WEBAPP.close();
+                    
+                    // Fechar após enviar os dados
+                    setTimeout(() => {
+                        TELEGRAM_WEBAPP.close();
+                    }, 500);
+                    
                 } else {
+                    console.log('Usando link direto do bot...');
+                    
+                    // Método 2: Link direto do bot
                     const linkBot = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
+                    
+                    // Para mobile, tenta abrir app primeiro
                     if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
                         window.location.href = `tg://resolve?domain=${BOT_USERNAME}&start=palpites_${usuarioId}_${rodadaNum}`;
-                        setTimeout(() => window.open(linkBot, '_blank'), 2000);
+                        
+                        // Fallback após 1 segundo
+                        setTimeout(() => {
+                            window.open(linkBot, '_blank');
+                        }, 1000);
                     } else {
+                        // Desktop - abrir nova aba
                         window.open(linkBot, '_blank');
                     }
                 }
+                
             } catch (error) {
-                console.error('Erro ao abrir palpites:', error);
-                alert(`Erro: ${error.message}`);
+                console.error('Erro detalhado ao abrir palpites:', error);
+                
+                // Método 3: Fallback com alert
+                alert(`Clique OK e depois vá para @${BOT_USERNAME} e digite: /start palpites_${usuarioId}_${rodadaNum}`);
+                
+                // Tentar copiar o comando para área de transferência
+                try {
+                    const comando = `/start palpites_${usuarioId}_${rodadaNum}`;
+                    await navigator.clipboard.writeText(comando);
+                    console.log('Comando copiado:', comando);
+                } catch (clipboardError) {
+                    console.error('Erro ao copiar:', clipboardError);
+                }
             }
         }
 
@@ -784,7 +850,7 @@
         }
 
         function voltarMenu() {
-            if (TELEGRAM_WEBAPP) {
+            if (isTelegramWebApp()) {
                 TELEGRAM_WEBAPP.close();
             } else {
                 window.history.back();
@@ -793,10 +859,28 @@
 
         // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('Telegram Web App disponível:', !!TELEGRAM_WEBAPP);
+            
             if (TELEGRAM_WEBAPP) {
+                // Expandir para usar tela cheia
                 TELEGRAM_WEBAPP.expand();
+                
+                // Configurar botão principal
+                TELEGRAM_WEBAPP.MainButton
+                    .setText('FECHAR')
+                    .setParams({
+                        color: '#4f46e5'
+                    })
+                    .show()
+                    .onClick(() => {
+                        TELEGRAM_WEBAPP.close();
+                    });
+                
+                // Log para debug
+                console.log('Telegram Web App configurado. InitData:', TELEGRAM_WEBAPP.initData ? 'Presente' : 'Ausente');
             }
             
+            // Carregar dados
             carregarDados();
         });
 
@@ -834,9 +918,13 @@
         if (window.location.href.includes('localhost') || window.location.href.includes('file://')) {
             setTimeout(() => {
                 if (!dadosRanking) {
+                    console.log('Usando dados de exemplo para teste local');
                     dadosRanking = window.dadosExemplo;
                     atualizarInterface();
                     mostrarLoading(false);
+                    
+                    // Testar clique
+                    console.log('Teste: Clique em qualquer nome para testar abertura de palpites');
                 }
             }, 800);
         }
