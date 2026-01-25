@@ -615,9 +615,36 @@
         }
 
         // VERIFICAR SE É TELEGRAM WEB APP
-        function isTelegramWebApp() {
-            return TELEGRAM_WEBAPP && TELEGRAM_WEBAPP.initData;
-        }
+        // REMOVA a função isTelegramWebApp atual e substitua por:
+
+// VERIFICAR SE É TELEGRAM WEB APP - VERSÃO CORRIGIDA
+function isTelegramWebApp() {
+    // Verifica múltiplas formas de detecção
+    const isInTelegram = 
+        // Método 1: Telegram WebApp API
+        (window.Telegram && window.Telegram.WebApp) ||
+        // Método 2: User agent do Telegram
+        /TelegramBot/i.test(navigator.userAgent) ||
+        // Método 3: URL parameter do Telegram
+        window.location.search.includes('tgWebAppPlatform') ||
+        // Método 4: Variável global do Telegram
+        (window.TelegramWebviewProxy !== undefined) ||
+        // Método 5: WebView do Telegram
+        (window.external && window.external.notify);
+    
+    if (isInTelegram) {
+        console.log('✅ Detectado Telegram Web App:', {
+            hasTelegramObject: !!(window.Telegram && window.Telegram.WebApp),
+            userAgent: navigator.userAgent.substring(0, 50) + '...',
+            hasWebviewProxy: !!(window.TelegramWebviewProxy),
+            searchParams: window.location.search
+        });
+    } else {
+        console.log('❌ NÃO detectado Telegram Web App');
+    }
+    
+    return isInTelegram;
+}
 
         // FUNÇÃO PARA DECODIFICAR BASE64
         function decodeBase64(base64) {
@@ -662,80 +689,125 @@
         // ==================== FUNÇÃO PRINCIPAL PARA ABRIR PALPITES ====================
         // ⭐⭐ FUNÇÃO CORRIGIDA PARA COMPATIBILIDADE COM O BOT ⭐⭐
         async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
+    try {
+        logDetalhado('🎯 Abrindo palpites para:', { 
+            usuarioId, 
+            rodadaNum, 
+            nomeUsuario 
+        });
+        
+        // ⭐⭐ VERIFICAÇÃO MAIS ROBUSTA ⭐⭐
+        const isTelegram = isTelegramWebApp();
+        const hasTelegramAPI = window.Telegram && window.Telegram.WebApp;
+        
+        logDetalhado('🔍 Status Telegram:', {
+            isTelegram: isTelegram,
+            hasTelegramAPI: hasTelegramAPI,
+            userAgent: navigator.userAgent,
+            platform: hasTelegramAPI ? TELEGRAM_WEBAPP.platform : 'N/A'
+        });
+        
+        // Se estiver no Telegram Web App E tiver a API disponível
+        if (isTelegram && hasTelegramAPI) {
+            logDetalhado('📤 Enviando dados via Telegram Web App API...');
+            
+            // ⭐⭐ ESTRUTURA QUE O BOT ESPERA ⭐⭐
+            const dadosParaBot = {
+                action: 'carregar_rodada',
+                usuario_id: usuarioId,
+                rodada_num: rodadaNum,
+                nome_usuario: nomeUsuario,
+                timestamp: Date.now(),
+                origem: 'ranking_tabela',
+                versao: '3.0',
+                platform: TELEGRAM_WEBAPP.platform || 'unknown'
+            };
+            
+            logDetalhado('📦 Dados para envio:', dadosParaBot);
+            
             try {
-                logDetalhado('🎯 Abrindo palpites para:', { 
-                    usuarioId, 
-                    rodadaNum, 
-                    nomeUsuario 
-                });
+                // Método PREFERIDO: sendData
+                TELEGRAM_WEBAPP.sendData(JSON.stringify(dadosParaBot));
+                logDetalhado('✅ Dados enviados via TELEGRAM_WEBAPP.sendData()');
                 
-                // Se estiver no Telegram Web App
-                if (isTelegramWebApp()) {
-                    logDetalhado('📤 Enviando dados via Telegram Web App...');
-                    
-                    // ⭐⭐ ESTRUTURA QUE O BOT ESPERA (COMPATÍVEL COM web_app_data_handler) ⭐⭐
-                    const dadosParaBot = {
-                        action: 'carregar_rodada',      // ⭐⭐ AÇÃO QUE O BOT RECONHECE ⭐⭐
-                        usuario_id: usuarioId,          // ⭐⭐ NOME DO CAMPO ESPECÍFICO ⭐⭐
-                        rodada_num: rodadaNum,          // ⭐⭐ NOME DO CAMPO ESPECÍFICO ⭐⭐
-                        nome_usuario: nomeUsuario,
-                        timestamp: Date.now(),
-                        origem: 'ranking_tabela',
-                        versao: '2.0'
-                    };
-                    
-                    logDetalhado('📦 Dados estruturados para envio:', dadosParaBot);
-                    
-                    // Método PREFERIDO: Usar sendData do Telegram WebApp
-                    // Isso será processado pelo web_app_data_handler no bot
-                    TELEGRAM_WEBAPP.sendData(JSON.stringify(dadosParaBot));
-                    
-                    logDetalhado('✅ Dados enviados via TELEGRAM_WEBAPP.sendData()');
-                    
-                    // ⭐⭐ IMPORTANTE: NÃO FECHA O WEB APP ⭐⭐
-                    // O bot processará os dados e abrirá novo WebApp se necessário
-                    // Se quiser feedback visual, pode mostrar loading
-                    mostrarFeedback('⏳ Carregando palpites...');
-                    
-                } else {
-                    logDetalhado('🌐 Usando link direto do bot (fallback)...');
-                    
-                    // Método alternativo: Link direto do bot
-                    const linkBot = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
-                    
-                    // Para mobile, tenta abrir app primeiro
-                    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-                        window.location.href = `tg://resolve?domain=${BOT_USERNAME}&start=palpites_${usuarioId}_${rodadaNum}`;
-                        
-                        // Fallback após 1 segundo
-                        setTimeout(() => {
-                            window.open(linkBot, '_blank');
-                        }, 1000);
-                    } else {
-                        // Desktop - abrir nova aba
-                        window.open(linkBot, '_blank');
-                    }
-                }
+                // Mostrar feedback visual
+                TELEGRAM_WEBAPP.showAlert('📥 Solicitando palpites...');
                 
-            } catch (error) {
-                logDetalhado('❌ Erro ao abrir palpites:', error);
+                // ⭐⭐ IMPORTANTE: Não fecha o WebApp - deixa o bot processar
+                return;
                 
-                // Método de fallback com alert
-                mostrarErroTemporario(`Erro: ${error.message || 'Falha na comunicação'}`);
-                
-                // Tentar copiar comando para área de transferência
-                try {
-                    const comando = `/start palpites_${usuarioId}_${rodadaNum}`;
-                    await navigator.clipboard.writeText(comando);
-                    logDetalhado('📋 Comando copiado para área de transferência:', comando);
-                    
-                    // Informar usuário
-                    alert(`Comando copiado! Cole no chat com @${BOT_USERNAME}: ${comando}`);
-                } catch (clipboardError) {
-                    console.error('Erro ao copiar:', clipboardError);
-                }
+            } catch (sendDataError) {
+                logDetalhado('❌ Erro no sendData, tentando alternativa...', sendDataError);
+                // Continua para o fallback
             }
         }
+        
+        // ⭐⭐ FALLBACK PARA TODOS OS CASOS ⭐⭐
+        logDetalhado('🌐 Usando método de fallback...');
+        
+        // Método alternativo 1: Deep link do Telegram
+        const deepLink = `tg://resolve?domain=${BOT_USERNAME}&start=palpites_${usuarioId}_${rodadaNum}`;
+        const webLink = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
+        
+        logDetalhado('🔗 Links gerados:', { deepLink, webLink });
+        
+        // Tentar abrir deep link
+        try {
+            // Criar iframe invisível para abrir deep link (técnica comum)
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = deepLink;
+            document.body.appendChild(iframe);
+            
+            logDetalhado('🔄 Tentando abrir deep link via iframe...');
+            
+            // Remover iframe após 2 segundos
+            setTimeout(() => {
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                    logDetalhado('🗑️ Iframe removido');
+                }
+            }, 2000);
+            
+            // Fallback secundário após 1 segundo
+            setTimeout(() => {
+                logDetalhado('⏱️ Fallback secundário: abrindo link web...');
+                window.open(webLink, '_blank');
+            }, 1000);
+            
+        } catch (iframeError) {
+            logDetalhado('❌ Erro com iframe, abrindo link diretamente...', iframeError);
+            window.open(webLink, '_blank');
+        }
+        
+    } catch (error) {
+        logDetalhado('❌ Erro ao abrir palpites:', error);
+        
+        // Método de fallback final
+        try {
+            const comando = `/start palpites_${usuarioId}_${rodadaNum}`;
+            
+            // Tentar copiar para área de transferência
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(comando);
+                logDetalhado('📋 Comando copiado para área de transferência:', comando);
+                
+                // Mostrar alerta
+                if (window.Telegram && window.Telegram.WebApp) {
+                    TELEGRAM_WEBAPP.showAlert(`Comando copiado! Cole no chat: ${comando}`);
+                } else {
+                    alert(`Comando copiado! Cole no chat com @${BOT_USERNAME}: ${comando}`);
+                }
+            } else {
+                // Fallback para navegadores antigos
+                alert(`Vá para @${BOT_USERNAME} e digite: ${comando}`);
+            }
+        } catch (clipboardError) {
+            console.error('Erro ao copiar:', clipboardError);
+            alert(`Vá para @${BOT_USERNAME} e digite: /start palpites_${usuarioId}_${rodadaNum}`);
+        }
+    }
+}
 
         // Função auxiliar para mostrar feedback visual
         function mostrarFeedback(mensagem) {
@@ -917,6 +989,31 @@
         document.addEventListener('DOMContentLoaded', () => {
             logDetalhado('🚀 Inicializando ranking...');
             logDetalhado('Telegram Web App disponível:', !!TELEGRAM_WEBAPP);
+function debugTelegramEnvironment() {
+    console.log('🔍 DEBUG Telegram Environment:');
+    console.log('  User Agent:', navigator.userAgent);
+    console.log('  URL:', window.location.href);
+    console.log('  Search Params:', window.location.search);
+    console.log('  Telegram object:', window.Telegram);
+    console.log('  Telegram.WebApp:', window.Telegram && window.Telegram.WebApp);
+    console.log('  TelegramWebviewProxy:', window.TelegramWebviewProxy);
+    console.log('  window.external:', window.external);
+    console.log('  window.parent:', window.parent !== window);
+    
+    // Verificar parâmetros específicos do Telegram
+    const params = new URLSearchParams(window.location.search);
+    console.log('  tgWebAppPlatform:', params.get('tgWebAppPlatform'));
+    console.log('  tgWebAppVersion:', params.get('tgWebAppVersion'));
+    console.log('  tgWebAppThemeParams:', params.get('tgWebAppThemeParams'));
+}
+
+// Chame a função de debug na inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    logDetalhado('🚀 Inicializando ranking...');
+    
+    // DEBUG
+    debugTelegramEnvironment();
+
             
             if (TELEGRAM_WEBAPP) {
                 // Expandir para usar tela cheia
@@ -948,6 +1045,8 @@
             carregarDados();
         });
 
+
+        
         // ==================== DADOS DE EXEMPLO PARA TESTE ====================
         
         window.dadosExemplo = {
