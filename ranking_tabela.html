@@ -614,43 +614,25 @@
         }
 
         // Função para abrir palpites do usuário
-         function abrirPalpitesUsuario(usuarioId, rodadaNum) {
-        if (!window.Telegram || !window.Telegram.WebApp) {
-            alert("Por favor, abra pelo Telegram!");
-            return;
-        }
-        
-        // Prepara dados para enviar ao bot
-        const dadosParaBot = {
-            action: 'carregar_rodada',
+         function abrirPalpitesUsuario(usuarioId, usuarioNome) {
+    console.log(`👤 Abrindo palpites de ${usuarioNome} (ID: ${usuarioId})`);
+    
+    if (window.Telegram && Telegram.WebApp) {
+        // Enviar comando para o bot
+        Telegram.WebApp.sendData(JSON.stringify({
+            tipo: 'ver_palpites_usuario',
             usuario_id: usuarioId,
-            rodada_num: rodadaNum,
-            chat_id: window.Telegram.WebApp.initDataUnsafe.user?.id || null,
+            usuario_nome: usuarioNome,
             timestamp: Date.now()
-        };
+        }));
         
-        // Envia dados para o bot via Web App Data
-        try {
-            // Método 1: Envia dados e fecha Web App
-            window.Telegram.WebApp.sendData(JSON.stringify(dadosParaBot));
-            
-            // Aguarda um pouco e fecha
-            setTimeout(() => {
-                window.Telegram.WebApp.close();
-            }, 300);
-            
-        } catch (error) {
-            console.error('Erro ao enviar dados:', error);
-            
-            // Método alternativo: Abre URL do bot com parâmetros
-            const botUsername = 'seu_bot_username'; // Substitua pelo username real do bot
-            const params = `start=palpites_${usuarioId}_${rodadaNum}`;
-            const telegramUrl = `https://t.me/${botUsername}?${params}`;
-            
-            window.Telegram.WebApp.openTelegramLink(telegramUrl);
-            window.Telegram.WebApp.close();
-        }
+        // Fechar web app atual
+        Telegram.WebApp.close();
+    } else {
+        // Para desenvolvimento
+        alert(`Clique no usuário ${usuarioNome} (ID: ${usuarioId})`);
     }
+}
         // Função para atualizar ranking
         function atualizarRanking() {
             location.reload();
