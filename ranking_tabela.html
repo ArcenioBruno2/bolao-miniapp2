@@ -601,7 +601,7 @@
         let rodadaAtual = 0;
 
         // CONFIGURAÇÕES
-        const BOT_USERNAME = 'BolaoFutebolBot';
+        const BOT_USERNAME = @BolaoFutebolBot;
         const TELEGRAM_WEBAPP = window.Telegram && window.Telegram.WebApp;
 
         // ==================== FUNÇÕES AUXILIARES ====================
@@ -688,124 +688,38 @@ function isTelegramWebApp() {
 
         // ==================== FUNÇÃO PRINCIPAL PARA ABRIR PALPITES ====================
         // ⭐⭐ FUNÇÃO CORRIGIDA PARA COMPATIBILIDADE COM O BOT ⭐⭐
-        async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
+        // ABRIR PALPITES DO USUÁRIO
+async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
     try {
-        logDetalhado('🎯 Abrindo palpites para:', { 
-            usuarioId, 
-            rodadaNum, 
-            nomeUsuario 
-        });
+        console.log('Abrindo palpites para:', { usuarioId, rodadaNum, nomeUsuario });
         
-        // ⭐⭐ VERIFICAÇÃO MAIS ROBUSTA ⭐⭐
-        const isTelegram = isTelegramWebApp();
-        const hasTelegramAPI = window.Telegram && window.Telegram.WebApp;
-        
-        logDetalhado('🔍 Status Telegram:', {
-            isTelegram: isTelegram,
-            hasTelegramAPI: hasTelegramAPI,
-            userAgent: navigator.userAgent,
-            platform: hasTelegramAPI ? TELEGRAM_WEBAPP.platform : 'N/A'
-        });
-        
-        // Se estiver no Telegram Web App E tiver a API disponível
-        if (isTelegram && hasTelegramAPI) {
-            logDetalhado('📤 Enviando dados via Telegram Web App API...');
+        // Se estiver no Telegram Web App
+        if (isTelegramWebApp()) {
+            console.log('Enviando dados via Telegram Web App...');
             
-            // ⭐⭐ ESTRUTURA QUE O BOT ESPERA ⭐⭐
-            const dadosParaBot = {
+            // Envia os dados para o Bot Python
+            TELEGRAM_WEBAPP.sendData(JSON.stringify({
                 action: 'carregar_rodada',
-                usuario_id: usuarioId,
-                rodada_num: rodadaNum,
+                usuario_id: parseInt(usuarioId),
+                rodada_num: parseInt(rodadaNum),
                 nome_usuario: nomeUsuario,
-                timestamp: Date.now(),
-                origem: 'ranking_tabela',
-                versao: '3.0',
-                platform: TELEGRAM_WEBAPP.platform || 'unknown'
-            };
+                timestamp: Date.now()
+            }));
             
-            logDetalhado('📦 Dados para envio:', dadosParaBot);
+            // Fecha o WebApp para que o usuário veja a nova mensagem do bot
+            // (O bot vai enviar um botão "📊 Palpites de [Nome]")
+            /* Comentado para debug: TELEGRAM_WEBAPP.close(); */
             
-            try {
-                // Método PREFERIDO: sendData
-                TELEGRAM_WEBAPP.sendData(JSON.stringify(dadosParaBot));
-                logDetalhado('✅ Dados enviados via TELEGRAM_WEBAPP.sendData()');
-                
-                // Mostrar feedback visual
-                TELEGRAM_WEBAPP.showAlert('📥 Solicitando palpites...');
-                
-                // ⭐⭐ IMPORTANTE: Não fecha o WebApp - deixa o bot processar
-                return;
-                
-            } catch (sendDataError) {
-                logDetalhado('❌ Erro no sendData, tentando alternativa...', sendDataError);
-                // Continua para o fallback
-            }
-        }
-        
-        // ⭐⭐ FALLBACK PARA TODOS OS CASOS ⭐⭐
-        logDetalhado('🌐 Usando método de fallback...');
-        
-        // Método alternativo 1: Deep link do Telegram
-        const deepLink = `tg://resolve?domain=${BOT_USERNAME}&start=palpites_${usuarioId}_${rodadaNum}`;
-        const webLink = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
-        
-        logDetalhado('🔗 Links gerados:', { deepLink, webLink });
-        
-        // Tentar abrir deep link
-        try {
-            // Criar iframe invisível para abrir deep link (técnica comum)
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = deepLink;
-            document.body.appendChild(iframe);
-            
-            logDetalhado('🔄 Tentando abrir deep link via iframe...');
-            
-            // Remover iframe após 2 segundos
-            setTimeout(() => {
-                if (iframe.parentNode) {
-                    iframe.parentNode.removeChild(iframe);
-                    logDetalhado('🗑️ Iframe removido');
-                }
-            }, 2000);
-            
-            // Fallback secundário após 1 segundo
-            setTimeout(() => {
-                logDetalhado('⏱️ Fallback secundário: abrindo link web...');
-                window.open(webLink, '_blank');
-            }, 1000);
-            
-        } catch (iframeError) {
-            logDetalhado('❌ Erro com iframe, abrindo link diretamente...', iframeError);
-            window.open(webLink, '_blank');
+        } else {
+            // Fallback para navegador/desktop
+            // Certifique-se que BOT_USERNAME está configurado corretamente no topo
+            const linkBot = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
+            window.open(linkBot, '_blank');
         }
         
     } catch (error) {
-        logDetalhado('❌ Erro ao abrir palpites:', error);
-        
-        // Método de fallback final
-        try {
-            const comando = `/start palpites_${usuarioId}_${rodadaNum}`;
-            
-            // Tentar copiar para área de transferência
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(comando);
-                logDetalhado('📋 Comando copiado para área de transferência:', comando);
-                
-                // Mostrar alerta
-                if (window.Telegram && window.Telegram.WebApp) {
-                    TELEGRAM_WEBAPP.showAlert(`Comando copiado! Cole no chat: ${comando}`);
-                } else {
-                    alert(`Comando copiado! Cole no chat com @${BOT_USERNAME}: ${comando}`);
-                }
-            } else {
-                // Fallback para navegadores antigos
-                alert(`Vá para @${BOT_USERNAME} e digite: ${comando}`);
-            }
-        } catch (clipboardError) {
-            console.error('Erro ao copiar:', clipboardError);
-            alert(`Vá para @${BOT_USERNAME} e digite: /start palpites_${usuarioId}_${rodadaNum}`);
-        }
+        console.error('Erro:', error);
+        alert('Erro ao abrir. Tente pelo comando /start');
     }
 }
 
@@ -886,66 +800,81 @@ function isTelegramWebApp() {
         }
 
         // ATUALIZAR INTERFACE
-        function atualizarInterface() {
-            if (!dadosRanking) return;
+        // ATUALIZAR INTERFACE
+function atualizarInterface() {
+    if (!dadosRanking) return;
 
-            const rodada = dadosRanking.r;
-            const ranking = dadosRanking.k;
+    const rodada = dadosRanking.r;
+    const ranking = dadosRanking.k;
 
-            // Atualizar informações da rodada
-            document.getElementById('rodada-numero').innerHTML = 
-                `<span>📅</span> <span>Rodada: ${rodada.n}</span>`;
-            document.getElementById('total-participantes').innerHTML = 
-                `<span>👥</span> <span>Participantes: ${rodada.p}</span>`;
-            document.getElementById('rodada-atual').textContent = rodada.n;
+    // Atualizar informações da rodada
+    document.getElementById('rodada-numero').innerHTML = 
+        `<span>📅</span> <span>Rodada: ${rodada.n}</span>`;
+    document.getElementById('total-participantes').innerHTML = 
+        `<span>👥</span> <span>Participantes: ${rodada.p}</span>`;
+    document.getElementById('rodada-atual').textContent = rodada.n;
 
-            // Atualizar top 3
-            if (ranking.length > 0) {
-                document.getElementById('top-1').textContent = `🥇 ${ranking[0].n}`;
-                document.getElementById('top-2').textContent = ranking.length > 1 ? `🥈 ${ranking[1].n}` : '🥈 --';
-                document.getElementById('top-3').textContent = ranking.length > 2 ? `🥉 ${ranking[2].n}` : '🥉 --';
-            }
+    // Atualizar top 3
+    if (ranking.length > 0) {
+        document.getElementById('top-1').textContent = `🥇 ${ranking[0].n}`;
+        document.getElementById('top-2').textContent = ranking.length > 1 ? `🥈 ${ranking[1].n}` : '🥈 --';
+        document.getElementById('top-3').textContent = ranking.length > 2 ? `🥉 ${ranking[2].n}` : '🥉 --';
+    }
 
-            // Gerar tabela de ranking
-            const tbody = document.getElementById('ranking-body');
-            tbody.innerHTML = '';
+    // Gerar tabela de ranking
+    const tbody = document.getElementById('ranking-body');
+    tbody.innerHTML = '';
 
-            ranking.forEach((participante, index) => {
-                const linha = document.createElement('tr');
+    ranking.forEach((participante, index) => {
+        const linha = document.createElement('tr');
 
-                // Determinar medalha
-                let medalha = '';
-                if (index === 0) medalha = '🥇';
-                else if (index === 1) medalha = '🥈';
-                else if (index === 2) medalha = '🥉';
-                else if (index === 3) medalha = '🎖️';
+        // Determinar medalha
+        let medalha = '';
+        if (index === 0) medalha = '🥇';
+        else if (index === 1) medalha = '🥈';
+        else if (index === 2) medalha = '🥉';
+        else if (index === 3) medalha = '🎖️';
 
-                // ⭐⭐ IMPORTANTE: Chamada corrigida para abrirPalpitesUsuario ⭐⭐
-                // Usa os parâmetros CORRETOS da estrutura do JSON
-                linha.innerHTML = `
-                    <td class="posicao-cell">
-                        ${medalha ? `<span class="medalha">${medalha}</span>` : ''}
-                        <strong>${index + 1}º</strong>
-                    </td>
-                    <td class="nome-cell">
-                        <a href="javascript:void(0)" class="nome-link" 
-                           onclick="abrirPalpitesUsuario(${participante.u}, ${rodada.n}, '${participante.n.replace(/'/g, "\\'")}')">
-                            <span class="user-icon">👤</span>
-                            ${participante.n}
-                        </a>
-                    </td>
-                    <td class="pontos-cell">${participante.t}</td>
-                    <td class="estatisticas-cell">
-                        <div class="estatisticas-badges">
-                            <span class="estatistica-badge pe">PE: ${participante.e.pe}</span>
-                            <span class="estatistica-badge rc">RC: ${participante.e.rc}</span>
-                        </div>
-                    </td>
-                `;
+        // CORREÇÃO DE SEGURANÇA:
+        // Em vez de passar strings no onclick, usamos data-attributes e event listener
+        // Isso evita erros com nomes contendo aspas ou caracteres especiais
+        
+        linha.innerHTML = `
+            <td class="posicao-cell">
+                ${medalha ? `<span class="medalha">${medalha}</span>` : ''}
+                <strong>${index + 1}º</strong>
+            </td>
+            <td class="nome-cell">
+                <a href="javascript:void(0)" class="nome-link user-action" 
+                   data-uid="${participante.u}" 
+                   data-rodada="${rodada.n}"
+                   data-nome="${participante.n.replace(/"/g, '&quot;')}">
+                    <span class="user-icon">👤</span>
+                    ${participante.n}
+                </a>
+            </td>
+            <td class="pontos-cell">${participante.t}</td>
+            <td class="estatisticas-cell">
+                <div class="estatisticas-badges">
+                    <span class="estatistica-badge pe">PE: ${participante.e.pe}</span>
+                    <span class="estatistica-badge rc">RC: ${participante.e.rc}</span>
+                </div>
+            </td>
+        `;
 
-                tbody.appendChild(linha);
-            });
-        }
+        tbody.appendChild(linha);
+    });
+
+    // Adiciona os eventos de clique após criar os elementos
+    document.querySelectorAll('.user-action').forEach(el => {
+        el.addEventListener('click', function() {
+            const uid = this.getAttribute('data-uid');
+            const rodada = this.getAttribute('data-rodada');
+            const nome = this.getAttribute('data-nome');
+            abrirPalpitesUsuario(uid, rodada, nome);
+        });
+    });
+}
 
         // ==================== FUNÇÕES AUXILIARES DA INTERFACE ====================
         
