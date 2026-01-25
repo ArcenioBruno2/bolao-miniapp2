@@ -193,13 +193,10 @@
             gap: 10px;
             transition: var(--transition);
             cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
         }
 
         .nome-link:hover {
             color: var(--primary);
-            background: rgba(67, 97, 238, 0.05);
         }
 
         .user-icon {
@@ -420,31 +417,17 @@
 
     <!-- Script para processar dados e exibir ranking -->
     <script>
-        // ==================== CONFIGURAÇÃO ====================
+        // ==================== DECOMPRESSÃO E PROCESSAMENTO DE DADOS ====================
         
-        // Habilita logs detalhados para debug
-        const DEBUG = true;
-        
-        function debugLog(...args) {
-            if (DEBUG) {
-                console.log('[RANKING DEBUG]', ...args);
-            }
-        }
-
-        // ==================== DECOMPRESSÃO DE DADOS ====================
-        
+        // Função para descomprimir dados GZIP do Base64
         async function decompressGzip(base64Data) {
             try {
-                debugLog('Iniciando descompressão GZIP...');
-                
                 // Decodifica Base64 para bytes
                 const binaryString = atob(base64Data);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
-                
-                debugLog(`Bytes decodificados: ${bytes.length}`);
                 
                 // Descomprime GZIP
                 const decompressedStream = new Response(bytes).body.pipeThrough(
@@ -454,15 +437,12 @@
                 const decompressedArrayBuffer = await new Response(decompressedStream).arrayBuffer();
                 const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
                 
-                debugLog('Dados descomprimidos com sucesso');
-                
                 return JSON.parse(decompressedString);
             } catch (error) {
                 console.error('Erro ao descomprimir dados:', error);
                 
-                // Fallback: tenta decodificar como Base64 simples
+                // Fallback: tenta decodificar como Base64 simples (sem GZIP)
                 try {
-                    debugLog('Tentando fallback (Base64 simples)...');
                     const decodedString = atob(base64Data);
                     return JSON.parse(decodedString);
                 } catch (fallbackError) {
@@ -472,8 +452,7 @@
             }
         }
 
-        // ==================== FUNÇÕES AUXILIARES ====================
-        
+        // Função para extrair dados da URL
         function getDataFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             const dataParam = urlParams.get('data');
@@ -482,14 +461,15 @@
                 throw new Error('Nenhum dado encontrado na URL');
             }
             
-            debugLog('Dados extraídos da URL (primeiros 100 chars):', dataParam.substring(0, 100));
             return dataParam;
         }
 
+        // Função para formatar número com separador de milhar
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
+        // Função para obter iniciais do nome
         function getInitials(name) {
             return name
                 .split(' ')
@@ -499,120 +479,112 @@
                 .slice(0, 2);
         }
 
-        // ==================== NAVEGAÇÃO PARA PALPITES ====================
-        
-        function navigateToUserPalpites(userId, rodadaNum, userName) {
-            debugLog(`Navegando para palpites:`, { userId, rodadaNum, userName });
-            
-            // Prepara os dados no formato que o bot espera
+        // Função para gerar link de navegação para palpites do usuário
+        // FUNÇÃO CORRIGIDA para gerar link de navegação
+function generateUserLink(userId, rodadaNum, userName) {
+    // IMPORTANTE: O formato deve ser EXATAMENTE como o bot espera
+    return `palpites_${userId}_${rodadaNum}`;
+}
+
+// FUNÇÃO CORRIGIDA para navegar para palpites do usuário
+function navigateToUserPalpites(userId, rodadaNum, userName) {
+    console.log(`Navegando para: usuário=${userId}, rodada=${rodadaNum}, nome=${userName}`);
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        // Método 1: Usando o método oficial do Telegram WebApp
+        try {
+            // Envia dados para o bot (formato que o bot espera)
             const dadosNavegacao = {
                 tipo: 'ver_palpites_usuario',
-                action: 'carregar_rodada',  // ← CAMPO OBRIGATÓRIO
+                action: 'carregar_rodada',  // ← ESSE É O CAMPO QUE O BOT VERIFICA!
                 usuario_id: userId,
                 rodada_num: rodadaNum,
-                timestamp: Date.now(),
-                source: 'ranking_webapp'
+                timestamp: Date.now()
             };
             
-            debugLog('Dados de navegação:', dadosNavegacao);
+            console.log('Enviando dados para o bot:', dadosNavegacao);
+            window.Telegram.WebApp.sendData(JSON.stringify(dadosNavegacao));
             
-            if (window.Telegram && window.Telegram.WebApp) {
-                // Método 1: Envia dados via Telegram WebApp
-                try {
-                    window.Telegram.WebApp.sendData(JSON.stringify(dadosNavegacao));
-                    debugLog('Dados enviados via Telegram WebApp');
-                    
-                    // Fecha o WebApp após um breve delay
-                    setTimeout(() => {
-                        window.Telegram.WebApp.close();
-                    }, 300);
-                    
-                } catch (error) {
-                    console.error('Erro ao enviar via WebApp:', error);
-                    
-                    // Método 2: Tenta via start parameters
-                    try {
-                        const botUsername = window.Telegram.WebApp.initDataUnsafe.user?.username || 'bot';
-                        const startParams = `palpites_${userId}_${rodadaNum}`;
-                        const telegramLink = `https://t.me/${botUsername}?start=${encodeURIComponent(startParams)}`;
-                        
-                        window.Telegram.WebApp.openTelegramLink(telegramLink);
-                        debugLog('Link do Telegram aberto:', telegramLink);
-                    } catch (fallbackError) {
-                        console.error('Fallback também falhou:', fallbackError);
-                        alert('Erro ao navegar. Tente novamente.');
-                    }
-                }
-            } else {
-                // Modo de teste (fora do Telegram)
-                alert(`🔄 NAVEGAÇÃO DE TESTE\n\nUsuário: ${userName}\nID: ${userId}\nRodada: ${rodadaNum}\n\nDados que seriam enviados:\n${JSON.stringify(dadosNavegacao, null, 2)}`);
-                
-                // Simula envio para testes
-                if (window.parent && window.parent.postMessage) {
-                    window.parent.postMessage({
-                        type: 'telegram_web_app_data',
-                        data: JSON.stringify(dadosNavegacao)
-                    }, '*');
-                    debugLog('Dados enviados via postMessage (teste)');
-                }
+            // Fecha o WebApp para retornar ao bot
+            setTimeout(() => {
+                window.Telegram.WebApp.close();
+            }, 100);
+            
+        } catch (error) {
+            console.error('Erro ao enviar dados via WebApp:', error);
+            
+            // Fallback: Tenta abrir via start parameters
+            try {
+                const startParams = `palpites_${userId}_${rodadaNum}`;
+                window.Telegram.WebApp.openTelegramLink(`https://t.me/${window.Telegram.WebApp.initDataUnsafe.user?.username || 'bot'}?start=${startParams}`);
+            } catch (fallbackError) {
+                console.error('Fallback também falhou:', fallbackError);
             }
         }
-
-        // ==================== CRIAÇÃO DA TABELA ====================
+    } else {
+        // Modo de teste (fora do Telegram)
+        alert(`TESTE: Navegaria para palpites de ${userName}\nUsuário ID: ${userId}\nRodada: ${rodadaNum}\n\nNo Telegram, isso abriria o bot com os parâmetros: /start palpites_${userId}_${rodadaNum}`);
         
-        function createNomeCell(user, rodadaNum) {
-            const nomeCell = document.createElement('td');
-            nomeCell.className = 'nome-cell';
-            
-            const nomeContainer = document.createElement('div');
-            nomeContainer.className = 'nome-link';
-            
-            // Configura o clique
-            nomeContainer.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                navigateToUserPalpites(user.u, rodadaNum, user.n);
-            };
-            
-            nomeContainer.style.cursor = 'pointer';
-            nomeContainer.title = `Ver palpites de ${user.n} na rodada ${rodadaNum}`;
-            
-            // Feedback visual
-            nomeContainer.addEventListener('mousedown', () => {
-                nomeContainer.style.transform = 'scale(0.98)';
-                nomeContainer.style.opacity = '0.9';
-            });
-            
-            nomeContainer.addEventListener('mouseup', () => {
-                nomeContainer.style.transform = 'scale(1)';
-                nomeContainer.style.opacity = '1';
-            });
-            
-            nomeContainer.addEventListener('mouseleave', () => {
-                nomeContainer.style.transform = 'scale(1)';
-                nomeContainer.style.opacity = '1';
-            });
-            
-            // Conteúdo da célula
-            nomeContainer.innerHTML = `
-                <div class="user-icon">${getInitials(user.n)}</div>
-                <div>
-                    <div class="user-name">${user.n}</div>
-                    <div style="font-size: 0.8rem; color: var(--gray); margin-top: 2px;">
-                        <i class="fas fa-external-link-alt"></i> Clique para ver palpites
-                    </div>
-                </div>
-            `;
-            
-            nomeCell.appendChild(nomeContainer);
-            return nomeCell;
+        // Para testes locais, simula o envio de dados
+        if (window.parent && window.parent.postMessage) {
+            window.parent.postMessage({
+                type: 'telegram_web_app_data',
+                data: JSON.stringify({
+                    tipo: 'ver_palpites_usuario',
+                    action: 'carregar_rodada',
+                    usuario_id: userId,
+                    rodada_num: rodadaNum
+                })
+            }, '*');
         }
+    }
+}
 
+// FUNÇÃO CORRIGIDA para criar célula do nome
+function createNomeCell(user, rodadaNum) {
+    const nomeCell = document.createElement('td');
+    nomeCell.className = 'nome-cell';
+    
+    const nomeContainer = document.createElement('div');
+    nomeContainer.className = 'nome-link';
+    nomeContainer.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigateToUserPalpites(user.u, rodadaNum, user.n);
+    };
+    nomeContainer.style.cursor = 'pointer';
+    nomeContainer.title = `Ver palpites de ${user.n} na rodada ${rodadaNum}`;
+    
+    // Adiciona feedback visual ao clicar
+    nomeContainer.addEventListener('mousedown', () => {
+        nomeContainer.style.transform = 'scale(0.98)';
+    });
+    nomeContainer.addEventListener('mouseup', () => {
+        nomeContainer.style.transform = 'scale(1)';
+    });
+    nomeContainer.addEventListener('mouseleave', () => {
+        nomeContainer.style.transform = 'scale(1)';
+    });
+    
+    nomeContainer.innerHTML = `
+        <div class="user-icon">${getInitials(user.n)}</div>
+        <div>
+            <div class="user-name">${user.n}</div>
+            <div style="font-size: 0.8rem; color: var(--gray); margin-top: 2px;">
+                <i class="fas fa-external-link-alt"></i> Clique para ver palpites
+            </div>
+        </div>
+    `;
+    
+    nomeCell.appendChild(nomeContainer);
+    return nomeCell;
+}
+        // Função para criar elemento HTML do ranking
         function createRankingRow(user, index, rodadaNum) {
             const row = document.createElement('tr');
             row.className = 'ranking-row';
             
-            // Medalhas e posição
+            // Determina classe de posição
             let posClass = 'posicao-other';
             let medalha = '';
             
@@ -634,8 +606,26 @@
             posCell.className = `posicao-cell ${posClass}`;
             posCell.innerHTML = `<span class="medalha">${medalha}</span>${index + 1}º`;
             
-            // Célula do nome (usando função corrigida)
-            const nomeCell = createNomeCell(user, rodadaNum);
+            // Célula do nome (clicável)
+            const nomeCell = document.createElement('td');
+            nomeCell.className = 'nome-cell';
+            
+            const nomeLink = document.createElement('div');
+            nomeLink.className = 'nome-link';
+            nomeLink.onclick = () => navigateToUserPalpites(user.u, rodadaNum, user.n);
+            nomeLink.title = `Ver palpites de ${user.n} na rodada ${rodadaNum}`;
+            
+            nomeLink.innerHTML = `
+                <div class="user-icon">${getInitials(user.n)}</div>
+                <div>
+                    <div class="user-name">${user.n}</div>
+                    <div style="font-size: 0.8rem; color: var(--gray); margin-top: 2px;">
+                        <i class="fas fa-external-link-alt"></i> Clique para ver palpites
+                    </div>
+                </div>
+            `;
+            
+            nomeCell.appendChild(nomeLink);
             
             // Célula de pontos
             const pontosCell = document.createElement('td');
@@ -668,7 +658,7 @@
             
             statsCell.innerHTML = statsHTML;
             
-            // Monta a linha
+            // Adiciona todas as células à linha
             row.appendChild(posCell);
             row.appendChild(nomeCell);
             row.appendChild(pontosCell);
@@ -677,8 +667,73 @@
             return row;
         }
 
-        // ==================== BOTÕES E CONTROLES ====================
-        
+        // Função para criar botões de ação
+        function createActionButtons(rodadaNum, totalParticipantes, webappBaseUrl) {
+            const actionsContainer = document.getElementById('actionsContainer');
+            
+            actionsContainer.innerHTML = `
+                <button class="btn btn-primary" onclick="refreshRanking()">
+                    <i class="fas fa-sync-alt"></i> Atualizar Ranking
+                </button>
+                <button class="btn btn-secondary" onclick="shareRanking(${rodadaNum})">
+                    <i class="fas fa-share-alt"></i> Compartilhar
+                </button>
+                ${webappBaseUrl ? `
+                <button class="btn btn-secondary" onclick="openFullResults(${rodadaNum})">
+                    <i class="fas fa-chart-bar"></i> Ver Resultados Completos
+                </button>
+                ` : ''}
+            `;
+        }
+
+        // Função para atualizar o ranking (recarrega a página)
+        function refreshRanking() {
+            location.reload();
+        }
+
+        // Função para compartilhar o ranking
+        function shareRanking(rodadaNum) {
+            if (navigator.share) {
+                navigator.share({
+                    title: `🏆 Ranking da Rodada ${rodadaNum} - Bolão`,
+                    text: `Confira o ranking da rodada ${rodadaNum} do bolão!`,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback para copiar link
+                navigator.clipboard.writeText(window.location.href)
+                    .then(() => alert('Link do ranking copiado!'))
+                    .catch(err => console.error('Erro ao copiar link:', err));
+            }
+        }
+
+        // Função para abrir resultados completos (gera imagem)
+        function openFullResults(rodadaNum) {
+            // Esta função enviaria os dados de volta ao bot para gerar uma imagem
+            // Implementação depende da API do bot
+            
+            const rankingData = window.rankingData;
+            
+            // Prepara dados para enviar ao bot
+            const resultadosData = {
+                tipo: 'enviar_resultados_completos',
+                rodada_num: rodadaNum,
+                ranking_data: rankingData.k,
+                rodada_info: rankingData.r,
+                timestamp: new Date().toISOString(),
+                // Adicione outros dados necessários
+            };
+            
+            // Envia dados de volta ao bot via Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(JSON.stringify(resultadosData));
+            } else {
+                console.log('Dados para resultados completos:', resultadosData);
+                alert('Em ambiente Telegram, isso enviaria uma solicitação para gerar imagem dos resultados.');
+            }
+        }
+
+        // Função para criar informações da rodada
         function createRodadaInfo(rodadaData) {
             const rodadaInfo = document.getElementById('rodadaInfo');
             
@@ -698,42 +753,10 @@
             `;
         }
 
-        function createActionButtons(rodadaNum, totalParticipantes) {
-            const actionsContainer = document.getElementById('actionsContainer');
-            
-            actionsContainer.innerHTML = `
-                <button class="btn btn-primary" onclick="refreshRanking()">
-                    <i class="fas fa-sync-alt"></i> Atualizar Ranking
-                </button>
-                <button class="btn btn-secondary" onclick="shareRanking()">
-                    <i class="fas fa-share-alt"></i> Compartilhar
-                </button>
-            `;
-        }
-
-        function refreshRanking() {
-            location.reload();
-        }
-
-        function shareRanking() {
-            if (navigator.share) {
-                navigator.share({
-                    title: `🏆 Ranking da Rodada ${window.rankingData?.r?.n || ''} - Bolão`,
-                    text: `Confira o ranking completo da rodada ${window.rankingData?.r?.n || ''}!`,
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(window.location.href)
-                    .then(() => alert('🔗 Link copiado para a área de transferência!'))
-                    .catch(err => console.error('Erro ao copiar:', err));
-            }
-        }
-
-        // ==================== CARREGAMENTO PRINCIPAL ====================
-        
+        // Função principal para carregar e exibir o ranking
         async function loadRanking() {
             try {
-                // Tela de loading
+                // Mostra loading
                 document.body.innerHTML = `
                     <div class="container">
                         <div class="loading">
@@ -744,46 +767,33 @@
                     </div>
                 `;
                 
-                debugLog('Iniciando carregamento do ranking...');
-                
-                // Obtém e processa dados
+                // Obtém dados da URL
                 const base64Data = getDataFromURL();
+                
+                // Descomprime dados
                 const rankingData = await decompressGzip(base64Data);
                 
-                // Valida dados
+                // Verifica estrutura dos dados
                 if (!rankingData || rankingData.t !== 'ranking_tabela') {
-                    throw new Error('Formato de dados inválido. Esperado: tipo="ranking_tabela"');
+                    throw new Error('Formato de dados inválido');
                 }
                 
-                debugLog('Dados recebidos:', rankingData);
-                
-                // Salva globalmente
+                // Salva dados globalmente para uso posterior
                 window.rankingData = rankingData;
                 
-                // Renderiza
+                // Atualiza a página com os dados
                 renderRanking(rankingData);
-                
-                // Inicializa Telegram WebApp
-                if (window.Telegram && window.Telegram.WebApp) {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    Telegram.WebApp.setHeaderColor('#4361ee');
-                    Telegram.WebApp.setBackgroundColor('#f8f9fa');
-                    debugLog('Telegram WebApp inicializado');
-                }
                 
             } catch (error) {
                 console.error('Erro ao carregar ranking:', error);
                 
+                // Exibe mensagem de erro
                 document.body.innerHTML = `
                     <div class="container">
                         <div class="loading">
                             <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--danger); margin-bottom: 20px;"></i>
                             <h3>Erro ao carregar ranking</h3>
-                            <p style="color: var(--gray); margin: 10px 0;">${error.message}</p>
-                            <p style="font-size: 0.9rem; color: var(--gray); margin: 20px 0;">
-                                Verifique se os dados foram enviados corretamente.
-                            </p>
+                            <p>${error.message}</p>
                             <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 20px;">
                                 <i class="fas fa-redo"></i> Tentar novamente
                             </button>
@@ -793,8 +803,9 @@
             }
         }
 
+        // Função para renderizar o ranking na página
         function renderRanking(rankingData) {
-            // Restaura estrutura HTML
+            // Restaura o HTML original
             document.body.innerHTML = `
                 <div class="container">
                     <div class="header">
@@ -819,42 +830,54 @@
                     <div class="actions" id="actionsContainer"></div>
 
                     <div class="footer">
-                        <p>© 2024 Bolão - Sistema de Ranking</p>
-                        <p style="font-size: 0.8rem; opacity: 0.7;">Clique em um nome para ver os palpites</p>
+                        <p>© 2024 Bolão - Sistema de Ranking | Dados atualizados automaticamente</p>
                     </div>
                 </div>
             `;
             
-            // Preenche dados
+            // Cria informações da rodada
             createRodadaInfo(rankingData.r);
             
+            // Preenche o ranking
             const rankingBody = document.getElementById('rankingBody');
             rankingData.k.forEach((user, index) => {
                 const row = createRankingRow(user, index, rankingData.r.n);
                 rankingBody.appendChild(row);
             });
             
-            createActionButtons(rankingData.r.n, rankingData.r.p);
+            // Cria botões de ação
+            createActionButtons(
+                rankingData.r.n,
+                rankingData.r.p,
+                rankingData.c?.w
+            );
             
-            debugLog(`Ranking renderizado: ${rankingData.k.length} participantes`);
+            // Inicializa Telegram WebApp se disponível
+            if (window.Telegram && window.Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Muda cor da barra superior
+                Telegram.WebApp.setHeaderColor('#4361ee');
+                Telegram.WebApp.setBackgroundColor('#f8f9fa');
+            }
         }
 
-        // ==================== INICIALIZAÇÃO ====================
-        
+        // Inicializa o ranking quando a página carrega
         document.addEventListener('DOMContentLoaded', loadRanking);
         
-        // Suporte para teclado
+        // Adiciona suporte para teclado (acessibilidade)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && window.Telegram && window.Telegram.WebApp) {
                 Telegram.WebApp.close();
             }
         });
 
-        // Exporta funções para debug
-        window.debugLog = debugLog;
+        // Exporta funções para uso global (se necessário)
         window.refreshRanking = refreshRanking;
         window.shareRanking = shareRanking;
-        
+        window.openFullResults = openFullResults;
+        window.navigateToUserPalpites = navigateToUserPalpites;
     </script>
 </body>
 </html>
