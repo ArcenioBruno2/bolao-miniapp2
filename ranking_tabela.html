@@ -3,517 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 Ranking do Bolão</title>
+    <title>🏆 Ranking</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* RESET & VARIÁVEIS */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --secondary: #4cc9f0;
+            --accent: #ffd700;
+            --success: #06d6a0;
+            --danger: #ef476f;
+            --dark: #1a1a2e;
+            --dark-light: #2d3047;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light);
             min-height: 100vh;
+            line-height: 1.6;
             padding: 20px;
+            overflow-x: hidden;
         }
 
+        /* CONTAINER */
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
+        /* HEADER */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            letter-spacing: -0.5px;
         }
 
-        .rodada-info {
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* STATS BADGES */
+        .stats {
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 20px;
+            margin-top: 25px;
             flex-wrap: wrap;
         }
 
-        .rodada-badge {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .participantes-badge {
-            background: linear-gradient(135deg, #4cc9f0, #4361ee);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        /* Tabela de Ranking */
-        .ranking-table {
-            width: 100%;
+        .stat-badge {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: var(--transition);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-badge:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .stat-badge i {
+            color: var(--secondary);
+            font-size: 1.2rem;
+        }
+
+        /* RANKING TABLE */
+        .ranking-section {
+            margin-bottom: 40px;
+        }
+
+        .ranking-table {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            overflow: hidden;
             margin-bottom: 30px;
         }
 
         .table-header {
             display: grid;
-            grid-template-columns: 80px 1fr 100px 100px 100px;
-            padding: 20px;
+            grid-template-columns: 80px 1fr 120px 100px 100px;
+            padding: 20px 24px;
             background: rgba(0, 0, 0, 0.3);
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .table-row {
             display: grid;
-            grid-template-columns: 80px 1fr 100px 100px 100px;
-            padding: 18px 20px;
+            grid-template-columns: 80px 1fr 120px 100px 100px;
+            padding: 18px 24px;
             align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            transition: var(--transition);
             cursor: pointer;
+            position: relative;
         }
 
         .table-row:hover {
             background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-2px);
         }
 
-        /* Posições especiais */
-        .primeiro {
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-            border-left: 5px solid #ffd700;
+        .table-row:last-child {
+            border-bottom: none;
         }
 
-        .segundo {
-            background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05));
-            border-left: 5px solid #c0c0c0;
-        }
-
-        .terceiro {
-            background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05));
-            border-left: 5px solid #cd7f32;
-        }
-
-        .quarto {
-            background: linear-gradient(90deg, rgba(255, 140, 0, 0.15), rgba(255, 140, 0, 0.05));
-            border-left: 5px solid #ff8c00;
-        }
-
-        /* Colunas */
+        /* POSITION STYLES */
         .posicao {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-size: 1.3rem;
-            font-weight: bold;
+            font-weight: 700;
         }
 
         .medalha {
             font-size: 1.8rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
         }
 
+        .primeiro .medalha { background: rgba(255, 215, 0, 0.15); }
+        .segundo .medalha { background: rgba(192, 192, 192, 0.15); }
+        .terceiro .medalha { background: rgba(205, 127, 50, 0.15); }
+        .quarto .medalha { background: rgba(255, 140, 0, 0.15); }
+
+        /* PLAYER NAME */
         .nome {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-name {
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .nome a {
-            color: #4cc9f0;
+        .player-name i {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .player-link {
+            color: var(--secondary);
             text-decoration: none;
-            transition: color 0.3s;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            opacity: 0.8;
         }
 
-        .nome a:hover {
-            color: #ffd700;
-            text-decoration: underline;
+        .player-link:hover {
+            color: var(--accent);
+            opacity: 1;
         }
 
+        /* SCORE COLUMNS */
         .pontos, .pe, .rc {
-            text-align: center;
             font-size: 1.2rem;
-            font-weight: bold;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .pontos {
-            color: #ffd700;
+        .pontos { color: var(--accent); }
+        .pe { color: var(--secondary); }
+        .rc { color: var(--success); }
+
+        .score-icon {
+            font-size: 1rem;
+            opacity: 0.7;
         }
 
-        .pe {
-            color: #4cc9f0;
-        }
-
-        .rc {
-            color: #72efdd;
-        }
-
-        /* Barra de progresso */
-        .progress-bar {
+        /* PROGRESS BAR */
+        .progress-container {
             width: 100%;
             height: 6px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 3px;
-            margin-top: 8px;
             overflow: hidden;
         }
 
-        .progress-fill {
+        .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #4cc9f0, #4361ee);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             border-radius: 3px;
             transition: width 1s ease-in-out;
+            width: 0;
         }
 
-        /* Estatísticas */
-        .stats-container {
+        /* SUMMARY CARDS */
+        .summary-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-top: 30px;
         }
 
-        .stat-box {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .summary-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: var(--transition);
         }
 
-        .stat-box h3 {
-            color: #4cc9f0;
-            margin-bottom: 10px;
+        .summary-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .summary-card h3 {
+            color: var(--secondary);
             font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #ffd700;
+        .summary-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
         }
 
-        /* Botões */
-        .buttons {
+        .summary-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+
+        /* ACTION BUTTONS */
+        .actions {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 30px;
+            margin-top: 40px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: 14px 28px;
             border: none;
             border-radius: 50px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             font-size: 1rem;
+            min-width: 160px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Loading */
-        .loading {
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.4);
+        }
+
+        /* LOADING & ERROR STATES */
+        .loading, .error {
             text-align: center;
-            padding: 50px;
-            font-size: 1.2rem;
-            color: #4cc9f0;
+            padding: 60px 20px;
         }
 
-        .loading i {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            display: block;
+        .loading i, .error i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
         }
 
-        /* Responsivo */
-        @media (max-width: 768px) {
-            .table-header, .table-row {
-                grid-template-columns: 60px 1fr 80px 80px 80px;
-                padding: 15px;
-                font-size: 0.9rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .posicao {
-                font-size: 1.1rem;
-            }
-
-            .medalha {
-                font-size: 1.5rem;
-            }
-
-            .pontos, .pe, .rc {
-                font-size: 1rem;
-            }
+        .loading p, .error p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 480px) {
-            .table-header, .table-row {
-                grid-template-columns: 50px 1fr 70px 70px 70px;
-                padding: 12px;
-                font-size: 0.8rem;
-            }
-
-            .container {
-                padding: 10px;
-            }
-
-            .btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
-            }
-        }
-
-        /* Animações */
+        /* ANIMATIONS */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
         .fade-in {
-            animation: fadeIn 0.8s ease forwards;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .slide-in {
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        .stagger-delay-1 { animation-delay: 0.1s; }
+        .stagger-delay-2 { animation-delay: 0.2s; }
+        .stagger-delay-3 { animation-delay: 0.3s; }
+        .stagger-delay-4 { animation-delay: 0.4s; }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .table-header,
+            .table-row {
+                grid-template-columns: 60px 1fr 80px 70px 70px;
+                padding: 15px;
+                font-size: 0.9rem;
+            }
+            
+            .posicao {
+                font-size: 1.1rem;
+            }
+            
+            .medalha {
+                width: 32px;
+                height: 32px;
+                font-size: 1.4rem;
+            }
+            
+            .pontos, .pe, .rc {
+                font-size: 1rem;
+            }
+            
+            .btn {
+                min-width: 140px;
+                padding: 12px 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 50px 1fr 70px 60px 60px;
+                padding: 12px;
+                font-size: 0.85rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stat-badge {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* PULSE ANIMATION FOR MEDALS */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .pulse {
             animation: pulse 2s infinite;
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        /* SCROLLBAR STYLING */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Cabeçalho -->
+        <!-- HEADER -->
         <div class="header fade-in">
             <h1><i class="fas fa-trophy"></i> RANKING DO BOLÃO</h1>
-            <p>Classificação atualizada da rodada</p>
+            <p>Classificação atualizada com estatísticas detalhadas</p>
             
-            <div class="rodada-info">
-                <div class="rodada-badge" id="rodadaNum">
-                    <i class="fas fa-calendar-alt"></i> Rodada: --
+            <div class="stats">
+                <div class="stat-badge" id="rodadaNum">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>Rodada: <span id="rodadaNumValue">--</span></span>
                 </div>
-                <div class="participantes-badge" id="totalParticipantes">
-                    <i class="fas fa-users"></i> Participantes: --
+                <div class="stat-badge" id="totalParticipantes">
+                    <i class="fas fa-users"></i>
+                    <span>Participantes: <span id="participantesValue">--</span></span>
+                </div>
+                <div class="stat-badge" id="dataAtualizacao">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Atualizado: <span id="horaValue">--</span></span>
                 </div>
             </div>
         </div>
 
-        <!-- Tabela de Ranking -->
-        <div class="ranking-table fade-in" style="animation-delay: 0.2s">
-            <div class="table-header">
-                <div>POSIÇÃO</div>
-                <div>JOGADOR</div>
-                <div>PONTOS</div>
-                <div>PE</div>
-                <div>RC</div>
-            </div>
-            
-            <div id="rankingBody">
-                <!-- Ranking será carregado aqui -->
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Carregando ranking...</p>
+        <!-- RANKING TABLE -->
+        <div class="ranking-section">
+            <div class="ranking-table fade-in stagger-delay-1">
+                <div class="table-header">
+                    <div>POSIÇÃO</div>
+                    <div>JOGADOR</div>
+                    <div>PONTOS</div>
+                    <div>PE</div>
+                    <div>RC</div>
+                </div>
+                
+                <div id="rankingBody">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Carregando ranking...</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Estatísticas -->
-        <div class="stats-container fade-in" style="animation-delay: 0.4s">
-            <div class="stat-box">
-                <h3><i class="fas fa-crown"></i> CAMPEÃO</h3>
-                <div class="stat-value" id="campeaoNome">--</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="campeaoBarra" style="width: 100%"></div>
+        <!-- SUMMARY STATS -->
+        <div class="summary-cards">
+            <div class="summary-card fade-in stagger-delay-2">
+                <h3><i class="fas fa-crown"></i> LÍDER</h3>
+                <div class="summary-value" id="campeaoNome">--</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="campeaoBarra"></div>
                 </div>
+                <div class="summary-label">Maior pontuação da rodada</div>
             </div>
             
-            <div class="stat-box">
-                <h3><i class="fas fa-chart-line"></i> MAIOR PONTUAÇÃO</h3>
-                <div class="stat-value" id="maiorPontuacao">--</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="pontuacaoBarra" style="width: 100%"></div>
+            <div class="summary-card fade-in stagger-delay-3">
+                <h3><i class="fas fa-star"></i> DESTAQUE</h3>
+                <div class="summary-value" id="maisPE">--</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="peBarra"></div>
                 </div>
+                <div class="summary-label">Mais placares exatos (PE)</div>
             </div>
             
-            <div class="stat-box">
-                <h3><i class="fas fa-bullseye"></i> MAIS PLACARES EXATOS</h3>
-                <div class="stat-value" id="maisPE">--</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="peBarra" style="width: 100%"></div>
+            <div class="summary-card fade-in stagger-delay-4">
+                <h3><i class="fas fa-chart-line"></i> MÉDIA</h3>
+                <div class="summary-value" id="mediaPontos">--</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="mediaBarra"></div>
                 </div>
+                <div class="summary-label">Pontuação média da rodada</div>
             </div>
         </div>
 
-        <!-- Botões -->
-        <div class="buttons fade-in" style="animation-delay: 0.6s">
-            <button class="btn btn-primary" onclick="window.Telegram.WebApp.close()">
+        <!-- ACTION BUTTONS -->
+        <div class="actions">
+            <button class="btn btn-primary" onclick="fecharWebApp()">
                 <i class="fas fa-times"></i> FECHAR
             </button>
             <button class="btn btn-secondary" onclick="atualizarRanking()">
-                <i class="fas fa-sync-alt"></i> ATUALIZAR
+                <i class="fas fa-redo"></i> ATUALIZAR
             </button>
         </div>
     </div>
 
     <script>
-        // Variáveis globais
+        // ==================== CONFIGURAÇÃO ====================
         let rankingData = null;
-        let webappUsuarioUrl = '';
-
-        // Função para decodificar dados comprimidos
-        async function decodificarDados() {
+        let botUsername = '';
+        
+        // ==================== FUNÇÕES PRINCIPAIS ====================
+        
+        // Função principal para carregar dados
+        async function carregarDados() {
             try {
-                // Pega parâmetro 'data' da URL
-                const urlParams = new URLSearchParams(window.location.search);
-                const dadosBase64 = urlParams.get('data');
+                mostrarCarregamento();
+                const dados = await decodificarDadosURL();
                 
-                if (!dadosBase64) {
-                    throw new Error('Nenhum dado recebido na URL');
-                }
-
-                // Decodifica Base64 URL-safe
-                const dadosBin = atob(dadosBase64.replace(/-/g, '+').replace(/_/g, '/'));
-                
-                // Converte para ArrayBuffer
-                const arrayBuffer = new ArrayBuffer(dadosBin.length);
-                const uint8Array = new Uint8Array(arrayBuffer);
-                for (let i = 0; i < dadosBin.length; i++) {
-                    uint8Array[i] = dadosBin.charCodeAt(i);
-                }
-                
-                // Descomprime GZIP
-                const dadosComprimidos = new Uint8Array(arrayBuffer);
-                
-                // Se começar com 0x1f 0x8b é GZIP
-                if (dadosComprimidos[0] === 0x1f && dadosComprimidos[1] === 0x8b) {
-                    // Tenta usar pako se disponível, senão assume que já está descomprimido
-                    if (typeof pako !== 'undefined') {
-                        const dadosDescomprimidos = pako.inflate(dadosComprimidos, { to: 'string' });
-                        return JSON.parse(dadosDescomprimidos);
-                    } else {
-                        // Fallback: assume que não está comprimido
-                        const decoder = new TextDecoder('utf-8');
-                        const dadosString = decoder.decode(dadosComprimidos);
-                        return JSON.parse(dadosString);
-                    }
-                } else {
-                    // Não é GZIP, decodifica direto
-                    const decoder = new TextDecoder('utf-8');
-                    const dadosString = decoder.decode(dadosComprimidos);
-                    return JSON.parse(dadosString);
-                }
-                
-            } catch (error) {
-                console.error('Erro ao decodificar dados:', error);
-                // Fallback: tenta decodificar como JSON direto (sem compressão)
-                const urlParams = new URLSearchParams(window.location.search);
-                const dadosBase64 = urlParams.get('data');
-                if (dadosBase64) {
-                    const dadosJson = atob(dadosBase64);
-                    return JSON.parse(dadosJson);
-                }
-                throw error;
-            }
-        }
-
-        // Função para carregar ranking
-        async function carregarRanking() {
-            try {
-                const dados = await decodificarDados();
-                
-                // Verifica estrutura dos dados
                 if (!dados || !dados.k) {
                     throw new Error('Estrutura de dados inválida');
                 }
                 
-                // Atualiza variáveis globais
                 rankingData = dados;
-                webappUsuarioUrl = dados.c?.w || '';
+                botUsername = dados.c?.b || '';
                 
-                // Atualiza informações da rodada
-                document.getElementById('rodadaNum').innerHTML = 
-                    `<i class="fas fa-calendar-alt"></i> Rodada: ${dados.r?.n || '--'}`;
-                
-                document.getElementById('totalParticipantes').innerHTML = 
-                    `<i class="fas fa-users"></i> Participantes: ${dados.r?.p || 0}`;
-                
-                // Renderiza ranking
+                atualizarInformacoesGerais();
                 renderizarRanking();
-                
-                // Atualiza estatísticas
                 atualizarEstatisticas();
                 
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                document.getElementById('rankingBody').innerHTML = `
-                    <div class="loading">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Erro ao carregar ranking: ${error.message}</p>
-                        <button class="btn btn-primary" onclick="location.reload()">
-                            <i class="fas fa-redo"></i> TENTAR NOVAMENTE
-                        </button>
-                    </div>
-                `;
+                console.error('Erro ao carregar dados:', error);
+                mostrarErro(`Erro ao carregar ranking: ${error.message}`);
             }
         }
-
-        // Função para renderizar ranking
+        
+        // Decodifica dados da URL
+        async function decodificarDadosURL() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosBase64 = urlParams.get('data');
+                
+                if (!dadosBase64) {
+                    throw new Error('Nenhum dado recebido');
+                }
+                
+                // Decodifica Base64 URL-safe
+                const dadosJson = atob(dadosBase64.replace(/-/g, '+').replace(/_/g, '/'));
+                const dados = JSON.parse(dadosJson);
+                
+                // Se os dados estão comprimidos (GZIP), descomprime
+                if (dados.c && dados.d) {
+                    if (typeof pako !== 'undefined') {
+                        const dadosBin = atob(dados.d);
+                        const arrayBuffer = new ArrayBuffer(dadosBin.length);
+                        const uint8Array = new Uint8Array(arrayBuffer);
+                        for (let i = 0; i < dadosBin.length; i++) {
+                            uint8Array[i] = dadosBin.charCodeAt(i);
+                        }
+                        const dadosDescomprimidos = pako.inflate(uint8Array, { to: 'string' });
+                        return JSON.parse(dadosDescomprimidos);
+                    }
+                }
+                
+                return dados;
+                
+            } catch (error) {
+                console.error('Erro na decodificação:', error);
+                throw error;
+            }
+        }
+        
+        // Atualiza informações gerais
+        function atualizarInformacoesGerais() {
+            if (!rankingData) return;
+            
+            // Rodada
+            document.getElementById('rodadaNumValue').textContent = rankingData.r?.n || '--';
+            
+            // Participantes
+            const total = rankingData.r?.p || 0;
+            document.getElementById('participantesValue').textContent = total;
+            
+            // Hora atual
+            const agora = new Date();
+            const hora = agora.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            document.getElementById('horaValue').textContent = hora;
+        }
+        
+        // Renderiza a tabela de ranking
         function renderizarRanking() {
             const rankingBody = document.getElementById('rankingBody');
             
@@ -521,27 +672,30 @@
                 rankingBody.innerHTML = `
                     <div class="loading">
                         <i class="fas fa-info-circle"></i>
-                        <p>Nenhum dado de ranking disponível</p>
+                        <p>Nenhum dado disponível</p>
                     </div>
                 `;
                 return;
             }
             
-            let html = '';
-            
             // Encontra maior pontuação para barras de progresso
-            const maiorPontuacao = Math.max(...rankingData.k.map(item => item.t));
+            const maiorPontuacao = Math.max(...rankingData.k.map(item => item.t || 0));
+            
+            let html = '';
             
             rankingData.k.forEach((item, index) => {
                 const posicao = index + 1;
+                const pontos = item.t || 0;
+                const pe = item.e?.pe || 0;
+                const rc = item.e?.rc || 0;
                 
-                // Define medalha e classe CSS
+                // Define medalha e classe
                 let medalha = '';
                 let classeCss = '';
                 
                 if (posicao === 1) {
                     medalha = '🥇';
-                    classeCss = 'primeiro';
+                    classeCss = 'primeiro pulse';
                 } else if (posicao === 2) {
                     medalha = '🥈';
                     classeCss = 'segundo';
@@ -551,109 +705,185 @@
                 } else if (posicao === 4) {
                     medalha = '🎖️';
                     classeCss = 'quarto';
+                } else {
+                    medalha = `${posicao}º`;
                 }
                 
                 // Calcula percentual para barra
-                const percentualPontos = Math.round((item.t / maiorPontuacao) * 100);
-                
-                // Cria link se tiver ID de usuário
-                let nomeHtml = item.n;
-                if (item.u && webappUsuarioUrl) {
-                    nomeHtml = `<a href="javascript:void(0)" onclick="abrirPalpitesUsuario(${item.u}, ${rankingData.r.n})">${item.n}</a>`;
-                }
+                const percentual = maiorPontuacao > 0 ? Math.round((pontos / maiorPontuacao) * 100) : 0;
                 
                 html += `
-                    <div class="table-row ${classeCss}">
+                    <div class="table-row ${classeCss}" onclick="abrirPalpitesUsuario(${item.u}, ${rankingData.r.n})">
                         <div class="posicao">
-                            <span class="medalha">${medalha}</span>
-                            <span>${posicao}º</span>
+                            <div class="medalha">${medalha}</div>
                         </div>
                         <div class="nome">
-                            ${nomeHtml}
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${percentualPontos}%"></div>
+                            <div class="player-name">
+                                <i class="fas fa-user"></i> ${item.n || 'Jogador'}
+                            </div>
+                            <a href="javascript:void(0)" class="player-link" onclick="event.stopPropagation(); abrirPalpitesUsuario(${item.u}, ${rankingData.r.n})">
+                                <i class="fas fa-chart-bar"></i> Ver palpites
+                            </a>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${percentual}%"></div>
                             </div>
                         </div>
-                        <div class="pontos">${item.t}</div>
-                        <div class="pe">${item.e?.pe || 0}</div>
-                        <div class="rc">${item.e?.rc || 0}</div>
+                        <div class="pontos">
+                            <i class="fas fa-star score-icon"></i> ${pontos}
+                        </div>
+                        <div class="pe">
+                            <i class="fas fa-bullseye score-icon"></i> ${pe}
+                        </div>
+                        <div class="rc">
+                            <i class="fas fa-check-circle score-icon"></i> ${rc}
+                        </div>
                     </div>
                 `;
             });
             
             rankingBody.innerHTML = html;
         }
-
-        // Função para atualizar estatísticas
+        
+        // Atualiza estatísticas
         function atualizarEstatisticas() {
             if (!rankingData || !rankingData.k || rankingData.k.length === 0) return;
             
-            // Campeão
-            const campeao = rankingData.k[0];
-            document.getElementById('campeaoNome').textContent = campeao.n;
+            const jogadores = rankingData.k;
             
-            // Maior pontuação
-            const maiorPontuacao = Math.max(...rankingData.k.map(item => item.t));
-            document.getElementById('maiorPontuacao').textContent = maiorPontuacao;
+            // Líder
+            const lider = jogadores[0];
+            document.getElementById('campeaoNome').textContent = lider.n || '--';
             
             // Mais placares exatos
-            const maisPE = Math.max(...rankingData.k.map(item => item.e?.pe || 0));
-            document.getElementById('maisPE').textContent = maisPE;
+            const maisPE = Math.max(...jogadores.map(j => j.e?.pe || 0));
+            const jogadorMaisPE = jogadores.find(j => (j.e?.pe || 0) === maisPE);
+            document.getElementById('maisPE').textContent = `${jogadorMaisPE?.n || '--'} (${maisPE})`;
+            
+            // Média de pontos
+            const totalPontos = jogadores.reduce((sum, j) => sum + (j.t || 0), 0);
+            const media = jogadores.length > 0 ? Math.round(totalPontos / jogadores.length) : 0;
+            document.getElementById('mediaPontos').textContent = media;
             
             // Atualiza barras de progresso
-            const participantes = rankingData.k.length;
-            const campeaoPercentual = Math.round((campeao.t / maiorPontuacao) * 100);
-            document.getElementById('campeaoBarra').style.width = `${campeaoPercentual}%`;
-            
-            // Encontra quem tem mais PE
-            const topPE = rankingData.k.reduce((prev, current) => 
-                (prev.e?.pe || 0) > (current.e?.pe || 0) ? prev : current
-            );
-            const pePercentual = Math.round(((topPE.e?.pe || 0) / maisPE) * 100);
-            document.getElementById('peBarra').style.width = `${pePercentual}%`;
+            const maiorPontuacao = Math.max(...jogadores.map(j => j.t || 0));
+            if (maiorPontuacao > 0) {
+                const percentualLider = Math.round((lider.t / maiorPontuacao) * 100);
+                document.getElementById('campeaoBarra').style.width = `${percentualLider}%`;
+                
+                const percentualMedia = Math.round((media / maiorPontuacao) * 100);
+                document.getElementById('mediaBarra').style.width = `${percentualMedia}%`;
+                
+                const maxPE = Math.max(...jogadores.map(j => j.e?.pe || 0));
+                if (maxPE > 0) {
+                    const percentualPE = Math.round((maisPE / maxPE) * 100);
+                    document.getElementById('peBarra').style.width = `${percentualPE}%`;
+                }
+            }
         }
-
-        // Função para abrir palpites do usuário
-         // Função para abrir palpites do usuário
-function abrirPalpitesUsuario(usuarioId, rodadaNum) {
-    console.log(`👤 Abrindo palpites do usuário ID: ${usuarioId} - Rodada: ${rodadaNum}`);
-    
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.sendData(JSON.stringify({
-            tipo: 'ver_palpites_usuario',
-            usuario_id: usuarioId,
-            rodada_num: rodadaNum,  // ← Adiciona rodada!
-            timestamp: Date.now()
-        }));
         
-        Telegram.WebApp.close();
-    }
-}
-
-        // Função para atualizar ranking
+        // ==================== FUNÇÃO PRINCIPAL PARA ABRIR PALPITES ====================
+        async function abrirPalpitesUsuario(usuarioId, rodadaNum) {
+            console.log(`🎯 Abrindo palpites - Usuário: ${usuarioId}, Rodada: ${rodadaNum}`);
+            
+            if (!window.Telegram || !Telegram.WebApp) {
+                console.error('Telegram Web App não disponível');
+                mostrarErro('Erro: Não foi possível abrir os palpites');
+                return;
+            }
+            
+            try {
+                // ⭐⭐ FORMATO CORRETO QUE O BOT ESPERA ⭐⭐
+                const dadosParaEnviar = {
+                    tipo: 'carregar_rodada_usuario',  // ⭐ TIPO QUE O BOT RECONHECE
+                    usuario_id: usuarioId,
+                    rodada_num: rodadaNum,
+                    chat_id: Telegram.WebApp.initDataUnsafe.chat?.id,
+                    timestamp: Date.now(),
+                    action: 'carregar_rodada'  // ⭐ ACTION ALTERNATIVA
+                };
+                
+                console.log('📤 Enviando dados para o bot:', dadosParaEnviar);
+                
+                // Envia os dados para o bot
+                Telegram.WebApp.sendData(JSON.stringify(dadosParaEnviar));
+                
+                // ⭐⭐ NÃO FECHA O WEB APP - DEIXA O BOT PROCESSAR ⭐⭐
+                // Telegram.WebApp.close(); // REMOVIDO!
+                
+                // Mostra feedback para o usuário
+                mostrarFeedback('Carregando palpites...');
+                
+            } catch (error) {
+                console.error('Erro ao enviar dados:', error);
+                mostrarErro(`Erro: ${error.message}`);
+            }
+        }
+        
+        // ==================== FUNÇÕES AUXILIARES ====================
+        
+        function mostrarCarregamento() {
+            const rankingBody = document.getElementById('rankingBody');
+            rankingBody.innerHTML = `
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Carregando ranking...</p>
+                </div>
+            `;
+        }
+        
+        function mostrarErro(mensagem) {
+            const rankingBody = document.getElementById('rankingBody');
+            rankingBody.innerHTML = `
+                <div class="error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${mensagem}</p>
+                    <button class="btn btn-primary" onclick="atualizarRanking()">
+                        <i class="fas fa-redo"></i> TENTAR NOVAMENTE
+                    </button>
+                </div>
+            `;
+        }
+        
+        function mostrarFeedback(mensagem) {
+            // Pode implementar um toast/notificação aqui
+            console.log('Feedback:', mensagem);
+        }
+        
+        function fecharWebApp() {
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.close();
+            }
+        }
+        
         function atualizarRanking() {
             location.reload();
         }
-
-        // Inicialização
+        
+        // ==================== INICIALIZAÇÃO ====================
+        
         document.addEventListener('DOMContentLoaded', () => {
-            // Carrega ranking automaticamente
-            carregarRanking();
-            
-            // Atualiza a cada 30 segundos
-            setInterval(atualizarRanking, 30000);
-            
             // Configura botão de voltar do Telegram
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.BackButton.show();
-                window.Telegram.WebApp.BackButton.onClick(() => {
-                    window.Telegram.WebApp.close();
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.expand();
+                Telegram.WebApp.BackButton.show();
+                Telegram.WebApp.BackButton.onClick(() => {
+                    Telegram.WebApp.close();
                 });
+                
+                // Configura tema
+                Telegram.WebApp.setHeaderColor('#1a1a2e');
+                Telegram.WebApp.setBackgroundColor('#0f172a');
             }
+            
+            // Carrega dados
+            carregarDados();
+            
+            // Atualiza a cada 2 minutos
+            setInterval(atualizarRanking, 120000);
         });
     </script>
     
-    <!-- Biblioteca para descompressão GZIP (fallback) -->
+    <!-- Biblioteca para descompressão GZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 </body>
 </html>
