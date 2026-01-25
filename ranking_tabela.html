@@ -586,64 +586,216 @@
         // ==================== FUNÇÕES PRINCIPAIS ====================
         
         // Função principal para carregar dados
-        async function carregarDados() {
-            try {
-                mostrarCarregamento();
-                const dados = await decodificarDadosURL();
-                
-                if (!dados || !dados.k) {
-                    throw new Error('Estrutura de dados inválida');
-                }
-                
-                rankingData = dados;
-                botUsername = dados.c?.b || '';
-                
-                atualizarInformacoesGerais();
-                renderizarRanking();
-                atualizarEstatisticas();
-                
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                mostrarErro(`Erro ao carregar ranking: ${error.message}`);
-            }
+        // ==================== VERSÃO DEBUG SIMPLES ====================
+async function carregarDados() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dadosBase64 = urlParams.get('data');
+        
+        console.log('='.repeat(60));
+        console.log('🔍 DEBUG - INICIANDO CARREGAMENTO');
+        console.log('URL completa:', window.location.href);
+        console.log('Parâmetro "data" existe?', !!dadosBase64);
+        console.log('Tamanho do data:', dadosBase64?.length || 0);
+        console.log('Primeiros 200 chars do data:', dadosBase64?.substring(0, 200));
+        console.log('='.repeat(60));
+        
+        if (!dadosBase64) {
+            mostrarErro('Nenhum dado recebido na URL');
+            return;
         }
+        
+        // ⭐⭐ MÉTODO DIRETO PARA DEBUG ⭐⭐
+        // Tenta decodificar como string simples
+        try {
+            const jsonString = atob(dadosBase64);
+            console.log('📄 String decodificada:', jsonString.substring(0, 500));
+            
+            const dados = JSON.parse(jsonString);
+            console.log('✅ JSON parseado com sucesso!');
+            console.log('Estrutura do JSON:', Object.keys(dados));
+            
+            // Processa os dados
+            rankingData = dados;
+            renderizarRankingSimples(dados);
+            
+        } catch (parseError) {
+            console.error('❌ Erro ao parsear:', parseError);
+            
+            // Mostra erro detalhado
+            mostrarErro(`
+                Erro ao decodificar dados:<br><br>
+                <small>${parseError.message}</small><br><br>
+                <button onclick="mostrarDadosBrutos()" class="btn btn-secondary">
+                    <i class="fas fa-code"></i> VER DADOS BRUTOS
+                </button>
+            `);
+        }
+        
+    } catch (error) {
+        console.error('Erro geral:', error);
+        mostrarErro(`Erro: ${error.message}`);
+    }
+}
+
+// Função para mostrar dados brutos (debug)
+function mostrarDadosBrutos() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dadosBase64 = urlParams.get('data');
+    
+    if (!dadosBase64) {
+        alert('Nenhum dado encontrado');
+        return;
+    }
+    
+    try {
+        const jsonString = atob(dadosBase64);
+        const dadosDiv = document.getElementById('rankingBody');
+        dadosDiv.innerHTML = `
+            <div class="loading">
+                <h3><i class="fas fa-code"></i> DADOS BRUTOS RECEBIDOS</h3>
+                <div style="text-align: left; background: #1a1a2e; padding: 15px; border-radius: 8px; margin: 15px 0; max-height: 300px; overflow: auto; font-family: monospace;">
+                    ${jsonString.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                </div>
+                <button class="btn btn-primary" onclick="carregarDados()">
+                    <i class="fas fa-arrow-left"></i> VOLTAR
+                </button>
+            </div>
+        `;
+    } catch (e) {
+        alert('Erro ao decodificar: ' + e.message);
+    }
+}
+
+// Versão simples de renderização
+function renderizarRankingSimples(dados) {
+    const rankingBody = document.getElementById('rankingBody');
+    
+    if (!dados.k || !Array.isArray(dados.k)) {
+        mostrarErro('Estrutura de dados inválida: campo "k" não encontrado');
+        return;
+    }
+    
+    let html = '';
+    
+    dados.k.forEach((item, index) => {
+        const posicao = index + 1;
+        
+        html += `
+            <div class="table-row" onclick="abrirPalpitesUsuario(${item.u}, ${dados.r.n})">
+                <div class="posicao">${posicao}º</div>
+                <div class="nome">
+                    <div class="player-name">
+                        <i class="fas fa-user"></i> ${item.n}
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: ${Math.random() * 100}%"></div>
+                    </div>
+                </div>
+                <div class="pontos">${item.t || 0}</div>
+                <div class="pe">${item.e?.pe || 0}</div>
+                <div class="rc">${item.e?.rc || 0}</div>
+            </div>
+        `;
+    });
+    
+    rankingBody.innerHTML = html;
+    
+    // Atualiza informações
+    document.getElementById('rodadaNumValue').textContent = dados.r?.n || '--';
+    document.getElementById('participantesValue').textContent = dados.k.length;
+}
         
         // Decodifica dados da URL
-        async function decodificarDadosURL() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const dadosBase64 = urlParams.get('data');
-                
-                if (!dadosBase64) {
-                    throw new Error('Nenhum dado recebido');
-                }
-                
-                // Decodifica Base64 URL-safe
-                const dadosJson = atob(dadosBase64.replace(/-/g, '+').replace(/_/g, '/'));
-                const dados = JSON.parse(dadosJson);
-                
-                // Se os dados estão comprimidos (GZIP), descomprime
-                if (dados.c && dados.d) {
-                    if (typeof pako !== 'undefined') {
-                        const dadosBin = atob(dados.d);
-                        const arrayBuffer = new ArrayBuffer(dadosBin.length);
-                        const uint8Array = new Uint8Array(arrayBuffer);
-                        for (let i = 0; i < dadosBin.length; i++) {
-                            uint8Array[i] = dadosBin.charCodeAt(i);
-                        }
-                        const dadosDescomprimidos = pako.inflate(uint8Array, { to: 'string' });
-                        return JSON.parse(dadosDescomprimidos);
-                    }
-                }
-                
-                return dados;
-                
-            } catch (error) {
-                console.error('Erro na decodificação:', error);
-                throw error;
-            }
+        // ==================== FUNÇÃO CORRIGIDA PARA DECODIFICAR ====================
+async function decodificarDadosURL() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dadosBase64 = urlParams.get('data');
+        
+        if (!dadosBase64) {
+            throw new Error('Nenhum dado recebido na URL');
+        }
+
+        console.log('📥 Dados Base64 recebidos (primeiros 100 chars):', dadosBase64.substring(0, 100));
+        
+        // ⭐⭐ DECODIFICAÇÃO CORRETA ⭐⭐
+        // 1. Base64 URL-safe para normal
+        const base64Normal = dadosBase64
+            .replace(/-/g, '+')
+            .replace(/_/g, '/')
+            .replace(/\s/g, '');
+        
+        // 2. Decodifica Base64 para bytes
+        const binaryString = atob(base64Normal);
+        const bytes = new Uint8Array(binaryString.length);
+        
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
         }
         
+        console.log('🔍 Bytes decodificados:', bytes.length, 'bytes');
+        console.log('🔍 Primeiros bytes:', Array.from(bytes.slice(0, 10)));
+        
+        // 3. VERIFICA SE É GZIP (magic bytes: 0x1F 0x8B)
+        const isGzipped = bytes[0] === 0x1F && bytes[1] === 0x8B;
+        console.log('📦 É GZIP?', isGzipped);
+        
+        let dadosJson;
+        
+        if (isGzipped && typeof pako !== 'undefined') {
+            // 4. DESCOMPRIME GZIP
+            console.log('🔄 Descomprimindo GZIP...');
+            try {
+                const decompressed = pako.inflate(bytes, { to: 'string' });
+                dadosJson = JSON.parse(decompressed);
+                console.log('✅ GZIP descomprimido com sucesso!');
+            } catch (gzipError) {
+                console.error('❌ Erro ao descomprimir GZIP:', gzipError);
+                // Tenta como JSON direto (fallback)
+                const textDecoder = new TextDecoder('utf-8');
+                const jsonString = textDecoder.decode(bytes);
+                dadosJson = JSON.parse(jsonString);
+            }
+        } else {
+            // 5. NÃO É GZIP - decodifica como texto direto
+            console.log('📄 Processando como texto direto...');
+            const textDecoder = new TextDecoder('utf-8');
+            const jsonString = textDecoder.decode(bytes);
+            dadosJson = JSON.parse(jsonString);
+        }
+        
+        console.log('🎉 Dados decodificados com sucesso!');
+        console.log('📋 Estrutura:', {
+            tipo: dadosJson.t,
+            rodada: dadosJson.r,
+            participantes: dadosJson.k?.length || 0
+        });
+        
+        return dadosJson;
+        
+    } catch (error) {
+        console.error('❌ ERRO na decodificação:', error);
+        
+        // ⭐⭐ FALLBACK ULTRA SIMPLES PARA DEBUG ⭐⭐
+        try {
+            // Tenta decodificar direto como string (para debug)
+            const urlParams = new URLSearchParams(window.location.search);
+            const dadosBase64 = urlParams.get('data');
+            
+            if (dadosBase64) {
+                console.log('🆘 Tentando fallback simples...');
+                const jsonString = atob(dadosBase64);
+                console.log('🆘 String decodificada:', jsonString.substring(0, 200));
+                return JSON.parse(jsonString);
+            }
+        } catch (fallbackError) {
+            console.error('❌ Fallback também falhou:', fallbackError);
+        }
+        
+        throw error;
+    }
+}
         // Atualiza informações gerais
         function atualizarInformacoesGerais() {
             if (!rankingData) return;
