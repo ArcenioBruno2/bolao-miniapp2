@@ -589,55 +589,111 @@
         // ==================== VERSÃO DEBUG SIMPLES ====================
 async function carregarDados() {
     try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const dadosBase64 = urlParams.get('data');
+        console.clear();
+        console.log('🚀 INICIANDO CARREGAMENTO DO RANKING');
         
-        console.log('='.repeat(60));
-        console.log('🔍 DEBUG - INICIANDO CARREGAMENTO');
-        console.log('URL completa:', window.location.href);
-        console.log('Parâmetro "data" existe?', !!dadosBase64);
-        console.log('Tamanho do data:', dadosBase64?.length || 0);
-        console.log('Primeiros 200 chars do data:', dadosBase64?.substring(0, 200));
-        console.log('='.repeat(60));
+        // Mostra estado de carregamento
+        document.getElementById('rankingBody').innerHTML = `
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Decodificando dados...</p>
+                <small class="debug-info" id="debugInfo"></small>
+            </div>
+        `;
         
-        if (!dadosBase64) {
-            mostrarErro('Nenhum dado recebido na URL');
-            return;
+        // Atualiza info de debug
+        document.getElementById('debugInfo').textContent = 
+            `URL: ${window.location.href.substring(0, 100)}...`;
+        
+        const dados = await decodificarDadosURL();
+        
+        if (!dados) {
+            throw new Error('Dados vazios recebidos');
         }
         
-        // ⭐⭐ MÉTODO DIRETO PARA DEBUG ⭐⭐
-        // Tenta decodificar como string simples
-        try {
-            const jsonString = atob(dadosBase64);
-            console.log('📄 String decodificada:', jsonString.substring(0, 500));
-            
-            const dados = JSON.parse(jsonString);
-            console.log('✅ JSON parseado com sucesso!');
-            console.log('Estrutura do JSON:', Object.keys(dados));
-            
-            // Processa os dados
-            rankingData = dados;
-            renderizarRankingSimples(dados);
-            
-        } catch (parseError) {
-            console.error('❌ Erro ao parsear:', parseError);
-            
-            // Mostra erro detalhado
-            mostrarErro(`
-                Erro ao decodificar dados:<br><br>
-                <small>${parseError.message}</small><br><br>
-                <button onclick="mostrarDadosBrutos()" class="btn btn-secondary">
-                    <i class="fas fa-code"></i> VER DADOS BRUTOS
-                </button>
-            `);
-        }
+        // ⭐⭐ NORMALIZA DADOS ⭐⭐
+        // Se vier em formato antigo, converte para novo
+        const dadosNormalizados = normalizarDados(dados);
+        
+        // Atualiza variáveis globais
+        rankingData = dadosNormalizados;
+        
+        // Atualiza interface
+        atualizarInformacoesGerais();
+        renderizarRanking();
+        atualizarEstatisticas();
+        
+        console.log('✅ RANKING CARREGADO COM SUCESSO!');
         
     } catch (error) {
-        console.error('Erro geral:', error);
-        mostrarErro(`Erro: ${error.message}`);
+        console.error('❌ ERRO AO CARREGAR DADOS:', error);
+        
+        // Mostra erro detalhado
+        const rankingBody = document.getElementById('rankingBody');
+        rankingBody.innerHTML = `
+            <div class="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Erro ao carregar ranking</h3>
+                <p>${error.message}</p>
+                <div style="text-align: left; background: rgba(255,0,0,0.1); padding: 15px; border-radius: 8px; margin: 15px 0; font-family: monospace; font-size: 12px;">
+                    <strong>Detalhes técnicos:</strong><br>
+                    ${error.stack || 'Sem stack trace'}
+                </div>
+                <div class="buttons" style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="mostrarDebugDetalhado()">
+                        <i class="fas fa-bug"></i> DEBUG DETALHADO
+                    </button>
+                    <button class="btn btn-secondary" onclick="carregarDados()">
+                        <i class="fas fa-redo"></i> TENTAR NOVAMENTE
+                    </button>
+                </div>
+            </div>
+        `;
     }
 }
 
+function normalizarDados(dados) {
+    // ⭐⭐ NORMALIZA ESTRUTURA DE DADOS ⭐⭐
+    
+    // Se já estiver no formato correto, retorna
+    if (dados.t && dados.r && dados.k) {
+        return dados;
+    }
+    
+    // Converte formato antigo para novo
+    const normalizado = {
+        t: dados.tipo || 'ranking_tabela',
+        r: {
+            n: dados.rodada || dados.r?.n || 0,
+            p: dados.total_participantes || dados.k?.length || 0
+        },
+        k: []
+    };
+    
+    // Processa participantes
+    if (dados.ranking && Array.isArray(dados.ranking)) {
+        // Formato antigo: dados.ranking[]
+        dados.ranking.forEach((item, index) => {
+            normalizado.k.push({
+                p: index + 1,
+                n: item.nome || item.name,
+                t: item.total || item.pontos,
+                u: item.usuario_id || item.id,
+                e: {
+                    pe: item.estatisticas?.pe || item.pe || 0,
+                    rc: item.estatisticas?.rc || item.rc || 0,
+                    gm: item.estatisticas?.gm || 0,
+                    gv: item.estatisticas?.gv || 0
+                }
+            });
+        });
+    } else if (dados.k && Array.isArray(dados.k)) {
+        // Já está no formato novo
+        normalizado.k = dados.k;
+    }
+    
+    return normalizado;
+}
 // Função para mostrar dados brutos (debug)
 function mostrarDadosBrutos() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -708,43 +764,67 @@ function renderizarRankingSimples(dados) {
         
         // Decodifica dados da URL
         // ==================== FUNÇÃO CORRIGIDA PARA DECODIFICAR ====================
+// ==================== FUNÇÃO DE DECODIFICAÇÃO CORRIGIDA ====================
+function decodificarBase64Url(base64Url) {
+    // ⭐⭐ CORREÇÃO: Converte Base64 URL-safe para Base64 normal ⭐⭐
+    
+    // 1. Remove espaços e quebras de linha
+    let base64 = base64Url.replace(/\s/g, '');
+    
+    // 2. Substitui caracteres URL-safe
+    base64 = base64
+        .replace(/-/g, '+')   // - → +
+        .replace(/_/g, '/');  // _ → /
+    
+    // 3. Adiciona padding se necessário
+    const padLength = 4 - (base64.length % 4);
+    if (padLength < 4) {
+        base64 += '='.repeat(padLength);
+    }
+    
+    console.log('🔧 Base64 após conversão:', base64.substring(0, 100));
+    
+    return base64;
+}
+
 async function decodificarDadosURL() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
-        const dadosBase64 = urlParams.get('data');
+        const dadosBase64Url = urlParams.get('data');
         
-        if (!dadosBase64) {
-            throw new Error('Nenhum dado recebido na URL');
-        }
-
-        console.log('📥 Dados Base64 recebidos (primeiros 100 chars):', dadosBase64.substring(0, 100));
-        
-        // ⭐⭐ DECODIFICAÇÃO CORRETA ⭐⭐
-        // 1. Base64 URL-safe para normal
-        const base64Normal = dadosBase64
-            .replace(/-/g, '+')
-            .replace(/_/g, '/')
-            .replace(/\s/g, '');
-        
-        // 2. Decodifica Base64 para bytes
-        const binaryString = atob(base64Normal);
-        const bytes = new Uint8Array(binaryString.length);
-        
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
+        if (!dadosBase64Url) {
+            throw new Error('❌ Nenhum dado recebido na URL');
         }
         
-        console.log('🔍 Bytes decodificados:', bytes.length, 'bytes');
-        console.log('🔍 Primeiros bytes:', Array.from(bytes.slice(0, 10)));
+        console.log('='.repeat(60));
+        console.log('📥 DADOS RECEBIDOS PARA DECODIFICAÇÃO');
+        console.log('Tamanho:', dadosBase64Url.length, 'caracteres');
+        console.log('Primeiros 100 chars:', dadosBase64Url.substring(0, 100));
+        console.log('Contém "-" ou "_"?', dadosBase64Url.includes('-') || dadosBase64Url.includes('_'));
         
-        // 3. VERIFICA SE É GZIP (magic bytes: 0x1F 0x8B)
+        // ⭐⭐ CONVERTE BASE64 URL-SAFE PARA NORMAL ⭐⭐
+        const base64Normal = decodificarBase64Url(dadosBase64Url);
+        
+        console.log('🔄 Base64 normal (primeiros 100 chars):', base64Normal.substring(0, 100));
+        
+        // ⭐⭐ DECODIFICA BASE64 PARA STRING ⭐⭐
+        const jsonString = atob(base64Normal);
+        
+        console.log('📄 String decodificada (primeiros 200 chars):', jsonString.substring(0, 200));
+        
+        // ⭐⭐ VERIFICA SE É GZIP (magic bytes 0x1F 0x8B) ⭐⭐
+        const bytes = new Uint8Array(jsonString.length);
+        for (let i = 0; i < jsonString.length; i++) {
+            bytes[i] = jsonString.charCodeAt(i);
+        }
+        
         const isGzipped = bytes[0] === 0x1F && bytes[1] === 0x8B;
         console.log('📦 É GZIP?', isGzipped);
         
         let dadosJson;
         
         if (isGzipped && typeof pako !== 'undefined') {
-            // 4. DESCOMPRIME GZIP
+            // ⭐⭐ DESCOMPRIME GZIP ⭐⭐
             console.log('🔄 Descomprimindo GZIP...');
             try {
                 const decompressed = pako.inflate(bytes, { to: 'string' });
@@ -752,42 +832,46 @@ async function decodificarDadosURL() {
                 console.log('✅ GZIP descomprimido com sucesso!');
             } catch (gzipError) {
                 console.error('❌ Erro ao descomprimir GZIP:', gzipError);
-                // Tenta como JSON direto (fallback)
-                const textDecoder = new TextDecoder('utf-8');
-                const jsonString = textDecoder.decode(bytes);
-                dadosJson = JSON.parse(jsonString);
+                throw new Error('Falha ao descomprimir dados GZIP');
             }
         } else {
-            // 5. NÃO É GZIP - decodifica como texto direto
-            console.log('📄 Processando como texto direto...');
-            const textDecoder = new TextDecoder('utf-8');
-            const jsonString = textDecoder.decode(bytes);
+            // ⭐⭐ NÃO É GZIP - parseia como JSON direto ⭐⭐
+            console.log('📄 Processando como JSON direto...');
             dadosJson = JSON.parse(jsonString);
         }
         
-        console.log('🎉 Dados decodificados com sucesso!');
-        console.log('📋 Estrutura:', {
-            tipo: dadosJson.t,
-            rodada: dadosJson.r,
-            participantes: dadosJson.k?.length || 0
-        });
+        console.log('🎉 DADOS DECODIFICADOS COM SUCESSO!');
+        console.log('Tipo:', dadosJson.t || dadosJson.tipo);
+        console.log('Rodada:', dadosJson.r?.n || dadosJson.rodada);
+        console.log('Participantes:', dadosJson.k?.length || 0);
+        console.log('='.repeat(60));
         
         return dadosJson;
         
     } catch (error) {
-        console.error('❌ ERRO na decodificação:', error);
+        console.error('❌ ERRO NA DECODIFICAÇÃO:', error);
         
-        // ⭐⭐ FALLBACK ULTRA SIMPLES PARA DEBUG ⭐⭐
+        // ⭐⭐ FALLBACK PARA DEBUG ⭐⭐
         try {
-            // Tenta decodificar direto como string (para debug)
-            const urlParams = new URLSearchParams(window.location.search);
-            const dadosBase64 = urlParams.get('data');
+            console.log('🆘 Tentando método alternativo...');
             
-            if (dadosBase64) {
-                console.log('🆘 Tentando fallback simples...');
-                const jsonString = atob(dadosBase64);
-                console.log('🆘 String decodificada:', jsonString.substring(0, 200));
-                return JSON.parse(jsonString);
+            const urlParams = new URLSearchParams(window.location.search);
+            const dadosBase64Url = urlParams.get('data');
+            
+            if (dadosBase64Url) {
+                // Método alternativo: usa TextDecoder
+                const binaryString = atob(dadosBase64Url);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Verifica se começa com { (JSON) ou 0x1F 0x8B (GZIP)
+                if (bytes[0] === 0x7B) { // { em ASCII
+                    const decoder = new TextDecoder('utf-8');
+                    const jsonString = decoder.decode(bytes);
+                    return JSON.parse(jsonString);
+                }
             }
         } catch (fallbackError) {
             console.error('❌ Fallback também falhou:', fallbackError);
@@ -935,41 +1019,122 @@ async function decodificarDadosURL() {
         
         // ==================== FUNÇÃO PRINCIPAL PARA ABRIR PALPITES ====================
         async function abrirPalpitesUsuario(usuarioId, rodadaNum) {
-            console.log(`🎯 Abrindo palpites - Usuário: ${usuarioId}, Rodada: ${rodadaNum}`);
-            
-            if (!window.Telegram || !Telegram.WebApp) {
-                console.error('Telegram Web App não disponível');
-                mostrarErro('Erro: Não foi possível abrir os palpites');
-                return;
-            }
-            
-            try {
-                // ⭐⭐ FORMATO CORRETO QUE O BOT ESPERA ⭐⭐
-                const dadosParaEnviar = {
-                    tipo: 'carregar_rodada_usuario',  // ⭐ TIPO QUE O BOT RECONHECE
+    console.log(`🎯 Abrindo palpites - Usuário: ${usuarioId}, Rodada: ${rodadaNum}`);
+    
+    if (!usuarioId || !rodadaNum) {
+        console.error('❌ Dados inválidos para abrir palpites');
+        mostrarToast('Erro: Dados inválidos', 'error');
+        return;
+    }
+    
+    // ⭐⭐ MÉTODO CONFIÁVEL: Link Telegram ⭐⭐
+    try {
+        // Tenta pegar username do bot dos dados
+        let botUsername = '';
+        
+        if (rankingData && rankingData.c && rankingData.c.b) {
+            botUsername = rankingData.c.b;
+        } else if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe) {
+            // Tenta do WebApp
+            botUsername = Telegram.WebApp.initDataUnsafe.user?.username || '';
+        }
+        
+        // Fallback: username fixo (SUBSTITUA PELO SEU!)
+        if (!botUsername) {
+            botUsername = 'SeuBotUsername'; // ⭐⭐ ALTERE AQUI! ⭐⭐
+        }
+        
+        console.log(`🤖 Usando bot: @${botUsername}`);
+        
+        // Cria link do Telegram
+        const link = `https://t.me/${botUsername}?start=palpites_${usuarioId}_${rodadaNum}`;
+        
+        console.log(`🔗 Link gerado: ${link}`);
+        
+        // Mostra feedback
+        mostrarToast('Abrindo palpites...', 'info');
+        
+        // ⭐⭐ OPÇÃO 1: Abre link (RECOMENDADO) ⭐⭐
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.openLink(link);
+        } 
+        // ⭐⭐ OPÇÃO 2: Abre em nova aba (fallback) ⭐⭐
+        else {
+            window.open(link, '_blank');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro ao gerar link:', error);
+        
+        // ⭐⭐ FALLBACK: Web App Data ⭐⭐
+        try {
+            if (window.Telegram && Telegram.WebApp) {
+                const dados = {
+                    tipo: 'ver_palpites_usuario',
+                    action: 'carregar_rodada',
                     usuario_id: usuarioId,
                     rodada_num: rodadaNum,
-                    chat_id: Telegram.WebApp.initDataUnsafe.chat?.id,
-                    timestamp: Date.now(),
-                    action: 'carregar_rodada'  // ⭐ ACTION ALTERNATIVA
+                    timestamp: Date.now()
                 };
                 
-                console.log('📤 Enviando dados para o bot:', dadosParaEnviar);
-                
-                // Envia os dados para o bot
-                Telegram.WebApp.sendData(JSON.stringify(dadosParaEnviar));
-                
-                // ⭐⭐ NÃO FECHA O WEB APP - DEIXA O BOT PROCESSAR ⭐⭐
-                // Telegram.WebApp.close(); // REMOVIDO!
-                
-                // Mostra feedback para o usuário
-                mostrarFeedback('Carregando palpites...');
-                
-            } catch (error) {
-                console.error('Erro ao enviar dados:', error);
-                mostrarErro(`Erro: ${error.message}`);
+                console.log('📤 Enviando via Web App Data:', dados);
+                Telegram.WebApp.sendData(JSON.stringify(dados));
+                mostrarToast('Enviando solicitação...', 'info');
             }
+        } catch (webappError) {
+            console.error('❌ Web App Data também falhou:', webappError);
+            mostrarToast('Erro ao abrir palpites', 'error');
         }
+    }
+}
+
+// Função auxiliar para mostrar mensagens
+function mostrarToast(mensagem, tipo = 'info') {
+    // Cria toast simples
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: ${tipo === 'error' ? '#ef476f' : '#4361ee'};
+        color: white;
+        border-radius: 8px;
+        z-index: 10000;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        animation: slideIn 0.3s ease;
+    `;
+    
+    toast.textContent = mensagem;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// Adicione estas animações ao CSS
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .debug-info {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.8rem;
+        margin-top: 10px;
+        display: block;
+    }
+`;
+document.head.appendChild(style);
         
         // ==================== FUNÇÕES AUXILIARES ====================
         
