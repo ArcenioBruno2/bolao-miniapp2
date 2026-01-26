@@ -418,7 +418,7 @@
     </div>
 
     <script>
-        // Função para decodificar dados comprimidos (mantida igual)
+        // Função para decodificar dados comprimidos
         async function decompressData(compressedData) {
             try {
                 // Decodifica base64
@@ -502,21 +502,20 @@
             `;
         }
 
-        // Função para renderizar o ranking - ATUALIZADA para trabalhar com a estrutura do Python
+        // Função para renderizar o ranking
         function renderRanking(data) {
-            console.log('Dados recebidos para ranking geral:', data);
+            console.log('Dados recebidos:', data);
             
-            // Verifica se há dados (estrutura do Python)
+            // Verifica se há dados
             if (!data || !data.k || data.k.length === 0) {
                 showEmptyState();
                 return;
             }
             
-            // Atualiza informações gerais (estrutura do Python)
-            const info = data.info || {};
+            // Atualiza informações gerais
             document.getElementById('total-participantes').textContent = data.k.length;
-            document.getElementById('total-rodadas').textContent = info.total_rodadas || '0';
-            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${info.data_atualizacao || '--/--/----'}`;
+            document.getElementById('total-rodadas').textContent = data.info?.total_rodadas || 'N/A';
+            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info?.data_atualizacao || '--/--/----'}`;
             
             if (data.k.length > 0) {
                 document.getElementById('lider-atual').textContent = data.k[0].n;
@@ -539,9 +538,7 @@
                 let medalhaHtml = '';
                 let posicaoClass = '';
                 
-                const posicao = index + 1;
-                
-                switch (posicao) {
+                switch (participante.p) {
                     case 1:
                         medalhaHtml = '<div class="medalha medalha-ouro">🥇</div>';
                         posicaoClass = 'primeiro';
@@ -558,18 +555,15 @@
                         medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
                 }
                 
-                // Estatísticas (estrutura do Python: e.pe, e.rc, e.gm, e.gv)
-                const estatisticas = participante.e || {};
-                
                 row.innerHTML = `
                     <td class="posicao">
                         ${medalhaHtml}
-                        <strong>${posicao}º</strong>
+                        <strong>${participante.p}º</strong>
                     </td>
                     <td class="participante">
                         <strong>${participante.n}</strong>
                         <br>
-                        <a href="https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
+                        <a href="https://t.me/share/url?url=https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
                            target="_blank" 
                            class="btn-ver-palpites">
                             📊 Ver palpites
@@ -581,20 +575,12 @@
                     <td>
                         <div class="estatisticas">
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${estatisticas.pe || 0}</span>
+                                <span class="estatistica-valor">${participante.e.pe || 0}</span>
                                 <span class="estatistica-label">PE</span>
                             </div>
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${estatisticas.rc || 0}</span>
+                                <span class="estatistica-valor">${participante.e.rc || 0}</span>
                                 <span class="estatistica-label">RC</span>
-                            </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${estatisticas.gm || 0}</span>
-                                <span class="estatistica-label">GM</span>
-                            </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${estatisticas.gv || 0}</span>
-                                <span class="estatistica-label">GV</span>
                             </div>
                         </div>
                     </td>
@@ -604,13 +590,10 @@
             });
         }
 
-        // Função para obter username do bot (precisa ser ajustado conforme sua configuração)
+        // Função para obter username do bot (simplificada)
         function getBotUsername() {
-            // IMPORTANTE: Você precisa substituir isso pelo username real do seu bot
-            // Se não souber, deixe como está e ajuste no seu código Python
-            const urlParams = new URLSearchParams(window.location.search);
-            const botUsername = urlParams.get('bot') || 'seu_bot_username';
-            return botUsername.replace('@', '');
+            // Você pode ajustar isso se necessário
+            return 'seu_bot_username';
         }
 
         // Adiciona animação de spin
