@@ -3,3058 +3,1006 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 Sistema de Ranking - Bolão</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <title>🏆 Ranking do Bolão</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #2ecc71;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --purple-color: #9b59b6;
-            --gold-color: #FFD700;
-            --silver-color: #C0C0C0;
-            --bronze-color: #CD7F32;
-            --fourth-color: #3498db;
+        /* RESET E BASE */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-bottom: 50px;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
-        
-        .container-main {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin-top: 30px;
-            margin-bottom: 30px;
-            padding: 0;
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            width: 100%;
+            max-width: 900px;
             overflow: hidden;
+            margin: 10px;
         }
-        
-        .navbar-custom {
-            background: linear-gradient(90deg, var(--primary-color), #1a252f);
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
-            border-radius: 0 0 10px 10px;
-            padding: 1rem 0;
-        }
-        
-        .navbar-brand {
-            font-weight: bold;
-            font-size: 1.8rem;
-            color: white !important;
-        }
-        
-        .navbar-brand i {
-            margin-right: 10px;
-        }
-        
-        .nav-tabs-custom {
-            background-color: #f8f9fa;
-            border-bottom: 3px solid var(--primary-color);
-            padding: 0 20px;
-        }
-        
-        .nav-tabs-custom .nav-link {
-            color: var(--primary-color);
-            font-weight: 500;
-            border: none;
-            border-radius: 0;
-            padding: 15px 25px;
-            transition: all 0.3s;
-        }
-        
-        .nav-tabs-custom .nav-link:hover {
-            background-color: rgba(52, 152, 219, 0.1);
-        }
-        
-        .nav-tabs-custom .nav-link.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-bottom: 3px solid var(--warning-color);
-        }
-        
-        .card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-            border: none;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .table-custom {
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .table-custom thead {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-        
-        .position-cell {
-            font-weight: bold;
+            padding: 25px 20px;
             text-align: center;
-            width: 80px;
         }
-        
-        .position-1 {
-            background: linear-gradient(135deg, var(--gold-color), #FFA500);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rodada-info {
             display: flex;
-            align-items: center;
             justify-content: center;
-            margin: 0 auto;
-        }
-        
-        .position-2 {
-            background: linear-gradient(135deg, var(--silver-color), #A9A9A9);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-        
-        .position-3 {
-            background: linear-gradient(135deg, var(--bronze-color), #8B4513);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-        
-        .position-4 {
-            background: linear-gradient(135deg, var(--fourth-color), #2980b9);
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-        }
-        
-        .position-other {
-            background-color: #f8f9fa;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        /* ==================== NOVAS CORES PARA LINHAS COMPLETAS ==================== */
-        
-        /* Top 4 - Cores especiais */
-        .row-gold {
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05)) !important;
-            border-left: 4px solid var(--gold-color);
-        }
-        
-        .row-silver {
-            background: linear-gradient(90deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.05)) !important;
-            border-left: 4px solid var(--silver-color);
-        }
-        
-        .row-bronze {
-            background: linear-gradient(90deg, rgba(205, 127, 50, 0.15), rgba(205, 127, 50, 0.05)) !important;
-            border-left: 4px solid var(--bronze-color);
-        }
-        
-        .row-fourth {
-            background: linear-gradient(90deg, rgba(52, 152, 219, 0.15), rgba(52, 152, 219, 0.05)) !important;
-            border-left: 4px solid var(--fourth-color);
-        }
-        
-        /* Escala de cinza para demais posições (5 em diante) */
-        .row-pos-5 { background: linear-gradient(90deg, #f8f9fa, #e9ecef) !important; }
-        .row-pos-6 { background: linear-gradient(90deg, #e9ecef, #dee2e6) !important; }
-        .row-pos-7 { background: linear-gradient(90deg, #dee2e6, #ced4da) !important; }
-        .row-pos-8 { background: linear-gradient(90deg, #ced4da, #adb5bd) !important; }
-        .row-pos-9 { background: linear-gradient(90deg, #adb5bd, #6c757d) !important; }
-        .row-pos-10 { background: linear-gradient(90deg, #6c757d, #495057) !important; color: white !important; }
-        
-        /* Para posições acima de 10, cicla entre os últimos 5 tons */
-        .row-pos-11 { background: linear-gradient(90deg, #e9ecef, #dee2e6) !important; }
-        .row-pos-12 { background: linear-gradient(90deg, #dee2e6, #ced4da) !important; }
-        .row-pos-13 { background: linear-gradient(90deg, #ced4da, #adb5bd) !important; }
-        .row-pos-14 { background: linear-gradient(90deg, #adb5bd, #6c757d) !important; }
-        .row-pos-15 { background: linear-gradient(90deg, #6c757d, #495057) !important; color: white !important; }
-        
-        /* Continue o padrão para mais posições */
-        .row-pos-default { background: #f8f9fa !important; }
-        
-        /* ==================== FIM DAS NOVAS CORES ==================== */
-        
-        .badge-pe {
-            background-color: var(--warning-color);
-            color: white;
-            min-width: 50px;
-        }
-        
-        .badge-rc {
-            background-color: var(--success-color);
-            color: white;
-            min-width: 50px;
-        }
-        
-        .badge-vp {
-            background-color: #6c757d;
-            color: white;
-            min-width: 40px;
-            font-weight: bold;
-        }
-        
-        .badge-vp-positive {
-            background-color: var(--success-color) !important;
-        }
-        
-        .badge-vp-negative {
-            background-color: var(--danger-color) !important;
-        }
-        
-        .badge-vp-zero {
-            background-color: #6c757d !important;
-        }
-        
-        .stats-container {
-            display: flex;
+            gap: 12px;
+            margin-top: 12px;
             flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* CONTROLES */
+        .controls {
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .rodada-selector {
+            display: flex;
+            align-items: center;
             gap: 8px;
         }
-        
-        .btn-primary-custom {
-            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .btn-telegram {
-            background: linear-gradient(90deg, #0088cc, #34b7f1);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .btn-telegram:hover {
-            background: linear-gradient(90deg, #006699, #2a9fd8);
-            transform: translateY(-2px);
-        }
-        
-        .btn-whatsapp {
-            background: linear-gradient(90deg, #25D366, #128C7E);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .btn-whatsapp:hover {
-            background: linear-gradient(90deg, #1DA851, #0D7A5F);
-            transform: translateY(-2px);
-        }
-        
-        .status-online {
-            color: var(--success-color);
-            font-weight: bold;
-        }
-        
-        .status-offline {
-            color: var(--danger-color);
-            font-weight: bold;
-        }
-        
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .rodada-selector {
-            max-width: 200px;
-        }
-        
-        .user-card {
-            border-left: 4px solid var(--secondary-color);
-        }
-        
-        .user-card.position-1-card {
-            border-left-color: var(--gold-color);
-        }
-        
-        .user-card.position-2-card {
-            border-left-color: var(--silver-color);
-        }
-        
-        .user-card.position-3-card {
-            border-left-color: var(--bronze-color);
-        }
-        
-        .user-card.position-4-card {
-            border-left-color: var(--fourth-color);
-        }
-        
-        .header-info {
-            background-color: #f8f9fa;
-            padding: 15px 20px;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .legendas-container {
-            background-color: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .legenda-item {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 15px;
-            font-size: 0.85rem;
-        }
-        
-        .legenda-cor {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            margin-right: 5px;
-        }
-        
-        .legenda-pe {
-            background-color: var(--warning-color);
-        }
-        
-        .legenda-rc {
-            background-color: var(--success-color);
-        }
-        
-        .legenda-vp-pos {
-            background-color: var(--success-color);
-        }
-        
-        .legenda-vp-neg {
-            background-color: var(--danger-color);
-        }
-        
-        .legenda-vp-zero {
-            background-color: #6c757d;
-        }
-        
-        .last-update {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        .mobile-only {
-            display: none;
-        }
-        
-        /* Estatísticas - Layout 3 colunas */
-        .estatisticas-container {
-            display: flex;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .estatisticas-coluna {
-            flex: 1;
-        }
-        
-        .estatisticas-coluna-grande {
-            flex: 2;
-        }
-        
-        .estatisticas-card {
-            min-height: 300px;
-        }
-        
-        .estatisticas-info {
-            padding: 20px;
-        }
-        
-        .estatisticas-item {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        /* ==================== MODAL PALPITES JOGADOR ==================== */
-        .modal-palpites-jogador {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1061;
-            overflow-y: auto;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal-palpites-content {
+
+        .btn {
             background: white;
-            margin: 20px auto;
-            width: 95%;
-            max-width: 900px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
-            position: relative;
-            animation: modalSlideIn 0.4s ease-out;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .modal-palpites-header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        
-        .modal-palpites-body {
-            padding: 20px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-        
-        .palpites-container {
-            background: #f8f9fa;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 8px 16px;
             border-radius: 10px;
-            padding: 20px;
-            margin-top: 15px;
-        }
-        
-        .jogo-palpite-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #dee2e6;
-            transition: all 0.3s;
-        }
-        
-        .jogo-palpite-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .jogo-palpite-card.acerto-pe {
-            border-left-color: #FFD700;
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.05), rgba(255, 215, 0, 0.02));
-        }
-        
-        .jogo-palpite-card.acerto-rc {
-            border-left-color: #2ecc71;
-            background: linear-gradient(90deg, rgba(46, 204, 113, 0.05), rgba(46, 204, 113, 0.02));
-        }
-        
-        .jogo-palpite-card.sem-palpite {
-            border-left-color: #95a5a6;
-            background: linear-gradient(90deg, rgba(149, 165, 166, 0.05), rgba(149, 165, 166, 0.02));
-        }
-        
-        .palpite-resultado {
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        .palpite-pontos {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        
-        .btn-duplo-envio {
-            background: linear-gradient(90deg, #25D366, #0088cc);
-            border: none;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: 10px;
-        }
-        
-        .btn-duplo-envio:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-        }
-        
-        .btn-fechar-modal {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: all 0.3s;
-        }
-        
-        .btn-fechar-modal:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        /* ==================== MODAL TELEGRAM ENVIO ==================== */
-        .modal-telegram {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1060;
-            overflow-y: auto;
-        }
-        
-        .modal-telegram-content {
-            background: white;
-            margin: 30px auto;
-            width: 90%;
-            max-width: 500px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
-        }
-        
-        .modal-telegram-header {
-            background: linear-gradient(135deg, #0088cc 0%, #34b7f1 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-telegram-body {
-            padding: 20px;
-        }
-        
-        .preview-imagem {
-            border: 2px dashed #dee2e6;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-        }
-        
-        .preview-imagem img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 5px;
-        }
-        
-        @keyframes modalSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* ==================== NOMES DOS JOGADORES TODOS PRETOS ==================== */
-        .jogador-nome-padrao {
-            color: #000000 !important; /* Preto para todos */
-            text-decoration: none;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            padding: 2px 5px;
-            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: #f3f4f6;
+        }
+
+        .stats {
+            display: flex;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+
+        /* TABELA DE RANKING */
+        .ranking-container {
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .ranking-table th {
+            background: #f9fafb;
+            color: #6b7280;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            padding: 16px 12px;
+            text-align: left;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .ranking-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+
+        .ranking-table tr:hover td {
+            background: #f9fafb;
+        }
+
+        .ranking-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* COLUNAS COM LARGURAS FIXAS */
+        .posicao-cell {
+            width: 60px; /* Reduzida */
+            text-align: center;
+            font-weight: 700;
+            color: #374151;
+            padding-left: 5px; /* Empurra mais para direita */
+        }
+
+        .nome-cell {
+            text-align: left;
+            font-weight: 600;
+            color: #111827;
+            padding-left: 25px; /* Empurra mais para direita */
+        }
+
+        .pontos-cell {
+            width: 80px; /* Reduzida */
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #4f46e5;
+        }
+
+        .estatisticas-cell {
+            width: 150px;
+            text-align: center;
+            padding-right: 10px;
+        }
+
+        /* MEDALHAS */
+        .medalha {
+            font-size: 1.4rem;
             display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
         }
-        
-        /* Forçar preto mesmo para os top 4 */
-        .row-gold .jogador-nome-padrao,
-        .row-silver .jogador-nome-padrao,
-        .row-bronze .jogador-nome-padrao,
-        .row-fourth .jogador-nome-padrao { 
-            color: #000000 !important;
+
+        /* LINKS CLICÁVEIS */
+        .nome-link {
+            color: #4f46e5;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
         }
-        
-        /* ==================== CORREÇÃO: NOMES DO 10º PARA BAIXO TAMBÉM PRETOS ==================== */
-        /* Remover a regra que colocava branco para posições 10 e 15 */
-        .row-pos-10 .jogador-nome-padrao,
-        .row-pos-15 .jogador-nome-padrao { 
-            color: #000000 !important; /* Mantém preto igual aos outros */
+
+        .nome-link:hover {
+            color: #3730a3;
+            background-color: #f3f4f6;
+            text-decoration: none;
         }
-        
-        .jogador-nome-padrao:hover {
-            color: #3498db !important;
-            background-color: rgba(52, 152, 219, 0.1);
+
+        .user-icon {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+
+        /* ESTATÍSTICAS - PE E RC LADO A LADO */
+        .estatisticas-badges {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .estatistica-badge {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            min-width: 55px;
+            text-align: center;
+        }
+
+        .estatistica-badge.pe {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .estatistica-badge.rc {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        /* LEGENDA */
+        .legenda {
+            padding: 15px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #4b5563;
+        }
+
+        .legenda-badge {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legenda-badge.pe {
+            background: #10b981;
+        }
+
+        .legenda-badge.rc {
+            background: #3b82f6;
+        }
+
+        /* FOOTER */
+        .footer {
+            padding: 18px;
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 12px;
+        }
+
+        .footer-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
             text-decoration: underline;
-            transform: translateY(-1px);
         }
-        
-        /* Responsividade */
+
+        /* LOADING */
+        .loading {
+            padding: 50px 20px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ERRO */
+        .error {
+            padding: 50px 20px;
+            text-align: center;
+            color: #dc2626;
+            display: none;
+        }
+
+        /* RESPONSIVO */
         @media (max-width: 768px) {
-            .desktop-only {
-                display: none;
+            body {
+                padding: 10px;
             }
             
-            .mobile-only {
-                display: block;
+            .container {
+                margin: 5px;
+                border-radius: 16px;
             }
             
-            .nav-tabs-custom {
-                overflow-x: auto;
-                flex-wrap: nowrap;
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                padding: 15px;
+            }
+            
+            .rodada-selector {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .ranking-container {
+                padding: 0 15px;
+            }
+            
+            .ranking-table {
+                font-size: 0.9rem;
+            }
+            
+            .ranking-table th,
+            .ranking-table td {
+                padding: 14px 8px;
+            }
+            
+            .posicao-cell {
+                width: 50px;
+                padding-left: 3px;
+            }
+            
+            .nome-cell {
+                padding-left: 15px;
+            }
+            
+            .pontos-cell {
+                width: 70px;
+                font-size: 1rem;
+            }
+            
+            .estatisticas-cell {
+                width: 130px;
+                padding-right: 5px;
+            }
+            
+            .estatistica-badge {
+                min-width: 50px;
+                font-size: 0.8rem;
+                padding: 5px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .badge {
+                font-size: 0.85rem;
+                padding: 5px 12px;
+            }
+            
+            .btn {
+                padding: 7px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .ranking-container {
                 padding: 0 10px;
             }
             
-            .nav-tabs-custom .nav-link {
-                padding: 10px 15px;
-                font-size: 0.9rem;
+            .ranking-table {
+                font-size: 0.85rem;
             }
             
-            .header-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
+            .ranking-table th,
+            .ranking-table td {
+                padding: 12px 6px;
             }
             
-            .estatisticas-container {
-                flex-direction: column;
+            .posicao-cell {
+                width: 45px;
+                padding-left: 2px;
             }
             
-            .btn-enviar-imagem {
-                margin-top: 10px;
-                width: 100%;
+            .nome-cell {
+                padding-left: 10px;
             }
             
-            .modal-palpites-content {
-                width: 98%;
-                margin: 10px auto;
-                border-radius: 12px;
+            .pontos-cell {
+                width: 60px;
             }
             
-            .btn-duplo-envio {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-                margin-left: 0;
-                margin-top: 10px;
-                width: 100%;
+            .estatisticas-cell {
+                width: 110px;
+                padding-right: 3px;
+            }
+            
+            .estatisticas-badges {
+                gap: 5px;
+            }
+            
+            .estatistica-badge {
+                min-width: 45px;
+                font-size: 0.75rem;
+                padding: 4px 6px;
+            }
+            
+            .legenda {
+                padding: 12px 15px;
+                gap: 15px;
+            }
+            
+            .legenda-item {
+                font-size: 0.8rem;
             }
         }
+
+        /* ANIMAÇÕES */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ranking-table tr {
+            animation: fadeIn 0.3s ease backwards;
+        }
+
+        .ranking-table tr:nth-child(1) { animation-delay: 0.1s; }
+        .ranking-table tr:nth-child(2) { animation-delay: 0.15s; }
+        .ranking-table tr:nth-child(3) { animation-delay: 0.2s; }
+        .ranking-table tr:nth-child(4) { animation-delay: 0.25s; }
+        .ranking-table tr:nth-child(5) { animation-delay: 0.3s; }
     </style>
 </head>
 <body>
-    <div class="container container-main">
-        <!-- Cabeçalho -->
-        <nav class="navbar navbar-expand-lg navbar-custom">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">
-                    <i class="fas fa-trophy"></i> Sistema de Ranking - Bolão
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🏆 Ranking do Bolão</h1>
+            <div class="rodada-info">
+                <div class="badge" id="rodada-numero">
+                    <span>📅</span>
+                    <span>Rodada: --</span>
+                </div>
+                <div class="badge" id="total-participantes">
+                    <span>👥</span>
+                    <span>Participantes: --</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROLES -->
+        <div class="controls">
+            <div class="rodada-selector">
+                <button class="btn" onclick="mudarRodada(-1)">
+                    <span>⬅️</span> Anterior
+                </button>
+                <span style="padding: 0 12px; font-weight: 600; color: #374151;">
+                    Rodada <span id="rodada-atual">--</span>
+                </span>
+                <button class="btn" onclick="mudarRodada(1)">
+                    Próxima <span>➡️</span>
+                </button>
+            </div>
+            <div class="stats">
+                <div class="stat-item" id="top-1">🥇 --</div>
+                <div class="stat-item" id="top-2">🥈 --</div>
+                <div class="stat-item" id="top-3">🥉 --</div>
+            </div>
+        </div>
+
+        <!-- RANKING -->
+        <div class="ranking-container">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th class="posicao-cell">P</th> <!-- Alterado para P -->
+                        <th class="nome-cell">Participantes</th>
+                        <th class="pontos-cell">Pontos</th>
+                        <th class="estatisticas-cell">Estatísticas</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-body">
+                    <!-- Dados serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- LEGENDA -->
+        <div class="legenda">
+            <div class="legenda-item">
+                <div class="legenda-badge pe"></div>
+                <span>PE - Placar Exato</span>
+            </div>
+            <div class="legenda-item">
+                <div class="legenda-badge rc"></div>
+                <span>RC - Resultado Correto</span>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Carregando ranking...</p>
+        </div>
+
+        <!-- ERRO -->
+        <div class="error" id="error">
+            <div style="font-size: 2.5rem; margin-bottom: 8px;">😕</div>
+            <h3 style="margin-bottom: 8px; color: #dc2626;">Erro ao carregar ranking</h3>
+            <p id="error-message"></p>
+            <button onclick="carregarDados()" style="
+                margin-top: 16px;
+                background: #4f46e5;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+            ">Tentar novamente</button>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>⚽ Ranking gerado automaticamente</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link" onclick="atualizarRanking()">
+                    🔄 Atualizar
                 </a>
-                <div class="d-flex align-items-center">
-                    <span class="me-3 last-update" id="lastUpdate">Última atualização: --/--/-- --:--</span>
-                    <button class="btn btn-light btn-sm me-2" onclick="refreshData()">
-                        <i class="fas fa-sync-alt"></i> Atualizar
-                    </button>
-                    <span class="badge bg-success" id="apiStatus">API: Online</span>
-                </div>
-            </div>
-        </nav>
-        
-        <!-- Abas de Navegação -->
-        <ul class="nav nav-tabs nav-tabs-custom" id="mainTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral" type="button" role="tab">
-                    <i class="fas fa-chart-line"></i> Ranking Geral
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="rodadas-tab" data-bs-toggle="tab" data-bs-target="#rodadas" type="button" role="tab">
-                    <i class="fas fa-calendar-alt"></i> Por Rodada
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="estatisticas-tab" data-bs-toggle="tab" data-bs-target="#estatisticas" type="button" role="tab">
-                    <i class="fas fa-chart-pie"></i> Estatísticas
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="config-tab" data-bs-toggle="tab" data-bs-target="#config" type="button" role="tab">
-                    <i class="fas fa-cog"></i> Configurações
-                </button>
-            </li>
-        </ul>
-        
-        <!-- Conteúdo das Abas -->
-        <div class="tab-content p-4" id="mainTabsContent">
-            
-            <!-- ABA 1: RANKING GERAL -->
-            <div class="tab-pane fade show active" id="geral" role="tabpanel">
-                <div class="header-info">
-                    <div>
-                        <h4><i class="fas fa-chart-line"></i> Ranking Geral</h4>
-                        <div id="totalParticipantesContainer" class="mt-1">
-                            <span>Total de participantes: <strong id="totalGeral">0</strong></span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-telegram me-2" onclick="capturarETelegram('geral')" id="btnEnviarGeral">
-                            <i class="fab fa-telegram-plane"></i> Enviar para Grupo
-                        </button>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="showOnlyActive" checked>
-                            <label class="form-check-label" for="showOnlyActive">Apenas ativos</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Loading -->
-                <div class="loading-spinner" id="loadingGeral">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Carregando...</span>
-                    </div>
-                    <p class="mt-2">Carregando ranking geral...</p>
-                </div>
-                
-                <!-- Tabela Desktop -->
-                <div class="desktop-only">
-                    <div class="table-responsive" id="tabelaGeralContainer">
-                        <table class="table table-hover table-custom" id="tableGeral">
-                            <thead>
-                                <tr>
-                                    <th class="position-cell">Posição</th>
-                                    <th>Participante</th>
-                                    <th>Pontos</th>
-                                    <th>VP</th>
-                                    <th>PE</th>
-                                    <th>RC</th>
-                                    <th>Rodadas</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableGeralBody">
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Cards Mobile -->
-                <div class="mobile-only" id="cardsGeral">
-                    <!-- Cards serão inseridos via JavaScript -->
-                </div>
-                
-                <!-- Legendas -->
-                <div class="legendas-container">
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-pe"></span>
-                        <span>PE - Placar Exato (14 pontos)</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-rc"></span>
-                        <span>RC - Resultado Correto (4 pontos)</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-pos"></span>
-                        <span>VP +X - Subiu X posições</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-neg"></span>
-                        <span>VP -X - Desceu X posições</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-zero"></span>
-                        <span>VP 0 - Manteve posição</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>-</span>
-                        <span>VP - - Sem comparação (1ª rodada)</span>
-                    </div>
-                </div>
-                
-                <!-- Botão Enviar para Mobile -->
-                <div class="mobile-only text-center mt-3">
-                    <button class="btn btn-telegram w-100" onclick="capturarETelegram('geral')">
-                        <i class="fab fa-telegram-plane"></i> Enviar Ranking para Grupo
-                    </button>
-                </div>
-            </div>
-            
-            <!-- ABA 2: RANKING POR RODADA -->
-            <div class="tab-pane fade" id="rodadas" role="tabpanel">
-                <div class="header-info">
-                    <div>
-                        <h4><i class="fas fa-calendar-alt"></i> <span id="rodadaTitle">Ranking por Rodada</span></h4>
-                        <div class="mt-1">
-                            <span id="rodadaInfo">Selecione uma rodada</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <button class="btn btn-telegram me-2" onclick="capturarETelegram('rodada')" id="btnEnviarRodada" style="display: none;">
-                            <i class="fab fa-telegram-plane"></i> Enviar para Grupo
-                        </button>
-                        <div class="d-flex align-items-center">
-                            <span class="me-2">Rodada:</span>
-                            <select class="form-select form-select-sm rodada-selector" id="rodadaSelect">
-                                <option value="" disabled selected>Selecione...</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Loading -->
-                <div class="loading-spinner" id="loadingRodada">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Carregando...</span>
-                    </div>
-                    <p class="mt-2">Carregando dados da rodada...</p>
-                </div>
-                
-                <!-- Tabela Desktop -->
-                <div class="desktop-only">
-                    <div class="table-responsive" id="tabelaRodadaContainer">
-                        <table class="table table-hover table-custom" id="tableRodada">
-                            <thead>
-                                <tr>
-                                    <th class="position-cell">Posição</th>
-                                    <th>Participante</th>
-                                    <th>Pontos</th>
-                                    <th>VP</th>
-                                    <th>PE</th>
-                                    <th>RC</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableRodadaBody">
-                                <!-- Dados serão inseridos via JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Cards Mobile -->
-                <div class="mobile-only" id="cardsRodada">
-                    <!-- Cards serão inseridos via JavaScript -->
-                </div>
-                
-                <!-- Legendas -->
-                <div class="legendas-container">
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-pe"></span>
-                        <span>PE - Placar Exato (14 pontos)</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-rc"></span>
-                        <span>RC - Resultado Correto (4 pontos)</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-pos"></span>
-                        <span>VP +X - Subiu X posições</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-neg"></span>
-                        <span>VP -X - Desceu X posições</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span class="legenda-cor legenda-vp-zero"></span>
-                        <span>VP 0 - Manteve posição</span>
-                    </div>
-                    <div class="legenda-item">
-                        <span>-</span>
-                        <span>VP - - Sem comparação (1ª rodada)</span>
-                    </div>
-                </div>
-                
-                <!-- Botão Enviar para Mobile -->
-                <div class="mobile-only text-center mt-3">
-                    <button class="btn btn-telegram w-100" onclick="capturarETelegram('rodada')" id="btnEnviarRodadaMobile" style="display: none;">
-                        <i class="fab fa-telegram-plane"></i> Enviar Rodada para Grupo
-                    </button>
-                </div>
-            </div>
-            
-            <!-- ABA 3: ESTATÍSTICAS -->
-            <div class="tab-pane fade" id="estatisticas" role="tabpanel">
-                <div class="header-info">
-                    <h4><i class="fas fa-chart-pie"></i> Estatísticas por Jogador</h4>
-                    <div class="d-flex align-items-center">
-                        <span class="me-3">Selecione um jogador para ver estatísticas</span>
-                    </div>
-                </div>
-                
-                <!-- Container de 3 colunas -->
-                <div class="estatisticas-container">
-                    <!-- Coluna 1: Lista de Jogadores -->
-                    <div class="estatisticas-coluna">
-                        <div class="card estatisticas-card">
-                            <div class="card-header">
-                                <i class="fas fa-users me-2"></i> Jogadores
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <input type="text" class="form-control mb-2" id="filterJogadores" placeholder="Filtrar jogadores..." onkeyup="filtrarJogadores()">
-                                </div>
-                                <div class="list-group" id="listaJogadores" style="max-height: 400px; overflow-y: auto;">
-                                    <!-- Jogadores serão carregados via JavaScript -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Coluna 2: Lista de Rodadas -->
-                    <div class="estatisticas-coluna">
-                        <div class="card estatisticas-card">
-                            <div class="card-header">
-                                <i class="fas fa-calendar-alt me-2"></i> Rodadas
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <select class="form-select" id="tipoEstatisticas" onchange="mudarTipoEstatisticas()">
-                                        <option value="geral">Estatísticas Gerais</option>
-                                        <option value="rodada">Estatísticas por Rodada</option>
-                                    </select>
-                                </div>
-                                <div id="containerRodadas" style="display: none;">
-                                    <select class="form-select mb-3" id="selectRodadaEstatisticas">
-                                        <!-- Rodadas serão carregadas via JavaScript -->
-                                    </select>
-                                    <button class="btn btn-primary-custom w-100" onclick="carregarEstatisticasRodada()">
-                                        <i class="fas fa-chart-bar"></i> Carregar Estatísticas
-                                    </button>
-                                </div>
-                                <div id="containerGeral">
-                                    <button class="btn btn-primary-custom w-100" onclick="carregarEstatisticasGerais()">
-                                        <i class="fas fa-chart-line"></i> Carregar Estatísticas Gerais
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Coluna 3: Estatísticas -->
-                    <div class="estatisticas-coluna-grande">
-                        <div class="card estatisticas-card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-bar me-2"></i> Estatísticas
-                                <span id="estatisticasTitulo" class="float-end text-muted" style="font-size: 0.9rem;"></span>
-                            </div>
-                            <div class="card-body">
-                                <div class="loading-spinner" id="loadingEstatisticas">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Carregando...</span>
-                                    </div>
-                                    <p class="mt-2">Carregando estatísticas...</p>
-                                </div>
-                                
-                                <div id="estatisticasConteudo" class="estatisticas-info">
-                                    <div class="text-center text-muted py-5">
-                                        <i class="fas fa-user-chart fa-3x mb-3"></i>
-                                        <p>Selecione um jogador para ver suas estatísticas</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- ABA 4: CONFIGURAÇÕES -->
-            <div class="tab-pane fade" id="config" role="tabpanel">
-                <div class="header-info">
-                    <h4><i class="fas fa-cog"></i> Configurações do Sistema</h4>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-sync-alt me-2"></i> Recalcular Ranking
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">Forçar recálculo completo dos rankings.</p>
-                                <button class="btn btn-primary-custom" onclick="recalcularRanking()" id="btnRecalcular">
-                                    <i class="fas fa-calculator me-2"></i> Recalcular Agora
-                                </button>
-                                <div class="mt-2" id="recalcularStatus"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-server me-2"></i> Status da API
-                            </div>
-                            <div class="card-body">
-                                <p><strong>Endpoint:</strong> <code>http://localhost:8002</code></p>
-                                <p><strong>Status:</strong> <span id="apiStatusDetail" class="status-online">Verificando...</span></p>
-                                <p><strong>Última verificação:</strong> <span id="lastApiCheck">--:--:--</span></p>
-                                <button class="btn btn-sm btn-outline-primary" onclick="checkApiStatus()">
-                                    <i class="fas fa-redo"></i> Verificar Agora
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-filter me-2"></i> Filtros e Configurações
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Ordenar por:</label>
-                                        <select class="form-select" id="sortBy">
-                                            <option value="pontos">Pontos (Padrão)</option>
-                                            <option value="pe">Placar Exato</option>
-                                            <option value="nome">Nome</option>
-                                            <option value="rodadas">Rodadas</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Limitar a:</label>
-                                        <select class="form-select" id="limitResults">
-                                            <option value="10">10 resultados</option>
-                                            <option value="25">25 resultados</option>
-                                            <option value="50" selected>50 resultados</option>
-                                            <option value="100">100 resultados</option>
-                                            <option value="all">Todos</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Formato de exibição:</label>
-                                        <select class="form-select" id="displayFormat">
-                                            <option value="tabela">Tabela</option>
-                                            <option value="cards">Cards</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
-                                    <label class="form-check-label" for="autoRefresh">
-                                        Atualização automática a cada 30 segundos
-                                    </label>
-                                </div>
-                                
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="highlightTop4" checked>
-                                    <label class="form-check-label" for="highlightTop4">
-                                        Destacar top 4 com cores
-                                    </label>
-                                </div>
-                                
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="showDetails" checked>
-                                    <label class="form-check-label" for="showDetails">
-                                        Mostrar estatísticas detalhadas
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <a href="#" class="footer-link" onclick="voltarMenu()">
+                    🔙 Voltar
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- ==================== MODAL: PALPITES JOGADOR ==================== -->
-    <div class="modal-palpites-jogador" id="modalPalpitesJogador">
-        <div class="modal-palpites-content">
-            <div class="modal-palpites-header">
-                <div>
-                    <h3 style="margin: 0;"><i class="fas fa-user-chart"></i> Palpites do Jogador</h3>
-                    <div id="modalJogadorInfo" style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">
-                        Carregando informações...
-                    </div>
-                </div>
-                <div class="d-flex align-items-center">
-                    <button class="btn-duplo-envio" onclick="enviarRankingDuplo()" id="btnEnviarDuplo">
-                        <i class="fab fa-telegram-plane"></i> <i class="fab fa-whatsapp"></i> Enviar para Grupo e Privado
-                    </button>
-                    <button class="btn-fechar-modal" onclick="fecharModalPalpites()">&times;</button>
-                </div>
-            </div>
-            
-            <div class="modal-palpites-body">
-                <div id="palpitesLoading" class="loading-spinner">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Carregando...</span>
-                    </div>
-                    <p class="mt-2">Carregando palpites do jogador...</p>
-                </div>
-                
-                <div id="palpitesContent" style="display: none;">
-                    <div class="palpites-container">
-                        <h5><i class="fas fa-list"></i> Jogos com Palpite</h5>
-                        <div id="listaJogosPalpites">
-                            <!-- Jogos serão carregados aqui -->
-                        </div>
-                        
-                        <div class="mt-4">
-                            <h5><i class="fas fa-chart-pie"></i> Resumo da Rodada</h5>
-                            <div class="row mt-3" id="resumoRodada">
-                                <!-- Resumo será carregado aqui -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MODAL: TELEGRAM ENVIO ==================== -->
-    <div class="modal-telegram" id="modalTelegram">
-        <div class="modal-telegram-content">
-            <div class="modal-telegram-header">
-                <h3><i class="fab fa-telegram-plane"></i> Enviar para Telegram</h3>
-                <button class="close-modal" onclick="fecharModalTelegram()">&times;</button>
-            </div>
-            
-            <div class="modal-telegram-body">
-                <div id="previewContainer" class="preview-imagem">
-                    <div id="previewPlaceholder">
-                        <i class="fas fa-image fa-3x text-muted mb-3"></i>
-                        <p>Gerando preview da imagem...</p>
-                    </div>
-                    <img id="previewImage" style="display: none;" alt="Preview do Ranking">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="mensagemTelegram" class="form-label">Mensagem (opcional):</label>
-                    <textarea class="form-control" id="mensagemTelegram" rows="3" placeholder="Adicione uma mensagem para acompanhar o ranking..."></textarea>
-                </div>
-                
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-secondary" onclick="fecharModalTelegram()">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                    <button class="btn btn-telegram" onclick="enviarParaTelegram()" id="btnEnviarTelegram">
-                        <i class="fab fa-telegram-plane"></i> Enviar para Grupo
-                    </button>
-                </div>
-                
-                <div class="mt-3" id="statusEnvio"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script>
-        // Configurações globais
-        const API_BASE = "http://localhost:8002";
-        const TELEGRAM_TOKEN = "8555107685:AAHoIU-2JvDwnMnr-OKR1D1G67aiuACJuOs";
-        const TELEGRAM_GROUP_ID = "-5209609227";
-        
-        let rankingData = null;
-        let rodadasData = {};
-        let jogadoresData = [];
-        let rodadasList = [];
-        let currentModalType = null;
-        let currentModalElement = null;
-        let currentJogadorSelecionado = null;
-        let currentRodadaSelecionada = null;
-        
-        // Elementos DOM
-        const elements = {
-            // Cabeçalho
-            lastUpdate: document.getElementById('lastUpdate'),
-            apiStatus: document.getElementById('apiStatus'),
-            apiStatusDetail: document.getElementById('apiStatusDetail'),
-            lastApiCheck: document.getElementById('lastApiCheck'),
-            
-            // Ranking Geral
-            tableGeralBody: document.getElementById('tableGeralBody'),
-            cardsGeral: document.getElementById('cardsGeral'),
-            totalGeral: document.getElementById('totalGeral'),
-            totalParticipantesContainer: document.getElementById('totalParticipantesContainer'),
-            loadingGeral: document.getElementById('loadingGeral'),
-            tabelaGeralContainer: document.getElementById('tabelaGeralContainer'),
-            
-            // Ranking Rodada
-            tableRodadaBody: document.getElementById('tableRodadaBody'),
-            cardsRodada: document.getElementById('cardsRodada'),
-            rodadaSelect: document.getElementById('rodadaSelect'),
-            rodadaTitle: document.getElementById('rodadaTitle'),
-            rodadaInfo: document.getElementById('rodadaInfo'),
-            loadingRodada: document.getElementById('loadingRodada'),
-            tabelaRodadaContainer: document.getElementById('tabelaRodadaContainer'),
-            btnEnviarRodada: document.getElementById('btnEnviarRodada'),
-            btnEnviarRodadaMobile: document.getElementById('btnEnviarRodadaMobile'),
-            
-            // Estatísticas
-            listaJogadores: document.getElementById('listaJogadores'),
-            filterJogadores: document.getElementById('filterJogadores'),
-            tipoEstatisticas: document.getElementById('tipoEstatisticas'),
-            containerRodadas: document.getElementById('containerRodadas'),
-            containerGeral: document.getElementById('containerGeral'),
-            selectRodadaEstatisticas: document.getElementById('selectRodadaEstatisticas'),
-            estatisticasConteudo: document.getElementById('estatisticasConteudo'),
-            estatisticasTitulo: document.getElementById('estatisticasTitulo'),
-            loadingEstatisticas: document.getElementById('loadingEstatisticas'),
-            
-            // Configurações
-            btnRecalcular: document.getElementById('btnRecalcular'),
-            recalcularStatus: document.getElementById('recalcularStatus'),
-            
-            // Modais
-            modalTelegram: document.getElementById('modalTelegram'),
-            previewImage: document.getElementById('previewImage'),
-            previewPlaceholder: document.getElementById('previewPlaceholder'),
-            mensagemTelegram: document.getElementById('mensagemTelegram'),
-            btnEnviarTelegram: document.getElementById('btnEnviarTelegram'),
-            statusEnvio: document.getElementById('statusEnvio'),
-            
-            // Modal Palpites Jogador
-            modalPalpitesJogador: document.getElementById('modalPalpitesJogador'),
-            modalJogadorInfo: document.getElementById('modalJogadorInfo'),
-            palpitesLoading: document.getElementById('palpitesLoading'),
-            palpitesContent: document.getElementById('palpitesContent'),
-            listaJogosPalpites: document.getElementById('listaJogosPalpites'),
-            resumoRodada: document.getElementById('resumoRodada'),
-            btnEnviarDuplo: document.getElementById('btnEnviarDuplo')
-        };
-        
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            checkApiStatus();
-            loadRankingGeral();
-            loadJogadores();
-            setupEventListeners();
-            setupAutoRefresh();
-            updateLastUpdateTime();
-        });
-        
-        // Configurar listeners de eventos
-        function setupEventListeners() {
-            // Quando mudar a rodada selecionada
-            elements.rodadaSelect.addEventListener('change', function() {
-                if (this.value) {
-                    currentRodadaSelecionada = this.value;
-                    loadRodadaData(this.value);
-                }
-            });
-            
-            // Quando mudar configurações
-            document.getElementById('sortBy').addEventListener('change', applyFilters);
-            document.getElementById('limitResults').addEventListener('change', applyFilters);
-            document.getElementById('displayFormat').addEventListener('change', applyFilters);
-            document.getElementById('highlightTop4').addEventListener('change', applyFilters);
-            document.getElementById('showOnlyActive').addEventListener('change', applyFilters);
-            document.getElementById('showDetails').addEventListener('change', applyFilters);
-            document.getElementById('autoRefresh').addEventListener('change', setupAutoRefresh);
-            
-            // Fechar modais ao clicar fora
-            elements.modalTelegram.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    fecharModalTelegram();
-                }
-            });
-            
-            elements.modalPalpitesJogador.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    fecharModalPalpites();
-                }
-            });
-            
-            // Fechar modal com ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    if (elements.modalTelegram.style.display === 'block') {
-                        fecharModalTelegram();
-                    } else if (elements.modalPalpitesJogador.style.display === 'block') {
-                        fecharModalPalpites();
-                    }
-                }
-            });
-        }
-        
-        // Configurar atualização automática
-        function setupAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
-            
-            if (document.getElementById('autoRefresh').checked) {
-                autoRefreshInterval = setInterval(function() {
-                    const activeTab = document.querySelector('#mainTabs .nav-link.active').id;
-                    if (activeTab === 'geral-tab') {
-                        loadRankingGeral();
-                    } else if (activeTab === 'rodadas-tab' && elements.rodadaSelect.value) {
-                        loadRodadaData(elements.rodadaSelect.value);
-                    }
-                    checkApiStatus();
-                }, 30000); // 30 segundos
-            }
-        }
-        
-        // Verificar status da API
-        async function checkApiStatus() {
-            try {
-                const response = await fetch(`${API_BASE}/`);
-                if (response.ok) {
-                    elements.apiStatus.className = 'badge bg-success';
-                    elements.apiStatus.textContent = 'API: Online';
-                    elements.apiStatusDetail.className = 'status-online';
-                    elements.apiStatusDetail.textContent = '✅ Online';
-                } else {
-                    throw new Error('API não respondeu corretamente');
-                }
-            } catch (error) {
-                elements.apiStatus.className = 'badge bg-danger';
-                elements.apiStatus.textContent = 'API: Offline';
-                elements.apiStatusDetail.className = 'status-offline';
-                elements.apiStatusDetail.textContent = '❌ Offline';
-            }
-            elements.lastApiCheck.textContent = new Date().toLocaleTimeString();
-        }
-        
-        // Atualizar data/hora da última atualização
-        function updateLastUpdateTime() {
-            const now = new Date();
-            elements.lastUpdate.textContent = `Última atualização: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
-        }
-        
-        // ==============================================
-        // RANKING GERAL
-        // ==============================================
-        
-        // Carregar ranking geral
-        async function loadRankingGeral() {
-            showLoading('geral');
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/ranking-geral`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                rankingData = data.ranking;
-                
-                renderRankingGeral();
-                
-                // Preencher dropdown de rodadas
-                if (data.ranking.length > 0) {
-                    const rodadasDisponiveis = Array.from({length: Math.max(...data.ranking.map(r => r.rodadas))}, (_, i) => i + 1);
-                    populateRodadaSelect(rodadasDisponiveis);
-                }
-                
-                // Atualizar total de participantes
-                elements.totalGeral.textContent = data.ranking.length;
-                elements.totalParticipantesContainer.innerHTML = `
-                    <span>Total de participantes: <strong>${data.ranking.length}</strong></span>
-                `;
-                
-            } catch (error) {
-                console.error('Erro ao carregar ranking geral:', error);
-                elements.tableGeralBody.innerHTML = `
-                    <tr>
-                        <td colspan="7" class="text-center text-danger">
-                            <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados: ${error.message}
-                        </td>
-                    </tr>`;
-            } finally {
-                hideLoading('geral');
-                updateLastUpdateTime();
-            }
-        }
-        
-        // Renderizar ranking geral
-        function renderRankingGeral() {
-            if (!rankingData) return;
-            
-            // Aplicar filtros
-            let filteredData = [...rankingData];
-            const sortBy = document.getElementById('sortBy').value;
-            const limit = document.getElementById('limitResults').value;
-            const showOnlyActive = document.getElementById('showOnlyActive').checked;
-            const displayFormat = document.getElementById('displayFormat').value;
-            const highlightTop4 = document.getElementById('highlightTop4').checked;
-            
-            // Ordenar
-            switch(sortBy) {
-                case 'pe':
-                    filteredData.sort((a, b) => b.estatisticas.PE - a.estatisticas.PE || b.pontos - a.pontos);
-                    break;
-                case 'nome':
-                    filteredData.sort((a, b) => a.usuario.localeCompare(b.usuario));
-                    break;
-                case 'rodadas':
-                    filteredData.sort((a, b) => b.rodadas - a.rodadas || b.pontos - a.pontos);
-                    break;
-                default: // pontos
-                    filteredData.sort((a, b) => b.pontos - a.pontos);
-            }
-            
-            // Limitar
-            if (limit !== 'all') {
-                filteredData = filteredData.slice(0, parseInt(limit));
-            }
-            
-            // Renderizar
-            if (displayFormat === 'tabela' || window.innerWidth > 768) {
-                renderTableGeral(filteredData, highlightTop4);
-            } else {
-                renderCardsGeral(filteredData, highlightTop4);
-            }
-        }
-        
-        // Renderizar tabela geral
-        function renderTableGeral(data, highlightTop4) {
-            let html = '';
-            
-            data.forEach((item, index) => {
-                let positionClass = 'position-other';
-                let positionText = item.posicao || (index + 1);
-                let rowClass = getRowClass(positionText);
-                
-                // Definir classe de posição
-                if (positionText === 1) {
-                    positionClass = 'position-1';
-                } else if (positionText === 2) {
-                    positionClass = 'position-2';
-                } else if (positionText === 3) {
-                    positionClass = 'position-3';
-                } else if (positionText === 4 && highlightTop4) {
-                    positionClass = 'position-4';
-                }
-                
-                // Calcular VP (Variação de Posição)
-                const vp = calcularVP(item);
-                const vpClass = getVPClass(vp);
-                
-                // NOME DO JOGADOR - SEMPRE PRETO (CORREÇÃO: 10º para baixo também preto)
-                const nomeJogador = `<strong class="jogador-nome-padrao">${item.usuario}</strong>`;
-                
-                html += `
-                    <tr class="${rowClass}">
-                        <td class="position-cell">
-                            <div class="${positionClass}">
-                                ${positionText}
-                            </div>
-                        </td>
-                        <td>
-                            ${nomeJogador}
-                            ${positionText <= 3 ? `<span class="badge bg-warning ms-2">TOP ${positionText}</span>` : ''}
-                        </td>
-                        <td>
-                            <span class="badge bg-primary" style="font-size: 1.1em">${item.pontos}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-vp ${vpClass}">${vp}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-pe">${item.estatisticas.PE || 0}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-rc">${item.estatisticas.RC || 0}</span>
-                        </td>
-                        <td>${item.rodadas}</td>
-                    </tr>
-                `;
-            });
-            
-            elements.tableGeralBody.innerHTML = html;
-        }
-        
-        // Renderizar cards geral (mobile)
-        function renderCardsGeral(data, highlightTop4) {
-            let html = '';
-            
-            data.forEach((item, index) => {
-                let positionText = item.posicao || (index + 1);
-                let cardClass = 'user-card';
-                
-                if (positionText === 1) {
-                    cardClass += ' position-1-card';
-                } else if (positionText === 2) {
-                    cardClass += ' position-2-card';
-                } else if (positionText === 3) {
-                    cardClass += ' position-3-card';
-                } else if (positionText === 4 && highlightTop4) {
-                    cardClass += ' position-4-card';
-                }
-                
-                // Calcular VP
-                const vp = calcularVP(item);
-                const vpClass = getVPClass(vp).replace('badge-', '');
-                
-                html += `
-                    <div class="card ${cardClass} mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title">
-                                        ${item.usuario}
-                                    </h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">${positionText}º lugar</h6>
-                                </div>
-                                <div>
-                                    <span class="badge bg-primary" style="font-size: 1.2em">${item.pontos} pts</span>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-4">
-                                    <div class="text-center">
-                                        <span class="badge ${vpClass} w-100">${vp}</span>
-                                        <small class="text-muted">VP</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="text-center">
-                                        <span class="badge badge-pe w-100">${item.estatisticas.PE || 0}</span>
-                                        <small class="text-muted">PE</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="text-center">
-                                        <span class="badge badge-rc w-100">${item.estatisticas.RC || 0}</span>
-                                        <small class="text-muted">RC</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-2">
-                                <small class="text-muted">Participou de ${item.rodadas} rodadas</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            elements.cardsGeral.innerHTML = html;
-        }
-        
-        // ==============================================
-        // RANKING POR RODADA
-        // ==============================================
-        
-        // Preencher dropdown de rodadas
-        function populateRodadaSelect(rodadas) {
-            let html = '<option value="" disabled selected>Selecione uma rodada</option>';
-            rodadas.forEach(rodada => {
-                html += `<option value="${rodada}">Rodada ${rodada}</option>`;
-            });
-            elements.rodadaSelect.innerHTML = html;
-            rodadasList = rodadas;
-        }
-        
-        // Carregar dados de uma rodada específica
-        async function loadRodadaData(rodadaNum) {
-            showLoading('rodada');
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/rodada/${rodadaNum}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                rodadasData[rodadaNum] = data.ranking;
-                
-                // Atualizar título
-                elements.rodadaTitle.textContent = `Rodada ${rodadaNum}`;
-                elements.rodadaInfo.textContent = `${data.total} participantes`;
-                
-                // Mostrar botão de envio
-                elements.btnEnviarRodada.style.display = 'block';
-                elements.btnEnviarRodadaMobile.style.display = 'block';
-                
-                renderRodadaData(rodadaNum);
-                
-            } catch (error) {
-                console.error(`Erro ao carregar rodada ${rodadaNum}:`, error);
-                elements.tableRodadaBody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center text-danger">
-                            <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados da rodada: ${error.message}
-                        </td>
-                    </tr>`;
-            } finally {
-                hideLoading('rodada');
-                updateLastUpdateTime();
-            }
-        }
-        
-        // Renderizar dados da rodada
-        function renderRodadaData(rodadaNum) {
-            const data = rodadasData[rodadaNum];
-            if (!data) return;
-            
-            // Aplicar filtros
-            let filteredData = [...data];
-            const sortBy = document.getElementById('sortBy').value;
-            const limit = document.getElementById('limitResults').value;
-            const displayFormat = document.getElementById('displayFormat').value;
-            const highlightTop4 = document.getElementById('highlightTop4').checked;
-            
-            // Ordenar
-            switch(sortBy) {
-                case 'pe':
-                    filteredData.sort((a, b) => (b.estatisticas.pe || 0) - (a.estatisticas.pe || 0) || b.pontos - a.pontos);
-                    break;
-                case 'nome':
-                    filteredData.sort((a, b) => a.usuario.localeCompare(b.usuario));
-                    break;
-                default: // pontos
-                    filteredData.sort((a, b) => b.pontos - a.pontos);
-            }
-            
-            // Limitar
-            if (limit !== 'all') {
-                filteredData = filteredData.slice(0, parseInt(limit));
-            }
-            
-            // Renderizar
-            if (displayFormat === 'tabela' || window.innerWidth > 768) {
-                renderTableRodada(filteredData, rodadaNum, highlightTop4);
-            } else {
-                renderCardsRodada(filteredData, rodadaNum, highlightTop4);
-            }
-        }
-        
-        // Renderizar tabela da rodada
-        function renderTableRodada(data, rodadaNum, highlightTop4) {
-            let html = '';
-            
-            data.forEach((item, index) => {
-                let positionClass = 'position-other';
-                let positionText = item.posicao || (index + 1);
-                let rowClass = getRowClass(positionText);
-                
-                // Definir classe de posição
-                if (positionText === 1) {
-                    positionClass = 'position-1';
-                } else if (positionText === 2) {
-                    positionClass = 'position-2';
-                } else if (positionText === 3) {
-                    positionClass = 'position-3';
-                } else if (positionText === 4 && highlightTop4) {
-                    positionClass = 'position-4';
-                }
-                
-                // Calcular VP (Variação de Posição)
-                const vp = calcularVPRodada(item, rodadaNum);
-                const vpClass = getVPClass(vp);
-                
-                // NOME DO JOGADOR - SEMPRE PRETO, COM CLIQUE PARA ABRIR MODAL (CORREÇÃO: 10º para baixo também preto)
-                const nomeJogador = `<span class="jogador-nome-padrao" onclick="abrirModalPalpitesRodada('${item.usuario}', ${rodadaNum}, ${positionText})">${item.usuario}</span>`;
-                
-                html += `
-                    <tr class="${rowClass}">
-                        <td class="position-cell">
-                            <div class="${positionClass}">
-                                ${positionText}
-                            </div>
-                        </td>
-                        <td>
-                            ${nomeJogador}
-                            ${positionText <= 3 ? `<span class="badge bg-warning ms-2">TOP ${positionText}</span>` : ''}
-                        </td>
-                        <td><span class="badge bg-primary">${item.pontos}</span></td>
-                        <td>
-                            <span class="badge badge-vp ${vpClass}">${vp}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-pe">${item.estatisticas.pe || item.estatisticas.PE || 0}</span>
-                        </td>
-                        <td>
-                            <span class="badge badge-rc">${item.estatisticas.rc || item.estatisticas.RC || 0}</span>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            elements.tableRodadaBody.innerHTML = html;
-        }
-        
-        // Função para abrir modal de palpites (apenas na aba rodadas)
-        function abrirModalPalpitesRodada(jogadorNome, rodadaNum, posicao) {
-            currentJogadorSelecionado = {
-                id: jogadorNome,
-                nome: jogadorNome,
-                tipo: 'rodada',
-                posicao: posicao,
-                rodada: rodadaNum
-            };
-            
-            // Atualizar informações no modal
-            elements.modalJogadorInfo.innerHTML = `
-                <strong>${jogadorNome}</strong> • ${posicao}º lugar • Rodada ${rodadaNum}
-            `;
-            
-            // Abrir modal
-            abrirModalPalpites();
-            
-            // Carregar palpites do jogador
-            carregarPalpitesJogador(jogadorNome, jogadorNome, rodadaNum);
-        }
-        
-        // Renderizar cards da rodada (mobile)
-        function renderCardsRodada(data, rodadaNum, highlightTop4) {
-            let html = '';
-            
-            data.forEach((item, index) => {
-                let positionText = item.posicao || (index + 1);
-                let cardClass = 'user-card';
-                
-                if (positionText === 1) {
-                    cardClass += ' position-1-card';
-                } else if (positionText === 2) {
-                    cardClass += ' position-2-card';
-                } else if (positionText === 3) {
-                    cardClass += ' position-3-card';
-                } else if (positionText === 4 && highlightTop4) {
-                    cardClass += ' position-4-card';
-                }
-                
-                // Calcular VP
-                const vp = calcularVPRodada(item, rodadaNum);
-                const vpClass = getVPClass(vp).replace('badge-', '');
-                
-                html += `
-                    <div class="card ${cardClass} mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="card-title" onclick="abrirModalPalpitesRodada('${item.usuario}', ${rodadaNum}, ${positionText})" style="cursor: pointer;">
-                                        ${item.usuario}
-                                    </h5>
-                                    <h6 class="card-subtitle mb-2 text-muted">${positionText}º lugar</h6>
-                                </div>
-                                <div>
-                                    <span class="badge bg-primary" style="font-size: 1.2em">${item.pontos} pts</span>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-3">
-                                    <div class="text-center">
-                                        <span class="badge ${vpClass} w-100">${vp}</span>
-                                        <small class="text-muted">VP</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="text-center">
-                                        <span class="badge badge-pe w-100">${item.estatisticas.pe || item.estatisticas.PE || 0}</span>
-                                        <small class="text-muted">PE</small>
-                                    </div>
-                                </div>
-                                <div class="col-5">
-                                    <div class="text-center">
-                                        <span class="badge badge-rc w-100">${item.estatisticas.rc || item.estatisticas.RC || 0}</span>
-                                        <small class="text-muted">RC</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            elements.cardsRodada.innerHTML = html;
-        }
-        
-        // ==============================================
-        // MODAL PALPITES JOGADOR
-        // ==============================================
-        
-        // Abrir modal de palpites
-        function abrirModalPalpites() {
-            elements.modalPalpitesJogador.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            elements.palpitesLoading.style.display = 'block';
-            elements.palpitesContent.style.display = 'none';
-        }
-        
-        // Fechar modal de palpites
-        function fecharModalPalpites() {
-            elements.modalPalpitesJogador.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Carregar palpites do jogador
-        async function carregarPalpitesJogador(jogadorId, jogadorNome, rodadaNum) {
-            try {
-                const response = await fetch(`${API_BASE}/api/palpites/usuario/${encodeURIComponent(jogadorId)}?rodada=${rodadaNum || ''}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
-                }
-                
-                const data = await response.json();
-                
-                if (!data.success) {
-                    throw new Error('API retornou erro');
-                }
-                
-                // Renderizar palpites
-                renderPalpitesJogador(data.dados_webapp);
-                
-            } catch (error) {
-                console.error('❌ Erro ao carregar palpites do jogador:', error);
-                elements.palpitesLoading.innerHTML = `
-                    <div style="color: #e74c3c; text-align: center;">
-                        <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
-                        <p>Erro ao carregar palpites</p>
-                        <p><small>${error.message}</small></p>
-                        <button class="btn btn-primary mt-3" onclick="carregarPalpitesJogador('${jogadorId}', '${jogadorNome}', ${rodadaNum})">
-                            <i class="fas fa-redo"></i> Tentar novamente
-                        </button>
-                    </div>
-                `;
-            }
-        }
-        
-        // Renderizar palpites do jogador
-        function renderPalpitesJogador(dados) {
-            const rodada = dados.rodada_detalhada;
-            const jogos = rodada.jogos || [];
-            
-            // Filtrar apenas jogos com palpite (usados pelo jogador)
-            const jogosComPalpite = jogos.filter(jogo => jogo.tem_palpite && !jogo.sem_palpite);
-            
-            // Renderizar lista de jogos
-            let jogosHtml = '';
-            
-            if (jogosComPalpite.length === 0) {
-                jogosHtml = `
-                    <div class="alert alert-warning">
-                        <i class="fas fa-info-circle"></i> Nenhum palpite encontrado para esta rodada.
-                    </div>
-                `;
-            } else {
-                jogosComPalpite.forEach(jogo => {
-                    const temPlacar = jogo.tem_placar;
-                    const placarReal = jogo.pr || '-';
-                    const palpite = jogo.pal || '-';
-                    const pontos = jogo.pts || 0;
-                    const acertos = jogo.ac || [];
-                    
-                    // Determinar classe do card baseada nos acertos
-                    let cardClass = 'jogo-palpite-card';
-                    if (acertos.includes('PE')) {
-                        cardClass += ' acerto-pe';
-                    } else if (acertos.includes('RC')) {
-                        cardClass += ' acerto-rc';
-                    } else if (palpite === 'c/vim') {
-                        cardClass += ' sem-palpite';
-                    }
-                    
-                    jogosHtml += `
-                        <div class="${cardClass}">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="d-flex justify-content-between">
-                                        <div>
-                                            <strong>${jogo.m} vs ${jogo.v}</strong>
-                                            <div class="text-muted small">${formatarData(jogo.dh)}</div>
-                                        </div>
-                                        <div class="text-end">
-                                            ${temPlacar ? `<span class="badge bg-dark">Placar: ${placarReal}</span>` : '<span class="badge bg-secondary">Sem placar</span>'}
-                                        </div>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge ${pontos > 0 ? 'bg-info' : 'bg-secondary'}">Palpite: ${palpite}</span>
-                                        ${jogo.pd ? '<span class="badge bg-warning ms-1">PD</span>' : ''}
-                                    </div>
-                                </div>
-                                <div class="col-md-4 text-end">
-                                    <div class="palpite-pontos ${pontos > 0 ? 'text-success' : 'text-muted'}">
-                                        ${pontos} pts
-                                    </div>
-                                    <div class="mt-1">
-                                        ${acertos.map(acerto => `<span class="badge ${getBadgeAcertoClass(acerto)} me-1">${acerto}</span>`).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            elements.listaJogosPalpites.innerHTML = jogosHtml;
-            
-            // Renderizar resumo da rodada
-            const totalPontos = rodada.tp || 0;
-            const jogosPalpitados = rodada.jp || 0;
-            const totalJogos = rodada.jtf || 0;
-            const jogosComPlacar = rodada.jcp || 0;
-            
-            const estatisticas = rodada.est || {pe: 0, rc: 0, gm: 0, gv: 0, pd_usada: false};
-            
-            elements.resumoRodada.innerHTML = `
-                <div class="col-6 col-md-3">
-                    <div class="text-center">
-                        <div class="display-6 text-primary">${totalPontos}</div>
-                        <div class="text-muted">Pontos Totais</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-center">
-                        <div class="display-6 text-success">${estatisticas.pe || 0}</div>
-                        <div class="text-muted">Placares Exatos</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-center">
-                        <div class="display-6 text-info">${estatisticas.rc || 0}</div>
-                        <div class="text-muted">Resultados Corretos</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-center">
-                        <div class="display-6 ${jogosPalpitados === totalJogos ? 'text-success' : 'text-warning'}">${jogosPalpitados}/${totalJogos}</div>
-                        <div class="text-muted">Jogos Palpitados</div>
-                    </div>
-                </div>
-            `;
-            
-            // Mostrar conteúdo
-            elements.palpitesLoading.style.display = 'none';
-            elements.palpitesContent.style.display = 'block';
-        }
-        
-        // Função auxiliar para formatar data
-        function formatarData(dataString) {
-            if (!dataString) return '';
-            try {
-                const data = new Date(dataString);
-                return data.toLocaleDateString('pt-BR', { 
-                    day: '2-digit', 
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch (e) {
-                return dataString;
-            }
-        }
-        
-        // Função auxiliar para classe do badge de acerto
-        function getBadgeAcertoClass(acerto) {
-            switch(acerto) {
-                case 'PE': return 'bg-warning';
-                case 'RC': return 'bg-success';
-                case 'GM': return 'bg-info';
-                case 'GV': return 'bg-info';
-                case 'PD': return 'bg-danger';
-                default: return 'bg-secondary';
-            }
-        }
-        
-        // ==============================================
-        // ENVIAR PARA GRUPO E PRIVADO (MODAL PALPITES)
-        // ==============================================
-        
-        async function enviarRankingDuplo() {
-    if (!currentJogadorSelecionado) {
-        alert('Nenhum jogador selecionado');
-        return;
-    }
+        // ==================== VARIÁVEIS GLOBAIS ====================
+        let dadosRanking = null;
+        let rodadaAtual = 0;
 
-    elements.btnEnviarDuplo.disabled = true;
-    elements.btnEnviarDuplo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        // CONFIGURAÇÕES
+        const BOT_USERNAME = @BolaoFutebolBot;
+        const TELEGRAM_WEBAPP = window.Telegram && window.Telegram.WebApp;
 
-    try {
-        // 1. FECHAR o modal primeiro
-        fecharModalPalpites();
-        
-        // 2. Esperar um pouco para o DOM se atualizar
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // 3. CRIAR APENAS O CONTEÚDO DO MODAL
-        const modalContentDiv = document.createElement('div');
-        modalContentDiv.id = 'temp-modal-content';
-        modalContentDiv.style.cssText = `
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 900px;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            overflow: hidden;
-        `;
-        
-        // 4. CRIAR CONTEÚDO DO MODAL (apenas estrutura básica)
-        modalContentDiv.innerHTML = `
-            <div style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); color: white; padding: 20px;">
-                <h3 style="margin: 0;"><i class="fas fa-user-chart"></i> Palpites do Jogador</h3>
-                <div style="font-size: 0.9rem; opacity: 0.9; margin-top: 5px;">
-                    <strong>${currentJogadorSelecionado.nome}</strong> • ${currentJogadorSelecionado.posicao}º lugar • Rodada ${currentJogadorSelecionado.rodada}
-                </div>
-            </div>
-            <div style="padding: 20px;">
-                <h5 style="margin-bottom: 15px; color: #2c3e50;"><i class="fas fa-list"></i> Jogos com Palpite</h5>
-                <div id="temp-jogos" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
-                    <!-- Conteúdo será preenchido -->
-                </div>
-                
-                <!-- SEÇÃO DE RESUMO DA RODADA -->
-                <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 20px;">
-                    <h5 style="margin-bottom: 15px; color: #2c3e50;"><i class="fas fa-chart-pie"></i> Resumo da Rodada</h5>
-                    <div id="temp-resumo" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                        <!-- Resumo será preenchido -->
-                    </div>
-                </div>
-                
-                <!-- SEÇÃO DE ESTATÍSTICAS DETALHADAS -->
-                <div style="background: #f8f9fa; border-radius: 10px; padding: 15px;">
-                    <h5 style="margin-bottom: 15px; color: #2c3e50;"><i class="fas fa-chart-bar"></i> Estatísticas Detalhadas</h5>
-                    <div id="temp-estatisticas" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
-                        <!-- Estatísticas serão preenchidas -->
-                    </div>
-                </div>
-                
-                <!-- RODAPÉ -->
-                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; text-align: center; color: #666; font-size: 0.9em;">
-                    <div>Sistema de Ranking - Bolão • Rodada ${currentJogadorSelecionado.rodada}</div>
-                    <div style="font-size: 0.8em; color: #999;">Gerado em ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
-                </div>
-            </div>
-        `;
-        
-        // Adicionar ao body
-        document.body.appendChild(modalContentDiv);
-        
-        // 5. Buscar dados dos palpites e preencher TODAS as seções
-        await carregarEPreencherTodasInformacoes(modalContentDiv);
-        
-        // 6. Aguardar renderização
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // 7. CAPTURAR usando html2canvas
-        const canvas = await html2canvas(modalContentDiv, {
-            scale: 1.2,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            logging: false,
-            removeContainer: true
-        });
-        
-        // 8. REMOVER o container temporário
-        document.body.removeChild(modalContentDiv);
-        
-        // 9. Converter para imagem
-        const imageData = canvas.toDataURL('image/png');
-        
-        // 10. TESTAR: Abrir imagem em nova janela para verificar (DESATIVAR DEPOIS)
-        // const preview = window.open();
-        // preview.document.write('<img src="' + imageData + '" style="max-width:100%">');
-        
-        // 11. Continuar com o envio...
-        const blob = await dataURLtoBlob(imageData);
-        
-        // Buscar telegram_id
-        let telegramId = null;
-        try {
-            const responseUser = await fetch(`${API_BASE}/api/usuario/${encodeURIComponent(currentJogadorSelecionado.nome)}`);
-            if (responseUser.ok) {
-                const userData = await responseUser.json();
-                if (userData && userData.id) {
-                    const responseTelegram = await fetch(`${API_BASE}/api/usuario/${userData.id}/telegram-id`);
-                    if (responseTelegram.ok) {
-                        const telegramData = await responseTelegram.json();
-                        telegramId = telegramData.telegram_id;
-                    }
-                }
-            }
-        } catch (error) {
-            console.warn('Não foi possível buscar telegram_id:', error);
-        }
-        
-        // Mensagens
-        const mensagemGrupo = `📊 Palpites de ${currentJogadorSelecionado.nome}\n🏆 Rodada ${currentJogadorSelecionado.rodada} • ${currentJogadorSelecionado.posicao}º lugar`;
-        const mensagemPrivado = `📊 Seus palpites da Rodada ${currentJogadorSelecionado.rodada}\n🏆 Você está em ${currentJogadorSelecionado.posicao}º lugar!`;
-        
-        // Enviar para grupo
-        const formDataGrupo = new FormData();
-        formDataGrupo.append('chat_id', TELEGRAM_GROUP_ID);
-        formDataGrupo.append('caption', mensagemGrupo);
-        formDataGrupo.append('photo', blob, `palpites_${currentJogadorSelecionado.nome}_rodada${currentJogadorSelecionado.rodada}.png`);
-        
-        const responseGrupo = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
-            method: 'POST',
-            body: formDataGrupo
-        });
-        
-        let resultado = '❌ Erro ao enviar para o grupo';
-        
-        if (responseGrupo.ok) {
-            resultado = '✅ Enviado para o grupo';
-            
-            // Tentar enviar privado se tiver telegram_id
-            if (telegramId) {
-                const formDataPrivado = new FormData();
-                formDataPrivado.append('chat_id', telegramId);
-                formDataPrivado.append('caption', mensagemPrivado);
-                formDataPrivado.append('photo', blob, `seus_palpites_rodada${currentJogadorSelecionado.rodada}.png`);
-                
-                try {
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
-                        method: 'POST',
-                        body: formDataPrivado
-                    });
-                    resultado += ' e para o jogador!';
-                } catch (error) {
-                    resultado += ' (mas falhou no envio privado)';
-                }
+        // ==================== FUNÇÕES AUXILIARES ====================
+        function logDetalhado(mensagem, dados = null) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            if (dados) {
+                console.log(`[${timestamp}] ${mensagem}`, dados);
             } else {
-                resultado += ' (jogador não tem telegram_id cadastrado)';
+                console.log(`[${timestamp}] ${mensagem}`);
             }
         }
-        
-        alert(resultado);
-        
-    } catch (error) {
-        console.error('Erro completo:', error);
-        alert(`❌ Erro: ${error.message}`);
-        
-        // Limpar container temporário se existir
-        const tempDiv = document.getElementById('temp-modal-content');
-        if (tempDiv) {
-            document.body.removeChild(tempDiv);
-        }
-    } finally {
-        elements.btnEnviarDuplo.disabled = false;
-        elements.btnEnviarDuplo.innerHTML = '<i class="fab fa-telegram-plane"></i> <i class="fab fa-whatsapp"></i> Enviar para Grupo e Privado';
-        
-        // Reabrir o modal original
-        abrirModalPalpites();
+
+        // VERIFICAR SE É TELEGRAM WEB APP
+        // REMOVA a função isTelegramWebApp atual e substitua por:
+
+// VERIFICAR SE É TELEGRAM WEB APP - VERSÃO CORRIGIDA
+function isTelegramWebApp() {
+    // Verifica múltiplas formas de detecção
+    const isInTelegram = 
+        // Método 1: Telegram WebApp API
+        (window.Telegram && window.Telegram.WebApp) ||
+        // Método 2: User agent do Telegram
+        /TelegramBot/i.test(navigator.userAgent) ||
+        // Método 3: URL parameter do Telegram
+        window.location.search.includes('tgWebAppPlatform') ||
+        // Método 4: Variável global do Telegram
+        (window.TelegramWebviewProxy !== undefined) ||
+        // Método 5: WebView do Telegram
+        (window.external && window.external.notify);
+    
+    if (isInTelegram) {
+        console.log('✅ Detectado Telegram Web App:', {
+            hasTelegramObject: !!(window.Telegram && window.Telegram.WebApp),
+            userAgent: navigator.userAgent.substring(0, 50) + '...',
+            hasWebviewProxy: !!(window.TelegramWebviewProxy),
+            searchParams: window.location.search
+        });
+    } else {
+        console.log('❌ NÃO detectado Telegram Web App');
     }
+    
+    return isInTelegram;
 }
 
-// Função auxiliar para carregar e preencher TODAS as informações
-async function carregarEPreencherTodasInformacoes(container) {
+        // FUNÇÃO PARA DECODIFICAR BASE64
+        function decodeBase64(base64) {
+            try {
+                base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                return atob(base64);
+            } catch (error) {
+                console.error('Erro ao decodificar Base64:', error);
+                return null;
+            }
+        }
+
+        // FUNÇÃO PARA DESCOMPRIMIR GZIP
+        async function descomprimirGzip(bytes) {
+            try {
+                if (bytes.length >= 2 && bytes[0] === 0x1f && bytes[1] === 0x8b) {
+                    const ds = new DecompressionStream('gzip');
+                    const decompressedStream = new Blob([bytes]).stream().pipeThrough(ds);
+                    const decompressedArrayBuffer = await new Response(decompressedStream).arrayBuffer();
+                    return new TextDecoder().decode(decompressedArrayBuffer);
+                } else {
+                    return new TextDecoder().decode(bytes);
+                }
+            } catch (error) {
+                console.error('Erro na descompressão GZIP:', error);
+                return new TextDecoder().decode(bytes);
+            }
+        }
+
+        // CONVERTER STRING PARA BYTES
+        function stringParaBytes(str) {
+            const bytes = new Uint8Array(str.length);
+            for (let i = 0; i < str.length; i++) {
+                bytes[i] = str.charCodeAt(i);
+            }
+            return bytes;
+        }
+
+        // ==================== FUNÇÃO PRINCIPAL PARA ABRIR PALPITES ====================
+        // ⭐⭐ FUNÇÃO CORRIGIDA PARA COMPATIBILIDADE COM O BOT ⭐⭐
+        // ABRIR PALPITES DO USUÁRIO
+async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
     try {
-        const response = await fetch(`${API_BASE}/api/palpites/usuario/${encodeURIComponent(currentJogadorSelecionado.nome)}?rodada=${currentJogadorSelecionado.rodada}`);
+        console.log('Abrindo palpites para:', { usuarioId, rodadaNum, nomeUsuario });
         
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error('API retornou erro');
-        }
-        
-        const rodada = data.dados_webapp.rodada_detalhada;
-        const jogos = rodada.jogos || [];
-        const jogosComPalpite = jogos.filter(jogo => jogo.tem_palpite && !jogo.sem_palpite);
-        
-        // ========== PREENCHER JOGOS ==========
-        let jogosHtml = '';
-        
-        if (jogosComPalpite.length === 0) {
-            jogosHtml = '<div style="background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeaa7; text-align: center; color: #856404;">Nenhum palpite encontrado para esta rodada.</div>';
+        // Se estiver no Telegram Web App
+        if (isTelegramWebApp()) {
+            console.log('Enviando dados via Telegram Web App...');
+            
+            // Envia os dados para o Bot Python
+            TELEGRAM_WEBAPP.sendData(JSON.stringify({
+                action: 'carregar_rodada',
+                usuario_id: parseInt(usuarioId),
+                rodada_num: parseInt(rodadaNum),
+                nome_usuario: nomeUsuario,
+                timestamp: Date.now()
+            }));
+            
+            // Fecha o WebApp para que o usuário veja a nova mensagem do bot
+            // (O bot vai enviar um botão "📊 Palpites de [Nome]")
+            /* Comentado para debug: TELEGRAM_WEBAPP.close(); */
+            
         } else {
-            jogosComPalpite.forEach(jogo => {
-                const palpite = jogo.pal || '-';
-                const placarReal = jogo.pr || '-';
-                const pontos = jogo.pts || 0;
-                const acertos = jogo.ac || [];
-                
-                // Determinar cor do card baseado nos acertos
-                let borderColor = '#dee2e6';
-                let bgColor = 'white';
-                
-                if (acertos.includes('PE')) {
-                    borderColor = '#FFD700';
-                    bgColor = 'rgba(255, 215, 0, 0.05)';
-                } else if (acertos.includes('RC')) {
-                    borderColor = '#2ecc71';
-                    bgColor = 'rgba(46, 204, 113, 0.05)';
-                } else if (palpite === 'c/vim') {
-                    borderColor = '#95a5a6';
-                    bgColor = 'rgba(149, 165, 166, 0.05)';
-                }
-                
-                jogosHtml += `
-                    <div style="background: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 12px; margin-bottom: 8px; border-radius: 4px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: bold; color: #2c3e50; font-size: 1.05em;">${jogo.m} vs ${jogo.v}</div>
-                                <div style="color: #666; font-size: 0.85em; margin-top: 3px;">${formatarData(jogo.dh)}</div>
-                                <div style="margin-top: 8px;">
-                                    <span style="background: #e9ecef; color: #495057; padding: 3px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 5px;">Palpite: ${palpite}</span>
-                                    ${jogo.pd ? '<span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8em;">PD</span>' : ''}
-                                </div>
-                            </div>
-                            <div style="text-align: right; margin-left: 15px;">
-                                <div style="font-size: 1.3em; font-weight: bold; color: ${pontos > 0 ? '#27ae60' : '#e74c3c'};">${pontos} pts</div>
-                                <div style="margin-top: 5px;">
-                                    ${acertos.length > 0 ? 
-                                        acertos.map(a => {
-                                            let badgeColor = '#3498db';
-                                            if (a === 'PE') badgeColor = '#f39c12';
-                                            if (a === 'RC') badgeColor = '#27ae60';
-                                            if (a === 'PD') badgeColor = '#e74c3c';
-                                            return `<span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.75em; margin-left: 3px;">${a}</span>`;
-                                        }).join('') 
-                                        : '<span style="color: #999; font-size: 0.8em;">Sem acertos</span>'
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
-                            <span>Placar real: <strong>${placarReal}</strong></span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-        
-        const tempJogosDiv = container.querySelector('#temp-jogos');
-        if (tempJogosDiv) {
-            tempJogosDiv.innerHTML = jogosHtml;
-        }
-        
-        // ========== PREENCHER RESUMO ==========
-        const totalPontos = rodada.tp || 0;
-        const jogosPalpitados = rodada.jp || 0;
-        const totalJogos = rodada.jtf || 0;
-        const estatisticas = rodada.est || {pe: 0, rc: 0, gm: 0, gv: 0, pd_usada: false};
-        
-        const resumoHtml = `
-            <div style="text-align: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <div style="font-size: 1.8em; font-weight: bold; color: #3498db;">${totalPontos}</div>
-                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">Pontos Totais</div>
-            </div>
-            <div style="text-align: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <div style="font-size: 1.8em; font-weight: bold; color: #f39c12;">${estatisticas.pe || 0}</div>
-                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">Placares Exatos</div>
-            </div>
-            <div style="text-align: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <div style="font-size: 1.8em; font-weight: bold; color: #27ae60;">${estatisticas.rc || 0}</div>
-                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">Resultados Corretos</div>
-            </div>
-            <div style="text-align: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <div style="font-size: 1.8em; font-weight: bold; color: ${jogosPalpitados === totalJogos ? '#27ae60' : '#e74c3c'};">${jogosPalpitados}/${totalJogos}</div>
-                <div style="font-size: 0.85em; color: #666; margin-top: 5px;">Jogos Palpitados</div>
-            </div>
-        `;
-        
-        const tempResumoDiv = container.querySelector('#temp-resumo');
-        if (tempResumoDiv) {
-            tempResumoDiv.innerHTML = resumoHtml;
-        }
-        
-        // ========== PREENCHER ESTATÍSTICAS DETALHADAS ==========
-        const percentualPalpites = totalJogos > 0 ? Math.round((jogosPalpitados / totalJogos) * 100) : 0;
-        const mediaPontosPorJogo = jogosPalpitados > 0 ? (totalPontos / jogosPalpitados).toFixed(1) : '0.0';
-        const aproveitamentoPE = jogosPalpitados > 0 ? Math.round((estatisticas.pe / jogosPalpitados) * 100) : 0;
-        const aproveitamentoRC = jogosPalpitados > 0 ? Math.round((estatisticas.rc / jogosPalpitados) * 100) : 0;
-        
-        const estatisticasHtml = `
-            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #3498db;">
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;"><i class="fas fa-percentage"></i> Participação</div>
-                <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;">${percentualPalpites}%</div>
-                <div style="font-size: 0.8em; color: #999;">${jogosPalpitados} de ${totalJogos} jogos</div>
-            </div>
-            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #2ecc71;">
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;"><i class="fas fa-chart-line"></i> Média por Jogo</div>
-                <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;">${mediaPontosPorJogo}</div>
-                <div style="font-size: 0.8em; color: #999;">pontos por palpite</div>
-            </div>
-            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #f39c12;">
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;"><i class="fas fa-star"></i> Aproveitamento PE</div>
-                <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;">${aproveitamentoPE}%</div>
-                <div style="font-size: 0.8em; color: #999;">${estatisticas.pe || 0} placares exatos</div>
-            </div>
-            <div style="background: white; padding: 12px; border-radius: 8px; border-left: 4px solid #27ae60;">
-                <div style="font-size: 0.9em; color: #666; margin-bottom: 5px;"><i class="fas fa-check-circle"></i> Aproveitamento RC</div>
-                <div style="font-size: 1.4em; font-weight: bold; color: #2c3e50;">${aproveitamentoRC}%</div>
-                <div style="font-size: 0.8em; color: #999;">${estatisticas.rc || 0} resultados corretos</div>
-            </div>
-        `;
-        
-        const tempEstatisticasDiv = container.querySelector('#temp-estatisticas');
-        if (tempEstatisticasDiv) {
-            tempEstatisticasDiv.innerHTML = estatisticasHtml;
+            // Fallback para navegador/desktop
+            // Certifique-se que BOT_USERNAME está configurado corretamente no topo
+            const linkBot = `https://t.me/${BOT_USERNAME}?start=palpites_${usuarioId}_${rodadaNum}`;
+            window.open(linkBot, '_blank');
         }
         
     } catch (error) {
-        console.error('Erro ao carregar informações:', error);
-        
-        // Mensagem de erro em todas as seções
-        const erroHtml = '<div style="background: #fee; color: #c00; padding: 10px; border-radius: 5px; border: 1px solid #fcc;">Erro ao carregar dados: ' + error.message + '</div>';
-        
-        const tempJogosDiv = container.querySelector('#temp-jogos');
-        if (tempJogosDiv) tempJogosDiv.innerHTML = erroHtml;
-        
-        const tempResumoDiv = container.querySelector('#temp-resumo');
-        if (tempResumoDiv) tempResumoDiv.innerHTML = erroHtml;
-        
-        const tempEstatisticasDiv = container.querySelector('#temp-estatisticas');
-        if (tempEstatisticasDiv) tempEstatisticasDiv.innerHTML = erroHtml;
+        console.error('Erro:', error);
+        alert('Erro ao abrir. Tente pelo comando /start');
     }
 }
 
-// Função auxiliar para formatar data (se ainda não existir)
-function formatarData(dataString) {
-    if (!dataString) return 'Data não disponível';
-    try {
-        const data = new Date(dataString);
-        return data.toLocaleDateString('pt-BR', { 
-            day: '2-digit', 
-            month: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    } catch (e) {
-        return dataString;
-    }
-}
-// Função auxiliar para carregar e preencher palpites
-async function carregarEPreencherPalpites(container) {
-    try {
-        const response = await fetch(`${API_BASE}/api/palpites/usuario/${encodeURIComponent(currentJogadorSelecionado.nome)}?rodada=${currentJogadorSelecionado.rodada}`);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        // Função auxiliar para mostrar feedback visual
+        function mostrarFeedback(mensagem) {
+            // Pode implementar um toast ou modal de loading
+            console.log('📱 Feedback:', mensagem);
+            // Exemplo simples:
+            // if (TELEGRAM_WEBAPP && TELEGRAM_WEBAPP.showAlert) {
+            //     TELEGRAM_WEBAPP.showAlert(mensagem);
+            // }
         }
-        
-        const data = await response.json();
-        
-        if (!data.success) {
-            throw new Error('API retornou erro');
-        }
-        
-        const rodada = data.dados_webapp.rodada_detalhada;
-        const jogos = rodada.jogos || [];
-        const jogosComPalpite = jogos.filter(jogo => jogo.tem_palpite && !jogo.sem_palpite);
-        
-        let jogosHtml = '';
-        
-        if (jogosComPalpite.length === 0) {
-            jogosHtml = '<div style="background: #fff3cd; padding: 10px; border-radius: 5px; border: 1px solid #ffeaa7;">Nenhum palpite encontrado para esta rodada.</div>';
-        } else {
-            jogosComPalpite.forEach(jogo => {
-                const palpite = jogo.pal || '-';
-                const placarReal = jogo.pr || '-';
-                const pontos = jogo.pts || 0;
-                const acertos = jogo.ac || [];
-                
-                let bgColor = '#f8f9fa';
-                if (acertos.includes('PE')) bgColor = 'rgba(255, 215, 0, 0.1)';
-                else if (acertos.includes('RC')) bgColor = 'rgba(46, 204, 113, 0.1)';
-                
-                jogosHtml += `
-                    <div style="background: ${bgColor}; border-left: 4px solid #3498db; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
-                        <div style="font-weight: bold;">${jogo.m} vs ${jogo.v}</div>
-                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
-                            Palpite: <strong>${palpite}</strong> | 
-                            Placar: <strong>${placarReal}</strong> | 
-                            Pontos: <strong style="color: ${pontos > 0 ? '#27ae60' : '#e74c3c'}">${pontos}</strong>
-                        </div>
-                        ${acertos.length > 0 ? `<div style="margin-top: 5px;">${acertos.map(a => `<span style="background: #3498db; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; margin-right: 5px;">${a}</span>`).join('')}</div>` : ''}
-                    </div>
-                `;
-            });
-        }
-        
-        // Inserir no container
-        const tempJogosDiv = container.querySelector('#temp-jogos');
-        if (tempJogosDiv) {
-            tempJogosDiv.innerHTML = jogosHtml;
-        }
-        
-    } catch (error) {
-        console.error('Erro ao carregar palpites:', error);
-        const tempJogosDiv = container.querySelector('#temp-jogos');
-        if (tempJogosDiv) {
-            tempJogosDiv.innerHTML = `<div style="color: #e74c3c; padding: 10px;">Erro ao carregar palpites: ${error.message}</div>`;
-        }
-    }
-}
-        // TELEGRAM - CAPTURA E ENVIO DE IMAGEM
-        // ==============================================
-        
-        // Capturar e abrir modal Telegram
-        async function capturarETelegram(tipo) {
-            currentModalType = tipo;
-            
-            // Determinar qual elemento capturar
-            if (tipo === 'geral') {
-                currentModalElement = elements.tabelaGeralContainer;
-            } else if (tipo === 'rodada') {
-                currentModalElement = elements.tabelaRodadaContainer;
-            } else {
-                alert('Tipo de captura não suportado');
-                return;
-            }
-            
-            // Abrir modal
-            abrirModalTelegram();
-            
-            // Gerar preview
-            await gerarPreviewImagem();
-        }
-        
-        // Abrir modal Telegram
-        function abrirModalTelegram() {
-            elements.modalTelegram.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-            elements.previewImage.style.display = 'none';
-            elements.previewPlaceholder.style.display = 'block';
-            elements.statusEnvio.innerHTML = '';
-        }
-        
-        // Fechar modal Telegram
-        function fecharModalTelegram() {
-            elements.modalTelegram.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Gerar preview da imagem
-        async function gerarPreviewImagem() {
-            try {
-                // Capturar elemento como imagem com configurações otimizadas
-                const canvas = await html2canvas(currentModalElement, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    useCORS: true,
-                    logging: false,
-                    allowTaint: true,
-                    useCORS: true,
-                    removeContainer: true
-                });
-                
-                // Converter para data URL
-                const imageData = canvas.toDataURL('image/png');
-                
-                // Mostrar preview
-                elements.previewImage.src = imageData;
-                elements.previewImage.style.display = 'block';
-                elements.previewPlaceholder.style.display = 'none';
-                
-                // Armazenar imagem para envio
-                sessionStorage.setItem('imagemCapturada', imageData);
-                
-            } catch (error) {
-                console.error('Erro ao capturar imagem:', error);
-                elements.previewPlaceholder.innerHTML = `
-                    <div class="text-danger">
-                        <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        <p>Erro ao gerar imagem: ${error.message}</p>
-                    </div>
-                `;
-            }
-        }
-        
-        // Enviar para Telegram
-        async function enviarParaTelegram() {
-            const imagemData = sessionStorage.getItem('imagemCapturada');
-            const mensagem = elements.mensagemTelegram.value.trim();
-            
-            if (!imagemData) {
-                alert('Nenhuma imagem para enviar. Tente capturar novamente.');
-                return;
-            }
-            
-            elements.btnEnviarTelegram.disabled = true;
-            elements.btnEnviarTelegram.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-            elements.statusEnvio.innerHTML = '<div class="alert alert-info">Enviando para Telegram...</div>';
-            
-            try {
-                // Converter data URL para blob
-                const blob = await dataURLtoBlob(imagemData);
-                
-                // Criar form data
-                const formData = new FormData();
-                formData.append('chat_id', TELEGRAM_GROUP_ID);
-                
-                if (mensagem) {
-                    formData.append('caption', mensagem);
-                }
-                
-                formData.append('photo', blob, 'ranking.png');
-                
-                // Enviar para API do Telegram
-                const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.ok) {
-                    elements.statusEnvio.innerHTML = '<div class="alert alert-success">✅ Imagem enviada com sucesso para o grupo!</div>';
-                    
-                    // Fechar modal após 2 segundos
-                    setTimeout(() => {
-                        fecharModalTelegram();
-                    }, 2000);
-                } else {
-                    throw new Error(result.description || 'Erro ao enviar para Telegram');
-                }
-                
-            } catch (error) {
-                console.error('Erro ao enviar para Telegram:', error);
-                elements.statusEnvio.innerHTML = `<div class="alert alert-danger">❌ Erro ao enviar: ${error.message}</div>`;
-            } finally {
-                elements.btnEnviarTelegram.disabled = false;
-                elements.btnEnviarTelegram.innerHTML = '<i class="fab fa-telegram-plane"></i> Enviar para Grupo';
-            }
-        }
-        
-        // Converter data URL para blob
-        function dataURLtoBlob(dataurl) {
-            return new Promise((resolve, reject) => {
-                const arr = dataurl.split(',');
-                const mime = arr[0].match(/:(.*?);/)[1];
-                const bstr = atob(arr[1]);
-                let n = bstr.length;
-                const u8arr = new Uint8Array(n);
-                
-                while (n--) {
-                    u8arr[n] = bstr.charCodeAt(n);
-                }
-                
-                resolve(new Blob([u8arr], {type: mime}));
-            });
-        }
-        
-        // ==============================================
-        // FUNÇÕES RESTANTES
-        // ==============================================
-        
-        // Aplicar filtros
-        function applyFilters() {
-            const activeTab = document.querySelector('#mainTabs .nav-link.active').id;
-            
-            if (activeTab === 'geral-tab') {
-                renderRankingGeral();
-            } else if (activeTab === 'rodadas-tab' && elements.rodadaSelect.value) {
-                renderRodadaData(elements.rodadaSelect.value);
-            }
-        }
-        
-        // Recalcular ranking
-        async function recalcularRanking() {
-            const btn = elements.btnRecalcular;
-            const originalText = btn.innerHTML;
-            
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Calculando...';
-            elements.recalcularStatus.innerHTML = '<div class="alert alert-info">Recalculando rankings...</div>';
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/calcular`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const result = await response.json();
-                
-                if (result.status.includes('✅')) {
-                    elements.recalcularStatus.innerHTML = '<div class="alert alert-success">✅ Rankings recalculados com sucesso!</div>';
-                    // Recarregar dados após cálculo
-                    setTimeout(() => {
-                        loadRankingGeral();
-                        loadJogadores();
-                        if (elements.rodadaSelect.value) {
-                            loadRodadaData(elements.rodadaSelect.value);
-                        }
-                    }, 1000);
-                } else {
-                    throw new Error(result.status);
-                }
-                
-            } catch (error) {
-                console.error('Erro ao recalcular:', error);
-                elements.recalcularStatus.innerHTML = `<div class="alert alert-danger">❌ Erro ao recalcular: ${error.message}</div>`;
-            } finally {
+
+        // Função para mostrar erro temporário
+        function mostrarErroTemporario(mensagem) {
+            const erroDiv = document.getElementById('error-message');
+            if (erroDiv) {
+                const originalTexto = erroDiv.textContent;
+                erroDiv.textContent = mensagem;
                 setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }, 3000);
+                    erroDiv.textContent = originalTexto;
+                }, 5000);
             }
         }
+
+        // ==================== FUNÇÕES PARA CARREGAR DADOS ====================
         
-        // Atualizar todos os dados
-        function refreshData() {
-            checkApiStatus();
-            
-            const activeTab = document.querySelector('#mainTabs .nav-link.active').id;
-            if (activeTab === 'geral-tab') {
-                loadRankingGeral();
-            } else if (activeTab === 'rodadas-tab') {
-                if (elements.rodadaSelect.value) {
-                    loadRodadaData(elements.rodadaSelect.value);
-                } else {
-                    loadRankingGeral(); // Para carregar as rodadas disponíveis
-                }
-            } else if (activeTab === 'estatisticas-tab') {
-                loadRankingGeral();
-                loadJogadores();
-            }
-        }
-        
-        // Mostrar loading
-        function showLoading(tipo) {
-            if (tipo === 'geral') {
-                elements.loadingGeral.style.display = 'block';
-                elements.tableGeralBody.innerHTML = '';
-                elements.cardsGeral.innerHTML = '';
-            } else if (tipo === 'rodada') {
-                elements.loadingRodada.style.display = 'block';
-                elements.tableRodadaBody.innerHTML = '';
-                elements.cardsRodada.innerHTML = '';
-            } else if (tipo === 'estatisticas') {
-                elements.loadingEstatisticas.style.display = 'block';
-                elements.estatisticasConteudo.innerHTML = '';
-            }
-        }
-        
-        // Esconder loading
-        function hideLoading(tipo) {
-            if (tipo === 'geral') {
-                elements.loadingGeral.style.display = 'none';
-            } else if (tipo === 'rodada') {
-                elements.loadingRodada.style.display = 'none';
-            } else if (tipo === 'estatisticas') {
-                elements.loadingEstatisticas.style.display = 'none';
-            }
-        }
-        
-        // Carregar lista de jogadores
-        async function loadJogadores() {
+        // CARREGAR DADOS PRINCIPAIS
+        async function carregarDados() {
             try {
-                const response = await fetch(`${API_BASE}/api/ranking-geral`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                jogadoresData = data.ranking;
-                
-                renderListaJogadores();
-                populateRodadasEstatisticas();
-                
-            } catch (error) {
-                console.error('Erro ao carregar jogadores:', error);
-                elements.listaJogadores.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar jogadores
-                    </div>
-                `;
-            }
-        }
-        
-        function renderListaJogadores() {
-            let html = '';
-            
-            jogadoresData.forEach((jogador, index) => {
-                html += `
-                    <a href="#" class="list-group-item list-group-item-action" onclick="selecionarJogador('${jogador.usuario_id || jogador.usuario}', '${jogador.usuario}')">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>${jogador.usuario}</strong>
-                                <div class="text-muted small">
-                                    ${jogador.posicao || (index + 1)}º lugar • ${jogador.pontos} pontos
-                                </div>
-                            </div>
-                            <span class="badge bg-primary">${jogador.rodadas} rodadas</span>
-                        </div>
-                    </a>
-                `;
-            });
-            
-            elements.listaJogadores.innerHTML = html;
-        }
-        
-        function filtrarJogadores() {
-            const filtro = elements.filterJogadores.value.toLowerCase();
-            const itens = elements.listaJogadores.getElementsByClassName('list-group-item');
-            
-            for (let item of itens) {
-                const texto = item.textContent.toLowerCase();
-                if (texto.includes(filtro)) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
+                mostrarLoading(true);
+                esconderErro();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosBase64 = urlParams.get('data');
+
+                if (!dadosBase64) {
+                    throw new Error('Nenhum dado recebido na URL');
                 }
+
+                // Decodificar Base64
+                const dadosString = decodeBase64(dadosBase64);
+                if (!dadosString) {
+                    throw new Error('Falha ao decodificar Base64');
+                }
+
+                // Converter para bytes
+                const bytes = stringParaBytes(dadosString);
+
+                // Descomprimir GZIP
+                let dadosJSON;
+                try {
+                    dadosJSON = await descomprimirGzip(bytes);
+                } catch (e) {
+                    dadosJSON = dadosString;
+                }
+
+                // Parse do JSON
+                const dados = JSON.parse(dadosJSON);
+                
+                if (!dados.t || dados.t !== 'ranking_tabela') {
+                    throw new Error('Formato de dados inválido');
+                }
+
+                // Salvar dados
+                dadosRanking = dados;
+                rodadaAtual = dados.r.n;
+
+                // Atualizar interface
+                atualizarInterface();
+                mostrarLoading(false);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro(`Erro: ${error.message || 'Não foi possível carregar os dados'}`);
+                mostrarLoading(false);
             }
         }
+
+        // ATUALIZAR INTERFACE
+        // ATUALIZAR INTERFACE
+function atualizarInterface() {
+    if (!dadosRanking) return;
+
+    const rodada = dadosRanking.r;
+    const ranking = dadosRanking.k;
+
+    // Atualizar informações da rodada
+    document.getElementById('rodada-numero').innerHTML = 
+        `<span>📅</span> <span>Rodada: ${rodada.n}</span>`;
+    document.getElementById('total-participantes').innerHTML = 
+        `<span>👥</span> <span>Participantes: ${rodada.p}</span>`;
+    document.getElementById('rodada-atual').textContent = rodada.n;
+
+    // Atualizar top 3
+    if (ranking.length > 0) {
+        document.getElementById('top-1').textContent = `🥇 ${ranking[0].n}`;
+        document.getElementById('top-2').textContent = ranking.length > 1 ? `🥈 ${ranking[1].n}` : '🥈 --';
+        document.getElementById('top-3').textContent = ranking.length > 2 ? `🥉 ${ranking[2].n}` : '🥉 --';
+    }
+
+    // Gerar tabela de ranking
+    const tbody = document.getElementById('ranking-body');
+    tbody.innerHTML = '';
+
+    ranking.forEach((participante, index) => {
+        const linha = document.createElement('tr');
+
+        // Determinar medalha
+        let medalha = '';
+        if (index === 0) medalha = '🥇';
+        else if (index === 1) medalha = '🥈';
+        else if (index === 2) medalha = '🥉';
+        else if (index === 3) medalha = '🎖️';
+
+        // CORREÇÃO DE SEGURANÇA:
+        // Em vez de passar strings no onclick, usamos data-attributes e event listener
+        // Isso evita erros com nomes contendo aspas ou caracteres especiais
         
-        function populateRodadasEstatisticas() {
-            let html = '<option value="" disabled selected>Selecione uma rodada</option>';
+        linha.innerHTML = `
+            <td class="posicao-cell">
+                ${medalha ? `<span class="medalha">${medalha}</span>` : ''}
+                <strong>${index + 1}º</strong>
+            </td>
+            <td class="nome-cell">
+                <a href="javascript:void(0)" class="nome-link user-action" 
+                   data-uid="${participante.u}" 
+                   data-rodada="${rodada.n}"
+                   data-nome="${participante.n.replace(/"/g, '&quot;')}">
+                    <span class="user-icon">👤</span>
+                    ${participante.n}
+                </a>
+            </td>
+            <td class="pontos-cell">${participante.t}</td>
+            <td class="estatisticas-cell">
+                <div class="estatisticas-badges">
+                    <span class="estatistica-badge pe">PE: ${participante.e.pe}</span>
+                    <span class="estatistica-badge rc">RC: ${participante.e.rc}</span>
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(linha);
+    });
+
+    // Adiciona os eventos de clique após criar os elementos
+    document.querySelectorAll('.user-action').forEach(el => {
+        el.addEventListener('click', function() {
+            const uid = this.getAttribute('data-uid');
+            const rodada = this.getAttribute('data-rodada');
+            const nome = this.getAttribute('data-nome');
+            abrirPalpitesUsuario(uid, rodada, nome);
+        });
+    });
+}
+
+        // ==================== FUNÇÕES AUXILIARES DA INTERFACE ====================
+        
+        function mostrarLoading(mostrar) {
+            document.getElementById('loading').style.display = mostrar ? 'block' : 'none';
+            document.querySelector('.ranking-container').style.display = mostrar ? 'none' : 'block';
+            document.querySelector('.controls').style.display = mostrar ? 'none' : 'flex';
+            document.querySelector('.legenda').style.display = mostrar ? 'none' : 'flex';
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('error-message').textContent = mensagem;
+            document.getElementById('error').style.display = 'block';
+            document.querySelector('.ranking-container').style.display = 'none';
+            document.querySelector('.controls').style.display = 'none';
+            document.querySelector('.legenda').style.display = 'none';
+        }
+
+        function esconderErro() {
+            document.getElementById('error').style.display = 'none';
+        }
+
+        function mudarRodada(direcao) {
+            alert(`Na versão completa, isso carregaria outra rodada`);
+        }
+
+        function atualizarRanking() {
+            carregarDados();
+        }
+
+        function voltarMenu() {
+            if (isTelegramWebApp()) {
+                TELEGRAM_WEBAPP.close();
+            } else {
+                window.history.back();
+            }
+        }
+
+        // ==================== INICIALIZAÇÃO ====================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            logDetalhado('🚀 Inicializando ranking...');
+            logDetalhado('Telegram Web App disponível:', !!TELEGRAM_WEBAPP);
+
+
             
-            if (rodadasList.length > 0) {
-                rodadasList.forEach(rodada => {
-                    html += `<option value="${rodada}">Rodada ${rodada}</option>`;
+            if (TELEGRAM_WEBAPP) {
+                // Expandir para usar tela cheia
+                TELEGRAM_WEBAPP.expand();
+                
+                // Configurar botão principal
+                TELEGRAM_WEBAPP.MainButton
+                    .setText('FECHAR')
+                    .setParams({
+                        color: '#4f46e5'
+                    })
+                    .show()
+                    .onClick(() => {
+                        TELEGRAM_WEBAPP.close();
+                    });
+                
+                // Log para debug
+                logDetalhado('Telegram Web App configurado. InitData:', 
+                    TELEGRAM_WEBAPP.initData ? 'Presente' : 'Ausente');
+                
+                // ⭐⭐ CONFIGURAR EVENTO PARA RECEBER RESPOSTAS DO BOT ⭐⭐
+                // (Opcional - para feedback)
+                TELEGRAM_WEBAPP.onEvent('viewportChanged', (e) => {
+                    logDetalhado('Viewport changed:', e);
                 });
-            } else {
-                html += '<option value="" disabled>Nenhuma rodada disponível</option>';
             }
             
-            elements.selectRodadaEstatisticas.innerHTML = html;
-        }
+            // Carregar dados
+            carregarDados();
+        });
+
+
         
-        function mudarTipoEstatisticas() {
-            const tipo = elements.tipoEstatisticas.value;
-            
-            if (tipo === 'rodada') {
-                elements.containerRodadas.style.display = 'block';
-                elements.containerGeral.style.display = 'none';
-            } else {
-                elements.containerRodadas.style.display = 'none';
-                elements.containerGeral.style.display = 'block';
-            }
-        }
+        // ==================== DADOS DE EXEMPLO PARA TESTE ====================
         
-        function selecionarJogador(jogadorId, jogadorNome) {
-            // Remover seleção anterior
-            const itens = elements.listaJogadores.getElementsByClassName('list-group-item');
-            for (let item of itens) {
-                item.classList.remove('active');
-            }
-            
-            // Adicionar seleção atual
-            event.currentTarget.classList.add('active');
-            
-            // Armazenar jogador selecionado
-            sessionStorage.setItem('jogadorSelecionadoId', jogadorId);
-            sessionStorage.setItem('jogadorSelecionadoNome', jogadorNome);
-            
-            // Atualizar título
-            elements.estatisticasTitulo.textContent = `Jogador: ${jogadorNome}`;
-            
-            // Se for estatísticas gerais, carregar automaticamente
-            if (elements.tipoEstatisticas.value === 'geral') {
-                carregarEstatisticasGerais();
-            }
-        }
-        
-        async function carregarEstatisticasGerais() {
-            const jogadorId = sessionStorage.getItem('jogadorSelecionadoId');
-            const jogadorNome = sessionStorage.getItem('jogadorSelecionadoNome');
-            
-            if (!jogadorId) {
-                alert('Por favor, selecione um jogador primeiro.');
-                return;
-            }
-            
-            showLoading('estatisticas');
-            
-            try {
-                // Buscar estatísticas do jogador no ranking geral
-                const jogador = jogadoresData.find(j => (j.usuario_id || j.usuario) === jogadorId);
-                
-                if (!jogador) {
-                    throw new Error('Jogador não encontrado');
+        window.dadosExemplo = {
+            "t": "ranking_tabela",
+            "r": {"n": 2, "p": 3},
+            "k": [
+                {
+                    "p": 1,
+                    "n": "Bruno Vieira",
+                    "t": 38,
+                    "u": 1,
+                    "e": {"pe": 2, "rc": 5, "gm": 0, "gv": 0}
+                },
+                {
+                    "p": 2,
+                    "n": "Maria Silva",
+                    "t": 32,
+                    "u": 2,
+                    "e": {"pe": 1, "rc": 6, "gm": 0, "gv": 0}
+                },
+                {
+                    "p": 3,
+                    "n": "Carlos Santos",
+                    "t": 28,
+                    "u": 3,
+                    "e": {"pe": 0, "rc": 7, "gm": 0, "gv": 0}
                 }
-                
-                // Calcular média de pontos
-                const mediaPontos = jogador.rodadas > 0 ? (jogador.pontos / jogador.rodadas).toFixed(1) : '0.0';
-                
-                // Calcular VP
-                const vp = calcularVP(jogador);
-                const vpClass = getVPClass(vp).replace('badge-', '');
-                
-                // Renderizar estatísticas
-                elements.estatisticasConteudo.innerHTML = `
-                    <div class="text-center mb-4">
-                        <div class="display-4 text-primary">${jogador.posicao || '?'}º</div>
-                        <h5>Posição Geral</h5>
-                    </div>
+            ],
+            "c": {"m": true, "l": true, "w": ""}
+        };
+
+        // Para teste local
+        if (window.location.href.includes('localhost') || window.location.href.includes('file://')) {
+            setTimeout(() => {
+                if (!dadosRanking) {
+                    logDetalhado('Usando dados de exemplo para teste local');
+                    dadosRanking = window.dadosExemplo;
+                    atualizarInterface();
+                    mostrarLoading(false);
                     
-                    <div class="row text-center mb-4">
-                        <div class="col-4">
-                            <div class="display-6">${jogador.pontos}</div>
-                            <div class="text-muted">Pontos Totais</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="display-6">${mediaPontos}</div>
-                            <div class="text-muted">Média/Rodada</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="display-6">${jogador.rodadas}</div>
-                            <div class="text-muted">Rodadas</div>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-star text-warning"></i> Placar Exato (PE)</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Total de PE:</span>
-                            <span class="badge badge-pe">${jogador.estatisticas.PE || 0}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Média por rodada:</span>
-                            <span>${(jogador.estatisticas.PE / jogador.rodadas || 0).toFixed(2)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-check-circle text-success"></i> Resultado Correto (RC)</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Total de RC:</span>
-                            <span class="badge badge-rc">${jogador.estatisticas.RC || 0}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Média por rodada:</span>
-                            <span>${(jogador.estatisticas.RC / jogador.rodadas || 0).toFixed(2)}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-chart-line text-primary"></i> Variação de Posição (VP)</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Variação atual:</span>
-                            <span class="badge ${vpClass}">${vp}</span>
-                        </div>
-                        <div class="small text-muted">
-                            Comparação com a rodada anterior
-                        </div>
-                    </div>
-                `;
-                
-            } catch (error) {
-                console.error('Erro ao carregar estatísticas:', error);
-                elements.estatisticasConteudo.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar estatísticas: ${error.message}
-                    </div>
-                `;
-            } finally {
-                hideLoading('estatisticas');
-            }
-        }
-        
-        async function carregarEstatisticasRodada() {
-            const jogadorId = sessionStorage.getItem('jogadorSelecionadoId');
-            const jogadorNome = sessionStorage.getItem('jogadorSelecionadoNome');
-            const rodadaNum = elements.selectRodadaEstatisticas.value;
-            
-            if (!jogadorId) {
-                alert('Por favor, selecione um jogador primeiro.');
-                return;
-            }
-            
-            if (!rodadaNum) {
-                alert('Por favor, selecione uma rodada.');
-                return;
-            }
-            
-            showLoading('estatisticas');
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/estatisticas/jogador/${jogadorId}/rodada/${rodadaNum}`);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                
-                const estatisticas = data.estatisticas;
-                
-                // Calcular VP para esta rodada
-                const posicaoAtual = data.posicao_atual || '?';
-                const posicaoAnterior = data.posicao_anterior || '?';
-                let vp = '-';
-                
-                if (posicaoAnterior !== '?' && posicaoAtual !== '?' && rodadaNum > 1) {
-                    const diff = posicaoAnterior - posicaoAtual;
-                    if (diff > 0) {
-                        vp = `+${diff}`;
-                    } else if (diff < 0) {
-                        vp = `${diff}`;
-                    } else {
-                        vp = '0';
-                    }
+                    // Testar clique
+                    logDetalhado('✅ Teste: Clique em qualquer nome para testar abertura de palpites');
+                    logDetalhado('📋 Estrutura de dados de exemplo:', {
+                        usuario_id: 1,
+                        rodada_num: 2,
+                        nome_usuario: "Bruno Vieira"
+                    });
                 }
-                
-                const vpClass = getVPClass(vp).replace('badge-', '');
-                
-                // Renderizar estatísticas da rodada
-                elements.estatisticasConteudo.innerHTML = `
-                    <div class="text-center mb-4">
-                        <div class="display-4 text-primary">Rodada ${rodadaNum}</div>
-                        <h5>Estatísticas do Jogador</h5>
-                    </div>
-                    
-                    <div class="row text-center mb-4">
-                        <div class="col-4">
-                            <div class="display-6">${data.pontos || 0}</div>
-                            <div class="text-muted">Pontos</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="display-6">${posicaoAtual}º</div>
-                            <div class="text-muted">Posição</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="display-6">${vp}</div>
-                            <div class="text-muted">VP</div>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-star text-warning"></i> Placar Exato (PE)</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Total na rodada:</span>
-                            <span class="badge badge-pe">${estatisticas.pe || 0}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-check-circle text-success"></i> Resultado Correto (RC)</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Total na rodada:</span>
-                            <span class="badge badge-rc">${estatisticas.rc || 0}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-chart-line text-primary"></i> Variação de Posição</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Variação:</span>
-                            <span class="badge ${vpClass}">${vp}</span>
-                        </div>
-                        <div class="small text-muted">
-                            ${posicaoAnterior !== '?' ? `Posição anterior: ${posicaoAnterior}º` : 'Primeira rodada'}
-                        </div>
-                    </div>
-                    
-                    <div class="estatisticas-item">
-                        <h6><i class="fas fa-gamepad"></i> Participação</h6>
-                        <div class="d-flex justify-content-between">
-                            <span>Palpites realizados:</span>
-                            <span>${data.palpites_feitos || 0}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Jogos totais:</span>
-                            <span>${data.total_jogos || 0}</span>
-                        </div>
-                        <div class="d-flex justify-content-between">
-                            <span>Participação:</span>
-                            <span>${data.participacao_percentual || 0}%</span>
-                        </div>
-                    </div>
-                `;
-                
-            } catch (error) {
-                console.error('Erro ao carregar estatísticas da rodada:', error);
-                elements.estatisticasConteudo.innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar estatísticas: ${error.message}<br>
-                        <small>Certifique-se de que o jogador participou desta rodada e que a rodada já foi calculada.</small>
-                    </div>
-                `;
-            } finally {
-                hideLoading('estatisticas');
-            }
+            }, 800);
         }
-        
-        // Funções de cálculo de VP
-        function calcularVP(item) {
-            return item.vp || '-';
-        }
-        
-        function calcularVPRodada(item, rodadaNum) {
-            if (rodadaNum <= 1) {
-                return '-';
-            }
-            return item.vp || '-';
-        }
-        
-        function getVPClass(vp) {
-            if (vp === '-') return 'badge-vp-zero';
-            if (vp.startsWith('+')) return 'badge-vp-positive';
-            if (vp.startsWith('-')) return 'badge-vp-negative';
-            if (vp === '0') return 'badge-vp-zero';
-            return 'badge-vp';
-        }
-        
-        // Funções para cores das linhas
-        function getRowClass(position) {
-            if (position === 1) return 'row-gold';
-            if (position === 2) return 'row-silver';
-            if (position === 3) return 'row-bronze';
-            if (position === 4) return 'row-fourth';
-            if (position === 5) return 'row-pos-5';
-            if (position === 6) return 'row-pos-6';
-            if (position === 7) return 'row-pos-7';
-            if (position === 8) return 'row-pos-8';
-            if (position === 9) return 'row-pos-9';
-            if (position === 10) return 'row-pos-10';
-            if (position === 11) return 'row-pos-11';
-            if (position === 12) return 'row-pos-12';
-            if (position === 13) return 'row-pos-13';
-            if (position === 14) return 'row-pos-14';
-            if (position === 15) return 'row-pos-15';
-            
-            // Para posições acima de 15, ciclo entre os últimos 5 tons
-            if (position <= 20) return `row-pos-${10 + (position % 5)}`;
-            
-            return 'row-pos-default';
-        }
-        
-        // Inicializar auto-refresh
-        let autoRefreshInterval = null;
     </script>
 </body>
 </html>
