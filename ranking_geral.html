@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Ranking Geral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+        
+        .header .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 5px solid #3498db;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .medalha-ouro { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .medalha-prata { background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%); }
+        .medalha-bronze { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        
+        .medalha {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 10px;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .ranking-table {
+            width: calc(100% - 40px);
+            margin: 20px;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .ranking-table thead {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+        }
+        
+        .ranking-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        .ranking-table tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+        
+        .ranking-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .ranking-table td {
+            padding: 16px 12px;
+            vertical-align: middle;
+        }
+        
+        .posicao {
+            font-size: 20px;
+            font-weight: 800;
+            color: #2c3e50;
+            text-align: center;
+            width: 70px;
+        }
+        
+        .participante {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        .pontos {
+            font-size: 22px;
+            font-weight: 800;
+            color: #27ae60;
+            text-align: center;
+        }
+        
+        .estatisticas {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .estatistica-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 6px 10px;
+            background: #f1f8ff;
+            border-radius: 8px;
+            min-width: 70px;
+        }
+        
+        .estatistica-valor {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2980b9;
+        }
+        
+        .estatistica-label {
+            font-size: 11px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .legenda {
+            background: #f8f9fa;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .legenda h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .legenda-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .legenda-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legenda-cor {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .cor-ouro { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
+        .cor-prata { background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%); }
+        .cor-bronze { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        
+        .rodape {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: #7f8c8d;
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
+        
+        .btn-ver-palpites {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-ver-palpites:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .sem-pontos {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .info-box {
+                margin: 15px;
+                grid-template-columns: 1fr;
+            }
+            
+            .ranking-table {
+                margin: 15px;
+                width: calc(100% - 30px);
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .ranking-table th,
+            .ranking-table td {
+                padding: 12px 8px;
+                font-size: 14px;
+            }
+            
+            .medalha {
+                width: 35px;
+                height: 35px;
+                line-height: 35px;
+                font-size: 18px;
+            }
+            
+            .posicao {
+                width: 50px;
+                font-size: 18px;
+            }
+            
+            .pontos {
+                font-size: 18px;
+            }
+            
+            .estatisticas {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .estatistica-item {
+                flex-direction: row;
+                justify-content: space-between;
+                min-width: auto;
+            }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state img {
+            width: 100px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <div class="header">
+            <h1>🏆 RANKING GERAL</h1>
+            <div class="subtitle">Classificação completa de todos os participantes</div>
+            <div class="subtitle" id="data-atualizacao">Atualizado em: --/--/----</div>
+        </div>
+        
+        <!-- Informações gerais -->
+        <div class="info-box">
+            <div class="info-item">
+                <span class="info-label">Total de participantes</span>
+                <span class="info-value" id="total-participantes">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Rodadas consideradas</span>
+                <span class="info-value" id="total-rodadas">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Líder atual</span>
+                <span class="info-value" id="lider-atual">-</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Maior pontuação</span>
+                <span class="info-value" id="maior-pontuacao">0</span>
+            </div>
+        </div>
+        
+        <!-- Tabela de ranking -->
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th width="15%">Posição</th>
+                    <th width="35%">Participante</th>
+                    <th width="15%">Pontos</th>
+                    <th width="35%">Estatísticas</th>
+                </tr>
+            </thead>
+            <tbody id="ranking-body">
+                <!-- Será preenchido via JavaScript -->
+            </tbody>
+        </table>
+        
+        <!-- Estado vazio (se não houver dados) -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3>Nenhum dado de ranking disponível</h3>
+            <p>Aguarde os administradores atualizarem as rodadas.</p>
+        </div>
+        
+        <!-- Legenda -->
+        <div class="legenda">
+            <h3>📋 Legenda do Ranking</h3>
+            <div class="legenda-content">
+                <div class="legenda-item">
+                    <div class="legenda-cor cor-ouro"></div>
+                    <span><strong>🥇 1º Lugar</strong> - Campeão</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-cor cor-prata"></div>
+                    <span><strong>🥈 2º Lugar</strong> - Vice-campeão</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="legenda-cor cor-bronze"></div>
+                    <span><strong>🥉 3º Lugar</strong> - Terceiro lugar</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="estatistica-valor" style="color: #2980b9;">PE</div>
+                    <span><strong>Placar Exato</strong> - 10 pontos</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="estatistica-valor" style="color: #27ae60;">RC</div>
+                    <span><strong>Resultado Correto</strong> - 4 pontos</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rodapé -->
+        <div class="rodape">
+            <p>📊 Ranking calculado automaticamente com base em todas as rodadas concluídas</p>
+            <p style="font-size: 11px; margin-top: 5px;">Clique em "Ver palpites" para ver os detalhes de cada participante</p>
+        </div>
+    </div>
+
+    <script>
+        // Função para decodificar dados comprimidos
+        async function decompressData(compressedData) {
+            try {
+                // Decodifica base64
+                const binaryString = atob(compressedData);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Descomprime GZIP
+                const decompressedStream = new DecompressionStream('gzip');
+                const writer = decompressedStream.writable.getWriter();
+                writer.write(bytes);
+                writer.close();
+                
+                const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
+                const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
+                
+                return JSON.parse(decompressedString);
+            } catch (error) {
+                console.error('Erro ao descomprimir:', error);
+                // Tenta parsear como JSON direto (sem compressão)
+                try {
+                    return JSON.parse(atob(compressedData));
+                } catch (e) {
+                    throw new Error('Dados inválidos ou corrompidos');
+                }
+            }
+        }
+
+        // Função para carregar dados da URL
+        async function loadRankingData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const compressedData = urlParams.get('data');
+            
+            if (!compressedData) {
+                showEmptyState();
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const data = await decompressData(compressedData);
+                renderRanking(data);
+            } catch (error) {
+                console.error('Erro ao carregar ranking:', error);
+                showError('Erro ao carregar dados do ranking');
+            }
+        }
+
+        // Função para mostrar estado de carregamento
+        function showLoading() {
+            document.getElementById('ranking-body').innerHTML = `
+                <tr>
+                    <td colspan="4" class="loading">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 10px;">Carregando ranking...</p>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Função para mostrar estado vazio
+        function showEmptyState() {
+            document.getElementById('ranking-body').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'block';
+        }
+
+        // Função para mostrar erro
+        function showError(message) {
+            document.getElementById('ranking-body').innerHTML = `
+                <tr>
+                    <td colspan="4" class="loading" style="color: #e74c3c;">
+                        <p>❌ ${message}</p>
+                        <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
+                            Tentar novamente
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Função para renderizar o ranking
+        function renderRanking(data) {
+            console.log('Dados recebidos:', data);
+            
+            // Verifica se há dados
+            if (!data || !data.k || data.k.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            // Atualiza informações gerais
+            document.getElementById('total-participantes').textContent = data.k.length;
+            document.getElementById('total-rodadas').textContent = data.info?.total_rodadas || 'N/A';
+            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info?.data_atualizacao || '--/--/----'}`;
+            
+            if (data.k.length > 0) {
+                document.getElementById('lider-atual').textContent = data.k[0].n;
+                document.getElementById('maior-pontuacao').textContent = data.k[0].t;
+            }
+            
+            // Renderiza a tabela
+            const tbody = document.getElementById('ranking-body');
+            tbody.innerHTML = '';
+            
+            data.k.forEach((participante, index) => {
+                const row = document.createElement('tr');
+                
+                // Adiciona classe para participantes sem pontos
+                if (participante.t === 0) {
+                    row.classList.add('sem-pontos');
+                }
+                
+                // Determina medalha e classe CSS
+                let medalhaHtml = '';
+                let posicaoClass = '';
+                
+                switch (participante.p) {
+                    case 1:
+                        medalhaHtml = '<div class="medalha medalha-ouro">🥇</div>';
+                        posicaoClass = 'primeiro';
+                        break;
+                    case 2:
+                        medalhaHtml = '<div class="medalha medalha-prata">🥈</div>';
+                        posicaoClass = 'segundo';
+                        break;
+                    case 3:
+                        medalhaHtml = '<div class="medalha medalha-bronze">🥉</div>';
+                        posicaoClass = 'terceiro';
+                        break;
+                    default:
+                        medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
+                }
+                
+                row.innerHTML = `
+                    <td class="posicao">
+                        ${medalhaHtml}
+                        <strong>${participante.p}º</strong>
+                    </td>
+                    <td class="participante">
+                        <strong>${participante.n}</strong>
+                        <br>
+                        <a href="https://t.me/share/url?url=https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
+                           target="_blank" 
+                           class="btn-ver-palpites">
+                            📊 Ver palpites
+                        </a>
+                    </td>
+                    <td class="pontos">
+                        ${participante.t.toLocaleString('pt-BR')}
+                    </td>
+                    <td>
+                        <div class="estatisticas">
+                            <div class="estatistica-item">
+                                <span class="estatistica-valor">${participante.e.pe || 0}</span>
+                                <span class="estatistica-label">PE</span>
+                            </div>
+                            <div class="estatistica-item">
+                                <span class="estatistica-valor">${participante.e.rc || 0}</span>
+                                <span class="estatistica-label">RC</span>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Função para obter username do bot (simplificada)
+        function getBotUsername() {
+            // Você pode ajustar isso se necessário
+            return 'seu_bot_username';
+        }
+
+        // Adiciona animação de spin
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Carrega os dados quando a página carrega
+        document.addEventListener('DOMContentLoaded', loadRankingData);
+
+        // Botão para voltar (se estiver no Telegram Web App)
+        if (window.Telegram && Telegram.WebApp) {
+            Telegram.WebApp.BackButton.show();
+            Telegram.WebApp.BackButton.onClick(() => {
+                Telegram.WebApp.close();
+            });
+        }
+    </script>
+</body>
+</html>
