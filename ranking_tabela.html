@@ -601,7 +601,7 @@
         let rodadaAtual = 0;
 
         // CONFIGURAÇÕES
-        const BOT_USERNAME = @BolaoFutebolBot;
+        const BOT_USERNAME = "BolaoFutebolBot";
         const TELEGRAM_WEBAPP = window.Telegram && window.Telegram.WebApp;
 
         // ==================== FUNÇÕES AUXILIARES ====================
@@ -748,58 +748,57 @@ async function abrirPalpitesUsuario(usuarioId, rodadaNum, nomeUsuario) {
         // ==================== FUNÇÕES PARA CARREGAR DADOS ====================
         
         // CARREGAR DADOS PRINCIPAIS
-       // ==================== FUNÇÕES PARA CARREGAR DADOS ====================
-        
-// CARREGAR DADOS PRINCIPAIS
-async function carregarDados() {
-    try {
-        mostrarLoading(true);
-        esconderErro();
+        async function carregarDados() {
+            try {
+                mostrarLoading(true);
+                esconderErro();
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const dadosBase64 = urlParams.get('data');
+                const urlParams = new URLSearchParams(window.location.search);
+                const dadosBase64 = urlParams.get('data');
 
-        if (!dadosBase64) {
-            throw new Error('Nenhum dado recebido na URL');
-        }
+                if (!dadosBase64) {
+                    throw new Error('Nenhum dado recebido na URL');
+                }
 
-        // ⭐⭐ CORREÇÃO: APENAS DECODIFICA BASE64 (SEM GZIP) ⭐⭐
-        // Decodificar Base64
-        let dadosJSON;
-        try {
-            // Tenta decodificar como Base64 URL-safe
-            let base64Str = dadosBase64.replace(/-/g, '+').replace(/_/g, '/');
-            while (base64Str.length % 4) {
-                base64Str += '=';
+                // Decodificar Base64
+                const dadosString = decodeBase64(dadosBase64);
+                if (!dadosString) {
+                    throw new Error('Falha ao decodificar Base64');
+                }
+
+                // Converter para bytes
+                const bytes = stringParaBytes(dadosString);
+
+                // Descomprimir GZIP
+                let dadosJSON;
+                try {
+                    dadosJSON = await descomprimirGzip(bytes);
+                } catch (e) {
+                    dadosJSON = dadosString;
+                }
+
+                // Parse do JSON
+                const dados = JSON.parse(dadosJSON);
+                
+                if (!dados.t || dados.t !== 'ranking_tabela') {
+                    throw new Error('Formato de dados inválido');
+                }
+
+                // Salvar dados
+                dadosRanking = dados;
+                rodadaAtual = dados.r.n;
+
+                // Atualizar interface
+                atualizarInterface();
+                mostrarLoading(false);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro(`Erro: ${error.message || 'Não foi possível carregar os dados'}`);
+                mostrarLoading(false);
             }
-            const jsonStr = atob(base64Str);
-            dadosJSON = jsonStr;
-        } catch (e) {
-            console.error('Erro ao decodificar Base64:', e);
-            throw new Error('Falha ao decodificar Base64');
         }
 
-        // Parse do JSON
-        const dados = JSON.parse(dadosJSON);
-        
-        if (!dados.t || dados.t !== 'ranking_tabela') {
-            throw new Error('Formato de dados inválido');
-        }
-
-        // Salvar dados
-        dadosRanking = dados;
-        rodadaAtual = dados.r.n;
-
-        // Atualizar interface
-        atualizarInterface();
-        mostrarLoading(false);
-
-    } catch (error) {
-        console.error('Erro:', error);
-        mostrarErro(`Erro: ${error.message || 'Não foi possível carregar os dados'}`);
-        mostrarLoading(false);
-    }
-}
         // ATUALIZAR INTERFACE
         // ATUALIZAR INTERFACE
 function atualizarInterface() {
