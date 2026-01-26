@@ -154,13 +154,13 @@
             text-align: center;
         }
         
-        .estatisticas {
+        .estat {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
         
-        .estatistica-item {
+        .estat-item {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -170,13 +170,13 @@
             min-width: 70px;
         }
         
-        .estatistica-valor {
+        .estat-valor {
             font-size: 18px;
             font-weight: 700;
             color: #2980b9;
         }
         
-        .estatistica-label {
+        .estat-label {
             font-size: 11px;
             color: #7f8c8d;
             text-transform: uppercase;
@@ -305,12 +305,12 @@
                 font-size: 18px;
             }
             
-            .estatisticas {
+            .estat {
                 flex-direction: column;
                 gap: 5px;
             }
             
-            .estatistica-item {
+            .estat-item {
                 flex-direction: row;
                 justify-content: space-between;
                 min-width: auto;
@@ -327,6 +327,58 @@
             width: 100px;
             opacity: 0.5;
             margin-bottom: 20px;
+        }
+        
+        /* Estilos para navegação entre rodadas */
+        .nav-rodadas {
+            background: #f8f9fa;
+            margin: 0 20px 20px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-rodadas select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            background: white;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        .nav-rodadas button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-rodadas button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .nav-rodadas button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .nav-info {
+            font-size: 14px;
+            color: #7f8c8d;
         }
     </style>
 </head>
@@ -366,7 +418,7 @@
                     <th width="15%">Posição</th>
                     <th width="35%">Participante</th>
                     <th width="15%">Pontos</th>
-                    <th width="35%">Estatísticas</th>
+                    <th width="35%">Estat</th>
                 </tr>
             </thead>
             <tbody id="ranking-body">
@@ -400,12 +452,20 @@
                     <span><strong>🥉 3º Lugar</strong> - Terceiro lugar</span>
                 </div>
                 <div class="legenda-item">
-                    <div class="estatistica-valor" style="color: #2980b9;">PE</div>
+                    <div class="estat-valor" style="color: #2980b9;">PE</div>
                     <span><strong>Placar Exato</strong> - 10 pontos</span>
                 </div>
                 <div class="legenda-item">
-                    <div class="estatistica-valor" style="color: #27ae60;">RC</div>
+                    <div class="estat-valor" style="color: #27ae60;">RC</div>
                     <span><strong>Resultado Correto</strong> - 4 pontos</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="estat-valor" style="color: #e74c3c;">GM</div>
+                    <span><strong>Gols Mandante</strong> - 2 pontos</span>
+                </div>
+                <div class="legenda-item">
+                    <div class="estat-valor" style="color: #9b59b6;">GV</div>
+                    <span><strong>Gols Visitante</strong> - 2 pontos</span>
                 </div>
             </div>
         </div>
@@ -421,6 +481,15 @@
         // Função para decodificar dados comprimidos
         async function decompressData(compressedData) {
             try {
+                // Tenta decodificar como JSON simples primeiro (para debug)
+                try {
+                    const decoded = atob(compressedData);
+                    console.log('📄 Tentando como JSON simples:', decoded.substring(0, 200));
+                    return JSON.parse(decoded);
+                } catch (e) {
+                    console.log('❌ Não é JSON simples, tentando GZIP...');
+                }
+                
                 // Decodifica base64
                 const binaryString = atob(compressedData);
                 const bytes = new Uint8Array(binaryString.length);
@@ -437,13 +506,16 @@
                 const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
                 const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
                 
+                console.log('✅ Dados descomprimidos:', decompressedString.substring(0, 200));
                 return JSON.parse(decompressedString);
             } catch (error) {
-                console.error('Erro ao descomprimir:', error);
+                console.error('❌ Erro ao descomprimir:', error);
                 // Tenta parsear como JSON direto (sem compressão)
                 try {
-                    return JSON.parse(atob(compressedData));
+                    const decoded = atob(compressedData);
+                    return JSON.parse(decoded);
                 } catch (e) {
+                    console.error('❌ Erro ao parsear JSON:', e);
                     throw new Error('Dados inválidos ou corrompidos');
                 }
             }
@@ -454,6 +526,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('data');
             
+            console.log('🔍 Parâmetros da URL:', urlParams.toString());
+            console.log('📥 Dados recebidos (primeiros 200 chars):', compressedData ? compressedData.substring(0, 200) : 'Nenhum');
+            
             if (!compressedData) {
                 showEmptyState();
                 return;
@@ -463,10 +538,11 @@
             
             try {
                 const data = await decompressData(compressedData);
+                console.log('✅ Dados parseados:', data);
                 renderRanking(data);
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                showError('Erro ao carregar dados do ranking');
+                console.error('❌ Erro ao carregar ranking:', error);
+                showError('Erro ao carregar dados do ranking: ' + error.message);
             }
         }
 
@@ -504,18 +580,22 @@
 
         // Função para renderizar o ranking
         function renderRanking(data) {
-            console.log('Dados recebidos:', data);
+            console.log('📊 Dados recebidos para renderização:', data);
             
             // Verifica se há dados
             if (!data || !data.k || data.k.length === 0) {
+                console.warn('⚠️ Nenhum dado válido encontrado em data.k');
                 showEmptyState();
                 return;
             }
             
             // Atualiza informações gerais
             document.getElementById('total-participantes').textContent = data.k.length;
-            document.getElementById('total-rodadas').textContent = data.info?.total_rodadas || 'N/A';
-            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info?.data_atualizacao || '--/--/----'}`;
+            
+            if (data.info) {
+                document.getElementById('total-rodadas').textContent = data.info.total_rodadas || '0';
+                document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info.data_atualizacao || '--/--/----'}`;
+            }
             
             if (data.k.length > 0) {
                 document.getElementById('lider-atual').textContent = data.k[0].n;
@@ -555,6 +635,9 @@
                         medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
                 }
                 
+                // Garante que estat exista (backward compatibility)
+                const estat = participante.e || participante.estatisticas || {};
+                
                 row.innerHTML = `
                     <td class="posicao">
                         ${medalhaHtml}
@@ -563,24 +646,35 @@
                     <td class="participante">
                         <strong>${participante.n}</strong>
                         <br>
-                        <a href="https://t.me/share/url?url=https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
-                           target="_blank" 
-                           class="btn-ver-palpites">
-                            📊 Ver palpites
-                        </a>
+                        ${participante.u ? 
+                            `<a href="https://t.me/share/url?url=https://t.me/bolao_bot?start=palpites_${participante.u}_0" 
+                               target="_blank" 
+                               class="btn-ver-palpites">
+                                📊 Ver palpites
+                             </a>` 
+                            : ''
+                        }
                     </td>
                     <td class="pontos">
                         ${participante.t.toLocaleString('pt-BR')}
                     </td>
                     <td>
-                        <div class="estatisticas">
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.pe || 0}</span>
-                                <span class="estatistica-label">PE</span>
+                        <div class="estat">
+                            <div class="estat-item">
+                                <span class="estat-valor">${estat.pe || 0}</span>
+                                <span class="estat-label">PE</span>
                             </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.rc || 0}</span>
-                                <span class="estatistica-label">RC</span>
+                            <div class="estat-item">
+                                <span class="estat-valor">${estat.rc || 0}</span>
+                                <span class="estat-label">RC</span>
+                            </div>
+                            <div class="estat-item">
+                                <span class="estat-valor">${estat.gm || 0}</span>
+                                <span class="estat-label">GM</span>
+                            </div>
+                            <div class="estat-item">
+                                <span class="estat-valor">${estat.gv || 0}</span>
+                                <span class="estat-label">GV</span>
                             </div>
                         </div>
                     </td>
@@ -588,12 +682,6 @@
                 
                 tbody.appendChild(row);
             });
-        }
-
-        // Função para obter username do bot (simplificada)
-        function getBotUsername() {
-            // Você pode ajustar isso se necessário
-            return 'seu_bot_username';
         }
 
         // Adiciona animação de spin
@@ -609,13 +697,51 @@
         // Carrega os dados quando a página carrega
         document.addEventListener('DOMContentLoaded', loadRankingData);
 
-        // Botão para voltar (se estiver no Telegram Web App)
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.BackButton.show();
-            Telegram.WebApp.BackButton.onClick(() => {
-                Telegram.WebApp.close();
-            });
+        // Função para debug
+        function debugData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const compressedData = urlParams.get('data');
+            
+            console.group('🔍 DEBUG DOS DADOS');
+            console.log('URL completa:', window.location.href);
+            console.log('Parâmetros:', Array.from(urlParams.entries()));
+            
+            if (compressedData) {
+                console.log('Dados (Base64):', compressedData.substring(0, 200) + '...');
+                console.log('Tamanho:', compressedData.length, 'caracteres');
+                
+                // Tenta decodificar como texto simples
+                try {
+                    const decoded = atob(compressedData);
+                    console.log('Decodificado (primeiros 500 chars):', decoded.substring(0, 500) + '...');
+                    
+                    // Tenta parsear como JSON
+                    try {
+                        const parsed = JSON.parse(decoded);
+                        console.log('Parseado como JSON:', parsed);
+                        console.log('Estrutura:');
+                        console.log('• Tipo:', parsed.t || 'N/A');
+                        console.log('• Total participantes:', parsed.k ? parsed.k.length : 0);
+                        console.log('• Info:', parsed.info || 'N/A');
+                        if (parsed.k && parsed.k.length > 0) {
+                            console.log('• Primeiro participante:', parsed.k[0]);
+                        }
+                    } catch (e) {
+                        console.log('Não é JSON válido:', e.message);
+                    }
+                } catch (e) {
+                    console.log('Não é Base64 simples:', e.message);
+                }
+            } else {
+                console.log('❌ Nenhum parâmetro data encontrado');
+            }
+            console.groupEnd();
         }
+
+        // Executa debug quando a página carrega
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(debugData, 100);
+        });
     </script>
 </body>
 </html>
