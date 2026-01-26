@@ -419,16 +419,53 @@
 
     <script>
         // Função para decodificar dados comprimidos
-        async function decompressData(compressedData) {
+        // Função para decodificar dados comprimidos - VERSÃO COMPATÍVEL
+async function decompressData(compressedData) {
+    try {
+        console.log('🔍 Iniciando descompressão...');
+        console.log('📦 Dados recebidos (primeiros 50 chars):', compressedData.substring(0, 50));
+        
+        // 1. Substitui caracteres URL-safe de volta
+        let base64 = compressedData
+            .replace(/-/g, '+')
+            .replace(/_/g, '/')
+            .replace(/\s/g, '');
+        
+        // Adiciona padding se necessário
+        while (base64.length % 4) {
+            base64 += '=';
+        }
+        
+        console.log('📦 Base64 após normalização:', base64.substring(0, 50));
+        
+        // 2. Decodifica base64 para bytes
+        const binaryString = atob(base64);
+        console.log('📦 Binary string length:', binaryString.length);
+        
+        // 3. Converte para Uint8Array
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        
+        console.log('📦 Bytes array length:', bytes.length);
+        
+        // 4. Verifica se é GZIP (primeiros 2 bytes: 0x1F 0x8B)
+        const isGzip = bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B;
+        console.log('📦 É GZIP?', isGzip);
+        
+        if (isGzip && window.pako) {
+            // Usa pako se disponível (mais compatível)
+            console.log('🔄 Usando pako para descompressão...');
+            const decompressed = pako.inflate(bytes, { to: 'string' });
+            console.log('✅ Dados descomprimidos com pako');
+            return JSON.parse(decompress);
+        }
+        
+        // 5. Tenta com DecompressionStream (navegadores modernos)
+        if ('DecompressionStream' in window) {
             try {
-                // Decodifica base64
-                const binaryString = atob(compressedData);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                // Descomprime GZIP
+                console.log('🔄 Usando DecompressionStream...');
                 const decompressedStream = new DecompressionStream('gzip');
                 const writer = decompressedStream.writable.getWriter();
                 writer.write(bytes);
@@ -436,19 +473,41 @@
                 
                 const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
                 const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
-                
+                console.log('✅ Dados descomprimidos com DecompressionStream');
+                console.log('📝 Primeiros 200 chars:', decompressedString.substring(0, 200));
                 return JSON.parse(decompressedString);
-            } catch (error) {
-                console.error('Erro ao descomprimir:', error);
-                // Tenta parsear como JSON direto (sem compressão)
-                try {
-                    return JSON.parse(atob(compressedData));
-                } catch (e) {
-                    throw new Error('Dados inválidos ou corrompidos');
-                }
+            } catch (streamError) {
+                console.warn('⚠️ DecompressionStream falhou:', streamError);
             }
         }
-
+        
+        // 6. Fallback: tenta parsear como JSON direto (sem compressão)
+        console.log('🔄 Tentando como JSON sem compressão...');
+        try {
+            const jsonString = new TextDecoder().decode(bytes);
+            console.log('📝 String decodificada:', jsonString.substring(0, 200));
+            return JSON.parse(jsonString);
+        } catch (jsonError) {
+            console.error('❌ JSON direto falhou:', jsonError);
+            throw new Error('Dados inválidos ou corrompidos');
+        }
+        
+    } catch (error) {
+        console.error('❌ Erro na descompressão completa:', error);
+        console.error('❌ Stack:', error.stack);
+        
+        // Último fallback: tenta base64 direto
+        try {
+            console.log('🔄 Último fallback: base64 direto...');
+            const decoded = atob(compressedData);
+            console.log('📝 Decodificado:', decoded.substring(0, 200));
+            return JSON.parse(decoded);
+        } catch (finalError) {
+            console.error('❌ Fallback final falhou:', finalError);
+            throw new Error('Não foi possível decodificar os dados: ' + error.message);
+        }
+    }
+}
         // Função para carregar dados da URL
         async function loadRankingData() {
             const urlParams = new URLSearchParams(window.location.search);
