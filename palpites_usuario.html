@@ -6,7 +6,6 @@
     <title>Palpites e Pontuação</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         * { 
             margin: 0; 
@@ -409,74 +408,6 @@
             margin-bottom: 0;
         }
         
-        /* BOTÃO COMPARTILHAR */
-        .share-button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-        }
-        
-        .share-button:hover {
-            background: linear-gradient(135deg, #27ae60 0%, #219653 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
-        }
-        
-        .share-button:disabled {
-            background: #95a5a6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .share-button:active {
-            transform: translateY(0);
-        }
-        
-        /* Mensagem de status do compartilhamento */
-        .share-status {
-            text-align: center;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 10px;
-            font-size: 14px;
-            display: none;
-        }
-        
-        .share-status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            display: block;
-        }
-        
-        .share-status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            display: block;
-        }
-        
-        .share-status.loading {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-            display: block;
-        }
-        
         /* Responsividade */
         @media (max-width: 768px) {
             .stats-grid {
@@ -512,11 +443,6 @@
             .back-button {
                 padding: 10px;
                 font-size: 14px;
-            }
-            
-            .share-button {
-                padding: 12px;
-                font-size: 15px;
             }
         }
         
@@ -556,11 +482,6 @@
             .back-button {
                 padding: 8px;
                 font-size: 13px;
-            }
-            
-            .share-button {
-                padding: 10px;
-                font-size: 14px;
             }
         }
         
@@ -663,15 +584,6 @@
             
             <!-- Mensagem de erro -->
             <div id="error" class="error" style="display: none;"></div>
-        </div>
-        
-        <!-- BOTÃO PARA COMPARTILHAR NO GRUPO -->
-        <div style="padding: 0 20px 20px;">
-            <button class="share-button" id="btnCompartilhar" onclick="compartilharNoGrupo()">
-                📤 Compartilhar no Grupo
-            </button>
-            
-            <div class="share-status" id="shareStatus"></div>
         </div>
     </div>
 
@@ -1013,7 +925,7 @@
                     
                     <!-- Pontuação detalhada -->
                     <div class="points-calculation">
-                        ${calcularDetalhesPontuacao(temPalpite, acertos, pdUsada, pontosTotais)}
+                        ${calcularDetalhesPontuacao(temPalpite, acertos, pdUsada, pontos)}
                     </div>
                     
                     <!-- Mensagem de jogo sem palpite -->
@@ -1104,154 +1016,6 @@
             return html;
         }
         
-        // ==============================================
-        // FUNÇÃO PARA COMPARTILHAR NO GRUPO
-        // ==============================================
-        async function compartilharNoGrupo() {
-            const btn = document.getElementById('btnCompartilhar');
-            const status = document.getElementById('shareStatus');
-            
-            try {
-                // Desabilita o botão e mostra status
-                btn.disabled = true;
-                btn.innerHTML = '⏳ Gerando imagem...';
-                status.className = 'share-status loading';
-                status.innerHTML = 'Capturando tela e preparando para compartilhar...';
-                status.style.display = 'block';
-                
-                // 1. CAPTURA A TELA COM html2canvas
-                console.log('📸 Iniciando captura de tela...');
-                
-                // Captura apenas o container principal (exclui botões de navegação)
-                const container = document.querySelector('.container');
-                
-                // Opções para melhor qualidade
-                const canvas = await html2canvas(container, {
-                    scale: 2, // Maior qualidade
-                    useCORS: true,
-                    logging: false,
-                    backgroundColor: '#667eea', // Cor do fundo do body
-                    onclone: function(clonedDoc) {
-                        // Garante que elementos dinâmicos sejam capturados
-                        const clonedContainer = clonedDoc.querySelector('.container');
-                        if (clonedContainer) {
-                            // Remove sombras e ajustes visuais para imagem
-                            clonedContainer.style.boxShadow = 'none';
-                            clonedContainer.style.marginTop = '0';
-                            clonedContainer.style.marginBottom = '0';
-                            
-                            // Remove o botão de compartilhar da captura
-                            const shareBtn = clonedContainer.querySelector('.share-button');
-                            if (shareBtn) {
-                                shareBtn.style.display = 'none';
-                            }
-                            
-                            // Remove o status
-                            const shareStatus = clonedContainer.querySelector('.share-status');
-                            if (shareStatus) {
-                                shareStatus.style.display = 'none';
-                            }
-                        }
-                    }
-                });
-                
-                console.log('✅ Captura de tela concluída');
-                
-                // 2. CONVERTE PARA BASE64
-                const imagemBase64 = canvas.toDataURL('image/jpeg', 0.95); // JPEG com 95% qualidade
-                console.log(`📊 Tamanho da imagem: ${Math.round(imagemBase64.length / 1024)}KB`);
-                
-                // 3. PREPARA DADOS PARA ENVIAR
-                const dadosCompartilhamento = {
-                    tipo: 'compartilhar_resultados',
-                    usuario_id: usuarioId,
-                    usuario_nome: document.getElementById('userName').textContent,
-                    rodada_num: rodadaAtualNum,
-                    imagem_base64: imagemBase64,
-                    timestamp: Date.now()
-                };
-                
-                console.log('📤 Dados preparados para envio:', {
-                    usuario_id: usuarioId,
-                    usuario_nome: document.getElementById('userName').textContent,
-                    rodada_num: rodadaAtualNum
-                });
-                
-                // 4. ENVIA VIA TELEGRAM WEB APP
-                if (window.Telegram && Telegram.WebApp) {
-                    console.log('📤 Enviando imagem para o bot...');
-                    status.className = 'share-status loading';
-                    status.innerHTML = 'Enviando para o grupo...';
-                    
-                    // Envia os dados para o bot
-                    Telegram.WebApp.sendData(JSON.stringify(dadosCompartilhamento));
-                    
-                    // Atualiza status
-                    setTimeout(() => {
-                        status.className = 'share-status success';
-                        status.innerHTML = `
-                            ✅ <strong>Resultados compartilhados com sucesso!</strong><br>
-                            Sua imagem foi enviada para o grupo do bolão.
-                        `;
-                        
-                        btn.innerHTML = '✅ Compartilhado!';
-                        
-                        // Fecha o WebApp após 3 segundos
-                        setTimeout(() => {
-                            if (window.Telegram && Telegram.WebApp) {
-                                Telegram.WebApp.close();
-                            }
-                        }, 3000);
-                        
-                    }, 2000);
-                    
-                } else {
-                    // Modo de desenvolvimento - simula envio
-                    console.log('⚠️ Ambiente de desenvolvimento - simulando envio');
-                    console.log('📦 Dados:', dadosCompartilhamento);
-                    
-                    // Mostra a imagem em uma nova janela para teste
-                    const novaJanela = window.open();
-                    novaJanela.document.write(`
-                        <html>
-                        <head><title>Preview - Compartilhamento</title></head>
-                        <body style="margin: 0; padding: 20px; background: #f0f0f0;">
-                            <h2>Preview do Compartilhamento</h2>
-                            <p><strong>Usuário:</strong> ${document.getElementById('userName').textContent}</p>
-                            <p><strong>Rodada:</strong> ${rodadaAtualNum}</p>
-                            <img src="${imagemBase64}" style="max-width: 100%; border: 1px solid #ccc; border-radius: 10px;">
-                            <p style="margin-top: 20px; color: #666;">Em produção, esta imagem seria enviada automaticamente ao grupo.</p>
-                        </body>
-                        </html>
-                    `);
-                    
-                    status.className = 'share-status success';
-                    status.innerHTML = `
-                        ✅ <strong>Modo de teste:</strong> Imagem gerada!<br>
-                        Em produção, isto seria enviado ao grupo automaticamente.
-                    `;
-                    
-                    btn.innerHTML = '📤 Teste Concluído';
-                    btn.disabled = true;
-                }
-                
-            } catch (error) {
-                console.error('❌ Erro ao compartilhar:', error);
-                
-                status.className = 'share-status error';
-                status.innerHTML = `
-                    ❌ <strong>Erro ao compartilhar:</strong> ${error.message}<br>
-                    Tente novamente ou entre em contato com o administrador.
-                `;
-                
-                btn.disabled = false;
-                btn.innerHTML = '📤 Compartilhar no Grupo';
-            }
-        }
-        
-        // ==============================================
-        // FUNÇÕES DE NAVEGAÇÃO
-        // ==============================================
         function escolherOutraRodada() {
             console.log('🔄 Solicitando para escolher outra rodada...');
             
