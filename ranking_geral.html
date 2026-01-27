@@ -19,7 +19,7 @@
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -121,6 +121,10 @@
             transition: all 0.3s ease;
         }
         
+        .ranking-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
         .ranking-table tbody tr:hover {
             background-color: #f8f9fa;
             transform: translateY(-2px);
@@ -151,6 +155,7 @@
             font-weight: 800;
             color: #27ae60;
             text-align: center;
+            width: 100px;
         }
         
         .estatisticas {
@@ -199,7 +204,7 @@
         
         .legenda-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
             font-size: 14px;
             color: #555;
@@ -230,25 +235,6 @@
             border-top: 1px solid #eee;
         }
         
-        .btn-ver-palpites {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-decoration: none;
-        }
-        
-        .btn-ver-palpites:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
-        }
-        
         .sem-pontos {
             opacity: 0.7;
             font-style: italic;
@@ -258,6 +244,11 @@
             text-align: center;
             padding: 40px;
             color: #7f8c8d;
+        }
+        
+        /* Estilos para até 15 participantes */
+        .ranking-table tbody tr:nth-child(-n+15) {
+            display: table-row;
         }
         
         @media (max-width: 600px) {
@@ -302,6 +293,7 @@
             
             .pontos {
                 font-size: 18px;
+                width: 80px;
             }
             
             .estatisticas {
@@ -313,6 +305,10 @@
                 flex-direction: row;
                 justify-content: space-between;
                 min-width: auto;
+            }
+            
+            .legenda-content {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -326,6 +322,11 @@
             width: 100px;
             opacity: 0.5;
             margin-bottom: 20px;
+        }
+        
+        /* Esconder linhas extras além de 15 participantes */
+        .ranking-table tbody tr:nth-child(n+16) {
+            display: none;
         }
     </style>
 </head>
@@ -362,10 +363,10 @@
         <table class="ranking-table">
             <thead>
                 <tr>
-                    <th width="15%">Posição</th>
-                    <th width="35%">Participante</th>
-                    <th width="15%">Pontos</th>
-                    <th width="35%">Estatísticas</th>
+                    <th width="15%">P</th>
+                    <th width="35%">PARTICIPANTE</th>
+                    <th width="15%">PONTOS</th>
+                    <th width="35%">EST</th>
                 </tr>
             </thead>
             <tbody id="ranking-body">
@@ -406,11 +407,15 @@
                 </div>
                 <div class="legenda-item">
                     <div class="estatistica-valor" style="color: #2980b9;">PE</div>
-                    <span><strong>Placar Exato</strong> - 10 pontos</span>
+                    <span><strong>Placar Exato</strong> - 14 pontos</span>
                 </div>
                 <div class="legenda-item">
                     <div class="estatistica-valor" style="color: #27ae60;">RC</div>
                     <span><strong>Resultado Correto</strong> - 4 pontos</span>
+                </div>
+                <div class="legenda-item">
+                    <div style="font-size: 11px; color: #7f8c8d;">📊</div>
+                    <span><strong>Limite</strong> - Mostrando até 15 participantes</span>
                 </div>
             </div>
         </div>
@@ -418,7 +423,6 @@
         <!-- Rodapé -->
         <div class="rodape">
             <p>📊 Ranking calculado automaticamente com base em todas as rodadas concluídas</p>
-            <p style="font-size: 11px; margin-top: 5px;">Clique em "Ver palpites" para ver os detalhes de cada participante</p>
         </div>
     </div>
 
@@ -629,11 +633,14 @@
                 document.getElementById('maior-pontuacao').textContent = rankingArray[0].t || rankingArray[0].total || rankingArray[0].pontos || 0;
             }
             
-            // Renderiza a tabela
+            // Renderiza a tabela (LIMITADO A 15 PARTICIPANTES)
             const tbody = document.getElementById('ranking-body');
             tbody.innerHTML = '';
             
-            rankingArray.forEach((participante, index) => {
+            // Limita a 15 participantes
+            const participantesLimitados = rankingArray.slice(0, 15);
+            
+            participantesLimitados.forEach((participante, index) => {
                 const row = document.createElement('tr');
                 
                 // Adiciona classe para participantes sem pontos
@@ -657,21 +664,22 @@
                         medalhaHtml = '<div class="medalha medalha-bronze">🥉</div>';
                         break;
                     default:
-                        medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
+                        if (posicao <= 15) {
+                            medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
+                        }
                 }
                 
                 // Nome do participante
-                const nome = participante.n || participante.nome || `Participante ${index + 1}`;
+                const nome = participante.n || participante.nome || `Participante ${posicao}`;
                 
-                // ID do usuário para link (se disponível)
-                const userId = participante.u || participante.usuario_id || participante.id || 0;
-                
-                // Estatísticas (com fallbacks)
+                // Estatísticas (apenas PE e RC)
                 const estatisticas = participante.e || participante.estatisticas || {};
                 const pe = estatisticas.pe || estatisticas.placar_exato || 0;
                 const rc = estatisticas.rc || estatisticas.resultado_correto || 0;
-                const gm = estatisticas.gm || estatisticas.gols_mandante || 0;
-                const gv = estatisticas.gv || estatisticas.gols_visitante || 0;
+                
+                // Se não tiver PE e RC, tenta extrair de outras propriedades
+                const peFinal = pe;
+                const rcFinal = rc;
                 
                 row.innerHTML = `
                     <td class="posicao">
@@ -680,14 +688,6 @@
                     </td>
                     <td class="participante">
                         <strong>${nome}</strong>
-                        <br>
-                        ${userId > 0 ? `
-                        <a href="https://t.me/share/url?url=https://t.me/share/url?url=https://t.me/meubot?start=palpites_${userId}" 
-                           target="_blank" 
-                           class="btn-ver-palpites">
-                            📊 Ver palpites
-                        </a>
-                        ` : ''}
                     </td>
                     <td class="pontos">
                         ${pontos.toLocaleString('pt-BR')}
@@ -695,20 +695,12 @@
                     <td>
                         <div class="estatisticas">
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${pe}</span>
+                                <span class="estatistica-valor">${peFinal}</span>
                                 <span class="estatistica-label">PE</span>
                             </div>
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${rc}</span>
+                                <span class="estatistica-valor">${rcFinal}</span>
                                 <span class="estatistica-label">RC</span>
-                            </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${gm}</span>
-                                <span class="estatistica-label">GM</span>
-                            </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${gv}</span>
-                                <span class="estatistica-label">GV</span>
                             </div>
                         </div>
                     </td>
@@ -716,6 +708,17 @@
                 
                 tbody.appendChild(row);
             });
+            
+            // Se houver mais de 15 participantes, adiciona nota
+            if (rankingArray.length > 15) {
+                const notaRow = document.createElement('tr');
+                notaRow.innerHTML = `
+                    <td colspan="4" style="text-align: center; padding: 10px; color: #7f8c8d; font-size: 12px;">
+                        📊 Mostrando os 15 primeiros de ${rankingArray.length} participantes
+                    </td>
+                `;
+                tbody.appendChild(notaRow);
+            }
             
             console.log('✅ Ranking renderizado com sucesso!');
         }
