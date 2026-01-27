@@ -504,30 +504,37 @@
 
         // Função para renderizar o ranking
         function renderRanking(data) {
-            console.log('Dados recebidos:', data);
-            
-            // Verifica se há dados
-            if (!data || !data.k || data.k.length === 0) {
-                showEmptyState();
-                return;
-            }
-            
-            // Atualiza informações gerais
-            document.getElementById('total-participantes').textContent = data.k.length;
-            document.getElementById('total-rodadas').textContent = data.info?.total_rodadas || 'N/A';
-            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info?.data_atualizacao || '--/--/----'}`;
-            
-            if (data.k.length > 0) {
-                document.getElementById('lider-atual').textContent = data.k[0].n;
-                document.getElementById('maior-pontuacao').textContent = data.k[0].t;
-            }
-            
-            // Renderiza a tabela
-            const tbody = document.getElementById('ranking-body');
-            tbody.innerHTML = '';
-            
-            data.k.forEach((participante, index) => {
-                const row = document.createElement('tr');
+    console.log('Dados recebidos:', data);
+    
+    // Verifica se há dados
+    if (!data || !data.k || data.k.length === 0) {
+        showEmptyState();
+        return;
+    }
+    
+    // Atualiza informações gerais - AJUSTE AQUI
+    document.getElementById('total-participantes').textContent = data.k.length;
+    document.getElementById('total-rodadas').textContent = data.c?.info?.total_rodadas || data.r?.p || 'N/A';
+    
+    // Data de atualização
+    if (data.c?.info?.data_atualizacao) {
+        document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.c.info.data_atualizacao}`;
+    } else {
+        document.getElementById('data-atualizacao').textContent = 'Atualizado em: --/--/----';
+    }
+    
+    // Líder e maior pontuação
+    if (data.k.length > 0) {
+        document.getElementById('lider-atual').textContent = data.k[0].n;
+        document.getElementById('maior-pontuacao').textContent = data.k[0].t;
+    }
+    
+    // Renderiza a tabela (o resto do código já deve funcionar)
+    const tbody = document.getElementById('ranking-body');
+    tbody.innerHTML = '';
+    
+    data.k.forEach((participante, index) => {
+        const row = document.createElement('tr');
                 
                 // Adiciona classe para participantes sem pontos
                 if (participante.t === 0) {
