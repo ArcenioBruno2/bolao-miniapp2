@@ -25,7 +25,6 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            padding-bottom: 20px;
         }
         
         .header {
@@ -371,6 +370,12 @@
             </thead>
             <tbody id="ranking-body">
                 <!-- Será preenchido via JavaScript -->
+                <tr>
+                    <td colspan="4" class="loading">
+                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                        <p style="margin-top: 10px;">Carregando ranking...</p>
+                    </td>
+                </tr>
             </tbody>
         </table>
         
@@ -418,43 +423,96 @@
     </div>
 
     <script>
-        // Função para decodificar dados comprimidos
+        // Função para decodificar dados comprimidos (GZIP + Base64)
         async function decompressData(compressedData) {
+            console.log('🔍 Iniciando descompressão de dados...');
+            console.log('📏 Tamanho dos dados:', compressedData.length, 'caracteres');
+            
             try {
-                // Decodifica base64
-                const binaryString = atob(compressedData);
+                // Remove possíveis caracteres de URL encoding
+                let cleanData = compressedData;
+                if (cleanData.includes('%')) {
+                    cleanData = decodeURIComponent(cleanData);
+                }
+                
+                // 1. Decodifica base64
+                console.log('🔧 Decodificando Base64...');
+                const binaryString = atob(cleanData);
+                console.log('✅ Base64 decodificado');
+                
+                // 2. Converte para Uint8Array
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
                     bytes[i] = binaryString.charCodeAt(i);
                 }
                 
-                // Descomprime GZIP
-                const decompressedStream = new DecompressionStream('gzip');
-                const writer = decompressedStream.writable.getWriter();
-                writer.write(bytes);
-                writer.close();
+                console.log('📦 Bytes extraídos:', bytes.length);
                 
-                const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
-                const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
+                // 3. Verifica se é GZIP (primeiros 2 bytes são 0x1F 0x8B)
+                const isGzipped = bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B;
+                console.log('🎯 É GZIP?', isGzipped);
                 
-                return JSON.parse(decompressedString);
+                if (isGzipped) {
+                    // 4. Descomprime GZIP
+                    console.log('🔧 Descomprimindo GZIP...');
+                    const decompressedStream = new DecompressionStream('gzip');
+                    const writer = decompressedStream.writable.getWriter();
+                    writer.write(bytes);
+                    writer.close();
+                    
+                    const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
+                    const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
+                    console.log('✅ GZIP descomprimido');
+                    console.log('📝 Dados descomprimidos:', decompressedString.length, 'caracteres');
+                    console.log('📄 Primeiros 500 chars:', decompressedString.substring(0, 500));
+                    
+                    return JSON.parse(decompressedString);
+                } else {
+                    // Não é GZIP, tenta parsear como texto direto
+                    console.log('📝 Tentando parsear como texto direto...');
+                    const text = new TextDecoder().decode(bytes);
+                    console.log('📝 Texto decodificado:', text.length, 'caracteres');
+                    console.log('📄 Primeiros 500 chars:', text.substring(0, 500));
+                    
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        console.error('❌ Erro ao parsear JSON direto:', e);
+                        throw e;
+                    }
+                }
             } catch (error) {
-                console.error('Erro ao descomprimir:', error);
-                // Tenta parsear como JSON direto (sem compressão)
+                console.error('❌ Erro na descompressão:', error);
+                
+                // Tenta alternativas
                 try {
-                    return JSON.parse(atob(compressedData));
-                } catch (e) {
-                    throw new Error('Dados inválidos ou corrompidos');
+                    // Tenta parsear como JSON direto (sem compressão)
+                    console.log('🔄 Tentando parsear como JSON direto (fallback)...');
+                    const decoded = atob(compressedData);
+                    console.log('📝 Decodificado:', decoded.substring(0, 200));
+                    return JSON.parse(decoded);
+                } catch (e2) {
+                    console.error('❌ Fallback também falhou:', e2);
+                    throw new Error('Dados inválidos ou corrompidos: ' + error.message);
                 }
             }
         }
 
         // Função para carregar dados da URL
         async function loadRankingData() {
+            console.log('🌐 Iniciando carregamento de dados...');
+            
             const urlParams = new URLSearchParams(window.location.search);
             const compressedData = urlParams.get('data');
             
+            console.log('🔍 Parâmetros da URL:', {
+                temData: !!compressedData,
+                tamanhoData: compressedData ? compressedData.length : 0,
+                urlCompleta: window.location.href
+            });
+            
             if (!compressedData) {
+                console.error('❌ Nenhum parâmetro "data" encontrado na URL');
                 showEmptyState();
                 return;
             }
@@ -462,11 +520,15 @@
             showLoading();
             
             try {
+                console.log('🚀 Descomprimindo dados...');
                 const data = await decompressData(compressedData);
+                console.log('✅ Dados descomprimidos com sucesso!');
+                console.log('📊 Estrutura dos dados:', data);
+                
                 renderRanking(data);
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                showError('Erro ao carregar dados do ranking');
+                console.error('❌ Erro ao carregar ranking:', error);
+                showError('Erro ao carregar dados do ranking: ' + error.message);
             }
         }
 
@@ -504,90 +566,149 @@
 
         // Função para renderizar o ranking
         function renderRanking(data) {
-    console.log('Dados recebidos:', data);
-    
-    // Verifica se há dados
-    if (!data || !data.k || data.k.length === 0) {
-        showEmptyState();
-        return;
-    }
-    
-    // Atualiza informações gerais - AJUSTE AQUI
-    document.getElementById('total-participantes').textContent = data.k.length;
-    document.getElementById('total-rodadas').textContent = data.c?.info?.total_rodadas || data.r?.p || 'N/A';
-    
-    // Data de atualização
-    if (data.c?.info?.data_atualizacao) {
-        document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.c.info.data_atualizacao}`;
-    } else {
-        document.getElementById('data-atualizacao').textContent = 'Atualizado em: --/--/----';
-    }
-    
-    // Líder e maior pontuação
-    if (data.k.length > 0) {
-        document.getElementById('lider-atual').textContent = data.k[0].n;
-        document.getElementById('maior-pontuacao').textContent = data.k[0].t;
-    }
-    
-    // Renderiza a tabela (o resto do código já deve funcionar)
-    const tbody = document.getElementById('ranking-body');
-    tbody.innerHTML = '';
-    
-    data.k.forEach((participante, index) => {
-        const row = document.createElement('tr');
+            console.log('🎨 Renderizando ranking com dados:', data);
+            
+            // Verifica se há dados - VERSÃO FLEXÍVEL
+            let rankingArray = null;
+            let info = {};
+            
+            // Tenta diferentes formatos de dados
+            if (data && data.k) {
+                // Formato 1: {k: [...], info: {...}} (formato esperado)
+                rankingArray = data.k;
+                info = data.info || {};
+                console.log('✅ Formato 1 detectado: data.k');
+            } else if (data && Array.isArray(data)) {
+                // Formato 2: array direto
+                rankingArray = data;
+                console.log('✅ Formato 2 detectado: array direto');
+            } else if (data && data.ranking) {
+                // Formato 3: {ranking: [...], info: {...}}
+                rankingArray = data.ranking;
+                info = data.info || {};
+                console.log('✅ Formato 3 detectado: data.ranking');
+            } else if (data && data.data) {
+                // Formato 4: {data: [...], info: {...}}
+                rankingArray = data.data;
+                info = data.info || {};
+                console.log('✅ Formato 4 detectado: data.data');
+            }
+            
+            if (!rankingArray || rankingArray.length === 0) {
+                console.error('❌ Nenhum dado de ranking encontrado:', data);
+                showEmptyState();
+                return;
+            }
+            
+            console.log(`✅ ${rankingArray.length} participantes encontrados`);
+            
+            // Atualiza informações gerais com fallbacks
+            document.getElementById('total-participantes').textContent = rankingArray.length;
+            
+            // Total de rodadas
+            if (info.total_rodadas !== undefined) {
+                document.getElementById('total-rodadas').textContent = info.total_rodadas;
+            } else if (data.c?.info?.total_rodadas !== undefined) {
+                document.getElementById('total-rodadas').textContent = data.c.info.total_rodadas;
+            } else {
+                document.getElementById('total-rodadas').textContent = 'N/A';
+            }
+            
+            // Data de atualização
+            if (info.data_atualizacao) {
+                document.getElementById('data-atualizacao').textContent = `Atualizado em: ${info.data_atualizacao}`;
+            } else if (data.c?.info?.data_atualizacao) {
+                document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.c.info.data_atualizacao}`;
+            } else {
+                document.getElementById('data-atualizacao').textContent = `Atualizado em: ${new Date().toLocaleDateString('pt-BR')}`;
+            }
+            
+            // Líder atual
+            if (rankingArray.length > 0) {
+                document.getElementById('lider-atual').textContent = rankingArray[0].n || rankingArray[0].nome || 'N/A';
+                document.getElementById('maior-pontuacao').textContent = rankingArray[0].t || rankingArray[0].total || rankingArray[0].pontos || 0;
+            }
+            
+            // Renderiza a tabela
+            const tbody = document.getElementById('ranking-body');
+            tbody.innerHTML = '';
+            
+            rankingArray.forEach((participante, index) => {
+                const row = document.createElement('tr');
                 
                 // Adiciona classe para participantes sem pontos
-                if (participante.t === 0) {
+                const pontos = participante.t || participante.total || participante.pontos || 0;
+                if (pontos === 0) {
                     row.classList.add('sem-pontos');
                 }
                 
-                // Determina medalha e classe CSS
+                // Determina medalha e classe CSS (baseado na posição real ou no índice)
                 let medalhaHtml = '';
-                let posicaoClass = '';
+                const posicao = participante.p || participante.posicao || (index + 1);
                 
-                switch (participante.p) {
+                switch (posicao) {
                     case 1:
                         medalhaHtml = '<div class="medalha medalha-ouro">🥇</div>';
-                        posicaoClass = 'primeiro';
                         break;
                     case 2:
                         medalhaHtml = '<div class="medalha medalha-prata">🥈</div>';
-                        posicaoClass = 'segundo';
                         break;
                     case 3:
                         medalhaHtml = '<div class="medalha medalha-bronze">🥉</div>';
-                        posicaoClass = 'terceiro';
                         break;
                     default:
                         medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
                 }
                 
+                // Nome do participante
+                const nome = participante.n || participante.nome || `Participante ${index + 1}`;
+                
+                // ID do usuário para link (se disponível)
+                const userId = participante.u || participante.usuario_id || participante.id || 0;
+                
+                // Estatísticas (com fallbacks)
+                const estatisticas = participante.e || participante.estatisticas || {};
+                const pe = estatisticas.pe || estatisticas.placar_exato || 0;
+                const rc = estatisticas.rc || estatisticas.resultado_correto || 0;
+                const gm = estatisticas.gm || estatisticas.gols_mandante || 0;
+                const gv = estatisticas.gv || estatisticas.gols_visitante || 0;
+                
                 row.innerHTML = `
                     <td class="posicao">
                         ${medalhaHtml}
-                        <strong>${participante.p}º</strong>
+                        <strong>${posicao}º</strong>
                     </td>
                     <td class="participante">
-                        <strong>${participante.n}</strong>
+                        <strong>${nome}</strong>
                         <br>
-                        <a href="https://t.me/share/url?url=https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
+                        ${userId > 0 ? `
+                        <a href="https://t.me/share/url?url=https://t.me/share/url?url=https://t.me/meubot?start=palpites_${userId}" 
                            target="_blank" 
                            class="btn-ver-palpites">
                             📊 Ver palpites
                         </a>
+                        ` : ''}
                     </td>
                     <td class="pontos">
-                        ${participante.t.toLocaleString('pt-BR')}
+                        ${pontos.toLocaleString('pt-BR')}
                     </td>
                     <td>
                         <div class="estatisticas">
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.pe || 0}</span>
+                                <span class="estatistica-valor">${pe}</span>
                                 <span class="estatistica-label">PE</span>
                             </div>
                             <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.rc || 0}</span>
+                                <span class="estatistica-valor">${rc}</span>
                                 <span class="estatistica-label">RC</span>
+                            </div>
+                            <div class="estatistica-item">
+                                <span class="estatistica-valor">${gm}</span>
+                                <span class="estatistica-label">GM</span>
+                            </div>
+                            <div class="estatistica-item">
+                                <span class="estatistica-valor">${gv}</span>
+                                <span class="estatistica-label">GV</span>
                             </div>
                         </div>
                     </td>
@@ -595,12 +716,8 @@
                 
                 tbody.appendChild(row);
             });
-        }
-
-        // Função para obter username do bot (simplificada)
-        function getBotUsername() {
-            // Você pode ajustar isso se necessário
-            return 'seu_bot_username';
+            
+            console.log('✅ Ranking renderizado com sucesso!');
         }
 
         // Adiciona animação de spin
