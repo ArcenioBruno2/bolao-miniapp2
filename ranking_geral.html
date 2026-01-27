@@ -3,330 +3,482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏆 Ranking Geral</title>
+    <title>🏆 Ranking Geral - Bolão</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
-            padding-bottom: 20px;
         }
         
+        /* Cabeçalho */
         .header {
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            padding: 25px 20px;
+            padding: 30px 20px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: float 20s linear infinite;
+            opacity: 0.3;
+        }
+        
+        @keyframes float {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         .header h1 {
-            font-size: 32px;
+            font-size: 36px;
             margin-bottom: 10px;
             font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            position: relative;
         }
         
         .header .subtitle {
             font-size: 16px;
             opacity: 0.9;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        .header .date {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+            position: relative;
+        }
+        
+        /* Estatísticas gerais */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #2c3e50;
             margin-bottom: 5px;
         }
         
-        .info-box {
-            background: #f8f9fa;
-            margin: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            border-left: 5px solid #3498db;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-        }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .info-label {
-            font-size: 12px;
+        .stat-label {
+            font-size: 14px;
             color: #7f8c8d;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         
-        .info-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2c3e50;
-        }
-        
-        .medalha-ouro { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
-        .medalha-prata { background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%); }
-        .medalha-bronze { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
-        
-        .medalha {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
+        /* Medalhas */
+        .medal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            text-align: center;
-            line-height: 40px;
+            margin-right: 15px;
+            font-size: 24px;
             font-weight: bold;
-            margin-right: 10px;
-            color: white;
-            font-size: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
+        .gold-medal {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #8B6914;
+        }
+        
+        .silver-medal {
+            background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+            color: #696969;
+        }
+        
+        .bronze-medal {
+            background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+            color: white;
+        }
+        
+        /* Tabela de ranking */
         .ranking-table {
-            width: calc(100% - 40px);
-            margin: 20px;
+            width: 100%;
             border-collapse: collapse;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .ranking-table thead {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
         .ranking-table th {
-            padding: 16px 12px;
+            padding: 18px 15px;
             text-align: left;
             font-weight: 600;
             text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 0.5px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            border-bottom: 3px solid #1a252f;
         }
         
         .ranking-table tbody tr {
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f1f1f1;
             transition: all 0.3s ease;
         }
         
         .ranking-table tbody tr:hover {
-            background-color: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, #f8f9fa 0%, #e9f7fe 100%);
+            transform: scale(1.01);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
         
         .ranking-table td {
-            padding: 16px 12px;
+            padding: 20px 15px;
             vertical-align: middle;
         }
         
-        .posicao {
-            font-size: 20px;
+        .position-cell {
+            width: 100px;
+            text-align: center;
+            font-size: 24px;
             font-weight: 800;
             color: #2c3e50;
-            text-align: center;
-            width: 70px;
         }
         
-        .participante {
-            font-weight: 600;
+        .player-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .player-name {
+            font-weight: 700;
             color: #2c3e50;
-            font-size: 16px;
+            font-size: 18px;
+            margin-bottom: 5px;
         }
         
-        .pontos {
-            font-size: 22px;
+        .view-bets-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        
+        .view-bets-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .points-cell {
+            text-align: center;
+            font-size: 28px;
             font-weight: 800;
             color: #27ae60;
-            text-align: center;
+            text-shadow: 0 2px 5px rgba(39, 174, 96, 0.2);
         }
         
-        .estatisticas {
+        .stats-container {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
         
-        .estatistica-item {
+        .stat-badge {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px 10px;
-            background: #f1f8ff;
-            border-radius: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
             min-width: 70px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
         }
         
-        .estatistica-valor {
-            font-size: 18px;
+        .stat-badge:hover {
+            border-color: #3498db;
+            transform: translateY(-3px);
+        }
+        
+        .stat-badge.pe { border-left: 4px solid #e74c3c; }
+        .stat-badge.rc { border-left: 4px solid #2ecc71; }
+        .stat-badge.gm { border-left: 4px solid #f39c12; }
+        .stat-badge.gv { border-left: 4px solid #9b59b6; }
+        
+        .stat-value-small {
+            font-size: 20px;
             font-weight: 700;
-            color: #2980b9;
         }
         
-        .estatistica-label {
-            font-size: 11px;
+        .stat-label-small {
+            font-size: 10px;
             color: #7f8c8d;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            margin-top: 3px;
         }
         
-        .legenda {
+        /* Legenda */
+        .legend {
             background: #f8f9fa;
             margin: 20px;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 25px;
+            border-radius: 15px;
             border: 2px solid #e9ecef;
         }
         
-        .legenda h3 {
+        .legend h3 {
             color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 16px;
+            margin-bottom: 15px;
+            font-size: 18px;
             font-weight: 600;
-        }
-        
-        .legenda-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            font-size: 14px;
-            color: #555;
-        }
-        
-        .legenda-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
-        .legenda-cor {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
         }
         
-        .cor-ouro { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); }
-        .cor-prata { background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%); }
-        .cor-bronze { background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%); }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
         
-        .rodape {
+        .legend-color {
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+        }
+        
+        /* Rodapé */
+        .footer {
             text-align: center;
-            margin-top: 20px;
-            padding: 15px;
+            padding: 20px;
             color: #7f8c8d;
             font-size: 12px;
             border-top: 1px solid #eee;
+            background: #f8f9fa;
         }
         
-        .btn-ver-palpites {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-decoration: none;
+        .footer p {
+            margin-bottom: 5px;
         }
         
-        .btn-ver-palpites:hover {
-            background: #2980b9;
-            transform: translateY(-2px);
+        /* Estados especiais */
+        .top-3-row {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, rgba(255, 165, 0, 0.02) 100%);
         }
         
-        .sem-pontos {
-            opacity: 0.7;
-            font-style: italic;
+        .top-3-row:hover {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 165, 0, 0.05) 100%);
         }
         
         .loading {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
             color: #7f8c8d;
         }
         
-        @media (max-width: 600px) {
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-icon {
+            width: 100px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
             .container {
                 margin: 10px;
                 border-radius: 15px;
             }
             
             .header h1 {
-                font-size: 24px;
+                font-size: 28px;
             }
             
-            .info-box {
-                margin: 15px;
+            .stats-grid {
                 grid-template-columns: 1fr;
+                padding: 15px;
             }
             
             .ranking-table {
-                margin: 15px;
-                width: calc(100% - 30px);
                 display: block;
                 overflow-x: auto;
             }
             
             .ranking-table th,
             .ranking-table td {
-                padding: 12px 8px;
+                padding: 15px 10px;
                 font-size: 14px;
             }
             
-            .medalha {
-                width: 35px;
-                height: 35px;
-                line-height: 35px;
+            .position-cell {
+                width: 60px;
+                font-size: 20px;
+            }
+            
+            .medal {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                margin-right: 10px;
+            }
+            
+            .points-cell {
+                font-size: 24px;
+            }
+            
+            .stat-badge {
+                padding: 8px 12px;
+                min-width: 60px;
+            }
+            
+            .stat-value-small {
                 font-size: 18px;
             }
             
-            .posicao {
-                width: 50px;
-                font-size: 18px;
+            .legend-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .pontos {
-                font-size: 18px;
-            }
-            
-            .estatisticas {
+        }
+        
+        @media (max-width: 480px) {
+            .player-info {
                 flex-direction: column;
-                gap: 5px;
+                align-items: flex-start;
             }
             
-            .estatistica-item {
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .stat-badge {
                 flex-direction: row;
                 justify-content: space-between;
-                min-width: auto;
             }
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #7f8c8d;
+        /* Animação de entrada */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
-        .empty-state img {
-            width: 100px;
-            opacity: 0.5;
-            margin-bottom: 20px;
+        .fade-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Badge para ranking atualizado */
+        .updated-badge {
+            background: #2ecc71;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-left: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
@@ -336,136 +488,125 @@
         <div class="header">
             <h1>🏆 RANKING GERAL</h1>
             <div class="subtitle">Classificação completa de todos os participantes</div>
-            <div class="subtitle" id="data-atualizacao">Atualizado em: --/--/----</div>
+            <div class="date" id="update-date">Atualizado em: --/--/---- --:--</div>
         </div>
         
-        <!-- Informações gerais -->
-        <div class="info-box">
-            <div class="info-item">
-                <span class="info-label">Total de participantes</span>
-                <span class="info-value" id="total-participantes">0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Rodadas consideradas</span>
-                <span class="info-value" id="total-rodadas">0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Líder atual</span>
-                <span class="info-value" id="lider-atual">-</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Maior pontuação</span>
-                <span class="info-value" id="maior-pontuacao">0</span>
-            </div>
+        <!-- Estatísticas gerais -->
+        <div class="stats-grid" id="stats-container">
+            <!-- Será preenchido via JavaScript -->
         </div>
         
         <!-- Tabela de ranking -->
-        <table class="ranking-table">
-            <thead>
-                <tr>
-                    <th width="15%">Posição</th>
-                    <th width="35%">Participante</th>
-                    <th width="15%">Pontos</th>
-                    <th width="35%">Estatísticas</th>
-                </tr>
-            </thead>
-            <tbody id="ranking-body">
-                <!-- Será preenchido via JavaScript -->
-            </tbody>
-        </table>
+        <div class="table-container" style="overflow-x: auto; padding: 0 20px;">
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th width="15%">Posição</th>
+                        <th width="35%">Participante</th>
+                        <th width="15%">Pontos</th>
+                        <th width="35%">Estatísticas</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-body">
+                    <!-- Será preenchido via JavaScript -->
+                </tbody>
+            </table>
+        </div>
         
-        <!-- Estado vazio (se não houver dados) -->
+        <!-- Estado de carregamento -->
+        <div id="loading-state" class="loading">
+            <div class="spinner"></div>
+            <h3>Carregando ranking...</h3>
+            <p>Por favor, aguarde enquanto carregamos os dados.</p>
+        </div>
+        
+        <!-- Estado vazio -->
         <div id="empty-state" class="empty-state" style="display: none;">
-            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
-                <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <h3>Nenhum dado de ranking disponível</h3>
             <p>Aguarde os administradores atualizarem as rodadas.</p>
         </div>
         
         <!-- Legenda -->
-        <div class="legenda">
+        <div class="legend">
             <h3>📋 Legenda do Ranking</h3>
-            <div class="legenda-content">
-                <div class="legenda-item">
-                    <div class="legenda-cor cor-ouro"></div>
-                    <span><strong>🥇 1º Lugar</strong> - Campeão</span>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);"></div>
+                    <div>
+                        <strong>🥇 1º Lugar</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">Campeão do Ranking</div>
+                    </div>
                 </div>
-                <div class="legenda-item">
-                    <div class="legenda-cor cor-prata"></div>
-                    <span><strong>🥈 2º Lugar</strong> - Vice-campeão</span>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);"></div>
+                    <div>
+                        <strong>🥈 2º Lugar</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">Vice-campeão</div>
+                    </div>
                 </div>
-                <div class="legenda-item">
-                    <div class="legenda-cor cor-bronze"></div>
-                    <span><strong>🥉 3º Lugar</strong> - Terceiro lugar</span>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);"></div>
+                    <div>
+                        <strong>🥉 3º Lugar</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">Terceiro lugar</div>
+                    </div>
                 </div>
-                <div class="legenda-item">
-                    <div class="estatistica-valor" style="color: #2980b9;">PE</div>
-                    <span><strong>Placar Exato</strong> - 10 pontos</span>
+                <div class="legend-item">
+                    <div style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: #e74c3c; font-weight: bold;">PE</div>
+                    <div>
+                        <strong>Placar Exato</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">10 pontos cada</div>
+                    </div>
                 </div>
-                <div class="legenda-item">
-                    <div class="estatistica-valor" style="color: #27ae60;">RC</div>
-                    <span><strong>Resultado Correto</strong> - 4 pontos</span>
+                <div class="legend-item">
+                    <div style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: #2ecc71; font-weight: bold;">RC</div>
+                    <div>
+                        <strong>Resultado Correto</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">4 pontos cada</div>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: #f39c12; font-weight: bold;">GM</div>
+                    <div>
+                        <strong>Gols Mandante</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">2 pontos cada</div>
+                    </div>
+                </div>
+                <div class="legend-item">
+                    <div style="width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; color: #9b59b6; font-weight: bold;">GV</div>
+                    <div>
+                        <strong>Gols Visitante</strong>
+                        <div style="font-size: 12px; color: #7f8c8d;">2 pontos cada</div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Rodapé -->
-        <div class="rodape">
+        <div class="footer">
             <p>📊 Ranking calculado automaticamente com base em todas as rodadas concluídas</p>
-            <p style="font-size: 11px; margin-top: 5px;">Clique em "Ver palpites" para ver os detalhes de cada participante</p>
+            <p style="margin-top: 8px; font-size: 11px;">Clique em "Ver palpites" para ver os detalhes de cada participante</p>
+            <p style="margin-top: 5px; font-size: 10px; color: #95a5a6;">Bolão • Sistema Automático</p>
         </div>
     </div>
 
     <script>
-        // Função para decodificar dados comprimidos
-        // Função para decodificar dados comprimidos - VERSÃO COMPATÍVEL
-async function decompressData(compressedData) {
-    try {
-        console.log('🔍 Iniciando descompressão...');
-        console.log('📦 Dados recebidos (primeiros 50 chars):', compressedData.substring(0, 50));
-        
-        // 1. Substitui caracteres URL-safe de volta
-        let base64 = compressedData
-            .replace(/-/g, '+')
-            .replace(/_/g, '/')
-            .replace(/\s/g, '');
-        
-        // Adiciona padding se necessário
-        while (base64.length % 4) {
-            base64 += '=';
-        }
-        
-        console.log('📦 Base64 após normalização:', base64.substring(0, 50));
-        
-        // 2. Decodifica base64 para bytes
-        const binaryString = atob(base64);
-        console.log('📦 Binary string length:', binaryString.length);
-        
-        // 3. Converte para Uint8Array
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-        
-        console.log('📦 Bytes array length:', bytes.length);
-        
-        // 4. Verifica se é GZIP (primeiros 2 bytes: 0x1F 0x8B)
-        const isGzip = bytes.length >= 2 && bytes[0] === 0x1F && bytes[1] === 0x8B;
-        console.log('📦 É GZIP?', isGzip);
-        
-        if (isGzip && window.pako) {
-            // Usa pako se disponível (mais compatível)
-            console.log('🔄 Usando pako para descompressão...');
-            const decompressed = pako.inflate(bytes, { to: 'string' });
-            console.log('✅ Dados descomprimidos com pako');
-            return JSON.parse(decompress);
-        }
-        
-        // 5. Tenta com DecompressionStream (navegadores modernos)
-        if ('DecompressionStream' in window) {
+        // Função para descomprimir dados GZIP
+        async function decompressData(compressedData) {
             try {
-                console.log('🔄 Usando DecompressionStream...');
+                console.log('🔍 Iniciando descompressão de dados...');
+                
+                // Decodifica base64
+                const binaryString = atob(compressedData);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // Descomprime GZIP
                 const decompressedStream = new DecompressionStream('gzip');
                 const writer = decompressedStream.writable.getWriter();
                 writer.write(bytes);
@@ -473,208 +614,406 @@ async function decompressData(compressedData) {
                 
                 const decompressedArrayBuffer = await new Response(decompressedStream.readable).arrayBuffer();
                 const decompressedString = new TextDecoder().decode(decompressedArrayBuffer);
-                console.log('✅ Dados descomprimidos com DecompressionStream');
-                console.log('📝 Primeiros 200 chars:', decompressedString.substring(0, 200));
+                
+                console.log('✅ Dados descomprimidos com sucesso');
                 return JSON.parse(decompressedString);
-            } catch (streamError) {
-                console.warn('⚠️ DecompressionStream falhou:', streamError);
+                
+            } catch (error) {
+                console.error('❌ Erro na descompressão GZIP:', error);
+                
+                // Tenta parsear como JSON direto (sem compressão)
+                try {
+                    console.log('🔄 Tentando parse como JSON direto...');
+                    return JSON.parse(atob(compressedData));
+                } catch (e) {
+                    console.error('❌ Falha no parse JSON:', e);
+                    
+                    // Tenta URL-safe base64
+                    try {
+                        console.log('🔄 Tentando URL-safe base64...');
+                        const urlSafeData = compressedData.replace(/-/g, '+').replace(/_/g, '/');
+                        const paddedData = urlSafeData + '='.repeat((4 - urlSafeData.length % 4) % 4);
+                        return JSON.parse(atob(paddedData));
+                    } catch (e3) {
+                        throw new Error('Dados inválidos ou corrompidos: ' + e3.message);
+                    }
+                }
             }
         }
-        
-        // 6. Fallback: tenta parsear como JSON direto (sem compressão)
-        console.log('🔄 Tentando como JSON sem compressão...');
-        try {
-            const jsonString = new TextDecoder().decode(bytes);
-            console.log('📝 String decodificada:', jsonString.substring(0, 200));
-            return JSON.parse(jsonString);
-        } catch (jsonError) {
-            console.error('❌ JSON direto falhou:', jsonError);
-            throw new Error('Dados inválidos ou corrompidos');
-        }
-        
-    } catch (error) {
-        console.error('❌ Erro na descompressão completa:', error);
-        console.error('❌ Stack:', error.stack);
-        
-        // Último fallback: tenta base64 direto
-        try {
-            console.log('🔄 Último fallback: base64 direto...');
-            const decoded = atob(compressedData);
-            console.log('📝 Decodificado:', decoded.substring(0, 200));
-            return JSON.parse(decoded);
-        } catch (finalError) {
-            console.error('❌ Fallback final falhou:', finalError);
-            throw new Error('Não foi possível decodificar os dados: ' + error.message);
-        }
-    }
-}
+
         // Função para carregar dados da URL
         async function loadRankingData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const compressedData = urlParams.get('data');
-            
-            if (!compressedData) {
-                showEmptyState();
-                return;
-            }
-            
-            showLoading();
-            
             try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const compressedData = urlParams.get('data');
+                
+                console.log('📥 Dados recebidos da URL:', {
+                    temDados: !!compressedData,
+                    tamanho: compressedData ? compressedData.length : 0,
+                    primeiros100: compressedData ? compressedData.substring(0, 100) : 'N/A'
+                });
+                
+                if (!compressedData) {
+                    console.error('❌ Nenhum parâmetro "data" na URL');
+                    showEmptyState('Nenhum dado fornecido na URL');
+                    return;
+                }
+                
+                showLoading();
+                
                 const data = await decompressData(compressedData);
+                console.log('📊 Dados parseados:', data);
+                
+                if (!data || typeof data !== 'object') {
+                    throw new Error('Dados inválidos recebidos');
+                }
+                
                 renderRanking(data);
+                
             } catch (error) {
-                console.error('Erro ao carregar ranking:', error);
-                showError('Erro ao carregar dados do ranking');
+                console.error('❌ Erro ao carregar ranking:', error);
+                showError(`Erro ao carregar dados: ${error.message}`);
             }
         }
 
         // Função para mostrar estado de carregamento
         function showLoading() {
-            document.getElementById('ranking-body').innerHTML = `
-                <tr>
-                    <td colspan="4" class="loading">
-                        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                        <p style="margin-top: 10px;">Carregando ranking...</p>
-                    </td>
-                </tr>
-            `;
+            document.getElementById('ranking-body').innerHTML = '';
+            document.getElementById('loading-state').style.display = 'block';
+            document.getElementById('empty-state').style.display = 'none';
         }
 
         // Função para mostrar estado vazio
-        function showEmptyState() {
-            document.getElementById('ranking-body').style.display = 'none';
-            document.getElementById('empty-state').style.display = 'block';
+        function showEmptyState(message = 'Nenhum dado de ranking disponível') {
+            document.getElementById('loading-state').style.display = 'none';
+            document.getElementById('ranking-body').innerHTML = '';
+            
+            const emptyState = document.getElementById('empty-state');
+            emptyState.querySelector('h3').textContent = message;
+            emptyState.style.display = 'block';
         }
 
         // Função para mostrar erro
         function showError(message) {
-            document.getElementById('ranking-body').innerHTML = `
+            document.getElementById('loading-state').style.display = 'none';
+            
+            const tbody = document.getElementById('ranking-body');
+            tbody.innerHTML = `
                 <tr>
-                    <td colspan="4" class="loading" style="color: #e74c3c;">
-                        <p>❌ ${message}</p>
-                        <button onclick="location.reload()" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px; cursor: pointer;">
-                            Tentar novamente
+                    <td colspan="4" style="text-align: center; padding: 40px; color: #e74c3c;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+                        <h3>Erro ao carregar ranking</h3>
+                        <p style="margin: 10px 0; color: #7f8c8d;">${message}</p>
+                        <button onclick="location.reload()" style="
+                            background: #3498db;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 25px;
+                            margin-top: 20px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                            transition: all 0.3s ease;
+                        ">
+                            🔄 Tentar novamente
                         </button>
                     </td>
                 </tr>
             `;
         }
 
-        // Função para renderizar o ranking
-        function renderRanking(data) {
-            console.log('Dados recebidos:', data);
+        // Função para renderizar estatísticas
+        function renderStats(data) {
+            const statsContainer = document.getElementById('stats-container');
             
-            // Verifica se há dados
-            if (!data || !data.k || data.k.length === 0) {
-                showEmptyState();
+            if (!data.info) {
+                statsContainer.innerHTML = '';
                 return;
             }
             
-            // Atualiza informações gerais
-            document.getElementById('total-participantes').textContent = data.k.length;
-            document.getElementById('total-rodadas').textContent = data.info?.total_rodadas || 'N/A';
-            document.getElementById('data-atualizacao').textContent = `Atualizado em: ${data.info?.data_atualizacao || '--/--/----'}`;
+            statsContainer.innerHTML = `
+                <div class="stat-card fade-in" style="animation-delay: 0.1s">
+                    <div class="stat-value">${data.info.total_participantes || 0}</div>
+                    <div class="stat-label">Total de Participantes</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.2s">
+                    <div class="stat-value">${data.info.total_rodadas || 0}</div>
+                    <div class="stat-label">Rodadas Consideradas</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.3s">
+                    <div class="stat-value">${data.info.lider_atual || '-'}</div>
+                    <div class="stat-label">Líder Atual</div>
+                </div>
+                <div class="stat-card fade-in" style="animation-delay: 0.4s">
+                    <div class="stat-value">${data.info.maior_pontuacao || 0}</div>
+                    <div class="stat-label">Maior Pontuação</div>
+                </div>
+            `;
             
-            if (data.k.length > 0) {
-                document.getElementById('lider-atual').textContent = data.k[0].n;
-                document.getElementById('maior-pontuacao').textContent = data.k[0].t;
+            // Atualiza data
+            if (data.info.data_atualizacao) {
+                document.getElementById('update-date').textContent = `Atualizado em: ${data.info.data_atualizacao}`;
+                document.getElementById('update-date').innerHTML += ' <span class="updated-badge">LIVE</span>';
+            }
+        }
+
+        // Função para renderizar o ranking
+        function renderRanking(data) {
+            console.log('🎨 Renderizando ranking com dados:', data);
+            
+            // Esconde loading
+            document.getElementById('loading-state').style.display = 'none';
+            
+            // Renderiza estatísticas
+            renderStats(data);
+            
+            // Verifica se há dados
+            if (!data.k || !Array.isArray(data.k) || data.k.length === 0) {
+                showEmptyState('Nenhum participante encontrado no ranking');
+                return;
             }
             
-            // Renderiza a tabela
             const tbody = document.getElementById('ranking-body');
             tbody.innerHTML = '';
             
+            // Renderiza cada participante
             data.k.forEach((participante, index) => {
                 const row = document.createElement('tr');
+                row.className = 'fade-in';
                 
-                // Adiciona classe para participantes sem pontos
-                if (participante.t === 0) {
-                    row.classList.add('sem-pontos');
+                if (index < 3) {
+                    row.classList.add('top-3-row');
                 }
                 
-                // Determina medalha e classe CSS
-                let medalhaHtml = '';
-                let posicaoClass = '';
+                // Posição com medalha
+                let positionHtml = '';
+                let medalClass = '';
                 
                 switch (participante.p) {
                     case 1:
-                        medalhaHtml = '<div class="medalha medalha-ouro">🥇</div>';
-                        posicaoClass = 'primeiro';
+                        positionHtml = `
+                            <div class="medal gold-medal">🥇</div>
+                            <strong>${participante.p}º</strong>
+                        `;
+                        medalClass = 'gold-medal';
                         break;
                     case 2:
-                        medalhaHtml = '<div class="medalha medalha-prata">🥈</div>';
-                        posicaoClass = 'segundo';
+                        positionHtml = `
+                            <div class="medal silver-medal">🥈</div>
+                            <strong>${participante.p}º</strong>
+                        `;
+                        medalClass = 'silver-medal';
                         break;
                     case 3:
-                        medalhaHtml = '<div class="medalha medalha-bronze">🥉</div>';
-                        posicaoClass = 'terceiro';
+                        positionHtml = `
+                            <div class="medal bronze-medal">🥉</div>
+                            <strong>${participante.p}º</strong>
+                        `;
+                        medalClass = 'bronze-medal';
                         break;
                     default:
-                        medalhaHtml = `<div style="width: 40px; height: 40px; display: inline-block; margin-right: 10px;"></div>`;
+                        positionHtml = `
+                            <div style="width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 24px; font-weight: bold; color: #95a5a6;">
+                                ${participante.p}
+                            </div>
+                            <strong>${participante.p}º</strong>
+                        `;
                 }
                 
-                row.innerHTML = `
-                    <td class="posicao">
-                        ${medalhaHtml}
-                        <strong>${participante.p}º</strong>
-                    </td>
-                    <td class="participante">
-                        <strong>${participante.n}</strong>
-                        <br>
-                        <a href="https://t.me/share/url?url=https://t.me/${getBotUsername()}?start=palpites_${participante.u}_0" 
-                           target="_blank" 
-                           class="btn-ver-palpites">
-                            📊 Ver palpites
-                        </a>
-                    </td>
-                    <td class="pontos">
-                        ${participante.t.toLocaleString('pt-BR')}
-                    </td>
-                    <td>
-                        <div class="estatisticas">
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.pe || 0}</span>
-                                <span class="estatistica-label">PE</span>
-                            </div>
-                            <div class="estatistica-item">
-                                <span class="estatistica-valor">${participante.e.rc || 0}</span>
-                                <span class="estatistica-label">RC</span>
-                            </div>
+                // Informações do participante
+                const participantHtml = `
+                    <div class="player-info">
+                        <div>
+                            <div class="player-name">${participante.n || 'Participante'}</div>
+                            <button class="view-bets-btn" onclick="viewPlayerBets(${participante.u})">
+                                📊 Ver palpites
+                            </button>
                         </div>
-                    </td>
+                    </div>
+                `;
+                
+                // Pontos
+                const pointsHtml = `
+                    <div class="points-cell">
+                        ${participante.t.toLocaleString('pt-BR')}
+                    </div>
+                `;
+                
+                // Estatísticas
+                const stats = participante.e || {};
+                const statsHtml = `
+                    <div class="stats-container">
+                        <div class="stat-badge pe">
+                            <div class="stat-value-small">${stats.pe || 0}</div>
+                            <div class="stat-label-small">PE</div>
+                        </div>
+                        <div class="stat-badge rc">
+                            <div class="stat-value-small">${stats.rc || 0}</div>
+                            <div class="stat-label-small">RC</div>
+                        </div>
+                        <div class="stat-badge gm">
+                            <div class="stat-value-small">${stats.gm || 0}</div>
+                            <div class="stat-label-small">GM</div>
+                        </div>
+                        <div class="stat-badge gv">
+                            <div class="stat-value-small">${stats.gv || 0}</div>
+                            <div class="stat-label-small">GV</div>
+                        </div>
+                    </div>
+                `;
+                
+                row.innerHTML = `
+                    <td class="position-cell">${positionHtml}</td>
+                    <td>${participantHtml}</td>
+                    <td class="points-cell">${pointsHtml}</td>
+                    <td>${statsHtml}</td>
                 `;
                 
                 tbody.appendChild(row);
             });
+            
+            console.log(`✅ Ranking renderizado com ${data.k.length} participantes`);
+            
+            // Adiciona animação sequencial
+            const rows = tbody.querySelectorAll('tr.fade-in');
+            rows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.05}s`;
+            });
         }
 
-        // Função para obter username do bot (simplificada)
+        // Função para ver palpites do jogador
+        function viewPlayerBets(userId) {
+            console.log('👤 Ver palpites do usuário:', userId);
+            
+            // Para Web App do Telegram
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'ver_palpites_usuario',
+                    usuario_id: userId
+                }));
+            } else {
+                // Fallback para navegador normal
+                alert(`Ver palpites do usuário ${userId}\nEsta funcionalidade só funciona no Telegram.`);
+            }
+        }
+
+        // Função para obter username do bot
         function getBotUsername() {
-            // Você pode ajustar isso se necessário
+            // Tenta obter do WebApp
+            if (window.Telegram && Telegram.WebApp) {
+                const initData = Telegram.WebApp.initData;
+                if (initData) {
+                    const params = new URLSearchParams(initData);
+                    const user = params.get('user');
+                    if (user) {
+                        try {
+                            const userData = JSON.parse(user);
+                            return userData.username || 'seu_bot_username';
+                        } catch (e) {
+                            return 'seu_bot_username';
+                        }
+                    }
+                }
+            }
             return 'seu_bot_username';
         }
 
-        // Adiciona animação de spin
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
+        // Função para configurar botão voltar no Telegram
+        function setupTelegramBackButton() {
+            if (window.Telegram && Telegram.WebApp) {
+                // Mostra botão voltar
+                Telegram.WebApp.BackButton.show();
+                Telegram.WebApp.BackButton.onClick(() => {
+                    Telegram.WebApp.close();
+                });
+                
+                // Expande o Web App
+                Telegram.WebApp.expand();
+                
+                // Configura cor da barra superior
+                Telegram.WebApp.setHeaderColor('#1e3c72');
+                Telegram.WebApp.setBackgroundColor('#667eea');
             }
-        `;
-        document.head.appendChild(style);
-
-        // Carrega os dados quando a página carrega
-        document.addEventListener('DOMContentLoaded', loadRankingData);
-
-        // Botão para voltar (se estiver no Telegram Web App)
-        if (window.Telegram && Telegram.WebApp) {
-            Telegram.WebApp.BackButton.show();
-            Telegram.WebApp.BackButton.onClick(() => {
-                Telegram.WebApp.close();
-            });
         }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Inicializando Web App de Ranking Geral...');
+            
+            // Configura Telegram Web App
+            setupTelegramBackButton();
+            
+            // Carrega dados
+            loadRankingData();
+            
+            // Configura auto-refresh a cada 5 minutos
+            setInterval(() => {
+                console.log('🔄 Atualizando ranking automaticamente...');
+                loadRankingData();
+            }, 5 * 60 * 1000);
+        });
+
+        // Adiciona efeito de confetti para top 3
+        function celebrateTop3() {
+            if (window.confetti) {
+                const count = 200;
+                const defaults = {
+                    origin: { y: 0.7 }
+                };
+
+                function fire(particleRatio, opts) {
+                    confetti(Object.assign({}, defaults, opts, {
+                        particleCount: Math.floor(count * particleRatio)
+                    }));
+                }
+
+                fire(0.25, {
+                    spread: 26,
+                    startVelocity: 55,
+                });
+                fire(0.2, {
+                    spread: 60,
+                });
+                fire(0.35, {
+                    spread: 100,
+                    decay: 0.91,
+                    scalar: 0.8
+                });
+                fire(0.1, {
+                    spread: 120,
+                    startVelocity: 25,
+                    decay: 0.92,
+                    scalar: 1.2
+                });
+                fire(0.1, {
+                    spread: 120,
+                    startVelocity: 45,
+                });
+            }
+        }
+    </script>
+    
+    <!-- Biblioteca Confetti para celebração -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        // Adiciona celebração quando o ranking carrega
+        let hasCelebrated = false;
+        
+        // Modifica a função renderRanking para adicionar celebração
+        const originalRenderRanking = renderRanking;
+        renderRanking = function(data) {
+            originalRenderRanking(data);
+            
+            // Celebra top 3 (apenas uma vez)
+            if (!hasCelebrated && data.k && data.k.length >= 3) {
+                setTimeout(() => {
+                    celebrateTop3();
+                    hasCelebrated = true;
+                }, 1000);
+            }
+        };
     </script>
 </body>
 </html>
