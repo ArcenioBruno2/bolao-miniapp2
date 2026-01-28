@@ -883,14 +883,30 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-
-           // ===== EXPANSÃO IMEDIATA DO TELEGRAM =====
-    if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        console.log("✅ Telegram WebApp expandido imediatamente");
-    }
-
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
+        function initTelegramWebApp() {
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            
+            if (window.Telegram && window.Telegram.WebApp) {
+                try {
+                    Telegram.WebApp.ready();
+                    Telegram.WebApp.expand();
+                    Telegram.WebApp.enableClosingConfirmation();
+                    Telegram.WebApp.setHeaderColor('#4a6cf7');
+                    Telegram.WebApp.setBackgroundColor('#ffffff');
+                    
+                    console.log("✅ Telegram WebApp configurado com sucesso!");
+                    return true;
+                    
+                } catch (error) {
+                    console.error("❌ Erro ao configurar Telegram WebApp:", error);
+                    return false;
+                }
+            } else {
+                console.log("❌ Telegram WebApp não detectado - modo desenvolvimento");
+                return false;
+            }
+        }
         
         // ===== VARIÁVEIS GLOBAIS =====
         let tg = null;
@@ -906,53 +922,16 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA PARA ANDROID =====
-        function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+        // ===== INICIALIZAÇÃO DA PÁGINA =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("📄 Documento carregado");
             
-            // PRIMEIRO: Garantir que a página ocupa 100% da tela
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.position = 'fixed';
-            
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                
-                // CONFIGURAÇÕES CRÍTICAS PARA ANDROID
-                tg.ready();
-                
-                // Expansão forçada - tela cheia
-                try {
-                    tg.expand();
-                    
-                    // Garantir expansão completa
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 100);
-                    
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 500);
-                    
-                } catch (error) {
-                    console.log("⚠️ Expand já foi chamado");
-                }
-                
-                // Configurar cores para se integrar
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
-                
-                console.log("✅ Web App inicializado");
-            } else {
-                console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
-            }
+            // Inicializa Telegram WebApp
+            initTelegramWebApp();
             
             // Iniciar carregamento
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 300);
-        }
+            carregarDadosRodada();
+        });
 
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
@@ -1789,16 +1768,16 @@
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btnConfirmar.disabled = true;
             
-            if (tg && tg.sendData) {
-                tg.sendData(JSON.stringify(dataToBot));
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.sendData) {
+                window.Telegram.WebApp.sendData(JSON.stringify(dataToBot));
                 console.log("✅ Dados enviados para o bot");
             } else {
                 console.log("📤 Dados simulados (Telegram não disponível):", dataToBot);
             }
             
             setTimeout(() => {
-                if (tg && tg.close) {
-                    tg.close();
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
+                    window.Telegram.WebApp.close();
                 }
             }, 1500);
         };
@@ -1806,38 +1785,16 @@
         document.getElementById('btn-sair').onclick = () => {
             if (palpites.length > 0 && !verificarPalpitesCompletos()) {
                 if (confirm("⚠️ Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
-                    if (tg && tg.close) {
-                        tg.close();
+                    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
+                        window.Telegram.WebApp.close();
                     }
                 }
             } else {
-                if (tg && tg.close) {
-                    tg.close();
+                if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.close) {
+                    window.Telegram.WebApp.close();
                 }
             }
         };
-
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
-        window.addEventListener('DOMContentLoaded', function() {
-            // Primeiro garantir que o corpo ocupa 100%
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
-            
-            // Inicializar Telegram WebApp
-            initTelegramWebApp();
-        });
-
-        // Backup: Se o Telegram não inicializar, tentar novamente
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (!tg && window.Telegram && window.Telegram.WebApp) {
-                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
-                    initTelegramWebApp();
-                }
-            }, 1000);
-        });
     </script>
 </body>
 </html>
