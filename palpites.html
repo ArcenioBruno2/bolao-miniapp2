@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>⚽ Bolão - Palpites</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -39,6 +39,13 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
+        html {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         body { 
             background: var(--tg-bg-color, white);
             color: var(--tg-text-color, var(--dark));
@@ -46,6 +53,8 @@
             width: 100%;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: none;
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
@@ -53,14 +62,15 @@
             width: 100%;
             max-width: 100%;
             min-height: 100vh;
+            position: relative;
         }
         
         .main-card {
             background: var(--tg-bg-color, white);
-            padding: 16px 12px 80px;
-            position: relative;
+            padding: 16px 12px 90px; /* Espaço extra para os botões fixos */
             animation: slideUp 0.5s ease-out;
             width: 100%;
+            min-height: 100vh;
         }
         
         @keyframes slideUp {
@@ -501,6 +511,7 @@
             border-top: 1px solid rgba(0,0,0,0.08);
             box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             z-index: 1000;
+            backdrop-filter: blur(10px);
         }
         
         .action-btn {
@@ -610,7 +621,7 @@
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
             .main-card {
-                padding: 14px 10px 75px;
+                padding: 14px 10px 85px;
             }
             
             .rodada-number {
@@ -676,15 +687,23 @@
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID ===== */
-        html, body {
-            width: 100% !important;
-            height: 100% !important;
+        /* ===== SCROLL TOUCH CORRIGIDO ===== */
+        html {
+            -webkit-overflow-scrolling: touch;
+            overflow-scrolling: touch;
+        }
+        
+        body {
+            overflow-y: auto !important;
             overflow-x: hidden !important;
+            position: relative !important;
+            height: auto !important;
+            min-height: 100vh !important;
+            touch-action: pan-y;
         }
         
         .app-container {
-            position: relative;
+            height: auto;
             min-height: 100vh;
         }
         
@@ -820,23 +839,20 @@
         let countdownInterval = null;
         let webAppInitialized = false;
 
-        // ===== NOVA LÓGICA PARA TELA CHEIA =====
+        // ===== INICIALIZAÇÃO SIMPLIFICADA =====
         function initTelegramWebApp() {
             console.log("🔧 INICIANDO TELEGRAM WEB APP");
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // NOVA ABORDAGEM: Configurar viewport para forçar tela cheia
-                configureFullscreenViewport();
-                
-                // Aplicar tema primeiro
+                // Aplicar tema
                 aplicarTemaTelegram();
                 
-                // Usar ready() mas SEM expand() - vamos usar outra abordagem
+                // Ready sem expand
                 tg.ready();
                 
-                console.log("✅ Web App inicializado (sem expand)");
+                console.log("✅ Web App inicializado");
                 
                 // Iniciar carregamento
                 setTimeout(() => {
@@ -849,35 +865,6 @@
                     carregarDadosRodada();
                 }, 200);
             }
-        }
-
-        // ===== CONFIGURAÇÃO DE VIEWPORT PARA TELA CHEIA =====
-        function configureFullscreenViewport() {
-            // Forçar viewport para ocupar toda a tela
-            const metaViewport = document.querySelector('meta[name="viewport"]');
-            if (metaViewport) {
-                metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
-            }
-            
-           
-            // CSS adicional via JavaScript
-            const style = document.createElement('style');
-            style.textContent = `
-                @supports (-webkit-touch-callout: none) {
-                    /* iOS Safari */
-                    .app-container {
-                        min-height: -webkit-fill-available !important;
-                    }
-                }
-                
-                html, body {
-                    overscroll-behavior: none !important;
-                    -webkit-overflow-scrolling: touch !important;
-                }
-            `;
-            document.head.appendChild(style);
-            
-            console.log("📱 Viewport configurado para tela cheia");
         }
 
         // ===== APLICAR TEMA DO TELEGRAM =====
@@ -911,6 +898,27 @@
                 
             } catch (error) {
                 console.log("⚠️ Erro ao aplicar tema:", error);
+            }
+        }
+
+        // ===== EXPANSÃO SEGURA =====
+        function safeWebAppExpand() {
+            if (!tg || webAppInitialized) return;
+            
+            try {
+                // Verificar se já está expandido
+                const isExpanded = tg.isExpanded;
+                console.log(`📱 Estado atual do WebApp: isExpanded=${isExpanded}`);
+                
+                if (!isExpanded) {
+                    console.log("📱 Expandindo WebApp...");
+                    tg.expand();
+                }
+                
+                webAppInitialized = true;
+                
+            } catch (error) {
+                console.log("⚠️ Erro ao expandir WebApp:", error);
             }
         }
 
@@ -1032,7 +1040,7 @@
                     
                     ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                     
-                    // Chamar expand() apenas uma vez e com delay
+                    // Chamar expand seguro
                     setTimeout(() => {
                         safeWebAppExpand();
                     }, 500);
@@ -1093,31 +1101,6 @@
                     };
                     
                 }, 1000);
-            }
-        }
-
-        // ===== EXPANSÃO SEGURA DO WEBAPP =====
-        function safeWebAppExpand() {
-            if (!tg || webAppInitialized) return;
-            
-            try {
-                // Verificar se já está expandido
-                const isExpanded = tg.isExpanded;
-                console.log(`📱 Estado atual do WebApp: isExpanded=${isExpanded}`);
-                
-                if (!isExpanded) {
-                    console.log("📱 Expandindo WebApp...");
-                    tg.expand();
-                    
-                    // Configurar cores
-                    tg.setHeaderColor('secondary_bg_color');
-                    tg.setBackgroundColor('bg_color');
-                }
-                
-                webAppInitialized = true;
-                
-            } catch (error) {
-                console.log("⚠️ Erro ao expandir WebApp:", error);
             }
         }
 
@@ -1191,11 +1174,11 @@
                 dobradaElem.style.color = "var(--success)";
             }
             
-            // Inicializar array de palpites - CORREÇÃO: não inicializar com valores
+            // Inicializar array de palpites
             palpites = [];
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
-            // CORREÇÃO: Restaurar palpites existentes corretamente
+            // Restaurar palpites existentes corretamente
             if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
                 console.log("🔄 Restaurando palpites existentes");
                 
@@ -1204,7 +1187,7 @@
                     if (dadosOriginais.palpites[jogoIdStr]) {
                         const palpite = dadosOriginais.palpites[jogoIdStr];
                         
-                        // IMPORTANTE: Tratar 0 como valor válido, não como vazio
+                        // Tratar 0 como valor válido, não como vazio
                         const mandanteValue = (palpite.mandante === 0 || palpite.mandante === '0') ? 0 : 
                                             (palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '');
                         
@@ -1230,7 +1213,6 @@
             
             console.log(`📊 Palpites carregados: ${palpites.length}`);
             console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
-            console.log('📋 Detalhes dos palpites:', palpites);
             
             // Renderizar jogos e verificar
             renderizarJogos();
@@ -1263,7 +1245,7 @@
             alerta.classList.remove('hidden');
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - CORRIGIDA =====
+        // ===== RENDERIZAÇÃO DOS JOGOS =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1286,7 +1268,7 @@
             dadosOriginais.jogos.forEach(jogo => {
                 const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id);
                 
-                // CORREÇÃO: Tratar 0 como valor válido para exibição
+                // Tratar 0 como valor válido para exibição
                 let mandanteValue = '';
                 let visitanteValue = '';
                 let temPD = false;
@@ -1605,7 +1587,7 @@
         }
 
         function salvarPlacar(jogoId, time, valor) {
-            // CORREÇÃO: Preservar 0 como valor válido
+            // Preservar 0 como valor válido
             valor = valor.replace(/\D/g, '');
             valor = valor.slice(0, 2);
             
@@ -1649,7 +1631,7 @@
             let preenchidos = 0;
             
             for (const palpite of palpites) {
-                // CORREÇÃO: 0 é considerado preenchido
+                // 0 é considerado preenchido
                 const mandantePreenchido = palpite.mandante !== '' && palpite.mandante !== undefined;
                 const visitantePreenchido = palpite.visitante !== '' && palpite.visitante !== undefined;
                 
@@ -1740,7 +1722,7 @@
             ordemOriginalJogos.forEach(jogoId => {
                 const palpite = palpites.find(p => p.jogo_id == jogoId);
                 if (palpite && palpite.mandante !== '' && palpite.visitante !== '') {
-                    // CORREÇÃO: Enviar 0 como número
+                    // Enviar 0 como número
                     const mandanteVal = palpite.mandante === '' ? 0 : (palpite.mandante === 0 ? 0 : parseInt(palpite.mandante) || 0);
                     const visitanteVal = palpite.visitante === '' ? 0 : (palpite.visitante === 0 ? 0 : parseInt(palpite.visitante) || 0);
                     
@@ -1792,11 +1774,8 @@
             }
         };
 
-        // ===== INICIALIZAÇÃO SEGURA =====
+        // ===== INICIALIZAÇÃO =====
         window.addEventListener('DOMContentLoaded', function() {
-            // Configurar viewport para tela cheia
-            configureFullscreenViewport();
-            
             // Inicializar Telegram WebApp
             initTelegramWebApp();
         });
