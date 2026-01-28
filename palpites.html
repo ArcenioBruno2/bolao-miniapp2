@@ -39,7 +39,6 @@
             justify-content: center;
             align-items: flex-start;
             overflow-x: hidden;
-            padding-top: env(safe-area-inset-top);
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
@@ -748,23 +747,6 @@
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
-        html, body {
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow-x: hidden !important;
-            position: fixed !important;
-        }
-        
-        #content {
-            width: 100% !important;
-            height: 100% !important;
-        }
-        
-        #lista-jogos {
-            width: 100% !important;
-        }
-        
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 4px;
@@ -883,33 +865,36 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
-        function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+        // ===== INICIALIZAÇÃO IMEDIATA DO TELEGRAM =====
+        (function() {
+            console.log("🔧 INICIALIZAÇÃO IMEDIATA DO TELEGRAM");
             
-            if (window.Telegram && window.Telegram.WebApp) {
-                try {
-                    Telegram.WebApp.ready();
-                    Telegram.WebApp.expand();
-                    Telegram.WebApp.enableClosingConfirmation();
-                    Telegram.WebApp.setHeaderColor('#4a6cf7');
-                    Telegram.WebApp.setBackgroundColor('#ffffff');
-                    
-                    console.log("✅ Telegram WebApp configurado com sucesso!");
-                    return true;
-                    
-                } catch (error) {
-                    console.error("❌ Erro ao configurar Telegram WebApp:", error);
-                    return false;
+            // Tenta múltiplas formas como nos outros arquivos
+            const telegramObjects = [
+                window.Telegram,
+                Telegram,
+                window.parent?.Telegram,
+                window.external?.Telegram
+            ];
+            
+            for (const tg of telegramObjects) {
+                if (tg && tg.WebApp) {
+                    try {
+                        tg.WebApp.ready();
+                        tg.WebApp.expand(); // ⭐⭐ TELA CHEIA IMEDIATA ⭐⭐
+                        tg.WebApp.enableClosingConfirmation();
+                        tg.WebApp.setHeaderColor('#4a6cf7');
+                        tg.WebApp.setBackgroundColor('#ffffff');
+                        console.log("✅ Telegram WebApp expandido imediatamente");
+                        break;
+                    } catch(e) {
+                        console.log("⚠️ Erro na expansão:", e);
+                    }
                 }
-            } else {
-                console.log("❌ Telegram WebApp não detectado - modo desenvolvimento");
-                return false;
             }
-        }
+        })();
         
         // ===== VARIÁVEIS GLOBAIS =====
-        let tg = null;
         let dadosOriginais = {};
         let pdSelecionado = null;
         let palpites = [];
@@ -925,11 +910,6 @@
         // ===== INICIALIZAÇÃO DA PÁGINA =====
         document.addEventListener('DOMContentLoaded', function() {
             console.log("📄 Documento carregado");
-            
-            // Inicializa Telegram WebApp
-            initTelegramWebApp();
-            
-            // Iniciar carregamento
             carregarDadosRodada();
         });
 
@@ -1256,7 +1236,7 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
+        // ===== RENDERIZAÇÃO DOS JOGOS =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1400,7 +1380,7 @@
                     }
                 }
                 
-                // Criar o elemento do jogo com NOVO LAYOUT
+                // Criar o elemento do jogo
                 const div = document.createElement('div');
                 div.className = cardClass;
                 
