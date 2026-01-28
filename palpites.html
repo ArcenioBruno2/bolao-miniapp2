@@ -859,23 +859,7 @@
                 metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
             }
             
-            // Estilos para forçar tela cheia
-            document.documentElement.style.cssText = `
-                width: 100% !important;
-                height: 100% !important;
-                overflow: hidden !important;
-                position: fixed !important;
-            `;
-            
-            document.body.style.cssText = `
-                width: 100% !important;
-                height: 100% !important;
-                overflow: hidden !important;
-                position: fixed !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            `;
-            
+           
             // CSS adicional via JavaScript
             const style = document.createElement('style');
             style.textContent = `
