@@ -177,7 +177,7 @@
             justify-content: center;
         }
         
-        /* ===== ALERTA DE PD JÁ USADA ===== */
+        /* ===== ALERTA DE PD JÁ USADA - CORRIGIDO ===== */
         .pd-used-alert {
             background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
             border: 1px solid rgba(247, 37, 133, 0.3);
@@ -187,19 +187,24 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            animation: pulse 2s infinite;
+            position: relative;
+            z-index: 1;
+            /* Removida animation: pulse que pode causar problemas */
+            box-shadow: 0 2px 8px rgba(247, 37, 133, 0.1);
         }
         
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
-            70% { box-shadow: 0 0 0 6px rgba(247, 37, 133, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
-        }
-        
+        /* Pulse apenas no ícone, não no container inteiro */
         .pd-used-icon {
             font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
+            animation: iconPulse 2s infinite;
+        }
+        
+        @keyframes iconPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         .pd-used-text {
@@ -598,6 +603,8 @@
             gap: 12px;
             animation: shake 0.5s ease-in-out;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
         
         @keyframes shake {
@@ -705,6 +712,19 @@
         .app-container {
             height: auto;
             min-height: 100vh;
+        }
+        
+        /* CORREÇÃO ESPECÍFICA PARA O ALERTA DE PD USADA */
+        .pd-used-alert {
+            /* Garantir que não bloqueie o scroll */
+            pointer-events: auto;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+        
+        /* Garantir que todo conteúdo seja scrollável */
+        .main-card {
+            overflow: visible !important;
         }
         
         /* ===== UTILITÁRIOS ===== */
