@@ -8,26 +8,27 @@
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
         :root {
-            --tg-bg-color: var(--tg-theme-bg-color, #ffffff);
-            --tg-text-color: var(--tg-theme-text-color, #000000);
-            --tg-hint-color: var(--tg-theme-hint-color, #999999);
-            --tg-link-color: var(--tg-theme-link-color, #2481cc);
-            --tg-button-color: var(--tg-theme-button-color, #2481cc);
-            --tg-button-text-color: var(--tg-theme-button-text-color, #ffffff);
-            --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             
-            --primary: #2481cc;
-            --secondary: #1a6bb3;
-            --success: #34c759;
-            --danger: #ff3b30;
-            --warning: #ff9500;
-            --dark: #000000;
-            --light: #ffffff;
-            --gray: #8e8e93;
-            --light-gray: #e5e5ea;
-            
-            --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Cores dinâmicas do Telegram (serão sobrescritas) */
+            --tg-bg-color: #ffffff;
+            --tg-text-color: #000000;
+            --tg-hint-color: #999999;
+            --tg-link-color: #3390ec;
+            --tg-button-color: #3390ec;
+            --tg-button-text-color: #ffffff;
+            --tg-secondary-bg-color: #f1f1f1;
         }
         
         * { 
@@ -35,507 +36,531 @@
             padding: 0; 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         body { 
-            background: var(--tg-bg-color);
-            color: var(--tg-text-color);
+            background: var(--tg-bg-color, white);
+            color: var(--tg-text-color, var(--dark));
             min-height: 100vh;
             width: 100%;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
             max-width: 100%;
-            margin: 0 auto;
+            min-height: 100vh;
         }
         
-        .main-content {
-            padding: 12px 16px 80px;
+        .main-card {
+            background: var(--tg-bg-color, white);
+            padding: 16px 12px 80px;
+            position: relative;
+            animation: slideUp 0.5s ease-out;
             width: 100%;
         }
         
-        /* ===== HEADER COMPACTO ===== */
-        .telegram-header {
-            background: var(--tg-secondary-bg-color);
-            padding: 16px 16px 12px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            background: rgba(var(--tg-theme-secondary-bg-color-rgb, 240, 240, 240), 0.9);
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .header-title {
-            font-size: 20px;
+        /* ===== HEADER DA RODADA ===== */
+        .header-section {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 18px 15px;
+            border-radius: 16px;
+            background: var(--tg-secondary-bg-color, #f8f9fa);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .rodada-number {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--tg-link-color, var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .rodada-icon {
+            font-size: 22px;
+        }
+        
+        .countdown-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--tg-hint-color, var(--gray));
+        }
+        
+        .countdown-icon {
+            color: var(--warning);
+        }
+        
+        .countdown-timer {
             font-weight: 700;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--tg-text-color);
-        }
-        
-        .header-subtitle {
-            font-size: 13px;
-            color: var(--tg-hint-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .rodada-badge {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
+            color: var(--tg-text-color, var(--dark));
+            background: rgba(0,0,0,0.05);
             padding: 4px 10px;
+            border-radius: 20px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* ===== STATUS INFORMAÇÕES ===== */
+        .status-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status-card {
+            background: var(--tg-secondary-bg-color, white);
             border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        /* ===== STATUS BAR COMPACTA ===== */
-        .status-bar {
-            display: flex;
-            gap: 8px;
-            margin: 12px 0 16px;
-            padding: 0 4px;
-        }
-        
-        .status-item {
-            flex: 1;
+            padding: 12px 10px;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px 6px;
-            background: var(--tg-secondary-bg-color);
-            border-radius: 10px;
-            min-height: 56px;
+            min-height: 85px;
         }
         
         .status-icon {
-            font-size: 14px;
-            margin-bottom: 6px;
-            width: 24px;
-            height: 24px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+            background: var(--tg-button-color, var(--primary));
+            color: var(--tg-button-text-color, white);
         }
         
-        .status-item.time .status-icon {
-            background: rgba(52, 199, 89, 0.1);
-            color: var(--success);
-        }
-        
-        .status-item.trunfo .status-icon {
-            background: rgba(255, 149, 0, 0.1);
-            color: var(--warning);
-        }
-        
-        .status-item.pd .status-icon {
-            background: rgba(36, 129, 204, 0.1);
-            color: var(--primary);
-        }
-        
-        .status-label {
-            font-size: 11px;
-            color: var(--tg-hint-color);
-            margin-bottom: 2px;
-            text-align: center;
-        }
-        
-        .status-value {
+        .status-title {
             font-size: 13px;
-            font-weight: 600;
-            color: var(--tg-text-color);
-            text-align: center;
-            line-height: 1.2;
-            min-height: 16px;
+            font-weight: 700;
+            color: var(--tg-text-color, var(--dark));
+            margin-bottom: 4px;
         }
         
-        .status-badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-        
-        .status-badge.active {
-            background: rgba(52, 199, 89, 0.15);
-            color: var(--success);
-        }
-        
-        .status-badge.inactive {
-            background: rgba(142, 142, 147, 0.15);
-            color: var(--gray);
-        }
-        
-        .status-badge.used {
-            background: rgba(255, 59, 48, 0.15);
-            color: var(--danger);
-        }
-        
-        .status-badge.blocked {
-            background: rgba(142, 142, 147, 0.2);
-            color: var(--gray);
-        }
-        
-        /* ===== ALERTA PD ===== */
-        .pd-alert {
-            background: rgba(255, 59, 48, 0.08);
-            border: 1px solid rgba(255, 59, 48, 0.2);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 16px;
-            display: none;
-        }
-        
-        .pd-alert.show {
+        .status-content {
+            font-size: 12px;
+            color: var(--tg-hint-color, var(--gray));
+            line-height: 1.3;
+            min-height: 32px;
             display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            animation: slideIn 0.3s ease-out;
+            align-items: center;
+            justify-content: center;
         }
         
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* ===== ALERTA DE PD JÁ USADA ===== */
+        .pd-used-alert {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: pulse 2s infinite;
         }
         
-        .pd-alert-icon {
-            font-size: 16px;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
+            70% { box-shadow: 0 0 0 6px rgba(247, 37, 133, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+        }
+        
+        .pd-used-icon {
+            font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
-            margin-top: 1px;
         }
         
-        .pd-alert-content {
-            flex: 1;
+        .pd-used-text {
+            flex-grow: 1;
         }
         
-        .pd-alert-title {
-            font-size: 14px;
-            font-weight: 600;
+        .pd-used-title {
+            font-weight: 800;
             color: var(--danger);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            font-size: 14px;
         }
         
-        .pd-alert-text {
+        .pd-used-info {
             font-size: 12px;
-            color: var(--tg-hint-color);
-            line-height: 1.3;
+            color: #666;
+            line-height: 1.4;
         }
         
-        .pd-game-info {
-            color: var(--tg-text-color);
-            font-weight: 600;
+        .pd-used-game {
+            font-weight: 700;
+            color: var(--dark);
         }
         
-        /* ===== LISTA DE JOGOS COMPACTA ===== */
+        /* ===== LISTA DE JOGOS - NOVO LAYOUT ===== */
         .games-section {
-            margin-top: 4px;
+            margin-bottom: 20px;
         }
         
         .games-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--tg-text-color);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--tg-text-color, var(--dark));
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            padding: 0 5px;
         }
         
         .games-title i {
-            color: var(--tg-button-color);
+            color: var(--tg-link-color, var(--primary));
         }
         
-        /* ===== CARD DE JOGO OTIMIZADO ===== */
+        /* ===== GAME CARD NOVO LAYOUT (ESTILO PLACAR OFICIAL) ===== */
         .game-card {
-            background: var(--tg-secondary-bg-color);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
+            background: var(--tg-bg-color, white);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(0,0,0,0.08);
             transition: var(--transition);
-            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
         
-        .game-card.active {
-            border-color: var(--tg-button-color);
-            box-shadow: 0 0 0 1px rgba(36, 129, 204, 0.1);
+        .game-card:active {
+            transform: scale(0.99);
         }
         
         .game-card.pd-blocked {
-            opacity: 0.7;
+            background: linear-gradient(135deg, var(--tg-secondary-bg-color, #f8f9fa) 0%, #f1f3f5 100%);
+            border-color: rgba(108, 117, 125, 0.2);
+            opacity: 0.9;
         }
         
         .game-card.pd-used {
-            background: rgba(255, 59, 48, 0.05);
-            border-color: rgba(255, 59, 48, 0.15);
+            background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
+            border-color: rgba(247, 37, 133, 0.25);
         }
         
-        .game-content {
-            padding: 14px;
-        }
-        
-        /* LAYOUT DOS TIMES E PLACAR */
-        .teams-row {
+        /* ===== CONTEÚDO DO JOGO - NOVO LAYOUT ===== */
+        .game-teams {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .team-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 10px;
         }
         
         .team-name {
-            flex: 1;
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 12px;
+            width: 100%;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            transition: var(--transition);
         }
         
         .team-home {
-            color: var(--tg-text-color);
-            text-align: left;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.12) 0%, rgba(67, 97, 238, 0.08) 100%);
+            color: var(--tg-link-color, var(--primary));
+            border: 1px solid rgba(67, 97, 238, 0.2);
         }
         
         .team-away {
-            color: var(--tg-text-color);
-            text-align: right;
+            background: linear-gradient(135deg, rgba(58, 12, 163, 0.12) 0%, rgba(58, 12, 163, 0.08) 100%);
+            color: var(--secondary);
+            border: 1px solid rgba(58, 12, 163, 0.2);
         }
         
-        .vs-separator {
-            color: var(--tg-hint-color);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 0 4px;
-            flex-shrink: 0;
-        }
-        
-        /* INPUTS DE PLACAR */
-        .scores-row {
+        /* ===== PLACAR OFICIAL (GRANDE) ===== */
+        .score-official {
+            position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 15px;
+            min-width: 120px;
         }
         
-        .score-input-group {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex: 1;
-        }
-        
-        .score-label {
-            font-size: 12px;
-            color: var(--tg-hint-color);
-            font-weight: 600;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .score-input-container {
-            flex: 1;
-        }
-        
-        .score-input {
-            width: 100%;
-            height: 44px;
-            border: 1.5px solid var(--light-gray);
+        .vs-label {
+            position: absolute;
+            top: -8px;
+            background: var(--tg-bg-color, white);
+            color: var(--tg-hint-color, var(--gray));
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
             border-radius: 10px;
+            z-index: 2;
+        }
+        
+        .score-input-large {
+            width: 60px;
+            height: 70px;
+            border: 3px solid #e0e7ff;
+            border-radius: 12px;
             text-align: center;
-            font-size: 17px;
-            font-weight: 700;
-            background: var(--tg-bg-color);
-            color: var(--tg-text-color);
+            font-size: 32px;
+            font-weight: 900;
             outline: none;
+            background: var(--tg-secondary-bg-color, #f8faff);
             transition: var(--transition);
+            color: var(--tg-text-color, var(--dark));
+            padding: 0;
             -webkit-appearance: none;
             -moz-appearance: textfield;
-            padding: 0;
         }
         
-        .score-input::-webkit-outer-spin-button,
-        .score-input::-webkit-inner-spin-button {
+        .score-input-large::-webkit-outer-spin-button,
+        .score-input-large::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
         
-        .score-input:focus {
-            border-color: var(--tg-button-color);
-            box-shadow: 0 0 0 2px rgba(36, 129, 204, 0.1);
+        .score-input-large:focus {
+            border-color: var(--tg-button-color, var(--primary));
+            background: var(--tg-bg-color, white);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            transform: scale(1.05);
         }
         
-        .score-input:disabled {
-            background: rgba(142, 142, 147, 0.1);
-            border-color: rgba(142, 142, 147, 0.2);
-            color: var(--tg-hint-color);
-            cursor: not-allowed;
-        }
-        
-        /* ESTRELA PD COMPACTA */
-        .pd-selector {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
-        }
-        
-        .pd-star-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            background: transparent;
-            border: 1.5px solid var(--light-gray);
-            color: var(--tg-text-color);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .pd-star-btn:active {
-            transform: scale(0.98);
-        }
-        
-        .pd-star-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .pd-star-btn.disabled:active {
-            transform: none;
-        }
-        
-        .pd-star-btn.active {
-            background: rgba(255, 215, 0, 0.1);
-            border-color: #ffd700;
-            color: #ffd700;
-        }
-        
-        .pd-star-btn.used {
-            background: rgba(255, 59, 48, 0.1);
-            border-color: var(--danger);
-            color: var(--danger);
-        }
-        
-        .pd-star-btn.blocked {
-            background: rgba(142, 142, 147, 0.1);
-            border-color: var(--gray);
-            color: var(--gray);
-        }
-        
-        .pd-star-icon {
+        .score-input-large::placeholder {
+            color: #d0d7ff;
+            font-weight: 400;
             font-size: 16px;
         }
         
-        .pd-star-text {
-            font-size: 13px;
+        .score-input-large:disabled {
+            background: var(--tg-secondary-bg-color, #f5f5f5);
+            border-color: #e0e0e0;
+            color: var(--tg-hint-color, #999);
+            cursor: not-allowed;
         }
         
-        .pd-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
+        .score-separator {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--tg-text-color, var(--dark));
+            margin: 0 5px;
+        }
+        
+        /* ===== SEÇÃO PD ABAIXO DOS TIMES ===== */
+        .pd-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .pd-label-section {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--tg-hint-color, var(--gray));
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .pd-star-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--tg-secondary-bg-color, #f8f9fa);
+            border: 2px solid transparent;
+            min-width: 180px;
+        }
+        
+        .pd-star-container:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .pd-star-container:active:not(.disabled) {
+            transform: scale(0.95);
+        }
+        
+        .pd-star-container.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .pd-star-container.active {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.08) 100%);
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+        
+        .pd-star-container.used {
+            background: linear-gradient(135deg, rgba(247, 37, 133, 0.15) 0%, rgba(247, 37, 133, 0.08) 100%);
+            border-color: rgba(247, 37, 133, 0.3);
+        }
+        
+        .pd-star-container.blocked {
+            background: var(--tg-secondary-bg-color, #f5f5f5);
+            border-color: #e0e0e0;
+        }
+        
+        .pd-star-large {
+            font-size: 34px;
+            color: #e0e0e0;
+            transition: var(--transition);
+            filter: grayscale(1);
+            margin-right: 12px;
+        }
+        
+        .pd-star-large.active {
+            color: #ffd700;
+            filter: grayscale(0);
+            transform: scale(1.1);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        
+        .pd-star-large.used {
+            color: var(--danger);
+            filter: grayscale(0);
+        }
+        
+        .pd-star-large.blocked {
+            color: #cccccc;
+        }
+        
+        .pd-text {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--tg-text-color, var(--dark));
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .pd-badge-large {
             background: var(--danger);
             color: white;
             font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-weight: 600;
-            z-index: 2;
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-weight: 800;
+            position: absolute;
+            top: -5px;
+            right: -5px;
         }
         
-        /* ===== BOTÕES FIXOS NO FINAL ===== */
+        /* ===== FOOTER BOTÕES FIXOS ===== */
         .footer-buttons {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--tg-bg-color);
-            padding: 12px 16px;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
+            padding: 15px;
+            background: var(--tg-bg-color, white);
+            border-top: 1px solid rgba(0,0,0,0.08);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
             z-index: 1000;
-            padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
         
         .action-btn {
-            flex: 1;
-            height: 48px;
+            padding: 18px 15px;
             border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            height: 52px;
         }
         
         .action-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
+        }
+        
+        .btn-cancel {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
+            color: white;
         }
         
         .btn-send {
-            background: var(--tg-button-color);
-            color: var(--tg-button-text-color);
+            background: linear-gradient(135deg, var(--tg-button-color, var(--primary)) 0%, var(--secondary) 100%);
+            color: var(--tg-button-text-color, white);
         }
         
         .btn-send:disabled {
-            background: rgba(142, 142, 147, 0.3);
-            color: rgba(255, 255, 255, 0.5);
+            background: linear-gradient(135deg, var(--tg-secondary-bg-color, #cccccc) 0%, #aaaaaa 100%);
+            color: var(--tg-hint-color, #999);
             cursor: not-allowed;
             transform: none !important;
         }
         
-        .btn-cancel {
-            background: var(--tg-secondary-bg-color);
-            color: var(--tg-text-color);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
         .btn-icon {
-            font-size: 16px;
+            font-size: 18px;
         }
         
         /* ===== LOADING E ERROS ===== */
         .loading-container {
+            text-align: center;
+            padding: 60px 15px;
+            width: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            background: var(--tg-bg-color);
-            padding: 20px;
+            align-items: center;
+            background: var(--tg-bg-color, white);
         }
         
         .loading-spinner {
             font-size: 48px;
-            color: var(--tg-button-color);
+            color: var(--tg-link-color, var(--primary));
             margin-bottom: 20px;
             animation: spin 1.5s linear infinite;
         }
@@ -547,114 +572,120 @@
         
         .loading-text {
             font-size: 16px;
-            color: var(--tg-hint-color);
-            font-weight: 500;
+            color: var(--tg-hint-color, var(--gray));
+            font-weight: 600;
         }
         
         .error-message {
-            background: rgba(255, 59, 48, 0.1);
-            border: 1px solid rgba(255, 59, 48, 0.2);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin: 16px;
+            background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
             display: none;
             align-items: center;
             gap: 12px;
             animation: shake 0.5s ease-in-out;
+            width: 100%;
         }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-        
-        .error-message.show {
-            display: flex;
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
         
         .error-icon {
-            font-size: 18px;
+            font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
         }
         
         .error-text {
-            font-size: 14px;
-            font-weight: 600;
+            font-weight: 800;
             color: var(--danger);
-            flex: 1;
+            font-size: 14px;
         }
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
-            .main-content {
-                padding: 12px 12px 80px;
+            .main-card {
+                padding: 14px 10px 75px;
             }
             
-            .telegram-header {
-                padding: 14px 12px 10px;
+            .rodada-number {
+                font-size: 24px;
             }
             
-            .header-title {
-                font-size: 18px;
-            }
-            
-            .game-content {
-                padding: 12px;
+            .score-input-large {
+                width: 50px;
+                height: 60px;
+                font-size: 28px;
             }
             
             .team-name {
-                font-size: 14px;
+                font-size: 15px;
+                min-height: 45px;
+                padding: 8px 12px;
             }
             
-            .score-input {
-                height: 42px;
-                font-size: 16px;
+            .pd-star-container {
+                padding: 10px 20px;
+                min-width: 160px;
             }
             
-            .pd-star-btn {
-                padding: 7px 12px;
+            .pd-star-large {
+                font-size: 30px;
+            }
+            
+            .action-btn {
+                padding: 16px 12px;
+                font-size: 15px;
+                height: 50px;
             }
         }
         
         @media (max-width: 320px) {
-            .status-item {
-                padding: 8px 4px;
-                min-height: 52px;
+            .game-card {
+                padding: 15px;
             }
             
-            .status-value {
-                font-size: 12px;
+            .score-input-large {
+                width: 45px;
+                height: 55px;
+                font-size: 24px;
             }
             
             .team-name {
-                font-size: 13px;
+                font-size: 14px;
+                min-height: 42px;
+                padding: 7px 10px;
             }
             
-            .score-input {
-                height: 40px;
-                font-size: 15px;
+            .pd-star-container {
+                min-width: 140px;
+            }
+            
+            .pd-star-large {
+                font-size: 26px;
+                margin-right: 8px;
+            }
+            
+            .pd-text {
+                font-size: 12px;
             }
         }
         
-        /* ===== AJUSTES PARA TELAS MAIORES ===== */
-        @media (min-width: 768px) {
-            .app-container {
-                max-width: 500px;
-                margin: 0 auto;
-                box-shadow: var(--card-shadow);
-                min-height: 100vh;
-            }
-            
-            .footer-buttons {
-                max-width: 500px;
-                margin: 0 auto;
-                left: 50%;
-                transform: translateX(-50%);
-                border-radius: 12px 12px 0 0;
-                box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.1);
-            }
+        /* ===== CORREÇÃO PARA ANDROID ===== */
+        html, body {
+            width: 100% !important;
+            height: 100% !important;
+            overflow-x: hidden !important;
+        }
+        
+        .app-container {
+            position: relative;
+            min-height: 100vh;
         }
         
         /* ===== UTILITÁRIOS ===== */
@@ -662,34 +693,18 @@
             display: none !important;
         }
         
-        .text-center {
-            text-align: center;
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
         }
         
-        .text-muted {
-            color: var(--tg-hint-color);
-        }
-        
-        .mb-2 {
-            margin-bottom: 8px;
-        }
-        
-        .mb-3 {
-            margin-bottom: 12px;
-        }
-        
-        .mt-2 {
-            margin-top: 8px;
-        }
-        
-        .mt-3 {
-            margin-top: 12px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- TELA DE LOADING -->
         <div id="loading" class="loading-container">
             <div class="loading-spinner">
                 <i class="fas fa-futbol"></i>
@@ -697,66 +712,68 @@
             <div class="loading-text">Carregando rodada...</div>
         </div>
         
-        <!-- CONTEÚDO PRINCIPAL (inicialmente oculto) -->
         <div id="content" class="hidden">
-            <!-- HEADER FIXO -->
-            <div class="telegram-header">
-                <div class="header-title">
-                    <i class="fas fa-trophy"></i>
-                    Bolão do Telegram
+            <div class="main-card">
+                <!-- HEADER -->
+                <div class="header-section">
+                    <div class="rodada-number">
+                        <i class="fas fa-trophy rodada-icon"></i>
+                        Rodada <span id="rodada-num">--</span>
+                    </div>
+                    <div class="countdown-container">
+                        <i class="fas fa-clock countdown-icon"></i>
+                        <span>Fechamento em:</span>
+                        <span id="countdown-timer" class="countdown-timer">00:00:00</span>
+                    </div>
                 </div>
-                <div class="header-subtitle">
-                    <span id="header-info">Carregando...</span>
-                    <span class="rodada-badge" id="rodada-badge">Rodada --</span>
+                
+                <!-- MENSAGEM DE ERRO -->
+                <div id="error-box" class="error-message">
+                    <i class="fas fa-exclamation-triangle error-icon"></i>
+                    <div class="error-text" id="error-text"></div>
                 </div>
-            </div>
-            
-            <!-- MENSAGEM DE ERRO -->
-            <div id="error-box" class="error-message">
-                <i class="fas fa-exclamation-triangle error-icon"></i>
-                <div class="error-text" id="error-text"></div>
-            </div>
-            
-            <!-- CONTEÚDO PRINCIPAL -->
-            <div class="main-content">
-                <!-- BARRA DE STATUS -->
-                <div class="status-bar">
-                    <div class="status-item time">
+                
+                <!-- STATUS INFO -->
+                <div class="status-section">
+                    <div class="status-card horario">
                         <div class="status-icon">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="status-label">Horário</div>
-                        <div class="status-value" id="txt-horario">--:--</div>
-                        <div id="time-badge" class="status-badge" style="display: none;"></div>
+                        <div class="status-title">Horário</div>
+                        <div class="status-content" id="txt-horario">
+                            Carregando...
+                        </div>
                     </div>
                     
-                    <div class="status-item trunfo">
+                    <div class="status-card trunfo">
                         <div class="status-icon">
                             <i class="fas fa-club"></i>
                         </div>
-                        <div class="status-label">Trunfo</div>
-                        <div class="status-value" id="txt-trunfo">--</div>
-                        <div id="trunfo-badge" class="status-badge inactive" style="display: none;"></div>
+                        <div class="status-title">Trunfo</div>
+                        <div class="status-content" id="txt-trunfo">
+                            Verificando...
+                        </div>
                     </div>
                     
-                    <div class="status-item pd">
+                    <div class="status-card dobrada">
                         <div class="status-icon">
                             <i class="fas fa-star"></i>
                         </div>
-                        <div class="status-label">PD</div>
-                        <div class="status-value" id="txt-dobrada">--</div>
-                        <div id="pd-badge" class="status-badge inactive" style="display: none;"></div>
+                        <div class="status-title">PD</div>
+                        <div class="status-content" id="txt-dobrada">
+                            Verificando...
+                        </div>
                     </div>
                 </div>
                 
                 <!-- ALERTA DE PD JÁ USADA -->
-                <div id="pd-alert" class="pd-alert">
-                    <i class="fas fa-exclamation-circle pd-alert-icon"></i>
-                    <div class="pd-alert-content">
-                        <div class="pd-alert-title">⭐ PD JÁ UTILIZADA</div>
-                        <div class="pd-alert-text">
+                <div id="pd-used-alert" class="pd-used-alert hidden">
+                    <i class="fas fa-exclamation-circle pd-used-icon"></i>
+                    <div class="pd-used-text">
+                        <div class="pd-used-title">⭐ PD JÁ UTILIZADA</div>
+                        <div class="pd-used-info">
                             Você já usou sua PD nesta rodada no jogo: 
-                            <span id="pd-game-info" class="pd-game-info"></span>
+                            <span id="pd-game-info" class="pd-used-game"></span>
                         </div>
                     </div>
                 </div>
@@ -771,7 +788,7 @@
                 </div>
             </div>
             
-            <!-- BOTÕES FIXOS -->
+            <!-- BOTÕES DE AÇÃO (FIXOS) -->
             <div class="footer-buttons">
                 <button class="action-btn btn-send" id="btn-confirmar" disabled>
                     <i class="fas fa-paper-plane btn-icon"></i>
@@ -800,83 +817,98 @@
         let pdJaUsouAnteriormente = false;
         let ehEdicao = false;
         let pdPodeTrocar = false;
-        let telegramInitialized = false;
-        let expandCalled = false; // Controle para expandir apenas uma vez
+        let countdownInterval = null;
+        let webAppExpanded = false; // Controle para expand() único
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP =====
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - SEGURA =====
         function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP (MODO SEGURO)");
             
-            if (telegramInitialized) {
-                console.log("⚠️ Telegram já inicializado, ignorando...");
-                return;
-            }
+            // Configuração inicial da viewport
+            document.documentElement.style.height = '100%';
+            document.body.style.height = '100%';
             
-            // Verificar se o Telegram Web App está disponível
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
-                telegramInitialized = true;
                 
-                // Configurar cores para o tema do Telegram
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
+                // PRIMEIRO: Configurar o tema do Telegram
+                aplicarTemaTelegram();
                 
-                // EXPANSÃO - CHAMADA APENAS UMA VEZ
-                if (!expandCalled) {
-                    try {
-                        console.log("📱 Expandindo para tela cheia...");
-                        tg.expand();
-                        expandCalled = true;
-                        
-                        // Timeout para garantir que a expansão foi aplicada
-                        setTimeout(() => {
-                            console.log("✅ Expand finalizado");
-                        }, 100);
-                        
-                    } catch (error) {
-                        console.log("⚠️ Erro ao expandir:", error);
-                        expandCalled = true; // Marcar como chamado mesmo com erro
-                    }
-                }
-                
-                // Indicar que o app está pronto
+                // SEGUNDO: Ready() sem expand() ainda
                 tg.ready();
-                console.log("✅ Telegram Web App inicializado com sucesso");
                 
-                // Adicionar listener para back button se necessário
-                tg.BackButton.onClick(() => {
-                    handleSair();
-                });
+                console.log("✅ Web App inicializado (sem expand ainda)");
+                
+                // TERCEIRO: Iniciar carregamento de dados
+                setTimeout(() => {
+                    carregarDadosRodada();
+                }, 300);
                 
             } else {
                 console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
-                // Iniciar carregamento mesmo sem Telegram
+                // Modo desenvolvimento: iniciar sem Telegram
                 setTimeout(() => {
                     carregarDadosRodada();
                 }, 300);
             }
         }
 
-        // ===== INICIALIZAÇÃO DA APLICAÇÃO =====
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("📄 DOM carregado, iniciando aplicação...");
+        // ===== APLICAR TEMA DO TELEGRAM =====
+        function aplicarTemaTelegram() {
+            if (!tg) return;
             
-            // Primeiro tentar inicializar o Telegram Web App
-            initTelegramWebApp();
-            
-            // Se o Telegram não inicializou em 500ms, tentar novamente
-            setTimeout(() => {
-                if (!telegramInitialized && window.Telegram && window.Telegram.WebApp) {
-                    console.log("🔄 Tentando inicialização tardia do Telegram...");
-                    initTelegramWebApp();
+            try {
+                const themeParams = tg.themeParams;
+                
+                // Aplicar cores do tema nas variáveis CSS
+                if (themeParams.bg_color) {
+                    document.documentElement.style.setProperty('--tg-bg-color', themeParams.bg_color);
+                }
+                if (themeParams.text_color) {
+                    document.documentElement.style.setProperty('--tg-text-color', themeParams.text_color);
+                }
+                if (themeParams.hint_color) {
+                    document.documentElement.style.setProperty('--tg-hint-color', themeParams.hint_color);
+                }
+                if (themeParams.link_color) {
+                    document.documentElement.style.setProperty('--tg-link-color', themeParams.link_color);
+                }
+                if (themeParams.button_color) {
+                    document.documentElement.style.setProperty('--tg-button-color', themeParams.button_color);
+                }
+                if (themeParams.button_text_color) {
+                    document.documentElement.style.setProperty('--tg-button-text-color', themeParams.button_text_color);
+                }
+                if (themeParams.secondary_bg_color) {
+                    document.documentElement.style.setProperty('--tg-secondary-bg-color', themeParams.secondary_bg_color);
                 }
                 
-                // Iniciar carregamento dos dados mesmo sem Telegram
-                if (!dadosOriginais.rodada) {
-                    carregarDadosRodada();
-                }
-            }, 500);
-        });
+                console.log("🎨 Tema do Telegram aplicado");
+                
+            } catch (error) {
+                console.log("⚠️ Erro ao aplicar tema:", error);
+            }
+        }
+
+        // ===== EXPANSÃO SEGURA (UMA VEZ) =====
+        function expandWebAppSeguramente() {
+            if (!tg || webAppExpanded) {
+                return;
+            }
+            
+            try {
+                console.log("📱 Expandindo WebApp (chamada única)");
+                tg.expand();
+                webAppExpanded = true;
+                
+                // Configurar cores da interface
+                tg.setHeaderColor('secondary_bg_color');
+                tg.setBackgroundColor('bg_color');
+                
+            } catch (error) {
+                console.log("⚠️ Erro ao expandir:", error);
+            }
+        }
 
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
@@ -924,30 +956,38 @@
             const hora = dt.getHours().toString().padStart(2, '0');
             const minutos = dt.getMinutes().toString().padStart(2, '0');
             
-            return `${dia}/${mes} ${hora}:${minutos}`;
+            return `${dia}/${mes} ${hora}:${minutos}h`;
         }
 
-        function calcularTempoRestante(dataLimite) {
-            if (!dataLimite) return null;
-            
-            const agora = new Date();
-            const limite = parseDataBrasilia(dataLimite);
-            
-            if (!limite) return null;
-            
-            const diffMs = limite - agora;
-            if (diffMs <= 0) return null;
-            
-            const horas = Math.floor(diffMs / (1000 * 60 * 60));
-            const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-            
-            if (horas > 0) {
-                return `${horas}h ${minutos}m`;
-            } else if (minutos > 0) {
-                return `${minutos} min`;
-            } else {
-                return '<1 min';
+        // ===== CONTADOR REGRESSIVO =====
+        function iniciarContadorRegressivo() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
             }
+            
+            if (!horarioLimite) return;
+            
+            function atualizarContador() {
+                const agora = new Date();
+                const diffMs = horarioLimite - agora;
+                
+                if (diffMs <= 0) {
+                    document.getElementById('countdown-timer').textContent = 'ENCERRADO';
+                    clearInterval(countdownInterval);
+                    verificarHorarioLimite();
+                    return;
+                }
+                
+                const horas = Math.floor(diffMs / (1000 * 60 * 60));
+                const minutos = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diffMs % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown-timer').textContent = 
+                    `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            }
+            
+            atualizarContador();
+            countdownInterval = setInterval(atualizarContador, 1000);
         }
 
         // ===== CARREGAMENTO DE DADOS =====
@@ -955,7 +995,6 @@
             try {
                 console.log("🔄 Iniciando carregamento de dados...");
                 
-                // Extrair dados da URL
                 const urlParams = new URLSearchParams(window.location.search);
                 let dadosBase64 = urlParams.get('data');
                 
@@ -973,13 +1012,13 @@
                 
                 console.log("✅ Dados Base64 encontrados");
                 
-                // Decodificar dados
                 try {
                     let dadosJson;
                     
                     try {
                         dadosJson = atob(dadosBase64);
                     } catch (e1) {
+                        console.log("⚠️ Tentando com decodeURIComponent...");
                         dadosBase64 = decodeURIComponent(dadosBase64);
                         dadosJson = atob(dadosBase64);
                     }
@@ -987,82 +1026,102 @@
                     dadosOriginais = JSON.parse(dadosJson);
                     console.log("📊 Dados recebidos com sucesso!");
                     
-                    // Processar dados
-                    processarDadosRecebidos();
+                    ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
+                    
+                    // AGORA expandir o WebApp (após carregar dados)
+                    setTimeout(() => {
+                        expandWebAppSeguramente();
+                    }, 100);
+                    
+                    atualizarInterface();
                     
                 } catch (decodeError) {
                     console.error("❌ Erro ao decodificar dados:", decodeError);
-                    throw new Error("Falha ao decodificar dados");
+                    
+                    try {
+                        dadosBase64 = dadosBase64.trim().replace(/\s/g, '');
+                        
+                        while (dadosBase64.length % 4 !== 0) {
+                            dadosBase64 += '=';
+                        }
+                        
+                        const dadosJson = atob(dadosBase64);
+                        dadosOriginais = JSON.parse(dadosJson);
+                        
+                        console.log("✅ Dados decodificados com abordagem alternativa!");
+                        
+                        ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
+                        
+                        setTimeout(() => {
+                            expandWebAppSeguramente();
+                        }, 100);
+                        
+                        atualizarInterface();
+                        
+                    } catch (finalError) {
+                        console.error("❌ Falha total ao decodificar:", finalError);
+                        throw new Error("Falha ao decodificar dados: " + finalError.message);
+                    }
                 }
                 
             } catch (e) {
                 console.error("❌ Erro crítico ao carregar dados", e);
-                mostrarErro("Erro ao carregar dados: " + e.message);
+                
+                let errorMsg = "Erro ao carregar dados da rodada: " + e.message;
+                errorMsg += "\n\nURL: " + window.location.href.substring(0, 100) + "...";
                 
                 setTimeout(() => {
                     document.getElementById('loading').classList.add('hidden');
                     document.getElementById('content').classList.remove('hidden');
-                }, 500);
+                    
+                    const errorBox = document.getElementById('error-box');
+                    const errorText = document.getElementById('error-text');
+                    
+                    errorMsg = errorMsg.replace(/\n/g, '<br>');
+                    errorText.innerHTML = errorMsg;
+                    errorBox.style.display = 'flex';
+                    
+                    const btnSair = document.getElementById('btn-sair');
+                    btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar ao Bot';
+                    btnSair.onclick = () => {
+                        if (window.Telegram && window.Telegram.WebApp) {
+                            window.Telegram.WebApp.close();
+                        }
+                    };
+                    
+                }, 1000);
             }
-        }
-
-        function processarDadosRecebidos() {
-            ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
-            
-            // Atualizar interface
-            atualizarInterface();
-            
-            // Mostrar conteúdo
-            setTimeout(() => {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('content').classList.remove('hidden');
-                verificarEAtualizar();
-            }, 300);
         }
 
         // ===== ATUALIZAÇÃO DA INTERFACE =====
         function atualizarInterface() {
-            // Atualizar header
-            document.getElementById('rodada-badge').textContent = `Rodada ${dadosOriginais.rodada.numero}`;
-            document.getElementById('header-info').textContent = `Palpite até ${formatarDataHora(dadosOriginais.rodada.horario_fechamento).split(' ')[1]}`;
+            document.getElementById('rodada-num').textContent = dadosOriginais.rodada.numero;
             
             // Configurar horário limite
+            const horarioElem = document.getElementById('txt-horario');
             const horarioStr = formatarDataHora(dadosOriginais.rodada.horario_fechamento);
-            document.getElementById('txt-horario').textContent = horarioStr;
-            
-            const tempoRestante = calcularTempoRestante(dadosOriginais.rodada.horario_fechamento);
-            const tempoBadge = document.getElementById('time-badge');
-            
-            if (tempoRestante) {
-                tempoBadge.textContent = tempoRestante;
-                tempoBadge.className = 'status-badge active';
-                tempoBadge.style.display = 'inline-block';
-            } else {
-                tempoBadge.style.display = 'none';
-            }
+            horarioElem.textContent = `${horarioStr}`;
             
             horarioLimite = parseDataBrasilia(dadosOriginais.rodada.horario_fechamento);
             
+            // Iniciar contador regressivo
+            if (horarioLimite) {
+                iniciarContadorRegressivo();
+            }
+            
             // Configurar trunfo
             const trunfoElem = document.getElementById('txt-trunfo');
-            const trunfoBadge = document.getElementById('trunfo-badge');
             
             if (dadosOriginais.trunfo) {
-                trunfoElem.textContent = "Disponível";
-                trunfoBadge.className = 'status-badge active';
-                trunfoBadge.textContent = 'ATIVO';
-                trunfoBadge.style.display = 'inline-block';
+                trunfoElem.textContent = "Tem trunfo!";
+                trunfoElem.style.color = "var(--success)";
+                trunfoElem.style.fontWeight = "800";
             } else {
-                trunfoElem.textContent = "Indisponível";
-                trunfoBadge.className = 'status-badge inactive';
-                trunfoBadge.textContent = 'INATIVO';
-                trunfoBadge.style.display = 'inline-block';
+                trunfoElem.textContent = "Sem trunfo";
             }
             
             // Configurar PD
             const dobradaElem = document.getElementById('txt-dobrada');
-            const pdBadge = document.getElementById('pd-badge');
-            const pdAlert = document.getElementById('pd-alert');
             
             pdJaUsada = dadosOriginais.pd_ja_usada || false;
             pdBloqueadaAdm = dadosOriginais.pd_bloqueada_adm || false;
@@ -1070,45 +1129,38 @@
             ehEdicao = dadosOriginais.eh_edicao || false;
             pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
             
-            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, EhEdicao=${ehEdicao}`);
+            console.log(`🔒 PD Status: JaUsada=${pdJaUsada}, BloqueadaADM=${pdBloqueadaAdm}, JaUsouAnteriormente=${pdJaUsouAnteriormente}, EhEdicao=${ehEdicao}, PodeTrocar=${pdPodeTrocar}`);
             
             // Configurar pdSelecionado inicial
             if (ehEdicao) {
                 pdSelecionado = dadosOriginais.pd_jogo_id;
+                console.log(`🔄 Modo edição: pdSelecionado inicial = ${pdSelecionado}`);
             } else if (pdJaUsada) {
                 pdSelecionado = dadosOriginais.pd_jogo_id;
+                console.log(`🔒 PD já usada: pdSelecionado = ${pdSelecionado}`);
             } else {
                 pdSelecionado = null;
+                console.log(`🆕 Modo normal: pdSelecionado inicial = null`);
             }
             
             // Texto do status da PD
             if (pdJaUsouAnteriormente) {
-                dobradaElem.textContent = "Já usou";
-                pdBadge.className = 'status-badge used';
-                pdBadge.textContent = 'BLOQUEADO';
-                pdBadge.style.display = 'inline-block';
+                dobradaElem.textContent = "Já usou PD";
+                dobradaElem.style.color = "var(--danger)";
                 mostrarAlertaPDUsada();
             } else if (pdBloqueadaAdm) {
-                dobradaElem.textContent = "Atribuída";
-                pdBadge.className = 'status-badge blocked';
-                pdBadge.textContent = 'BLOQUEADA';
-                pdBadge.style.display = 'inline-block';
+                dobradaElem.textContent = "PD atribuída";
+                dobradaElem.style.color = "var(--warning)";
             } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
-                dobradaElem.textContent = "Editável";
-                pdBadge.className = 'status-badge active';
-                pdBadge.textContent = 'EDITÁVEL';
-                pdBadge.style.display = 'inline-block';
+                dobradaElem.textContent = "PD editável";
+                dobradaElem.style.color = "var(--success)";
             } else if (pdJaUsada) {
-                dobradaElem.textContent = "Usada";
-                pdBadge.className = 'status-badge used';
-                pdBadge.textContent = 'UTILIZADA';
-                pdBadge.style.display = 'inline-block';
+                dobradaElem.textContent = "PD usada";
+                dobradaElem.style.color = "var(--danger)";
                 mostrarAlertaPDUsada();
             } else {
                 dobradaElem.textContent = "Disponível";
-                pdBadge.className = 'status-badge active';
-                pdBadge.textContent = 'DISPONÍVEL';
-                pdBadge.style.display = 'inline-block';
+                dobradaElem.style.color = "var(--success)";
             }
             
             // Inicializar array de palpites
@@ -1132,8 +1184,8 @@
                         
                         palpites.push(novoPalpite);
                         
-                        // Se este palpite tinha PD, garantir que pdSelecionado está correto
                         if (palpite.pd && pdSelecionado !== jogoId) {
+                            console.log(`⚠️ Ajustando: palpite ${jogoId} tem PD=true, mas pdSelecionado=${pdSelecionado}`);
                             pdSelecionado = jogoId;
                         }
                     }
@@ -1141,15 +1193,22 @@
             }
             
             console.log(`📊 Palpites carregados: ${palpites.length}`);
-            console.log(`⭐ PD selecionada: ${pdSelecionado}`);
+            console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
             
-            // Renderizar jogos
+            // Renderizar jogos e verificar
             renderizarJogos();
             verificarHorarioLimite();
+            
+            // Mostrar conteúdo
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+                verificarEAtualizar();
+            }, 300);
         }
 
         function mostrarAlertaPDUsada() {
-            const alerta = document.getElementById('pd-alert');
+            const alerta = document.getElementById('pd-used-alert');
             const infoElem = document.getElementById('pd-game-info');
             
             if (dadosOriginais.pd_jogo_info) {
@@ -1164,19 +1223,21 @@
                 }
             }
             
-            alerta.classList.add('show');
+            alerta.classList.remove('hidden');
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS =====
+        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
             
             if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--tg-hint-color);">
-                        <i class="fas fa-exclamation-circle" style="font-size: 40px; margin-bottom: 12px; opacity: 0.5;"></i>
-                        <p style="font-size: 14px; font-weight: 500;">Nenhum jogo disponível para palpites.</p>
+                    <div class="game-card">
+                        <div style="text-align: center; padding: 30px 20px; color: var(--tg-hint-color);">
+                            <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 15px; color: var(--warning);"></i>
+                            <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
+                        </div>
                     </div>
                 `;
                 return;
@@ -1197,130 +1258,178 @@
                 const tinhaPDOriginal = (pdJaUsada && isOriginalPD);
                 
                 let cardClass = 'game-card';
-                let starClass = 'pd-star-btn';
-                let starText = 'SELECIONAR PD';
+                let pdContainerClass = 'pd-star-container';
+                let pdStarClass = 'pd-star-large';
+                let pdText = 'SELECIONAR';
                 let isClickable = true;
                 let isDisabled = false;
+                let showBadge = false;
+                let badgeText = '';
                 
-                // LÓGICA DE ESTADO DA ESTRELA
-                if (pdBloqueadaAdm || pdJaUsouAnteriormente) {
-                    starClass += ' blocked';
-                    starText = pdJaUsouAnteriormente ? 'BLOQUEADO' : 'BLOQUEADA';
+                // ===== LÓGICA DE ESTADO DA ESTRELA =====
+                
+                // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
+                if (pdBloqueadaAdm) {
+                    cardClass += ' pd-blocked';
+                    pdContainerClass += ' blocked';
+                    pdStarClass += ' blocked';
+                    pdText = 'BLOQUEADA';
                     isClickable = false;
                     isDisabled = true;
                 }
+                else if (pdJaUsouAnteriormente) {
+                    cardClass += ' pd-blocked';
+                    pdContainerClass += ' blocked';
+                    pdStarClass += ' blocked';
+                    pdText = 'BLOQUEADO';
+                    isClickable = false;
+                    isDisabled = true;
+                }
+                // 2. HORÁRIO EXPIRADO (sem trunfo)
                 else if (horarioExpirado) {
                     isClickable = false;
                     if (!isDisabled) {
-                        starClass += ' blocked';
-                        starText = 'EXPIRADO';
+                        pdContainerClass += ' blocked';
+                        pdStarClass += ' blocked';
+                        pdText = 'EXPIRADO';
                     }
                 }
+                // 3. MODO NORMAL (NÃO É EDIÇÃO)
                 else if (!ehEdicao) {
                     if (pdJaUsada) {
                         if (isOriginalPD) {
                             cardClass += ' pd-used';
-                            starClass += ' used';
-                            starText = 'UTILIZADA';
+                            pdContainerClass += ' used';
+                            pdStarClass += ' used';
+                            pdText = 'UTILIZADA';
                             isClickable = false;
                             isDisabled = true;
+                            showBadge = true;
+                            badgeText = 'USADA';
                         } else {
-                            starClass += ' blocked';
-                            starText = 'INDISPONÍVEL';
+                            pdContainerClass += ' blocked';
+                            pdStarClass += ' blocked';
+                            pdText = 'INDISPONÍVEL';
                             isClickable = false;
                             isDisabled = true;
                         }
                     } else {
                         if (isPDAtual) {
-                            starClass += ' active';
-                            starText = 'SELECIONADA';
+                            pdContainerClass += ' active';
+                            pdStarClass += ' active';
+                            pdText = 'SELECIONADA';
                         }
                     }
                 }
+                // 4. MODO EDIÇÃO
                 else {
                     if (pdPodeTrocar) {
                         if (isPDAtual) {
-                            starClass += ' active';
-                            starText = 'SELECIONADA';
+                            pdContainerClass += ' active';
+                            pdStarClass += ' active';
+                            pdText = 'SELECIONADA';
+                            
+                            if (tinhaPDOriginal) {
+                                showBadge = true;
+                                badgeText = 'ORIGINAL';
+                            }
                         }
                     } else {
                         if (tinhaPDOriginal) {
                             cardClass += ' pd-used';
-                            starClass += ' used';
-                            starText = 'UTILIZADA';
+                            pdContainerClass += ' used';
+                            pdStarClass += ' used';
+                            pdText = 'UTILIZADA';
                             isClickable = false;
                             isDisabled = true;
+                            showBadge = true;
+                            badgeText = 'USADA';
                         } else {
-                            starClass += ' blocked';
-                            starText = 'INDISPONÍVEL';
+                            pdContainerClass += ' blocked';
+                            pdStarClass += ' blocked';
+                            pdText = 'INDISPONÍVEL';
                             isClickable = false;
                             isDisabled = true;
                         }
                     }
                 }
                 
-                if (isPDAtual) {
-                    cardClass += ' active';
-                }
-                
-                if (isDisabled) {
-                    starClass += ' disabled';
-                }
-                
+                // Criar o elemento do jogo
                 const div = document.createElement('div');
                 div.className = cardClass;
+                div.setAttribute('data-jogo-id', jogo.id);
                 
                 div.innerHTML = `
-                    <div class="game-content">
-                        <!-- TIMES -->
-                        <div class="teams-row">
+                    <!-- TIMES E PLACAR -->
+                    <div class="game-teams">
+                        <!-- TIME MANDANTE -->
+                        <div class="team-container">
                             <div class="team-name team-home" title="${jogo.mandante}">
                                 ${jogo.mandante}
                             </div>
-                            <div class="vs-separator">vs</div>
+                        </div>
+                        
+                        <!-- PLACAR OFICIAL -->
+                        <div class="score-official">
+                            <div class="vs-label">VS</div>
+                            <input type="number" min="0" max="99" 
+                                   class="score-input-large home-score" 
+                                   value="${palpiteAtual.mandante || ''}"
+                                   placeholder="0"
+                                   data-jogo-id="${jogo.id}"
+                                   data-time="mandante"
+                                   ${horarioExpirado ? 'disabled' : ''}>
+                            
+                            <span class="score-separator">×</span>
+                            
+                            <input type="number" min="0" max="99" 
+                                   class="score-input-large away-score" 
+                                   value="${palpiteAtual.visitante || ''}"
+                                   placeholder="0"
+                                   data-jogo-id="${jogo.id}"
+                                   data-time="visitante"
+                                   ${horarioExpirado ? 'disabled' : ''}>
+                        </div>
+                        
+                        <!-- TIME VISITANTE -->
+                        <div class="team-container">
                             <div class="team-name team-away" title="${jogo.visitante}">
                                 ${jogo.visitante}
                             </div>
                         </div>
-                        
-                        <!-- PLACARES -->
-                        <div class="scores-row">
-                            <div class="score-input-group">
-                                <div class="score-label">M</div>
-                                <div class="score-input-container">
-                                    <input type="number" min="0" max="99" class="score-input" 
-                                           value="${palpiteAtual.mandante}" 
-                                           oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                           placeholder="0"
-                                           ${horarioExpirado ? 'disabled' : ''}>
-                                </div>
+                    </div>
+                    
+                    <!-- SEÇÃO PD -->
+                    <div class="pd-section">
+                        <div class="pd-label-section">PONTUAÇÃO DOBRADA</div>
+                        <div class="${pdContainerClass} ${isDisabled ? 'disabled' : ''}" 
+                             onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                            <div class="${pdStarClass}">
+                                ⭐
+                                ${showBadge ? `<div class="pd-badge-large">${badgeText}</div>` : ''}
                             </div>
-                            
-                            <div class="score-input-group">
-                                <div class="score-label">V</div>
-                                <div class="score-input-container">
-                                    <input type="number" min="0" max="99" class="score-input" 
-                                           value="${palpiteAtual.visitante}" 
-                                           oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                           placeholder="0"
-                                           ${horarioExpirado ? 'disabled' : ''}>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- BOTÃO PD -->
-                        <div class="pd-selector">
-                            <button class="${starClass}" 
-                                    onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}"
-                                    ${isDisabled ? 'disabled' : ''}>
-                                <i class="fas fa-star pd-star-icon"></i>
-                                <span class="pd-star-text">${starText}</span>
-                            </button>
+                            <div class="pd-text">${pdText}</div>
                         </div>
                     </div>
                 `;
                 
                 container.appendChild(div);
+                
+                // Adicionar eventos aos inputs
+                const homeInput = div.querySelector('.home-score');
+                const awayInput = div.querySelector('.away-score');
+                
+                if (homeInput) {
+                    homeInput.addEventListener('input', function() {
+                        salvarPlacar(jogo.id, 'mandante', this.value);
+                    });
+                }
+                
+                if (awayInput) {
+                    awayInput.addEventListener('input', function() {
+                        salvarPlacar(jogo.id, 'visitante', this.value);
+                    });
+                }
             });
         }
 
@@ -1349,11 +1458,10 @@
             const isOriginalPD = (pdOriginalId == jogoId);
             const isPDAtual = (pdSelecionado == jogoId);
             
-            // CASO 1: Clicou na mesma estrela que já está selecionada
+            // CASO 1: Clicou na mesma PD
             if (isPDAtual) {
-                // Só permite remover se estiver em modo edição E puder trocar
                 if (ehEdicao && pdPodeTrocar) {
-                    if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
+                    if (confirm("⚠️ Remover pontuação dobrada deste jogo?\n\nSe remover, poderá selecionar outra estrela depois.")) {
                         pdSelecionado = null;
                         palpites.forEach(p => {
                             if (p.jogo_id == jogoId) {
@@ -1363,7 +1471,6 @@
                         console.log("✅ PD removida do jogo:", jogoId);
                     }
                 } else if (!ehEdicao && !pdJaUsada) {
-                    // Modo normal, PD não foi usada ainda
                     if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
                         pdSelecionado = null;
                         palpites.forEach(p => {
@@ -1374,20 +1481,18 @@
                         console.log("✅ PD removida (modo normal)");
                     }
                 } else {
-                    mostrarErro("❌ Não é possível remover a PD!");
+                    mostrarErro("❌ Não é possível remover a PD nesta situação!");
                 }
             }
-            // CASO 2: Clicou em uma estrela diferente
+            // CASO 2: Clicou em uma PD diferente
             else {
-                // 2A: Modo normal (não é edição) e PD já foi usada
                 if (!ehEdicao && pdJaUsada) {
                     mostrarErro("❌ Você já utilizou sua PD nesta rodada!");
                     return;
                 }
                 
-                // 2B: Modo edição mas não pode trocar PD
                 if (ehEdicao && !pdPodeTrocar) {
-                    mostrarErro("❌ Não é possível trocar a PD!");
+                    mostrarErro("❌ Não é possível trocar a PD nesta situação!");
                     return;
                 }
                 
@@ -1396,23 +1501,23 @@
                     const jogoAtual = dadosOriginais.jogos.find(j => j.id == pdSelecionado);
                     const jogoNovo = dadosOriginais.jogos.find(j => j.id == jogoId);
                     
-                    let mensagem = "⚠️ Transferir pontuação dobrada para este jogo?";
-                    if (jogoAtual && jogoNovo) {
-                        mensagem += `\n\nDe: ${jogoAtual.mandante} x ${jogoAtual.visitante}\nPara: ${jogoNovo.mandante} x ${jogoNovo.visitante}`;
+                    let mensagem = "⚠️ Transferir pontuação dobrada para este jogo?\n\n";
+                    if (jogoAtual) {
+                        mensagem += `De: ${jogoAtual.mandante} x ${jogoAtual.visitante}\n`;
+                    }
+                    if (jogoNovo) {
+                        mensagem += `Para: ${jogoNovo.mandante} x ${jogoNovo.visitante}`;
                     }
                     
                     if (confirm(mensagem)) {
-                        // Limpar PD anterior
                         palpites.forEach(p => {
                             if (p.jogo_id == pdSelecionado) {
                                 p.pd = false;
                             }
                         });
                         
-                        // Definir nova PD
                         pdSelecionado = jogoId;
                         
-                        // Adicionar PD ao novo jogo
                         let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
                         if (palpiteIndex === -1) {
                             palpites.push({
@@ -1432,7 +1537,6 @@
                 else {
                     pdSelecionado = jogoId;
                     
-                    // Adicionar PD ao jogo
                     let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
                     if (palpiteIndex === -1) {
                         palpites.push({
@@ -1447,7 +1551,6 @@
                 }
             }
             
-            // Atualizar interface
             renderizarJogos();
             verificarEAtualizar();
         }
@@ -1457,12 +1560,10 @@
             valor = valor.slice(0, 2);
             const valorNum = valor === '' ? '' : parseInt(valor) || 0;
             
-            // Validar range
             if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
                 valor = '';
             }
             
-            // Encontrar ou criar palpite
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
             
             if (palpiteIndex === -1) {
@@ -1475,18 +1576,10 @@
                 palpiteIndex = palpites.length - 1;
             }
             
-            // Atualizar placar
             palpites[palpiteIndex][time] = valorNum;
             
-            // Se este jogo tem a PD selecionada, manter a PD
             if (pdSelecionado === jogoId) {
                 palpites[palpiteIndex].pd = true;
-            }
-            
-            // Atualizar visualmente
-            const input = document.querySelector(`.score-input[oninput*="${jogoId}"][oninput*="${time}"]`);
-            if (input) {
-                input.value = valor;
             }
             
             verificarEAtualizar();
@@ -1502,6 +1595,7 @@
                 }
             }
             
+            console.log(`📋 Palpites preenchidos: ${preenchidos}/${totalJogos}`);
             return preenchidos === totalJogos;
         }
 
@@ -1516,6 +1610,14 @@
                 const btnConfirmar = document.getElementById('btn-confirmar');
                 btnConfirmar.disabled = true;
                 btnConfirmar.innerHTML = '<i class="fas fa-ban btn-icon"></i> Horário Encerrado';
+                
+                document.querySelectorAll('.score-input-large').forEach(input => {
+                    input.disabled = true;
+                });
+                
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
             }
         }
 
@@ -1535,15 +1637,17 @@
             const errorText = document.getElementById('error-text');
             
             errorText.textContent = mensagem;
-            errorBox.classList.add('show');
+            errorBox.style.display = 'flex';
             
             setTimeout(() => {
-                errorBox.classList.remove('show');
+                errorBox.style.display = 'none';
             }, 5000);
         }
 
         // ===== ENVIO DE PALPITES =====
         document.getElementById('btn-confirmar').onclick = () => {
+            console.log("📤 Enviando palpites...");
+            
             if (!verificarPalpitesCompletos()) {
                 mostrarErro("⚠️ Preencha todos os palpites antes de enviar!");
                 return;
@@ -1593,51 +1697,55 @@
             btnConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btnConfirmar.disabled = true;
             
-            // Enviar via Telegram Web App
             if (tg && tg.sendData) {
                 tg.sendData(JSON.stringify(dataToBot));
                 console.log("✅ Dados enviados para o bot");
-                
-                setTimeout(() => {
+            } else {
+                console.log("📤 Dados simulados (Telegram não disponível):", dataToBot);
+            }
+            
+            setTimeout(() => {
+                if (tg && tg.close) {
+                    tg.close();
+                }
+            }, 1500);
+        };
+
+        document.getElementById('btn-sair').onclick = () => {
+            if (palpites.length > 0 && !verificarPalpitesCompletos()) {
+                if (confirm("⚠️ Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
                     if (tg && tg.close) {
                         tg.close();
                     }
-                }, 1000);
+                }
             } else {
-                console.log("📤 Dados simulados:", dataToBot);
-                mostrarErro("✅ Palpites enviados com sucesso!");
-                
-                setTimeout(() => {
-                    if (window.history.length > 1) {
-                        window.history.back();
-                    } else {
-                        window.close();
-                    }
-                }, 1500);
+                if (tg && tg.close) {
+                    tg.close();
+                }
             }
         };
 
-        function handleSair() {
-            if (palpites.length > 0 && !verificarPalpitesCompletos()) {
-                if (confirm("⚠️ Tem certeza que deseja sair? Seus palpites não salvos serão perdidos.")) {
-                    fecharApp();
+        // ===== INICIALIZAÇÃO SEGURA =====
+        window.addEventListener('DOMContentLoaded', function() {
+            // Configurar viewport
+            document.documentElement.style.width = '100%';
+            document.documentElement.style.height = '100%';
+            document.body.style.width = '100%';
+            document.body.style.height = '100%';
+            
+            // Inicializar Telegram WebApp
+            initTelegramWebApp();
+        });
+
+        // Backup para inicialização tardia
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (!tg && window.Telegram && window.Telegram.WebApp) {
+                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
+                    initTelegramWebApp();
                 }
-            } else {
-                fecharApp();
-            }
-        }
-
-        function fecharApp() {
-            if (tg && tg.close) {
-                tg.close();
-            } else if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.close();
-            }
-        }
-
-        document.getElementById('btn-sair').onclick = handleSair;
+            }, 1000);
+        });
     </script>
 </body>
 </html>
