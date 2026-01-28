@@ -818,39 +818,82 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
         let countdownInterval = null;
-        let webAppExpanded = false; // Controle para expand() único
+        let webAppInitialized = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - SEGURA =====
+        // ===== NOVA LÓGICA PARA TELA CHEIA =====
         function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP (MODO SEGURO)");
-            
-            // Configuração inicial da viewport
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
+            console.log("🔧 INICIANDO TELEGRAM WEB APP");
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // PRIMEIRO: Configurar o tema do Telegram
+                // NOVA ABORDAGEM: Configurar viewport para forçar tela cheia
+                configureFullscreenViewport();
+                
+                // Aplicar tema primeiro
                 aplicarTemaTelegram();
                 
-                // SEGUNDO: Ready() sem expand() ainda
+                // Usar ready() mas SEM expand() - vamos usar outra abordagem
                 tg.ready();
                 
-                console.log("✅ Web App inicializado (sem expand ainda)");
+                console.log("✅ Web App inicializado (sem expand)");
                 
-                // TERCEIRO: Iniciar carregamento de dados
+                // Iniciar carregamento
                 setTimeout(() => {
                     carregarDadosRodada();
-                }, 300);
+                }, 200);
                 
             } else {
-                console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
-                // Modo desenvolvimento: iniciar sem Telegram
+                console.log("⚠️ Modo desenvolvimento - sem Telegram");
                 setTimeout(() => {
                     carregarDadosRodada();
-                }, 300);
+                }, 200);
             }
+        }
+
+        // ===== CONFIGURAÇÃO DE VIEWPORT PARA TELA CHEIA =====
+        function configureFullscreenViewport() {
+            // Forçar viewport para ocupar toda a tela
+            const metaViewport = document.querySelector('meta[name="viewport"]');
+            if (metaViewport) {
+                metaViewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover';
+            }
+            
+            // Estilos para forçar tela cheia
+            document.documentElement.style.cssText = `
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                position: fixed !important;
+            `;
+            
+            document.body.style.cssText = `
+                width: 100% !important;
+                height: 100% !important;
+                overflow: hidden !important;
+                position: fixed !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            `;
+            
+            // CSS adicional via JavaScript
+            const style = document.createElement('style');
+            style.textContent = `
+                @supports (-webkit-touch-callout: none) {
+                    /* iOS Safari */
+                    .app-container {
+                        min-height: -webkit-fill-available !important;
+                    }
+                }
+                
+                html, body {
+                    overscroll-behavior: none !important;
+                    -webkit-overflow-scrolling: touch !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            console.log("📱 Viewport configurado para tela cheia");
         }
 
         // ===== APLICAR TEMA DO TELEGRAM =====
@@ -860,7 +903,6 @@
             try {
                 const themeParams = tg.themeParams;
                 
-                // Aplicar cores do tema nas variáveis CSS
                 if (themeParams.bg_color) {
                     document.documentElement.style.setProperty('--tg-bg-color', themeParams.bg_color);
                 }
@@ -883,30 +925,8 @@
                     document.documentElement.style.setProperty('--tg-secondary-bg-color', themeParams.secondary_bg_color);
                 }
                 
-                console.log("🎨 Tema do Telegram aplicado");
-                
             } catch (error) {
                 console.log("⚠️ Erro ao aplicar tema:", error);
-            }
-        }
-
-        // ===== EXPANSÃO SEGURA (UMA VEZ) =====
-        function expandWebAppSeguramente() {
-            if (!tg || webAppExpanded) {
-                return;
-            }
-            
-            try {
-                console.log("📱 Expandindo WebApp (chamada única)");
-                tg.expand();
-                webAppExpanded = true;
-                
-                // Configurar cores da interface
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
-                
-            } catch (error) {
-                console.log("⚠️ Erro ao expandir:", error);
             }
         }
 
@@ -1028,10 +1048,10 @@
                     
                     ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                     
-                    // AGORA expandir o WebApp (após carregar dados)
+                    // Chamar expand() apenas uma vez e com delay
                     setTimeout(() => {
-                        expandWebAppSeguramente();
-                    }, 100);
+                        safeWebAppExpand();
+                    }, 500);
                     
                     atualizarInterface();
                     
@@ -1053,8 +1073,8 @@
                         ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                         
                         setTimeout(() => {
-                            expandWebAppSeguramente();
-                        }, 100);
+                            safeWebAppExpand();
+                        }, 500);
                         
                         atualizarInterface();
                         
@@ -1068,7 +1088,6 @@
                 console.error("❌ Erro crítico ao carregar dados", e);
                 
                 let errorMsg = "Erro ao carregar dados da rodada: " + e.message;
-                errorMsg += "\n\nURL: " + window.location.href.substring(0, 100) + "...";
                 
                 setTimeout(() => {
                     document.getElementById('loading').classList.add('hidden');
@@ -1090,6 +1109,31 @@
                     };
                     
                 }, 1000);
+            }
+        }
+
+        // ===== EXPANSÃO SEGURA DO WEBAPP =====
+        function safeWebAppExpand() {
+            if (!tg || webAppInitialized) return;
+            
+            try {
+                // Verificar se já está expandido
+                const isExpanded = tg.isExpanded;
+                console.log(`📱 Estado atual do WebApp: isExpanded=${isExpanded}`);
+                
+                if (!isExpanded) {
+                    console.log("📱 Expandindo WebApp...");
+                    tg.expand();
+                    
+                    // Configurar cores
+                    tg.setHeaderColor('secondary_bg_color');
+                    tg.setBackgroundColor('bg_color');
+                }
+                
+                webAppInitialized = true;
+                
+            } catch (error) {
+                console.log("⚠️ Erro ao expandir WebApp:", error);
             }
         }
 
@@ -1163,11 +1207,11 @@
                 dobradaElem.style.color = "var(--success)";
             }
             
-            // Inicializar array de palpites
+            // Inicializar array de palpites - CORREÇÃO: não inicializar com valores
             palpites = [];
             totalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.length : 0;
             
-            // Restaurar palpites existentes
+            // CORREÇÃO: Restaurar palpites existentes corretamente
             if (dadosOriginais.palpites && Object.keys(dadosOriginais.palpites).length > 0) {
                 console.log("🔄 Restaurando palpites existentes");
                 
@@ -1175,10 +1219,18 @@
                     const jogoIdStr = String(jogoId);
                     if (dadosOriginais.palpites[jogoIdStr]) {
                         const palpite = dadosOriginais.palpites[jogoIdStr];
+                        
+                        // IMPORTANTE: Tratar 0 como valor válido, não como vazio
+                        const mandanteValue = (palpite.mandante === 0 || palpite.mandante === '0') ? 0 : 
+                                            (palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '');
+                        
+                        const visitanteValue = (palpite.visitante === 0 || palpite.visitante === '0') ? 0 : 
+                                             (palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : '');
+                        
                         const novoPalpite = {
                             jogo_id: jogoId,
-                            mandante: palpite.mandante !== null && palpite.mandante !== undefined ? palpite.mandante : '',
-                            visitante: palpite.visitante !== null && palpite.visitante !== undefined ? palpite.visitante : '',
+                            mandante: mandanteValue,
+                            visitante: visitanteValue,
                             pd: palpite.pd || false
                         };
                         
@@ -1194,6 +1246,7 @@
             
             console.log(`📊 Palpites carregados: ${palpites.length}`);
             console.log(`⭐ PD selecionada inicialmente: ${pdSelecionado}`);
+            console.log('📋 Detalhes dos palpites:', palpites);
             
             // Renderizar jogos e verificar
             renderizarJogos();
@@ -1226,7 +1279,7 @@
             alerta.classList.remove('hidden');
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
+        // ===== RENDERIZAÇÃO DOS JOGOS - CORRIGIDA =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1247,11 +1300,23 @@
             const horarioExpirado = (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo);
             
             dadosOriginais.jogos.forEach(jogo => {
-                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id) || { 
-                    mandante: '', 
-                    visitante: '', 
-                    pd: false 
-                };
+                const palpiteAtual = palpites.find(p => p.jogo_id == jogo.id);
+                
+                // CORREÇÃO: Tratar 0 como valor válido para exibição
+                let mandanteValue = '';
+                let visitanteValue = '';
+                let temPD = false;
+                
+                if (palpiteAtual) {
+                    // Se o valor for 0 (número), mostrar "0", se for vazio, ficar em branco
+                    mandanteValue = (palpiteAtual.mandante === 0 || palpiteAtual.mandante === '0') ? '0' : 
+                                   (palpiteAtual.mandante !== undefined && palpiteAtual.mandante !== '' ? palpiteAtual.mandante : '');
+                    
+                    visitanteValue = (palpiteAtual.visitante === 0 || palpiteAtual.visitante === '0') ? '0' : 
+                                    (palpiteAtual.visitante !== undefined && palpiteAtual.visitante !== '' ? palpiteAtual.visitante : '');
+                    
+                    temPD = palpiteAtual.pd || false;
+                }
                 
                 const isOriginalPD = (pdOriginalId == jogo.id);
                 const isPDAtual = (pdSelecionado == jogo.id);
@@ -1314,7 +1379,7 @@
                             isDisabled = true;
                         }
                     } else {
-                        if (isPDAtual) {
+                        if (isPDAtual || temPD) {
                             pdContainerClass += ' active';
                             pdStarClass += ' active';
                             pdText = 'SELECIONADA';
@@ -1324,7 +1389,7 @@
                 // 4. MODO EDIÇÃO
                 else {
                     if (pdPodeTrocar) {
-                        if (isPDAtual) {
+                        if (isPDAtual || temPD) {
                             pdContainerClass += ' active';
                             pdStarClass += ' active';
                             pdText = 'SELECIONADA';
@@ -1374,7 +1439,7 @@
                             <div class="vs-label">VS</div>
                             <input type="number" min="0" max="99" 
                                    class="score-input-large home-score" 
-                                   value="${palpiteAtual.mandante || ''}"
+                                   value="${mandanteValue}"
                                    placeholder="0"
                                    data-jogo-id="${jogo.id}"
                                    data-time="mandante"
@@ -1384,7 +1449,7 @@
                             
                             <input type="number" min="0" max="99" 
                                    class="score-input-large away-score" 
-                                   value="${palpiteAtual.visitante || ''}"
+                                   value="${visitanteValue}"
                                    placeholder="0"
                                    data-jogo-id="${jogo.id}"
                                    data-time="visitante"
@@ -1556,12 +1621,21 @@
         }
 
         function salvarPlacar(jogoId, time, valor) {
+            // CORREÇÃO: Preservar 0 como valor válido
             valor = valor.replace(/\D/g, '');
             valor = valor.slice(0, 2);
-            const valorNum = valor === '' ? '' : parseInt(valor) || 0;
             
-            if (valorNum !== '' && (valorNum < 0 || valorNum > 99)) {
-                valor = '';
+            let valorNum;
+            if (valor === '') {
+                valorNum = ''; // Campo vazio
+            } else if (valor === '0') {
+                valorNum = 0; // Zero como número
+            } else {
+                valorNum = parseInt(valor) || '';
+            }
+            
+            if (valorNum !== '' && valorNum !== 0 && (valorNum < 0 || valorNum > 99)) {
+                valorNum = '';
             }
             
             let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
@@ -1576,6 +1650,7 @@
                 palpiteIndex = palpites.length - 1;
             }
             
+            // Salvar valor (pode ser '', 0, ou número)
             palpites[palpiteIndex][time] = valorNum;
             
             if (pdSelecionado === jogoId) {
@@ -1590,7 +1665,11 @@
             let preenchidos = 0;
             
             for (const palpite of palpites) {
-                if (palpite.mandante !== '' && palpite.visitante !== '') {
+                // CORREÇÃO: 0 é considerado preenchido
+                const mandantePreenchido = palpite.mandante !== '' && palpite.mandante !== undefined;
+                const visitantePreenchido = palpite.visitante !== '' && palpite.visitante !== undefined;
+                
+                if (mandantePreenchido && visitantePreenchido) {
                     preenchidos++;
                 }
             }
@@ -1677,10 +1756,14 @@
             ordemOriginalJogos.forEach(jogoId => {
                 const palpite = palpites.find(p => p.jogo_id == jogoId);
                 if (palpite && palpite.mandante !== '' && palpite.visitante !== '') {
+                    // CORREÇÃO: Enviar 0 como número
+                    const mandanteVal = palpite.mandante === '' ? 0 : (palpite.mandante === 0 ? 0 : parseInt(palpite.mandante) || 0);
+                    const visitanteVal = palpite.visitante === '' ? 0 : (palpite.visitante === 0 ? 0 : parseInt(palpite.visitante) || 0);
+                    
                     dataToBot.palpites.push({
                         jogo_id: jogoId,
-                        mandante: parseInt(palpite.mandante) || 0,
-                        visitante: parseInt(palpite.visitante) || 0,
+                        mandante: mandanteVal,
+                        visitante: visitanteVal,
                         pd: palpite.pd || false
                     });
                 }
@@ -1727,11 +1810,8 @@
 
         // ===== INICIALIZAÇÃO SEGURA =====
         window.addEventListener('DOMContentLoaded', function() {
-            // Configurar viewport
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
+            // Configurar viewport para tela cheia
+            configureFullscreenViewport();
             
             // Inicializar Telegram WebApp
             initTelegramWebApp();
