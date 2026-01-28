@@ -883,6 +883,15 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
+
+           // ===== EXPANSÃO IMEDIATA DO TELEGRAM =====
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        console.log("✅ Telegram WebApp expandido imediatamente");
+    }
+
+        
         // ===== VARIÁVEIS GLOBAIS =====
         let tg = null;
         let dadosOriginais = {};
