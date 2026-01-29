@@ -30,36 +30,37 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        body { 
-            background: white;
-            color: var(--dark);
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            overflow-x: hidden;
-            padding-top: env(safe-area-inset-top);
-        }
+       body { 
+    background: white;
+    color: var(--dark);
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Mudança chave: organiza em coluna como o Admin */
+    overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+}
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
-            width: 100%;
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
-        }
+    width: 100%;
+    max-width: 600px; /* Limita largura em telas grandes, fica bonito */
+    margin: 0 auto;   /* Centraliza horizontalmente */
+    padding: 0;
+    flex: 1;          /* Ocupa o espaço vertical disponível */
+}
         
         .main-card {
-            background: white;
-            border-radius: 0;
-            padding: 16px 12px;
-            position: relative;
-            overflow: hidden;
-            animation: slideUp 0.5s ease-out;
-            width: 100%;
-            min-height: 100vh;
-        }
+    background: white;
+    border-radius: 0;
+    padding: 16px 12px;
+    position: relative;
+    width: 100%;
+    /* REMOVIDO: overflow: hidden; (causa problemas de rolagem) */
+    /* REMOVIDO: min-height: 100vh; (causa o loop de altura) */
+    min-height: auto; 
+    padding-bottom: 40px; /* Espaço para rolar até o fim */
+}
         
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
