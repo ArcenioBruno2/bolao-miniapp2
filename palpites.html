@@ -10,15 +10,17 @@
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --dark: #212529;
+            --accent: #4cc9f0;
+            --danger: #ef476f;
+            --success: #06d6a0;
+            --warning: #ffd166;
+            --dark: #1a1a2e;
             --light: #f8f9fa;
+            --border: #e0e7ff;
+            --card-bg: #ffffff;
             --gray: #6c757d;
             --light-gray: #e9ecef;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
@@ -31,32 +33,30 @@
         }
         
         body { 
-            background: white;
+            background: linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%);
             color: var(--dark);
             min-height: 100vh;
             width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
             overflow-x: hidden;
             padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
             width: 100%;
             max-width: 100%;
-            margin: 0;
+            margin: 0 auto;
             padding: 0;
         }
         
         .main-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 0;
             padding: 16px 12px;
             position: relative;
             overflow: hidden;
-            animation: slideUp 0.5s ease-out;
+            animation: slideUp 0.4s ease-out;
             width: 100%;
             min-height: 100vh;
         }
@@ -69,17 +69,16 @@
         /* ===== HEADER DA RODADA ===== */
         .header-section {
             text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--light-gray);
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 0 0 15px 0;
+            margin-bottom: 18px;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
         
         .rodada-number {
-            font-size: 24px; /* Aumentado de 22px */
+            font-size: 22px;
             font-weight: 800;
             background: linear-gradient(90deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
@@ -88,307 +87,344 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .rodada-icon {
-            font-size: 22px; /* Aumentado de 20px */
+            font-size: 20px;
         }
         
-        /* ===== STATUS INFORMAÇÕES COMPACTAS ===== */
+        /* ===== STATUS COMPACTO ===== */
         .status-section {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 18px;
         }
         
-        .status-card-compact {
+        .status-card {
             background: white;
-            border-radius: 10px;
-            padding: 10px 8px;
-            border: 1px solid var(--light-gray);
+            border-radius: 12px;
+            padding: 12px 10px;
+            border: 1px solid var(--border);
             text-align: center;
             transition: var(--transition);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 70px;
+            min-height: 72px;
+            box-shadow: 0 2px 8px rgba(67, 97, 238, 0.05);
         }
         
-        .status-icon-compact {
-            width: 24px;
-            height: 24px;
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.1);
+        }
+        
+        .status-icon {
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
-            font-size: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
         }
         
-        .status-card-compact.horario .status-icon-compact {
-            background: rgba(67, 97, 238, 0.1);
+        .status-card.horario .status-icon {
+            background: rgba(67, 97, 238, 0.12);
             color: var(--primary);
         }
         
-        .status-card-compact.trunfo .status-icon-compact {
-            background: rgba(248, 150, 30, 0.1);
+        .status-card.trunfo .status-icon {
+            background: rgba(255, 209, 102, 0.12);
             color: var(--warning);
         }
         
-        .status-card-compact.dobrada .status-icon-compact {
-            background: rgba(76, 201, 240, 0.1);
-            color: var(--success);
+        .status-card.dobrada .status-icon {
+            background: rgba(76, 201, 240, 0.12);
+            color: var(--accent);
         }
         
-        .status-title-compact {
-            font-size: 12px; /* Aumentado de 11px */
+        .status-title {
+            font-size: 12px;
             font-weight: 700;
             color: var(--dark);
             margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         
-        .status-content-compact {
-            font-size: 11px; /* Aumentado de 10px */
-            line-height: 1.2;
+        .status-content {
+            font-size: 11px;
             color: var(--gray);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 24px;
+            line-height: 1.3;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .time-remaining-compact {
+        .time-remaining {
             display: inline-block;
             margin-top: 3px;
-            padding: 2px 6px;
+            padding: 3px 8px;
             background: rgba(67, 97, 238, 0.1);
-            border-radius: 50px;
+            border-radius: 20px;
             font-weight: 700;
             color: var(--primary);
-            font-size: 10px; /* Aumentado de 9px */
+            font-size: 10px;
         }
         
-        .status-badge-compact {
+        .status-badge {
             display: inline-block;
-            padding: 2px 6px;
-            border-radius: 50px;
-            font-size: 10px; /* Aumentado de 9px */
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
             font-weight: 700;
-            margin-top: 3px;
+            margin-top: 4px;
+            text-transform: uppercase;
         }
         
-        .status-badge-compact.active {
-            background: rgba(76, 201, 240, 0.1);
+        .status-badge.active {
+            background: rgba(6, 214, 160, 0.12);
             color: var(--success);
         }
         
-        .status-badge-compact.inactive {
-            background: rgba(108, 117, 125, 0.1);
+        .status-badge.inactive {
+            background: rgba(108, 117, 125, 0.08);
             color: var(--gray);
         }
         
-        .status-badge-compact.used {
-            background: rgba(247, 37, 133, 0.1);
+        .status-badge.used {
+            background: rgba(239, 71, 111, 0.12);
             color: var(--danger);
         }
         
-        .status-badge-compact.blocked {
-            background: rgba(108, 117, 125, 0.15);
+        .status-badge.blocked {
+            background: rgba(108, 117, 125, 0.12);
             color: var(--gray);
         }
         
-        /* ===== ALERTA DE PD JÁ USADA ===== */
-        .pd-used-alert {
-            background: linear-gradient(135deg, #fff5f7 0%, #ffeef1 100%);
-            border: 1px solid rgba(247, 37, 133, 0.2);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
+        /* ===== ALERTAS ===== */
+        .pd-alert {
+            background: linear-gradient(135deg, #fff5f7 0%, #ffeff2 100%);
+            border: 1px solid rgba(239, 71, 111, 0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0.2); }
-            70% { box-shadow: 0 0 0 6px rgba(247, 37, 133, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(247, 37, 133, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(239, 71, 111, 0.2); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 71, 111, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 71, 111, 0); }
         }
         
-        .pd-used-icon {
-            font-size: 18px;
+        .pd-alert-icon {
+            font-size: 20px;
             color: var(--danger);
             flex-shrink: 0;
         }
         
-        .pd-used-text {
+        .pd-alert-text {
             flex-grow: 1;
         }
         
-        .pd-used-title {
+        .pd-alert-title {
             font-weight: 700;
             color: var(--danger);
-            margin-bottom: 2px;
-            font-size: 13px; /* Aumentado de 12px */
+            margin-bottom: 3px;
+            font-size: 13px;
         }
         
-        .pd-used-info {
-            font-size: 11px; /* Aumentado de 10px */
+        .pd-alert-info {
+            font-size: 11px;
             color: #666;
-            line-height: 1.3;
+            line-height: 1.4;
         }
         
-        .pd-used-game {
+        .pd-alert-game {
             font-weight: 700;
             color: var(--dark);
         }
         
-        /* ===== LISTA DE JOGOS - NOVO LAYOUT ===== */
+        .error-message {
+            background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
+            border: 1px solid rgba(239, 71, 111, 0.25);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        
+        .error-icon {
+            font-size: 20px;
+            color: var(--danger);
+            flex-shrink: 0;
+        }
+        
+        .error-text {
+            font-weight: 700;
+            color: var(--danger);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        /* ===== LISTA DE JOGOS ===== */
         .games-section {
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         
         .games-title {
-            font-size: 18px; /* Aumentado de 16px */
-            font-weight: 700;
+            font-size: 17px;
+            font-weight: 800;
             color: var(--dark);
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 0 5px;
+            gap: 10px;
+            padding: 0 4px;
         }
         
         .games-title i {
             color: var(--primary);
-            font-size: 16px; /* Aumentado */
+            font-size: 16px;
         }
         
-        /* ===== GAME CARD NOVO LAYOUT ===== */
+        /* ===== NOVO LAYOUT DO JOGO - COMPACTO HORIZONTAL ===== */
         .game-card {
             background: white;
-            border-radius: 12px;
-            padding: 14px; /* Aumentado de 12px */
-            margin-bottom: 14px; /* Aumentado de 12px */
-            border: 1px solid var(--light-gray);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
             transition: var(--transition);
+            box-shadow: var(--shadow);
             position: relative;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
         }
         
         .game-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
             border-color: var(--primary);
         }
         
         .game-card.pd-blocked {
-            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f5 100%);
-            border-color: rgba(108, 117, 125, 0.2);
+            background: linear-gradient(135deg, #fafbfd 0%, #f5f7fb 100%);
+            border-color: rgba(108, 117, 125, 0.15);
         }
         
         .game-card.pd-used {
-            background: linear-gradient(135deg, #fffbfd 0%, #fff8fa 100%);
-            border-color: rgba(247, 37, 133, 0.2);
+            background: linear-gradient(135deg, #fffbfc 0%, #fff8f9 100%);
+            border-color: rgba(239, 71, 111, 0.2);
         }
         
-        /* CONTAINER PRINCIPAL DO JOGO - LAYOUT EM GRID */
-        .game-content {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 14px; /* Aumentado de 12px */
-            width: 100%;
-            align-items: start;
-        }
-        
-        /* TIMES - LADO ESQUERDO */
-        .teams-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Aumentado de 8px */
-        }
-        
-        .team-row {
+        /* LINHA 1: TIMES LADO A LADO */
+        .teams-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            position: relative;
+            padding: 0 10px;
         }
         
-        .team-name {
-            font-size: 16px; /* Aumentado de 13px */
-            font-weight: 800; /* Aumentado de 700 */
-            padding: 12px 14px; /* Aumentado de 8px 10px */
-            border-radius: 10px; /* Aumentado de 8px */
+        .team {
             flex: 1;
+            font-size: 15px;
+            font-weight: 800;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 10px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 100%;
-            min-height: 46px; /* Adicionado para altura consistente */
+            min-height: 36px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            transition: var(--transition);
         }
         
-        .team-home {
-            background: rgba(67, 97, 238, 0.12); /* Aumentado opacidade */
+        .team.home {
+            background: rgba(67, 97, 238, 0.08);
             color: var(--primary);
             border-left: 3px solid var(--primary);
         }
         
-        .team-away {
-            background: rgba(58, 12, 163, 0.12); /* Aumentado opacidade */
+        .team.away {
+            background: rgba(58, 12, 163, 0.08);
             color: var(--secondary);
-            border-left: 3px solid var(--secondary);
+            border-right: 3px solid var(--secondary);
         }
         
-        /* PLACARES E ESTRELA - LADO DIREITO */
-        .scores-pd-container {
+        .vs-large {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gray);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 10px;
+            z-index: 1;
+        }
+        
+        /* LINHA 2: PLACAR + ESTRELA */
+        .scores-pd-row {
             display: flex;
             align-items: center;
-            gap: 14px; /* Aumentado de 12px */
-            min-width: 100px; /* Aumentado de 90px */
+            justify-content: space-between;
+            position: relative;
+            padding: 0 10px;
         }
         
-        /* CONTÊINER DOS PLACARES (VERTICAL) */
-        .scores-container {
+        .score-input-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 6px; /* Aumentado de 4px */
             align-items: center;
+            flex: 1;
         }
         
-        .score-row {
-            display: flex;
-            align-items: center;
-            gap: 6px; /* Aumentado de 4px */
-            width: 100%;
+        .score-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gray);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .score-input-container {
             position: relative;
-            width: 44px; /* Aumentado de 36px */
+            width: 54px;
         }
         
         .score-input {
             width: 100%;
-            height: 40px; /* Aumentado de 32px */
-            border: 2px solid #e0e7ff; /* Aumentado de 1.5px */
-            border-radius: 8px; /* Aumentado de 6px */
+            height: 42px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
             text-align: center;
-            font-size: 18px; /* Aumentado de 14px */
-            font-weight: 800; /* Aumentado de 700 */
+            font-size: 18px;
+            font-weight: 800;
             outline: none;
             background: #f8faff;
             transition: var(--transition);
@@ -407,13 +443,13 @@
         .score-input:focus {
             border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15); /* Aumentado */
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
         }
         
         .score-input::placeholder {
             color: #d0d7ff;
             font-weight: 400;
-            font-size: 14px; /* Aumentado de 12px */
+            font-size: 14px;
         }
         
         .score-input:disabled {
@@ -423,61 +459,60 @@
             cursor: not-allowed;
         }
         
-        .vs-symbol-small {
-            font-size: 12px; /* Aumentado de 10px */
-            font-weight: 800;
-            color: var(--gray);
-            margin: 0 2px;
+        .vs-small {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 8px;
+            z-index: 1;
         }
         
-        /* ROTULO DO PLACAR (M / V) */
-        .score-label {
-            font-size: 12px; /* Aumentado de 9px */
-            font-weight: 700; /* Aumentado de 600 */
-            color: var(--gray);
-            text-transform: uppercase;
-            margin-right: 2px;
-            min-width: 16px; /* Aumentado de 12px */
-        }
-        
-        /* ESTRELA */
-        .pd-container {
+        /* ESTRELA PD */
+        .pd-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 52px; /* Aumentado de 44px */
+            width: 56px;
             cursor: pointer;
             transition: var(--transition);
-            position: relative;
-            padding: 8px; /* Aumentado de 5px */
-            border-radius: 10px; /* Aumentado de 8px */
+            padding: 6px;
+            border-radius: 10px;
+            margin-left: 8px;
         }
         
-        .pd-container.disabled {
+        .pd-wrapper.disabled {
             cursor: not-allowed;
             opacity: 0.5;
         }
         
-        .pd-container.clickable:hover:not(.disabled) {
-            background: rgba(255, 215, 0, 0.08); /* Aumentado */
-            transform: translateY(-2px); /* Aumentado de -1px */
+        .pd-wrapper.clickable:hover:not(.disabled) {
+            background: rgba(255, 215, 0, 0.08);
+            transform: translateY(-2px);
         }
         
         .pd-star {
-            font-size: 28px; /* Aumentado de 20px */
+            font-size: 26px;
             color: #e0e0e0;
             transition: var(--transition);
             filter: grayscale(1);
             position: relative;
             line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 32px;
         }
         
         .pd-star.active {
             color: #ffd700;
             filter: grayscale(0);
-            transform: scale(1.15); /* Aumentado de 1.1 */
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); /* Aumentado */
+            transform: scale(1.15);
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
         }
         
         .pd-star.used {
@@ -491,15 +526,13 @@
         }
         
         .pd-label {
-            font-size: 10px; /* Aumentado de 8px */
-            font-weight: 800; /* Aumentado de 700 */
-            margin-top: 6px; /* Aumentado de 4px */
+            font-size: 10px;
+            font-weight: 800;
+            margin-top: 4px;
             color: #999;
             text-transform: uppercase;
-            letter-spacing: 0.5px; /* Aumentado de 0.3px */
+            letter-spacing: 0.5px;
             transition: var(--transition);
-            text-align: center;
-            white-space: nowrap;
         }
         
         .pd-star.active + .pd-label {
@@ -516,13 +549,13 @@
         
         .pd-badge {
             position: absolute;
-            top: -2px; /* Ajustado de -4px */
-            right: -2px; /* Ajustado de -4px */
+            top: -4px;
+            right: -4px;
             background: var(--danger);
             color: white;
-            font-size: 8px; /* Aumentado de 6px */
-            padding: 2px 4px; /* Aumentado de 1px 3px */
-            border-radius: 50px;
+            font-size: 9px;
+            padding: 2px 5px;
+            border-radius: 20px;
             font-weight: 700;
             z-index: 2;
         }
@@ -531,60 +564,63 @@
         .footer-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 10px 0;
+            gap: 12px;
+            margin-top: 24px;
+            padding: 12px 0;
             position: sticky;
             bottom: 0;
-            background: white;
+            background: linear-gradient(to top, white 80%, transparent);
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
         }
         
         .action-btn {
-            padding: 16px 12px; /* Aumentado de 14px 10px */
+            padding: 16px;
             border: none;
-            border-radius: 10px;
-            font-size: 15px; /* Aumentado de 13px */
-            font-weight: 800; /* Aumentado de 700 */
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 800;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            width: 100%;
-            height: 48px; /* Aumentado de 44px */
+            height: 50px;
         }
         
         .action-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
         
         .btn-cancel {
             background: linear-gradient(135deg, #ff6b6b 0%, #ff4757 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
         }
         
         .btn-send {
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
         }
         
         .btn-send:disabled {
             background: linear-gradient(135deg, #cccccc 0%, #aaaaaa 100%);
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: none;
         }
         
         .btn-icon {
-            font-size: 16px; /* Aumentado de 14px */
+            font-size: 16px;
         }
         
-        /* ===== LOADING E ERROS ===== */
+        /* ===== LOADING ===== */
         .loading-container {
             text-align: center;
-            padding: 60px 15px;
+            padding: 60px 20px;
             width: 100%;
             min-height: 100vh;
             display: flex;
@@ -595,9 +631,9 @@
         }
         
         .loading-spinner {
-            font-size: 48px;
+            font-size: 52px;
             color: var(--primary);
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             animation: spin 1.5s linear infinite;
         }
         
@@ -612,157 +648,83 @@
             font-weight: 600;
         }
         
-        .error-message {
-            background: linear-gradient(135deg, #ffeaea 0%, #ffdbdb 100%);
-            border: 1px solid rgba(247, 37, 133, 0.3);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            animation: shake 0.5s ease-in-out;
-            width: 100%;
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        
-        .error-icon {
-            font-size: 18px;
-            color: var(--danger);
-            flex-shrink: 0;
-        }
-        
-        .error-text {
-            font-weight: 700;
-            color: var(--danger);
-            font-size: 13px; /* Aumentado de 12px */
-        }
-        
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
             .main-card {
-                padding: 12px 8px;
+                padding: 14px 10px;
             }
             
-            .status-section {
-                gap: 6px;
+            .game-card {
+                padding: 12px;
             }
             
-            .status-card-compact {
-                padding: 8px 6px;
-                min-height: 65px;
-            }
-            
-            .status-title-compact {
-                font-size: 11px; /* Ajustado */
-            }
-            
-            .status-content-compact {
-                font-size: 10px; /* Ajustado */
-                height: 22px;
-            }
-            
-            .team-name {
-                font-size: 15px; /* Aumentado de 12px */
-                padding: 10px 12px; /* Aumentado de 6px 8px */
-                min-height: 42px; /* Adicionado */
+            .team {
+                font-size: 14px;
+                padding: 7px 10px;
+                min-height: 34px;
             }
             
             .score-input-container {
-                width: 38px; /* Aumentado de 32px */
+                width: 48px;
             }
             
             .score-input {
-                height: 36px; /* Aumentado de 30px */
-                font-size: 16px; /* Aumentado de 13px */
+                height: 38px;
+                font-size: 17px;
             }
             
             .pd-star {
-                font-size: 24px; /* Aumentado de 18px */
+                font-size: 24px;
             }
             
-            .pd-label {
-                font-size: 9px; /* Aumentado de 7px */
-            }
-            
-            .action-btn {
-                padding: 14px 10px; /* Ajustado */
-                font-size: 14px; /* Aumentado de 12px */
-                height: 44px; /* Aumentado de 42px */
-            }
-            
-            .scores-pd-container {
-                gap: 10px; /* Aumentado de 8px */
-                min-width: 95px; /* Aumentado de 80px */
-            }
-            
-            .score-label {
-                font-size: 11px; /* Aumentado */
+            .pd-wrapper {
+                width: 52px;
             }
         }
         
         @media (max-width: 320px) {
-            .team-name {
-                font-size: 14px; /* Aumentado de 11px */
-                padding: 9px 10px; /* Aumentado de 5px 6px */
-                min-height: 40px; /* Adicionado */
+            .team {
+                font-size: 13px;
+                padding: 6px 8px;
             }
             
             .score-input-container {
-                width: 34px; /* Aumentado de 28px */
+                width: 44px;
             }
             
             .score-input {
-                height: 34px; /* Aumentado de 28px */
-                font-size: 15px; /* Aumentado de 12px */
+                height: 36px;
+                font-size: 16px;
             }
             
             .pd-star {
-                font-size: 22px; /* Aumentado de 16px */
+                font-size: 22px;
             }
             
-            .pd-label {
-                font-size: 8px; /* Aumentado de 6px */
+            .pd-wrapper {
+                width: 48px;
             }
             
-            .scores-pd-container {
-                min-width: 90px; /* Aumentado de 80px */
-                gap: 8px;
-            }
-            
-            .score-label {
-                font-size: 10px; /* Aumentado */
-            }
-            
-            .games-title {
-                font-size: 16px; /* Aumentado */
-            }
-            
-            .rodada-number {
-                font-size: 22px; /* Aumentado */
+            .action-btn {
+                padding: 14px;
+                font-size: 14px;
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
+        /* ===== CORREÇÕES ANDROID WEBAPP ===== */
         html, body {
             width: 100vw !important;
             height: 100vh !important;
             overflow-x: hidden !important;
             position: fixed !important;
+            overscroll-behavior: none;
         }
         
         #content {
             width: 100% !important;
             height: 100% !important;
-        }
-        
-        #lista-jogos {
-            width: 100% !important;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         /* ===== SCROLLBAR ===== */
@@ -811,48 +773,48 @@
                 
                 <!-- STATUS INFO COMPACTA -->
                 <div class="status-section">
-                    <div class="status-card-compact horario">
-                        <div class="status-icon-compact">
+                    <div class="status-card horario">
+                        <div class="status-icon">
                             <i class="fas fa-clock"></i>
                         </div>
-                        <div class="status-title-compact">Horário</div>
-                        <div class="status-content-compact" id="txt-horario">
+                        <div class="status-title">Horário</div>
+                        <div class="status-content" id="txt-horario">
                             Carregando...
                         </div>
-                        <div id="time-remaining" class="time-remaining-compact" style="display: none;"></div>
+                        <div id="time-remaining" class="time-remaining" style="display: none;"></div>
                     </div>
                     
-                    <div class="status-card-compact trunfo">
-                        <div class="status-icon-compact">
+                    <div class="status-card trunfo">
+                        <div class="status-icon">
                             <i class="fas fa-club"></i>
                         </div>
-                        <div class="status-title-compact">Trunfo</div>
-                        <div class="status-content-compact" id="txt-trunfo">
+                        <div class="status-title">Trunfo</div>
+                        <div class="status-content" id="txt-trunfo">
                             Verificando...
                         </div>
-                        <div id="trunfo-badge" class="status-badge-compact inactive" style="display: none;"></div>
+                        <div id="trunfo-badge" class="status-badge inactive" style="display: none;"></div>
                     </div>
                     
-                    <div class="status-card-compact dobrada">
-                        <div class="status-icon-compact">
+                    <div class="status-card dobrada">
+                        <div class="status-icon">
                             <i class="fas fa-star"></i>
                         </div>
-                        <div class="status-title-compact">PD</div>
-                        <div class="status-content-compact" id="txt-dobrada">
+                        <div class="status-title">PD</div>
+                        <div class="status-content" id="txt-dobrada">
                             Verificando...
                         </div>
-                        <div id="pd-badge" class="status-badge-compact inactive" style="display: none;"></div>
+                        <div id="pd-badge" class="status-badge inactive" style="display: none;"></div>
                     </div>
                 </div>
                 
                 <!-- ALERTA DE PD JÁ USADA -->
-                <div id="pd-used-alert" class="pd-used-alert" style="display: none;">
-                    <i class="fas fa-exclamation-circle pd-used-icon"></i>
-                    <div class="pd-used-text">
-                        <div class="pd-used-title">⭐ PD JÁ UTILIZADA</div>
-                        <div class="pd-used-info">
+                <div id="pd-used-alert" class="pd-alert" style="display: none;">
+                    <i class="fas fa-exclamation-circle pd-alert-icon"></i>
+                    <div class="pd-alert-text">
+                        <div class="pd-alert-title">⭐ PD JÁ UTILIZADA</div>
+                        <div class="pd-alert-info">
                             Você já usou sua PD nesta rodada no jogo: 
-                            <span id="pd-game-info" class="pd-used-game"></span>
+                            <span id="pd-game-info" class="pd-alert-game"></span>
                         </div>
                     </div>
                 </div>
@@ -897,52 +859,77 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA PARA ANDROID =====
+        // ===== INICIALIZAÇÃO OTIMIZADA PARA ANDROID WEBAPP =====
         function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP - OTIMIZADO");
             
-            // PRIMEIRO: Garantir que a página ocupa 100% da tela
-            document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.position = 'fixed';
+            // Configurar viewport seguro
+            const metaViewport = document.querySelector('meta[name="viewport"]');
+            metaViewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+            
+            // Forçar dimensões 100%
+            document.documentElement.style.cssText = `
+                width: 100vw !important;
+                height: 100vh !important;
+                position: fixed !important;
+                overflow: hidden !important;
+            `;
+            
+            document.body.style.cssText = `
+                width: 100vw !important;
+                height: 100vh !important;
+                position: fixed !important;
+                overflow: hidden !important;
+            `;
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // CONFIGURAÇÕES CRÍTICAS PARA ANDROID
-                tg.ready();
-                
-                // Expansão forçada - tela cheia
-                try {
+                // Estratégia de inicialização em etapas
+                setTimeout(() => {
+                    tg.ready();
                     tg.expand();
                     
-                    // Garantir expansão completa
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 100);
+                    // Configurar cores
+                    tg.setHeaderColor('secondary_bg_color');
+                    tg.setBackgroundColor('bg_color');
                     
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 500);
+                    console.log("✅ WebApp inicializado - Etapa 1");
                     
-                } catch (error) {
-                    console.log("⚠️ Expand já foi chamado");
-                }
+                    // Segunda tentativa após 300ms (para Android)
+                    setTimeout(() => {
+                        try {
+                            tg.expand();
+                            console.log("✅ Expand reforçado - Etapa 2");
+                        } catch (e) {
+                            console.log("⚠️ Expand já ativo");
+                        }
+                        
+                        // Terceira tentativa segura
+                        setTimeout(() => {
+                            try {
+                                tg.expand();
+                                console.log("✅ Expand final - Etapa 3");
+                            } catch (e) {
+                                console.log("✅ WebApp totalmente inicializado");
+                            }
+                            
+                            // Iniciar carregamento de dados
+                            setTimeout(() => {
+                                carregarDadosRodada();
+                            }, 200);
+                            
+                        }, 300);
+                    }, 300);
+                    
+                }, 100);
                 
-                // Configurar cores para se integrar
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
-                
-                console.log("✅ Web App inicializado");
             } else {
                 console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
+                setTimeout(() => {
+                    carregarDadosRodada();
+                }, 500);
             }
-            
-            // Iniciar carregamento
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 300);
         }
 
         // ===== FUNÇÕES DE UTILIDADE =====
@@ -1037,7 +1024,7 @@
                     throw new Error("Parâmetro 'data' não encontrado na URL");
                 }
                 
-                console.log("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
+                console.log("✅ Dados Base64 encontrados");
                 
                 try {
                     let dadosJson;
@@ -1137,12 +1124,12 @@
             
             if (dadosOriginais.trunfo) {
                 trunfoElem.textContent = "Tem trunfo!";
-                trunfoBadge.className = 'status-badge-compact active';
+                trunfoBadge.className = 'status-badge active';
                 trunfoBadge.textContent = 'ATIVO';
                 trunfoBadge.style.display = 'inline-block';
             } else {
                 trunfoElem.textContent = "Sem trunfo";
-                trunfoBadge.className = 'status-badge-compact inactive';
+                trunfoBadge.className = 'status-badge inactive';
                 trunfoBadge.textContent = 'INATIVO';
                 trunfoBadge.style.display = 'inline-block';
             }
@@ -1161,15 +1148,12 @@
             
             // ===== CONFIGURAR pdSelecionado INICIAL =====
             if (ehEdicao) {
-                // Modo edição: começa com a PD que já estava selecionada
                 pdSelecionado = dadosOriginais.pd_jogo_id;
                 console.log(`🔄 Modo edição: pdSelecionado inicial = ${pdSelecionado}`);
             } else if (pdJaUsada) {
-                // PD já foi usada: mostrar como usada
                 pdSelecionado = dadosOriginais.pd_jogo_id;
                 console.log(`🔒 PD já usada: pdSelecionado = ${pdSelecionado}`);
             } else {
-                // Modo normal: nenhuma PD selecionada ainda
                 pdSelecionado = null;
                 console.log(`🆕 Modo normal: pdSelecionado inicial = null`);
             }
@@ -1177,29 +1161,29 @@
             // Texto do status da PD
             if (pdJaUsouAnteriormente) {
                 dobradaElem.textContent = "Já usou PD";
-                pdBadge.className = 'status-badge-compact used';
+                pdBadge.className = 'status-badge used';
                 pdBadge.textContent = 'BLOQUEADO';
                 pdBadge.style.display = 'inline-block';
                 mostrarAlertaPDUsada();
             } else if (pdBloqueadaAdm) {
                 dobradaElem.textContent = "PD atribuída";
-                pdBadge.className = 'status-badge-compact blocked';
+                pdBadge.className = 'status-badge blocked';
                 pdBadge.textContent = 'BLOQUEADA';
                 pdBadge.style.display = 'inline-block';
             } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
                 dobradaElem.textContent = "PD editável";
-                pdBadge.className = 'status-badge-compact active';
+                pdBadge.className = 'status-badge active';
                 pdBadge.textContent = 'EDITÁVEL';
                 pdBadge.style.display = 'inline-block';
             } else if (pdJaUsada) {
                 dobradaElem.textContent = "PD usada";
-                pdBadge.className = 'status-badge-compact used';
+                pdBadge.className = 'status-badge used';
                 pdBadge.textContent = 'UTILIZADA';
                 pdBadge.style.display = 'inline-block';
                 mostrarAlertaPDUsada();
             } else {
                 dobradaElem.textContent = "Disponível";
-                pdBadge.className = 'status-badge-compact active';
+                pdBadge.className = 'status-badge active';
                 pdBadge.textContent = 'DISPONÍVEL';
                 pdBadge.style.display = 'inline-block';
             }
@@ -1268,7 +1252,7 @@
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT =====
+        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT HORIZONTAL =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1276,9 +1260,9 @@
             if (!dadosOriginais.jogos || dadosOriginais.jogos.length === 0) {
                 container.innerHTML = `
                     <div class="game-card">
-                        <div style="text-align: center; padding: 20px; color: var(--gray); width: 100%;">
-                            <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 10px; color: var(--warning);"></i>
-                            <p style="font-size: 13px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
+                        <div style="text-align: center; padding: 30px 20px; color: var(--gray); width: 100%;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 36px; margin-bottom: 12px; color: var(--warning);"></i>
+                            <p style="font-size: 14px; font-weight: 600;">Nenhum jogo disponível para palpites.</p>
                         </div>
                     </div>
                 `;
@@ -1311,7 +1295,6 @@
                 
                 // 1. VERIFICAÇÕES GERAIS DE BLOQUEIO
                 if (pdBloqueadaAdm) {
-                    // PD bloqueada administrativamente
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADA';
@@ -1319,7 +1302,6 @@
                     isDisabled = true;
                 }
                 else if (pdJaUsouAnteriormente) {
-                    // PD já usada em rodada anterior - BLOQUEIO PERMANENTE
                     cardClass += ' pd-blocked';
                     starClass += ' blocked';
                     pdLabel = 'BLOQUEADO';
@@ -1337,9 +1319,7 @@
                 // 3. MODO NORMAL (NÃO É EDIÇÃO)
                 else if (!ehEdicao) {
                     if (pdJaUsada) {
-                        // PD já foi usada nesta rodada
                         if (isOriginalPD) {
-                            // Esta é a PD que foi usada
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1348,20 +1328,16 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Não é a PD usada - não pode selecionar outra
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
                             isDisabled = true;
                         }
                     } else {
-                        // PD ainda não foi usada - disponível para seleção
                         if (isPDAtual) {
-                            // Esta é a PD selecionada
                             starClass += ' active';
                             pdLabel = 'SELECIONADA';
                         } else {
-                            // Disponível para seleção
                             pdLabel = 'SELECIONAR';
                         }
                     }
@@ -1369,32 +1345,23 @@
                 // 4. MODO EDIÇÃO
                 else {
                     if (pdPodeTrocar) {
-                        // Pode trocar a PD durante edição
                         if (isPDAtual) {
-                            // Esta é a PD atualmente selecionada
                             starClass += ' active';
                             pdLabel = 'SELECIONADA';
                             
-                            // Se era a PD original, mostrar badge
                             if (tinhaPDOriginal) {
                                 showBadge = true;
                                 badgeText = 'ORIGINAL';
                             }
                         } else {
-                            // Não é a PD selecionada no momento
                             if (tinhaPDOriginal) {
-                                // Era a PD original, mas não está mais selecionada
-                                // Mostrar como normal, disponível para seleção
                                 pdLabel = 'SELECIONAR';
                             } else {
-                                // Nunca foi PD - disponível para seleção
                                 pdLabel = 'SELECIONAR';
                             }
                         }
                     } else {
-                        // Não pode trocar PD durante edição
                         if (tinhaPDOriginal) {
-                            // É a PD original e não pode trocar
                             cardClass += ' pd-used';
                             starClass += ' used';
                             pdLabel = 'UTILIZADA';
@@ -1403,7 +1370,6 @@
                             showBadge = true;
                             badgeText = 'USADA';
                         } else {
-                            // Nunca foi PD e não pode selecionar agora
                             starClass += ' blocked';
                             pdLabel = 'INDISPONÍVEL';
                             isClickable = false;
@@ -1412,65 +1378,58 @@
                     }
                 }
                 
-                // Criar o elemento do jogo com NOVO LAYOUT
+                // Criar o elemento do jogo com NOVO LAYOUT HORIZONTAL
                 const div = document.createElement('div');
                 div.className = cardClass;
                 
                 div.innerHTML = `
-                    <div class="game-content">
-                        <!-- TIMES - LADO ESQUERDO -->
-                        <div class="teams-container">
-                            <div class="team-row">
-                                <div class="team-name team-home" title="${jogo.mandante}">
-                                    ${jogo.mandante}
-                                </div>
-                            </div>
-                            
-                            <div class="team-row">
-                                <div class="team-name team-away" title="${jogo.visitante}">
-                                    ${jogo.visitante}
-                                </div>
+                    <!-- LINHA 1: TIMES LADO A LADO -->
+                    <div class="teams-row">
+                        <div class="team home" title="${jogo.mandante}">
+                            ${jogo.mandante}
+                        </div>
+                        <div class="vs-large">X</div>
+                        <div class="team away" title="${jogo.visitante}">
+                            ${jogo.visitante}
+                        </div>
+                    </div>
+                    
+                    <!-- LINHA 2: PLACAR + ESTRELA -->
+                    <div class="scores-pd-row">
+                        <!-- PLACAR MANDANTE -->
+                        <div class="score-input-wrapper">
+                            <div class="score-label">M</div>
+                            <div class="score-input-container">
+                                <input type="number" min="0" max="99" class="score-input" 
+                                       value="${palpiteAtual.mandante}" 
+                                       oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
+                                       placeholder="0"
+                                       ${horarioExpirado ? 'disabled' : ''}>
                             </div>
                         </div>
                         
-                        <!-- PLACARES E ESTRELA - LADO DIREITO -->
-                        <div class="scores-pd-container">
-                            <!-- PLACARES (VERTICAL) -->
-                            <div class="scores-container">
-                                <!-- PLACAR MANDANTE -->
-                                <div class="score-row">
-                                    <div class="score-label">M</div>
-                                    <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.mandante}" 
-                                               oninput="salvarPlacar(${jogo.id}, 'mandante', this.value)" 
-                                               placeholder="0"
-                                               ${horarioExpirado ? 'disabled' : ''}>
-                                    </div>
-                                </div>
-                                
-                                <!-- PLACAR VISITANTE -->
-                                <div class="score-row">
-                                    <div class="score-label">V</div>
-                                    <div class="score-input-container">
-                                        <input type="number" min="0" max="99" class="score-input" 
-                                               value="${palpiteAtual.visitante}" 
-                                               oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
-                                               placeholder="0"
-                                               ${horarioExpirado ? 'disabled' : ''}>
-                                    </div>
-                                </div>
+                        <div class="vs-small">X</div>
+                        
+                        <!-- PLACAR VISITANTE -->
+                        <div class="score-input-wrapper">
+                            <div class="score-label">V</div>
+                            <div class="score-input-container">
+                                <input type="number" min="0" max="99" class="score-input" 
+                                       value="${palpiteAtual.visitante}" 
+                                       oninput="salvarPlacar(${jogo.id}, 'visitante', this.value)" 
+                                       placeholder="0"
+                                       ${horarioExpirado ? 'disabled' : ''}>
                             </div>
-                            
-                            <!-- ESTRELA -->
-                            <div class="pd-container ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
-                                 onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
-                                <div class="${starClass}">
-                                    ⭐
-                                    ${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}
-                                </div>
-                                <div class="pd-label">${pdLabel}</div>
+                        </div>
+                        
+                        <!-- ESTRELA PD -->
+                        <div class="pd-wrapper ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
+                             onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
+                            <div class="${starClass}">
+                                ⭐
+                                ${showBadge ? `<div class="pd-badge">${badgeText}</div>` : ''}
                             </div>
+                            <div class="pd-label">${pdLabel}</div>
                         </div>
                     </div>
                 `;
@@ -1577,7 +1536,6 @@
                         // Adicionar PD ao novo jogo
                         let palpiteIndex = palpites.findIndex(p => p.jogo_id == jogoId);
                         if (palpiteIndex === -1) {
-                            // Criar novo palpite para este jogo
                             palpites.push({
                                 jogo_id: jogoId,
                                 mandante: '',
@@ -1586,7 +1544,6 @@
                             });
                             console.log(`✅ Nova PD criada para jogo ${jogoId}`);
                         } else {
-                            // Atualizar palpite existente
                             palpites[palpiteIndex].pd = true;
                             console.log(`✅ PD atualizada para jogo ${jogoId}`);
                         }
@@ -1657,9 +1614,8 @@
                 palpites[palpiteIndex].pd = true;
             }
             
-            // Atualizar campo visualmente (opcional)
-            const inputSelector = `.score-input[oninput*="${jogoId}"]`;
-            const inputs = document.querySelectorAll(inputSelector);
+            // Atualizar campo visualmente
+            const inputs = document.querySelectorAll(`.score-input[oninput*="${jogoId}"]`);
             inputs.forEach(input => {
                 if (input.oninput.toString().includes(`'${time}'`)) {
                     input.value = valor;
@@ -1808,26 +1764,46 @@
             }
         };
 
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
+        // ===== INICIALIZAÇÃO - OTIMIZADA PARA ANDROID =====
         window.addEventListener('DOMContentLoaded', function() {
-            // Primeiro garantir que o corpo ocupa 100%
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
+            console.log("📱 DOM Carregado - Iniciando WebApp");
             
-            // Inicializar Telegram WebApp
-            initTelegramWebApp();
+            // Configuração inicial segura
+            document.documentElement.style.width = '100vw';
+            document.documentElement.style.height = '100vh';
+            document.body.style.width = '100vw';
+            document.body.style.height = '100vh';
+            document.body.style.overflow = 'hidden';
+            
+            // Delay estratégico para evitar conflitos Android
+            setTimeout(() => {
+                initTelegramWebApp();
+            }, 50);
         });
 
-        // Backup: Se o Telegram não inicializar, tentar novamente
+        // Backup para caso o Telegram WebApp carregue tardiamente
         window.addEventListener('load', function() {
+            console.log("🔄 Página totalmente carregada");
+            
             setTimeout(function() {
                 if (!tg && window.Telegram && window.Telegram.WebApp) {
                     console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
                     initTelegramWebApp();
                 }
             }, 1000);
+        });
+
+        // Fallback para garantir expansão em Android
+        window.addEventListener('resize', function() {
+            if (tg && tg.isExpanded && !tg.isExpanded()) {
+                setTimeout(() => {
+                    try {
+                        tg.expand();
+                    } catch (e) {
+                        console.log("⚠️ Não foi possível expandir no resize");
+                    }
+                }, 100);
+            }
         });
     </script>
 </body>
