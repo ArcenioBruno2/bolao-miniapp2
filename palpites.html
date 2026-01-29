@@ -706,21 +706,26 @@
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
-        html, body {
-            width: 100vw !important;
-            height: 100vh !important;
-            overflow-x: hidden !important;
-            position: fixed !important;
+        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN (NOVO) ===== */
+        html {
+            height: 100%;
         }
-        
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background-color: var(--light);
+            /* Importante: SEM position: fixed aqui */
+        }
+
         #content {
-            width: 100% !important;
-            height: 100% !important;
+            width: 100%;
+            padding-bottom: 20px;
         }
-        
+
         #lista-jogos {
-            width: 100% !important;
+            width: 100%;
         }
         
         /* ===== SCROLLBAR ===== */
@@ -866,52 +871,36 @@
         let pdPodeTrocar = false;
         let countdownInterval = null;
 
-        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - CORRIGIDA PARA ANDROID =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
-            // PRIMEIRO: Garantir que a página ocupa 100% da tela
+            // Configuração visual correta (SEM position fixed)
             document.documentElement.style.height = '100%';
-            document.body.style.height = '100%';
+            document.body.style.minHeight = '100vh';
             document.body.style.width = '100%';
-            document.body.style.position = 'fixed';
+            document.body.style.overflowX = 'hidden';
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // CONFIGURAÇÕES CRÍTICAS PARA ANDROID
+                // Expandir a tela
+                tg.expand();
                 tg.ready();
                 
-                // Expansão forçada - tela cheia
-                try {
-                    tg.expand();
-                    
-                    // Garantir expansão completa
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 100);
-                    
-                    setTimeout(() => {
-                        tg.expand();
-                    }, 500);
-                    
-                } catch (error) {
-                    console.log("⚠️ Expand já foi chamado");
+                // Ajustar cores se disponível
+                if (tg.colorScheme) {
+                    document.documentElement.style.setProperty('--bg-color', tg.backgroundColor);
                 }
-                
-                // Configurar cores para se integrar
-                tg.setHeaderColor('secondary_bg_color');
-                tg.setBackgroundColor('bg_color');
                 
                 console.log("✅ Web App inicializado");
             } else {
-                console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
+                console.log("⚠️ Telegram Web App não disponível");
             }
             
             // Iniciar carregamento
             setTimeout(() => {
                 carregarDadosRodada();
-            }, 300);
+            }, 100);
         }
 
         // ===== FUNÇÕES DE UTILIDADE =====
