@@ -857,53 +857,95 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // ===== VARIÁVEIS GLOBAIS =====
-        let tg = null;
-        let dadosOriginais = {};
-        let pdSelecionado = null;
-        let palpites = [];
-        let ordemOriginalJogos = [];
-        let totalJogos = 0;
-        let horarioLimite = null;
-        let pdJaUsada = false;
-        let pdBloqueadaAdm = false;
-        let pdJaUsouAnteriormente = false;
-        let ehEdicao = false;
-        let pdPodeTrocar = false;
-        let countdownInterval = null;
+       // ===== VARIÁVEIS GLOBAIS (Mantidas do segundo código) =====
+let tg = null; // Será preenchido se o Telegram for detectado
+let isTelegramWebApp = false;
+let telegramInitialized = false;
 
-        function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+let dadosOriginais = {};
+let pdSelecionado = null;
+let palpites = [];
+let ordemOriginalJogos = [];
+let totalJogos = 0;
+let horarioLimite = null;
+let pdJaUsada = false;
+let pdBloqueadaAdm = false;
+let pdJaUsouAnteriormente = false;
+let ehEdicao = false;
+let pdPodeTrocar = false;
+let countdownInterval = null;
+
+// ============================================
+// INICIALIZAÇÃO DO TELEGRAM WEB APP (Lógica do Código 1)
+// ============================================
+
+function initTelegramWebApp() {
+    console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+    
+    // Tenta múltiplas formas de detectar Telegram (Busca exaustiva do Código 1)
+    const telegramObjects = [
+        window.Telegram,
+        window.parent?.Telegram,
+        Telegram,
+        window.external?.Telegram
+    ];
+    
+    let telegramObj = null;
+    
+    for (const obj of telegramObjects) {
+        if (obj && obj.WebApp) {
+            telegramObj = obj;
+            console.log("✅ Telegram.WebApp encontrado via:", 
+                obj === window.Telegram ? 'window.Telegram' : 
+                obj === window.parent?.Telegram ? 'window.parent.Telegram' : 
+                obj === Telegram ? 'Telegram global' : 'outro');
+            break;
+        }
+    }
+    
+    if (telegramObj) {
+        try {
+            // ⭐ ATRIBUIÇÃO E CONFIGURAÇÃO (Estilo Código 1)
+            tg = telegramObj.WebApp; 
+            tg.ready();
+            tg.expand(); // Tela cheia
+            tg.enableClosingConfirmation();
+            tg.setHeaderColor('#4a6cf7');
+            tg.setBackgroundColor('#ffffff');
             
-            // Configuração visual correta (SEM position fixed)
-            document.documentElement.style.height = '100%';
-            document.body.style.minHeight = '100vh';
-            document.body.style.width = '100%';
-            document.body.style.overflowX = 'hidden';
+            isTelegramWebApp = true;
+            telegramInitialized = true;
             
-            if (window.Telegram && window.Telegram.WebApp) {
-                tg = window.Telegram.WebApp;
-                
-                // Expandir a tela
-                tg.expand();
-                tg.ready();
-                
-                // Ajustar cores se disponível
-                if (tg.colorScheme) {
-                    document.documentElement.style.setProperty('--bg-color', tg.backgroundColor);
-                }
-                
-                console.log("✅ Web App inicializado");
-            } else {
-                console.log("⚠️ Telegram Web App não disponível");
+            console.log("✅ Telegram WebApp configurado com sucesso!");
+            
+            // Se você tiver uma função de mostrar status na tela
+            if (typeof showStatus === "function") {
+                showStatus("✅ Conectado ao Telegram", "success");
             }
             
-            // Iniciar carregamento
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 100);
+        } catch (error) {
+            console.error("❌ Erro ao configurar Telegram WebApp:", error);
+            if (typeof showStatus === "function") {
+                showStatus("⚠️ Telegram detectado, mas com erro de configuração", "warning");
+            }
         }
+    } else {
+        // Modo desenvolvimento
+        console.log("❌ Telegram WebApp não detectado");
+        if (typeof showStatus === "function") {
+            showStatus("⚠️ Executando fora do Telegram (modo desenvolvimento)", "warning");
+        }
+    }
 
+    // Iniciar carregamento (Funcionalidade mantida do Código 2)
+    setTimeout(() => {
+        if (typeof carregarDadosRodada === "function") {
+            carregarDadosRodada();
+        }
+    }, 100);
+    
+    return isTelegramWebApp;
+}
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
