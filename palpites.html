@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚽ Bolão - Palpites</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SDK do Telegram movido para o head -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Expansão imediata para tela cheia -->
+    <script>
+        (function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                var tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                console.log("🚀 Telegram expandido imediatamente no <head>");
+            }
+        })();
+    </script>
+
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
         :root {
@@ -30,37 +46,35 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-       body { 
-    background: white;
-    color: var(--dark);
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column; /* Mudança chave: organiza em coluna como o Admin */
-    overflow-x: hidden;
-    padding-top: env(safe-area-inset-top);
-}
+        body { 
+            background: white;
+            color: var(--dark);
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+        }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
-    width: 100%;
-    max-width: 600px; /* Limita largura em telas grandes, fica bonito */
-    margin: 0 auto;   /* Centraliza horizontalmente */
-    padding: 0;
-    flex: 1;          /* Ocupa o espaço vertical disponível */
-}
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            flex: 1;
+        }
         
         .main-card {
-    background: white;
-    border-radius: 0;
-    padding: 16px 12px;
-    position: relative;
-    width: 100%;
-    /* REMOVIDO: overflow: hidden; (causa problemas de rolagem) */
-    /* REMOVIDO: min-height: 100vh; (causa o loop de altura) */
-    min-height: auto; 
-    padding-bottom: 40px; /* Espaço para rolar até o fim */
-}
+            background: white;
+            border-radius: 0;
+            padding: 16px 12px;
+            position: relative;
+            width: 100%;
+            min-height: auto;
+            padding-bottom: 40px;
+        }
         
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -707,7 +721,7 @@
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN (NOVO) ===== */
+        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN ===== */
         html {
             height: 100%;
         }
@@ -717,7 +731,6 @@
             width: 100%;
             overflow-x: hidden;
             background-color: var(--light);
-            /* Importante: SEM position: fixed aqui */
         }
 
         #content {
@@ -855,7 +868,6 @@
         </div>
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // ===== VARIÁVEIS GLOBAIS =====
         let tg = null;
@@ -875,17 +887,11 @@
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
-            // Configuração visual correta (SEM position fixed)
-            document.documentElement.style.height = '100%';
-            document.body.style.minHeight = '100vh';
-            document.body.style.width = '100%';
-            document.body.style.overflowX = 'hidden';
-            
+            // Verifica se já foi inicializado pelo script do head
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Expandir a tela
-                tg.expand();
+                // Já foi expandido no head, apenas garantir ready()
                 tg.ready();
                 
                 // Ajustar cores se disponível
@@ -893,7 +899,7 @@
                     document.documentElement.style.setProperty('--bg-color', tg.backgroundColor);
                 }
                 
-                console.log("✅ Web App inicializado");
+                console.log("✅ Web App inicializado (já expandido)");
             } else {
                 console.log("⚠️ Telegram Web App não disponível");
             }
@@ -1796,15 +1802,9 @@
             }
         };
 
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
+        // ===== INICIALIZAÇÃO =====
         window.addEventListener('DOMContentLoaded', function() {
-            // Primeiro garantir que o corpo ocupa 100%
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
-            
-            // Inicializar Telegram WebApp
+            // Inicializar Telegram WebApp (já expandido no head)
             initTelegramWebApp();
         });
 
