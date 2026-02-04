@@ -30,37 +30,47 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-       body { 
-    background: white;
-    color: var(--dark);
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column; /* Mudança chave: organiza em coluna como o Admin */
-    overflow-x: hidden;
-    padding-top: env(safe-area-inset-top);
-}
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: white;
+            color: var(--dark);
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+        }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
-    width: 100%;
-    max-width: 600px; /* Limita largura em telas grandes, fica bonito */
-    margin: 0 auto;   /* Centraliza horizontalmente */
-    padding: 0;
-    flex: 1;          /* Ocupa o espaço vertical disponível */
-}
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
         
         .main-card {
-    background: white;
-    border-radius: 0;
-    padding: 16px 12px;
-    position: relative;
-    width: 100%;
-    /* REMOVIDO: overflow: hidden; (causa problemas de rolagem) */
-    /* REMOVIDO: min-height: 100vh; (causa o loop de altura) */
-    min-height: auto; 
-    padding-bottom: 40px; /* Espaço para rolar até o fim */
-}
+            background: white;
+            border-radius: 0;
+            padding: 16px 12px;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
         
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -297,6 +307,9 @@
         /* ===== LISTA DE JOGOS - NOVO LAYOUT ESTILO CRUZEIRO x ATLÉTICO ===== */
         .games-section {
             margin-bottom: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .games-title {
@@ -543,10 +556,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: auto;
             padding: 10px 0;
-            position: sticky;
-            bottom: 0;
             background: white;
         }
         
@@ -597,7 +608,7 @@
             text-align: center;
             padding: 60px 15px;
             width: 100%;
-            min-height: 100vh;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -654,6 +665,13 @@
             font-size: 13px;
         }
         
+        /* ===== LISTA DE JOGOS CONTAINER ===== */
+        #lista-jogos {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+        }
+        
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
             .main-card {
@@ -707,28 +725,6 @@
             }
         }
         
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN (NOVO) ===== */
-        html {
-            height: 100%;
-        }
-
-        body {
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-            background-color: var(--light);
-            /* Importante: SEM position: fixed aqui */
-        }
-
-        #content {
-            width: 100%;
-            padding-bottom: 20px;
-        }
-
-        #lista-jogos {
-            width: 100%;
-        }
-        
         /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 4px;
@@ -757,7 +753,7 @@
             <div class="loading-text">Carregando rodada...</div>
         </div>
         
-        <div id="content" style="display: none;">
+        <div id="content" style="display: none; flex: 1; flex-direction: column;">
             <div class="main-card">
                 <!-- CONTADOR REGRESSIVO PROEMINENTE -->
                 <div class="countdown-section">
@@ -857,95 +853,51 @@
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-       // ===== VARIÁVEIS GLOBAIS (Mantidas do segundo código) =====
-let tg = null; // Será preenchido se o Telegram for detectado
-let isTelegramWebApp = false;
-let telegramInitialized = false;
+        // ===== VARIÁVEIS GLOBAIS =====
+        let tg = null;
+        let dadosOriginais = {};
+        let pdSelecionado = null;
+        let palpites = [];
+        let ordemOriginalJogos = [];
+        let totalJogos = 0;
+        let horarioLimite = null;
+        let pdJaUsada = false;
+        let pdBloqueadaAdm = false;
+        let pdJaUsouAnteriormente = false;
+        let ehEdicao = false;
+        let pdPodeTrocar = false;
+        let countdownInterval = null;
 
-let dadosOriginais = {};
-let pdSelecionado = null;
-let palpites = [];
-let ordemOriginalJogos = [];
-let totalJogos = 0;
-let horarioLimite = null;
-let pdJaUsada = false;
-let pdBloqueadaAdm = false;
-let pdJaUsouAnteriormente = false;
-let ehEdicao = false;
-let pdPodeTrocar = false;
-let countdownInterval = null;
-
-// ============================================
-// INICIALIZAÇÃO DO TELEGRAM WEB APP (Lógica do Código 1)
-// ============================================
-
-function initTelegramWebApp() {
-    console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
-    
-    // Tenta múltiplas formas de detectar Telegram (Busca exaustiva do Código 1)
-    const telegramObjects = [
-        window.Telegram,
-        window.parent?.Telegram,
-        Telegram,
-        window.external?.Telegram
-    ];
-    
-    let telegramObj = null;
-    
-    for (const obj of telegramObjects) {
-        if (obj && obj.WebApp) {
-            telegramObj = obj;
-            console.log("✅ Telegram.WebApp encontrado via:", 
-                obj === window.Telegram ? 'window.Telegram' : 
-                obj === window.parent?.Telegram ? 'window.parent.Telegram' : 
-                obj === Telegram ? 'Telegram global' : 'outro');
-            break;
-        }
-    }
-    
-    if (telegramObj) {
-        try {
-            // ⭐ ATRIBUIÇÃO E CONFIGURAÇÃO (Estilo Código 1)
-            tg = telegramObj.WebApp; 
-            tg.ready();
-            tg.expand(); // Tela cheia
-            tg.enableClosingConfirmation();
-            tg.setHeaderColor('#4a6cf7');
-            tg.setBackgroundColor('#ffffff');
+        // ===== INICIALIZAÇÃO OTIMIZADA PARA TELA CHEIA =====
+        function initTelegramWebApp() {
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
-            isTelegramWebApp = true;
-            telegramInitialized = true;
-            
-            console.log("✅ Telegram WebApp configurado com sucesso!");
-            
-            // Se você tiver uma função de mostrar status na tela
-            if (typeof showStatus === "function") {
-                showStatus("✅ Conectado ao Telegram", "success");
+            // Configuração simplificada como no admin
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                
+                // ⭐⭐ EXPANDE TELA IMEDIATAMENTE ⭐⭐
+                tg.ready();
+                tg.expand();
+                tg.enableClosingConfirmation();
+                
+                if (tg.setHeaderColor) tg.setHeaderColor('#4a6cf7');
+                if (tg.setBackgroundColor) tg.setBackgroundColor('#ffffff');
+                
+                console.log("✅ Telegram WebApp configurado com sucesso!");
+            } else if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
+                tg = Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+                console.log("✅ Telegram WebApp (global) configurado");
+            } else {
+                console.log("⚠️ Telegram WebApp não disponível (modo desenvolvimento)");
             }
             
-        } catch (error) {
-            console.error("❌ Erro ao configurar Telegram WebApp:", error);
-            if (typeof showStatus === "function") {
-                showStatus("⚠️ Telegram detectado, mas com erro de configuração", "warning");
-            }
-        }
-    } else {
-        // Modo desenvolvimento
-        console.log("❌ Telegram WebApp não detectado");
-        if (typeof showStatus === "function") {
-            showStatus("⚠️ Executando fora do Telegram (modo desenvolvimento)", "warning");
-        }
-    }
-
-    // Iniciar carregamento (Funcionalidade mantida do Código 2)
-    setTimeout(() => {
-        if (typeof carregarDadosRodada === "function") {
+            // Iniciar carregamento imediatamente
             carregarDadosRodada();
         }
-    }, 100);
-    
-    return isTelegramWebApp;
-}
+
         // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
@@ -1146,7 +1098,7 @@ function initTelegramWebApp() {
                 
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
-                    document.getElementById('content').style.display = 'block';
+                    document.getElementById('content').style.display = 'flex';
                     
                     const errorBox = document.getElementById('error-box');
                     const errorText = document.getElementById('error-text');
@@ -1158,8 +1110,8 @@ function initTelegramWebApp() {
                     const btnSair = document.getElementById('btn-sair');
                     btnSair.innerHTML = '<i class="fas fa-arrow-left btn-icon"></i> Voltar ao Bot';
                     btnSair.onclick = () => {
-                        if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.close();
+                        if (tg && tg.close) {
+                            tg.close();
                         }
                     };
                     
@@ -1292,7 +1244,7 @@ function initTelegramWebApp() {
             // Mostrar conteúdo
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
+                document.getElementById('content').style.display = 'flex';
                 verificarEAtualizar();
             }, 500);
         }
@@ -1316,7 +1268,7 @@ function initTelegramWebApp() {
             alerta.style.display = 'flex';
         }
 
-        // ===== RENDERIZAÇÃO DOS JOGOS - NOVO LAYOUT ESTILO CRUZEIRO x ATLÉTICO =====
+        // ===== RENDERIZAÇÃO DOS JOGOS =====
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
@@ -1460,7 +1412,7 @@ function initTelegramWebApp() {
                     }
                 }
                 
-                // Criar o elemento do jogo com NOVO LAYOUT
+                // Criar o elemento do jogo
                 const div = document.createElement('div');
                 div.className = cardClass;
                 
@@ -1838,26 +1790,22 @@ function initTelegramWebApp() {
             }
         };
 
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
-        window.addEventListener('DOMContentLoaded', function() {
-            // Primeiro garantir que o corpo ocupa 100%
-            document.documentElement.style.width = '100%';
-            document.documentElement.style.height = '100%';
-            document.body.style.width = '100%';
-            document.body.style.height = '100%';
+        // ===== INICIALIZAÇÃO OTIMIZADA =====
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("📄 Documento carregado");
             
-            // Inicializar Telegram WebApp
+            // Inicializar Telegram WebApp IMEDIATAMENTE (como no admin)
             initTelegramWebApp();
         });
 
-        // Backup: Se o Telegram não inicializar, tentar novamente
+        // Backup para inicialização tardia
         window.addEventListener('load', function() {
             setTimeout(function() {
-                if (!tg && window.Telegram && window.Telegram.WebApp) {
+                if (!tg && (window.Telegram?.WebApp || Telegram?.WebApp)) {
                     console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
                     initTelegramWebApp();
                 }
-            }, 1000);
+            }, 500);
         });
     </script>
 </body>
