@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>⚽ Bolão - Palpites</title>
+    <!-- FIX DE ABERTURA: Script do Telegram carregado o mais cedo possível -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Execução imediata para evitar o travamento de meia tela
+        (function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+                // Desabilitar gestos que causam o "bounce" no Android
+                if (window.Telegram.WebApp.disableVerticalSwipes) {
+                    window.Telegram.WebApp.disableVerticalSwipes();
+                }
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== VARIÁVEIS E RESET ===== */
@@ -30,42 +45,37 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* CORREÇÃO TÉCNICA PARA ABERTURA NO ANDROID */
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* Impede o scroll no body para evitar o travamento de meia tela */
-            background-color: white;
-        }
-
-        body { 
-            color: var(--dark);
-            display: flex;
-            flex-direction: column;
-            padding-top: env(safe-area-inset-top);
-        }
+       body { 
+    background: white;
+    color: var(--dark);
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Mudança chave: organiza em coluna como o Admin */
+    overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+}
         
-        /* CONTAINER PRINCIPAL - O SCROLL FICA AQUI AGORA */
+        /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            display: flex;
-            flex-direction: column;
-        }
+    width: 100%;
+    max-width: 600px; /* Limita largura em telas grandes, fica bonito */
+    margin: 0 auto;   /* Centraliza horizontalmente */
+    padding: 0;
+    flex: 1;          /* Ocupa o espaço vertical disponível */
+}
         
         .main-card {
-            background: white;
-            border-radius: 0;
-            padding: 16px 12px;
-            position: relative;
-            width: 100%;
-            min-height: auto; 
-            padding-bottom: 40px;
-        }
+    background: white;
+    border-radius: 0;
+    padding: 16px 12px;
+    position: relative;
+    width: 100%;
+    /* REMOVIDO: overflow: hidden; (causa problemas de rolagem) */
+    /* REMOVIDO: min-height: 100vh; (causa o loop de altura) */
+    min-height: auto; 
+    padding-bottom: 40px; /* Espaço para rolar até o fim */
+}
         
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -299,7 +309,7 @@
             color: var(--dark);
         }
         
-        /* ===== LISTA DE JOGOS ===== */
+        /* ===== LISTA DE JOGOS - NOVO LAYOUT ESTILO CRUZEIRO x ATLÉTICO ===== */
         .games-section {
             margin-bottom: 15px;
         }
@@ -320,7 +330,7 @@
             font-size: 16px;
         }
         
-        /* ===== CARD DE JOGO ===== */
+        /* ===== NOVO CARD DE JOGO - ESTILO CRUZEIRO x ATLÉTICO ===== */
         .game-card-modern {
             background: white;
             border-radius: 12px;
@@ -537,7 +547,6 @@
             position: sticky;
             bottom: 0;
             background: white;
-            z-index: 10;
         }
         
         .action-btn {
@@ -587,16 +596,12 @@
             text-align: center;
             padding: 60px 15px;
             width: 100%;
-            height: 100%;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             background: white;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1000;
         }
         
         .loading-spinner {
@@ -650,27 +655,96 @@
         
         /* ===== RESPONSIVIDADE ===== */
         @media (max-width: 380px) {
-            .main-card { padding: 12px 8px; }
-            .countdown-timer { font-size: 28px; }
-            .team-name-large { font-size: 15px; }
-            .placar-input-modern { width: 55px; height: 55px; font-size: 22px; }
-            .pd-star-modern { font-size: 26px; }
-            .x-text { font-size: 16px; }
+            .main-card {
+                padding: 12px 8px;
+            }
+            
+            .countdown-timer {
+                font-size: 28px;
+            }
+            
+            .team-name-large {
+                font-size: 15px;
+            }
+            
+            .placar-input-modern {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+            }
+            
+            .pd-star-modern {
+                font-size: 26px;
+            }
+            
+            .x-text {
+                font-size: 16px;
+            }
         }
         
         @media (max-width: 320px) {
-            .countdown-timer { font-size: 24px; }
-            .team-name-large { font-size: 14px; }
-            .placar-input-modern { width: 50px; height: 50px; font-size: 20px; }
-            .pd-star-modern { font-size: 24px; }
-            .x-text { font-size: 14px; }
+            .countdown-timer {
+                font-size: 24px;
+            }
+            
+            .team-name-large {
+                font-size: 14px;
+            }
+            
+            .placar-input-modern {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            .pd-star-modern {
+                font-size: 24px;
+            }
+            
+            .x-text {
+                font-size: 14px;
+            }
         }
         
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN (NOVO) ===== */
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+            background-color: var(--light);
+            /* Importante: SEM position: fixed aqui */
+        }
+
+        #content {
+            width: 100%;
+            padding-bottom: 20px;
+        }
+
+        #lista-jogos {
+            width: 100%;
+        }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
     </style>
 </head>
 <body>
@@ -682,7 +756,7 @@
             <div class="loading-text">Carregando rodada...</div>
         </div>
         
-        <div id="content" style="display: none; width: 100%;">
+        <div id="content" style="display: none;">
             <div class="main-card">
                 <!-- CONTADOR REGRESSIVO PROEMINENTE -->
                 <div class="countdown-section">
@@ -756,7 +830,7 @@
                     </div>
                 </div>
                 
-                <!-- LISTA DE JOGOS -->
+                <!-- LISTA DE JOGOS - NOVO LAYOUT -->
                 <div class="games-section">
                     <div class="games-title">
                         <i class="fas fa-list-ol"></i>
@@ -764,7 +838,7 @@
                     </div>
                     <div id="lista-jogos"></div>
                 </div>
-
+                
                 <!-- BOTÕES DE AÇÃO -->
                 <div class="footer-buttons">
                     <button class="action-btn btn-send" id="btn-confirmar" disabled>
@@ -780,7 +854,6 @@
         </div>
     </div>
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         // ===== VARIÁVEIS GLOBAIS =====
         let tg = null;
@@ -797,29 +870,26 @@
         let pdPodeTrocar = false;
         let countdownInterval = null;
 
-        // INICIALIZAÇÃO CRÍTICA PARA ANDROID
         function initTelegramWebApp() {
+            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
+            
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // FIX: Ordem de chamada para forçar expansão total
-                tg.ready();
+                // Garantir expansão máxima
                 tg.expand();
+                tg.ready();
                 
-                // Desabilitar gestos que podem travar a WebView no Android
-                if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
-                
-                // Garantir que a WebView ocupe a altura correta
-                document.body.style.height = tg.viewportHeight + 'px';
-                
-                console.log("✅ Web App inicializado e expandido");
+                console.log("✅ Web App inicializado");
             }
             
-            // Pequeno delay para garantir que a WebView expandiu antes de carregar o conteúdo
-            setTimeout(carregarDadosRodada, 150);
+            // Iniciar carregamento
+            setTimeout(() => {
+                carregarDadosRodada();
+            }, 100);
         }
 
-        // ===== FUNÇÕES DE UTILIDADE (RESTAURADAS DO ORIGINAL) =====
+        // ===== FUNÇÕES DE UTILIDADE =====
         function parseDataBrasilia(str) {
             if (!str) return null;
             try {
@@ -891,7 +961,6 @@
             }
         }
 
-        // ===== CARREGAMENTO DE DADOS (RESTAURADO DO ORIGINAL) =====
         function carregarDadosRodada() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -915,8 +984,9 @@
             } catch (e) {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-                document.getElementById('error-text').innerHTML = "Erro ao carregar: " + e.message;
+                document.getElementById('error-text').innerHTML = "Erro ao carregar dados: " + e.message;
                 document.getElementById('error-box').style.display = 'flex';
+                document.getElementById('btn-sair').onclick = () => { if(tg) tg.close(); };
             }
         }
 
@@ -945,12 +1015,13 @@
             pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
             pdSelecionado = (ehEdicao || pdJaUsada) ? dadosOriginais.pd_jogo_id : null;
 
-            const pdBadge = document.getElementById('pd-badge');
             const dobradaElem = document.getElementById('txt-dobrada');
+            const pdBadge = document.getElementById('pd-badge');
             if (pdJaUsouAnteriormente) {
                 dobradaElem.textContent = "Já usou PD";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'BLOQUEADO';
+                mostrarAlertaPDUsada();
             } else if (pdBloqueadaAdm) {
                 dobradaElem.textContent = "PD atribuída";
                 pdBadge.className = 'status-badge-compact blocked';
@@ -959,6 +1030,7 @@
                 dobradaElem.textContent = "PD usada";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'UTILIZADA';
+                mostrarAlertaPDUsada();
             } else {
                 dobradaElem.textContent = "Disponível";
                 pdBadge.className = 'status-badge-compact active';
@@ -985,12 +1057,10 @@
             
             renderizarJogos();
             verificarHorarioLimite();
-            
-            // Transição suave para evitar "pisca"
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-            }, 200);
+            }, 300);
         }
 
         function renderizarJogos() {
@@ -1047,6 +1117,7 @@
         }
 
         function togglePD(jogoId) {
+            if (pdBloqueadaAdm || pdJaUsouAnteriormente || (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo)) return;
             if (pdSelecionado === jogoId) {
                 if (confirm("⚠️ Remover pontuação dobrada?")) {
                     pdSelecionado = null;
@@ -1096,6 +1167,15 @@
             const btn = document.getElementById('btn-confirmar');
             btn.disabled = !completo;
             btn.innerHTML = completo ? '<i class="fas fa-paper-plane btn-icon"></i> Enviar' : '<i class="fas fa-lock btn-icon"></i> Preencher tudo';
+        }
+
+        function mostrarAlertaPDUsada() {
+            const alert = document.getElementById('pd-used-alert');
+            const gameInfo = document.getElementById('pd-game-info');
+            if (dadosOriginais.pd_jogo_nome) {
+                gameInfo.textContent = dadosOriginais.pd_jogo_nome;
+                alert.style.display = 'flex';
+            }
         }
 
         document.getElementById('btn-confirmar').onclick = () => {
