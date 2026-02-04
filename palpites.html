@@ -30,13 +30,11 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-        /* CORREÇÃO PARA ANDROID: Evitar loops de redimensionamento */
+        /* CORREÇÃO TÉCNICA PARA ABERTURA NO ANDROID */
         html, body {
             width: 100%;
             height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* O scroll será controlado pelo .app-container */
+            overflow: hidden; /* Impede o scroll no body para evitar o travamento de meia tela */
             background-color: white;
         }
 
@@ -47,7 +45,7 @@
             padding-top: env(safe-area-inset-top);
         }
         
-        /* ===== CONTAINER PRINCIPAL COM SCROLL INTERNO ===== */
+        /* CONTAINER PRINCIPAL - O SCROLL FICA AQUI AGORA */
         .app-container {
             width: 100%;
             max-width: 600px;
@@ -57,7 +55,6 @@
             -webkit-overflow-scrolling: touch;
             display: flex;
             flex-direction: column;
-            background: white;
         }
         
         .main-card {
@@ -323,6 +320,7 @@
             font-size: 16px;
         }
         
+        /* ===== CARD DE JOGO ===== */
         .game-card-modern {
             background: white;
             border-radius: 12px;
@@ -534,12 +532,11 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: auto; /* Garante que fique no fundo se o conteúdo for pouco */
-            padding: 15px;
+            margin-top: 20px;
+            padding: 10px 0;
             position: sticky;
             bottom: 0;
             background: white;
-            border-top: 1px solid var(--light-gray);
             z-index: 10;
         }
         
@@ -599,7 +596,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 100;
+            z-index: 1000;
         }
         
         .loading-spinner {
@@ -767,18 +764,18 @@
                     </div>
                     <div id="lista-jogos"></div>
                 </div>
-            </div>
 
-            <!-- BOTÕES DE AÇÃO -->
-            <div class="footer-buttons">
-                <button class="action-btn btn-send" id="btn-confirmar" disabled>
-                    <i class="fas fa-paper-plane btn-icon"></i>
-                    Enviar
-                </button>
-                <button class="action-btn btn-cancel" id="btn-sair">
-                    <i class="fas fa-times btn-icon"></i>
-                    Sair
-                </button>
+                <!-- BOTÕES DE AÇÃO -->
+                <div class="footer-buttons">
+                    <button class="action-btn btn-send" id="btn-confirmar" disabled>
+                        <i class="fas fa-paper-plane btn-icon"></i>
+                        Enviar
+                    </button>
+                    <button class="action-btn btn-cancel" id="btn-sair">
+                        <i class="fas fa-times btn-icon"></i>
+                        Sair
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -800,29 +797,29 @@
         let pdPodeTrocar = false;
         let countdownInterval = null;
 
+        // INICIALIZAÇÃO CRÍTICA PARA ANDROID
         function initTelegramWebApp() {
-            console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
-            
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Configuração de estabilidade
-                tg.expand();
-                if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+                // FIX: Ordem de chamada para forçar expansão total
                 tg.ready();
+                tg.expand();
                 
-                console.log("✅ Web App inicializado");
-            } else {
-                console.log("⚠️ Telegram Web App não disponível");
+                // Desabilitar gestos que podem travar a WebView no Android
+                if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+                
+                // Garantir que a WebView ocupe a altura correta
+                document.body.style.height = tg.viewportHeight + 'px';
+                
+                console.log("✅ Web App inicializado e expandido");
             }
             
-            // Iniciar carregamento
-            setTimeout(() => {
-                carregarDadosRodada();
-            }, 100);
+            // Pequeno delay para garantir que a WebView expandiu antes de carregar o conteúdo
+            setTimeout(carregarDadosRodada, 150);
         }
 
-        // ===== FUNÇÕES DE UTILIDADE =====
+        // ===== FUNÇÕES DE UTILIDADE (RESTAURADAS DO ORIGINAL) =====
         function parseDataBrasilia(str) {
             if (!str) return null;
             try {
@@ -894,7 +891,7 @@
             }
         }
 
-        // ===== CARREGAMENTO DE DADOS =====
+        // ===== CARREGAMENTO DE DADOS (RESTAURADO DO ORIGINAL) =====
         function carregarDadosRodada() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -916,13 +913,10 @@
                 ordemOriginalJogos = dadosOriginais.jogos ? dadosOriginais.jogos.map(j => j.id) : [];
                 atualizarInterface();
             } catch (e) {
-                console.error("Erro crítico", e);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
-                const errorBox = document.getElementById('error-box');
-                document.getElementById('error-text').innerHTML = "Erro ao carregar dados: " + e.message;
-                errorBox.style.display = 'flex';
-                document.getElementById('btn-sair').onclick = () => { if(tg) tg.close(); };
+                document.getElementById('error-text').innerHTML = "Erro ao carregar: " + e.message;
+                document.getElementById('error-box').style.display = 'flex';
             }
         }
 
@@ -951,26 +945,20 @@
             pdPodeTrocar = dadosOriginais.pd_pode_trocar || false;
             pdSelecionado = (ehEdicao || pdJaUsada) ? dadosOriginais.pd_jogo_id : null;
 
-            const dobradaElem = document.getElementById('txt-dobrada');
             const pdBadge = document.getElementById('pd-badge');
+            const dobradaElem = document.getElementById('txt-dobrada');
             if (pdJaUsouAnteriormente) {
                 dobradaElem.textContent = "Já usou PD";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'BLOQUEADO';
-                mostrarAlertaPDUsada();
             } else if (pdBloqueadaAdm) {
                 dobradaElem.textContent = "PD atribuída";
                 pdBadge.className = 'status-badge-compact blocked';
                 pdBadge.textContent = 'BLOQUEADA';
-            } else if (pdJaUsada && ehEdicao && pdPodeTrocar) {
-                dobradaElem.textContent = "PD editável";
-                pdBadge.className = 'status-badge-compact active';
-                pdBadge.textContent = 'EDITÁVEL';
             } else if (pdJaUsada) {
                 dobradaElem.textContent = "PD usada";
                 pdBadge.className = 'status-badge-compact used';
                 pdBadge.textContent = 'UTILIZADA';
-                mostrarAlertaPDUsada();
             } else {
                 dobradaElem.textContent = "Disponível";
                 pdBadge.className = 'status-badge-compact active';
@@ -997,17 +985,17 @@
             
             renderizarJogos();
             verificarHorarioLimite();
+            
+            // Transição suave para evitar "pisca"
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'flex';
-            }, 300);
+                document.getElementById('content').style.display = 'block';
+            }, 200);
         }
 
         function renderizarJogos() {
             const container = document.getElementById('lista-jogos');
             container.innerHTML = '';
-            if (!dadosOriginais.jogos) return;
-
             const agora = new Date();
             const horarioExpirado = (horarioLimite && agora > horarioLimite && !dadosOriginais.trunfo);
 
@@ -1018,8 +1006,6 @@
                 let pdLabel = 'Ponto Dobrado';
                 let isClickable = true;
                 let isDisabled = false;
-                let showBadge = false;
-                let badgeText = '';
 
                 if (pdSelecionado == jogo.id) {
                     cardClass += ' pd-selected';
@@ -1031,21 +1017,6 @@
                     isClickable = false;
                     isDisabled = true;
                     if (pdSelecionado != jogo.id) starClass += ' blocked';
-                } else if (ehEdicao && !pdPodeTrocar) {
-                    if (pdSelecionado == jogo.id) {
-                        cardClass += ' pd-used';
-                        starClass += ' used';
-                        pdLabel = 'UTILIZADA';
-                        isClickable = false;
-                        isDisabled = true;
-                        showBadge = true;
-                        badgeText = 'USADA';
-                    } else {
-                        starClass += ' blocked';
-                        pdLabel = 'INDISPONÍVEL';
-                        isClickable = false;
-                        isDisabled = true;
-                    }
                 }
 
                 const div = document.createElement('div');
@@ -1066,7 +1037,7 @@
                         </div>
                         <div class="pd-container-modern ${isClickable ? 'clickable' : ''} ${isDisabled ? 'disabled' : ''}" 
                              onclick="${isDisabled ? '' : `togglePD(${jogo.id})`}">
-                            <div class="${starClass}">⭐${showBadge ? `<div class="pd-badge-modern">${badgeText}</div>` : ''}</div>
+                            <div class="${starClass}">⭐</div>
                             <div class="pd-label-modern">${pdLabel}</div>
                         </div>
                     </div>
@@ -1076,19 +1047,14 @@
         }
 
         function togglePD(jogoId) {
-            if (pdBloqueadaAdm || pdJaUsouAnteriormente || (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo)) return;
-            if (ehEdicao && !pdPodeTrocar) { mostrarErro("❌ Não é possível trocar a PD!"); return; }
-
             if (pdSelecionado === jogoId) {
-                if (confirm("⚠️ Remover pontuação dobrada deste jogo?")) {
+                if (confirm("⚠️ Remover pontuação dobrada?")) {
                     pdSelecionado = null;
                     palpites.forEach(p => { if (p.jogo_id == jogoId) p.pd = false; });
                 }
             } else {
-                if (pdSelecionado !== null) {
-                    if (!confirm("⚠️ Transferir pontuação dobrada para este jogo?")) return;
-                    palpites.forEach(p => { if (p.jogo_id == pdSelecionado) p.pd = false; });
-                }
+                if (pdSelecionado !== null && !confirm("⚠️ Transferir pontuação dobrada?")) return;
+                palpites.forEach(p => { if (p.jogo_id == pdSelecionado) p.pd = false; });
                 pdSelecionado = jogoId;
                 let idx = palpites.findIndex(p => p.jogo_id == jogoId);
                 if (idx === -1) palpites.push({ jogo_id: jogoId, mandante: '', visitante: '', pd: true });
@@ -1100,13 +1066,12 @@
 
         function salvarPlacar(jogoId, time, valor) {
             valor = valor.replace(/\D/g, '').slice(0, 2);
-            const valorNum = valor === '' ? '' : parseInt(valor);
             let idx = palpites.findIndex(p => p.jogo_id == jogoId);
             if (idx === -1) {
                 palpites.push({ jogo_id: jogoId, mandante: '', visitante: '', pd: false });
                 idx = palpites.length - 1;
             }
-            palpites[idx][time] = valorNum;
+            palpites[idx][time] = valor === '' ? '' : parseInt(valor);
             if (pdSelecionado === jogoId) palpites[idx].pd = true;
             verificarEAtualizar();
         }
@@ -1118,8 +1083,7 @@
         }
 
         function verificarHorarioLimite() {
-            if (!horarioLimite) return;
-            if (new Date() > horarioLimite && !dadosOriginais.trunfo) {
+            if (horarioLimite && new Date() > horarioLimite && !dadosOriginais.trunfo) {
                 const btn = document.getElementById('btn-confirmar');
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
@@ -1134,28 +1098,8 @@
             btn.innerHTML = completo ? '<i class="fas fa-paper-plane btn-icon"></i> Enviar' : '<i class="fas fa-lock btn-icon"></i> Preencher tudo';
         }
 
-        function mostrarErro(msg) {
-            const box = document.getElementById('error-box');
-            document.getElementById('error-text').textContent = msg;
-            box.style.display = 'flex';
-            setTimeout(() => box.style.display = 'none', 5000);
-        }
-
-        function mostrarAlertaPDUsada() {
-            const alert = document.getElementById('pd-used-alert');
-            const gameInfo = document.getElementById('pd-game-info');
-            if (dadosOriginais.pd_jogo_nome) {
-                gameInfo.textContent = dadosOriginais.pd_jogo_nome;
-                alert.style.display = 'flex';
-            }
-        }
-
         document.getElementById('btn-confirmar').onclick = () => {
             if (!verificarPalpitesCompletos()) return;
-            const btn = document.getElementById('btn-confirmar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
-            btn.disabled = true;
-
             const dataToBot = {
                 tipo: 'enviar_palpites',
                 usuario: dadosOriginais.usuario,
@@ -1168,16 +1112,11 @@
                 })),
                 pd_jogo_id: pdSelecionado
             };
-
             if (tg && tg.sendData) tg.sendData(JSON.stringify(dataToBot));
             setTimeout(() => { if (tg) tg.close(); }, 1500);
         };
 
-        document.getElementById('btn-sair').onclick = () => {
-            if (palpites.length > 0 && !verificarPalpitesCompletos()) {
-                if (confirm("⚠️ Sair sem salvar?")) if (tg) tg.close();
-            } else if (tg) tg.close();
-        };
+        document.getElementById('btn-sair').onclick = () => { if (tg) tg.close(); };
 
         window.addEventListener('DOMContentLoaded', initTelegramWebApp);
     </script>
