@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>⚽ Bolão - Palpites</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -30,41 +30,38 @@
             font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
-       body { 
-    background: white;
-    color: var(--dark);
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column; /* Mudança chave: organiza em coluna como o Admin */
-    overflow-x: hidden;
-    padding-top: env(safe-area-inset-top);
-}
+        body { 
+            background: white;
+            color: var(--dark);
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            padding-top: env(safe-area-inset-top);
+        }
         
         /* ===== CONTAINER PRINCIPAL ===== */
         .app-container {
-    width: 100%;
-    max-width: 600px; /* Limita largura em telas grandes, fica bonito */
-    margin: 0 auto;   /* Centraliza horizontalmente */
-    padding: 0;
-    flex: 1;          /* Ocupa o espaço vertical disponível */
-}
+            width: 100%;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         
         .main-card {
-    background: white;
-    border-radius: 0;
-    padding: 16px 12px;
-    position: relative;
-    width: 100%;
-    /* REMOVIDO: overflow: hidden; (causa problemas de rolagem) */
-    /* REMOVIDO: min-height: 100vh; (causa o loop de altura) */
-    min-height: auto; 
-    padding-bottom: 40px; /* Espaço para rolar até o fim */
-}
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            background: white;
+            border-radius: 0;
+            padding: 16px 12px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            min-height: 100vh;
+            padding-bottom: 80px; /* Espaço para os botões fixos */
         }
         
         /* ===== CONTADOR REGRESSIVO PROEMINENTE ===== */
@@ -543,11 +540,15 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-top: 20px;
-            padding: 10px 0;
-            position: sticky;
+            padding: 12px;
+            position: fixed;
             bottom: 0;
+            left: 0;
+            right: 0;
             background: white;
+            border-top: 1px solid var(--light-gray);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
         }
         
         .action-btn {
@@ -658,6 +659,7 @@
         @media (max-width: 380px) {
             .main-card {
                 padding: 12px 8px;
+                padding-bottom: 80px;
             }
             
             .countdown-timer {
@@ -680,6 +682,10 @@
             
             .x-text {
                 font-size: 16px;
+            }
+            
+            .footer-buttons {
+                padding: 10px;
             }
         }
         
@@ -705,28 +711,6 @@
             .x-text {
                 font-size: 14px;
             }
-        }
-        
-        /* ===== CORREÇÃO PARA ANDROID FULLSCREEN (NOVO) ===== */
-        html {
-            height: 100%;
-        }
-
-        body {
-            min-height: 100vh;
-            width: 100%;
-            overflow-x: hidden;
-            background-color: var(--light);
-            /* Importante: SEM position: fixed aqui */
-        }
-
-        #content {
-            width: 100%;
-            padding-bottom: 20px;
-        }
-
-        #lista-jogos {
-            width: 100%;
         }
         
         /* ===== SCROLLBAR ===== */
@@ -839,19 +823,19 @@
                     </div>
                     <div id="lista-jogos"></div>
                 </div>
-                
-                <!-- BOTÕES DE AÇÃO -->
-                <div class="footer-buttons">
-                    <button class="action-btn btn-send" id="btn-confirmar" disabled>
-                        <i class="fas fa-paper-plane btn-icon"></i>
-                        Enviar
-                    </button>
-                    <button class="action-btn btn-cancel" id="btn-sair">
-                        <i class="fas fa-times btn-icon"></i>
-                        Sair
-                    </button>
-                </div>
             </div>
+        </div>
+        
+        <!-- BOTÕES DE AÇÃO (AGORA FORA DO MAIN-CARD) -->
+        <div class="footer-buttons" style="display: none;">
+            <button class="action-btn btn-send" id="btn-confirmar" disabled>
+                <i class="fas fa-paper-plane btn-icon"></i>
+                Enviar
+            </button>
+            <button class="action-btn btn-cancel" id="btn-sair">
+                <i class="fas fa-times btn-icon"></i>
+                Sair
+            </button>
         </div>
     </div>
 
@@ -871,37 +855,78 @@
         let ehEdicao = false;
         let pdPodeTrocar = false;
         let countdownInterval = null;
+        let isTelegramInitialized = false;
 
+        // ===== INICIALIZAÇÃO DO TELEGRAM WEB APP - OTIMIZADA =====
         function initTelegramWebApp() {
             console.log("🔧 INICIALIZANDO TELEGRAM WEB APP");
             
-            // Configuração visual correta (SEM position fixed)
-            document.documentElement.style.height = '100%';
-            document.body.style.minHeight = '100vh';
-            document.body.style.width = '100%';
-            document.body.style.overflowX = 'hidden';
+            if (isTelegramInitialized) return;
+            isTelegramInitialized = true;
+            
+            // Primeiro mostrar conteúdo para evitar flicker
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
             
             if (window.Telegram && window.Telegram.WebApp) {
                 tg = window.Telegram.WebApp;
                 
-                // Expandir a tela
-                tg.expand();
+                // Configurar cores para se integrar
+                tg.setHeaderColor('secondary_bg_color');
+                tg.setBackgroundColor('bg_color');
+                
+                // Preparar o body antes de expandir
+                document.body.style.backgroundColor = 'white';
+                document.body.style.height = '100%';
+                document.body.style.width = '100%';
+                
+                // Chamar ready e expand
                 tg.ready();
                 
-                // Ajustar cores se disponível
-                if (tg.colorScheme) {
-                    document.documentElement.style.setProperty('--bg-color', tg.backgroundColor);
-                }
+                // Chamar expand apenas uma vez com timing correto
+                setTimeout(() => {
+                    tg.expand();
+                    
+                    // Forçar redimensionamento após expansão
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                        // Mostrar botões após expansão
+                        document.querySelector('.footer-buttons').style.display = 'grid';
+                    }, 100);
+                    
+                }, 50);
                 
                 console.log("✅ Web App inicializado");
             } else {
-                console.log("⚠️ Telegram Web App não disponível");
+                console.log("⚠️ Telegram Web App não disponível - modo desenvolvimento");
+                // No modo dev, mostrar conteúdo imediatamente
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                document.querySelector('.footer-buttons').style.display = 'grid';
             }
             
             // Iniciar carregamento
             setTimeout(() => {
                 carregarDadosRodada();
             }, 100);
+        }
+
+        // ===== INICIALIZAÇÃO GERAL =====
+        function initializeApp() {
+            // Configurações de viewport para mobile
+            const metaViewport = document.querySelector('meta[name="viewport"]');
+            if (metaViewport) {
+                metaViewport.setAttribute('content', 
+                    'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+            }
+            
+            // Forçar dimensões
+            document.documentElement.style.height = '100%';
+            document.body.style.height = '100%';
+            document.body.style.width = '100%';
+            
+            // Inicializar Telegram
+            initTelegramWebApp();
         }
 
         // ===== FUNÇÕES DE UTILIDADE =====
@@ -1105,6 +1130,7 @@
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('content').style.display = 'block';
+                    document.querySelector('.footer-buttons').style.display = 'grid';
                     
                     const errorBox = document.getElementById('error-box');
                     const errorText = document.getElementById('error-text');
@@ -1247,12 +1273,8 @@
             renderizarJogos();
             verificarHorarioLimite();
             
-            // Mostrar conteúdo
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
-                verificarEAtualizar();
-            }, 500);
+            // Verificar e atualizar botão
+            verificarEAtualizar();
         }
 
         function mostrarAlertaPDUsada() {
@@ -1796,26 +1818,39 @@
             }
         };
 
-        // ===== INICIALIZAÇÃO - CORRIGIDA PARA ANDROID =====
+        // ===== INICIALIZAÇÃO OTIMIZADA =====
         window.addEventListener('DOMContentLoaded', function() {
             // Primeiro garantir que o corpo ocupa 100%
             document.documentElement.style.width = '100%';
             document.documentElement.style.height = '100%';
             document.body.style.width = '100%';
             document.body.style.height = '100%';
+            document.body.style.overflow = 'hidden';
             
-            // Inicializar Telegram WebApp
-            initTelegramWebApp();
+            // Inicializar app
+            initializeApp();
         });
 
-        // Backup: Se o Telegram não inicializar, tentar novamente
+        // Fallback para garantir inicialização
         window.addEventListener('load', function() {
             setTimeout(function() {
-                if (!tg && window.Telegram && window.Telegram.WebApp) {
-                    console.log("🔄 Tentando inicialização tardia do Telegram WebApp");
-                    initTelegramWebApp();
+                if (!isTelegramInitialized) {
+                    console.log("🔄 Tentando inicialização tardia");
+                    initializeApp();
                 }
-            }, 1000);
+            }, 500);
+        });
+
+        // Handle resize para Android
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+                if (tg && tg.isExpanded) {
+                    // Ajustar altura dinamicamente
+                    document.body.style.height = window.innerHeight + 'px';
+                }
+            }, 100);
         });
     </script>
 </body>
