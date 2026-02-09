@@ -853,6 +853,28 @@ function atualizarTituloRodada() {
         infoRodadaElement.textContent = `${rodadasSelecionadas.length} rodadas selecionadas`;
     }
 }
+
+        
+        // Função auxiliar para decodificar Base64 UTF-8 corretamente
+function decodeBase64UTF8(str) {
+    // Adiciona padding se necessário e normaliza caracteres URL-safe
+    const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = b64.length % 4;
+    const padded = pad ? b64 + '='.repeat(4 - pad) : b64;
+
+    try {
+        const binaryString = atob(padded);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return new TextDecoder('utf-8').decode(bytes);
+    } catch (e) {
+        console.error("Erro na decodificação UTF-8:", e);
+        // Fallback para atob simples se falhar
+        return atob(padded);
+    }
+}
         
         function carregarDadosDaURL() {
             console.log("🔍 Verificando dados na URL...");
@@ -865,8 +887,8 @@ function atualizarTituloRodada() {
             console.log("✅ Dados encontrados na URL! Processando...");
             
             try {
-                const dadosJson = atob(dataParam);
-                const dados = JSON.parse(dadosJson);
+    const dadosJson = decodeBase64UTF8(dataParam);
+    const dados = JSON.parse(dadosJson);
                 
                 console.log("📦 Dados decodificados com sucesso!");
                 console.log("Estrutura dos dados:", {
