@@ -1032,6 +1032,24 @@
             }
         }
 
+
+            // Função auxiliar para decodificar Base64 UTF-8 corretamente
+function decodeBase64UTF8(str) {
+    // Normaliza URL-safe base64 para base64 padrão
+    const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    // Adiciona padding
+    const pad = b64.length % 4;
+    const padded = pad ? b64 + '='.repeat(4 - pad) : b64;
+
+    const binaryString = atob(padded);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new TextDecoder('utf-8').decode(bytes);
+}
+        
+        
         // ===== CARREGAMENTO DE DADOS =====
         function carregarDadosRodada() {
             try {
@@ -1055,15 +1073,17 @@
                 console.log("✅ Dados Base64 encontrados, tamanho:", dadosBase64.length, "caracteres");
                 
                 try {
-                    let dadosJson;
-                    
-                    try {
-                        dadosJson = atob(dadosBase64);
-                    } catch (e1) {
-                        console.log("⚠️ Tentando com decodeURIComponent...");
-                        dadosBase64 = decodeURIComponent(dadosBase64);
-                        dadosJson = atob(dadosBase64);
-                    }
+    let dadosJson;
+    
+    try {
+        // Tenta usar a decodificação correta UTF-8
+        dadosJson = decodeBase64UTF8(dadosBase64);
+    } catch (e1) {
+        console.log("⚠️ Tentando decodeURI fallback...");
+        // Fallback antigo caso o TextDecoder falhe
+        dadosBase64 = decodeURIComponent(dadosBase64);
+        dadosJson = atob(dadosBase64);
+    }
                     
                     dadosOriginais = JSON.parse(dadosJson);
                     console.log("📊 Dados recebidos com sucesso!");
