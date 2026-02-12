@@ -2,541 +2,233 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ Pontos Extras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontos Extras</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --dark: #212529;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 16px;
-        }
-        
-        .app-container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        .main-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-bottom: 20px;
-        }
-        
-        .countdown-section {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 24px;
-            text-align: center;
-            color: white;
-        }
-        
-        .countdown-timer {
-            font-size: 42px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            line-height: 1.2;
-        }
-        
-        .items-grid {
-            display: grid;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .item-card {
-            background: #f8f9fa;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        
-        .item-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .item-icon {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #4361ee;
-            font-size: 20px;
-            font-weight: 800;
-        }
-        
-        .item-details h4 {
-            font-size: 16px;
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 4px;
-        }
-        
-        .item-select {
-            min-width: 200px;
-        }
-        
-        select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            font-size: 14px;
-            background: white;
-            cursor: pointer;
-        }
-        
-        select:focus {
-            border-color: #4361ee;
-            outline: none;
-        }
-        
-        .progress-section {
-            background: #f8f9fa;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #e9ecef;
-            border-radius: 50px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4361ee, #3a0ca3);
-            border-radius: 50px;
-            transition: width 0.3s;
-        }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        
-        .btn {
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            color: white;
-        }
-        
-        .btn-primary:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #ff6b6b, #ff4757);
-            color: white;
-        }
-        
-        .loading-container {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 24px;
-        }
-        
-        @media (max-width: 600px) {
-            .item-card {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .item-info, .item-select {
-                width: 100%;
-            }
-            
-            .countdown-timer {
-                font-size: 32px;
-            }
-            
-            .action-buttons {
-                grid-template-columns: 1fr;
-            }
-        }
+        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .timer { text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; }
+        .error-box { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px 4px; border-bottom: 1px solid rgba(128,128,128,0.2); font-size: 0.9em; }
+        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .btn-container { margin-top: 20px; display: flex; gap: 10px; position: sticky; bottom: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-send { background-color: #2ecc71; color: white; }
+        .btn-send:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .btn-cancel { background-color: #e74c3c; color: white; }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- LOADING -->
-        <div id="loading" class="loading-container">
-            <div style="font-size: 48px; color: #4361ee; margin-bottom: 20px;">
-                <i class="fas fa-star fa-spin"></i>
-            </div>
-            <div style="font-size: 16px; color: #6c757d;">
-                Carregando Pontos Extras...
-            </div>
+    <div class="timer" id="countdown">Carregando...</div>
+    <div id="error-container" style="display: none;"></div>
+    
+    <form id="extrasForm">
+        <table>
+            <tbody id="itemsTable"></tbody>
+        </table>
+        <div class="btn-container">
+            <button type="button" class="btn-cancel" onclick="window.Telegram.WebApp.close()">Cancelar</button>
+            <button type="submit" class="btn-send">Confirmar Escolhas</button>
         </div>
-        
-        <!-- CONTEÚDO PRINCIPAL -->
-        <div id="content" style="display: none;">
-            <div class="main-card">
-                <!-- CONTADOR -->
-                <div class="countdown-section">
-                    <div style="font-size: 14px; margin-bottom: 10px;">
-                        <i class="fas fa-clock"></i> TEMPO RESTANTE
-                    </div>
-                    <div class="countdown-timer" id="countdown-timer">--:--:--</div>
-                    <div style="font-size: 13px; opacity: 0.9; margin-top: 8px;" id="countdown-subtitle">
-                        Para encerramento
-                    </div>
-                </div>
-                
-                <!-- LISTA DE CATEGORIAS -->
-                <div id="items-container" class="items-grid"></div>
-                
-                <!-- PROGRESSO -->
-                <div class="progress-section">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="font-weight: 700;">Progresso</span>
-                        <span style="color: #4361ee; font-weight: 700;" id="progress-percent">0%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-                    </div>
-                </div>
-                
-                <!-- BOTÕES -->
-                <div class="action-buttons">
-                    <button class="btn btn-primary" id="btn-enviar" disabled>
-                        <i class="fas fa-paper-plane"></i> Enviar
-                    </button>
-                    <button class="btn btn-secondary" id="btn-cancelar">
-                        <i class="fas fa-times"></i> Sair
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    </form>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
-        
-        // ========== AS 15 CATEGORIAS ==========
-        const CATEGORIAS = [
-            "Campeão Geral",
-            "Campeão 1º Turno",
-            "Campeão 2º Turno",
-            "Melhor Visitante",
-            "Melhor Mandante",
-            "Melhor Ataque",
-            "Melhor Defesa",
-            "2º Colocado Final",
-            "3º Colocado Final",
-            "4º Colocado Final",
-            "17º Colocado Final",
-            "18º Colocado Final",
-            "19º Colocado Final",
-            "20º Colocado Final",
-            "Time Estrela"
+
+        const itens = [
+            "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
+            "Melhor Mandante", "Melhor Ataque", "Melhor Defesa", "2º Colocado Final",
+            "3º Colocado Final", "4º Colocado Final", "17º Colocado Final", "18º Colocado Final",
+            "19º Colocado Final", "20º Colocado Final", "Time Estrela"
         ];
-        
-        let escolhas = [];
-        let prazoFinal = null;
+
         let times = [];
-        let countdownInterval = null;
-        
-        // ========== CORREÇÃO: CARREGAR DADOS SEM ERRO ==========
-        function carregarDados() {
+        let escolhasAnteriores = {};
+        let prazoFinal = 0;
+
+        // CORREÇÃO: Função segura para decodificar Base64
+        function safeBase64Decode(str) {
             try {
-                console.log('📥 Carregando dados...');
-                
-                // 1. PEGAR O HASH DA URL
-                let hash = window.location.hash;
-                console.log('Hash original:', hash);
-                
-                if (!hash || hash === '#') {
-                    throw new Error('Nenhum dado encontrado na URL');
+                // Remover caracteres inválidos para Base64
+                let base64 = str.replace(/[^A-Za-z0-9+/=]/g, '');
+                // Adicionar padding se necessário
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                return atob(base64);
+            } catch (e) {
+                console.error('Erro no Base64:', e);
+                return null;
+            }
+        }
+
+        // CORREÇÃO: Decodificar dados da URL de forma robusta
+        function loadDataFromHash() {
+            try {
+                const hash = window.location.hash;
+                if (!hash) {
+                    throw new Error('No hash data');
                 }
                 
-                // 2. REMOVER O # DO INÍCIO
-                hash = hash.substring(1);
-                console.log('Hash sem #:', hash);
-                
-                // 3. SE TIVER 'data=', REMOVER
-                if (hash.startsWith('data=')) {
-                    hash = hash.substring(5);
+                // Extrair o Base64
+                let base64Data = '';
+                if (hash.includes('data=')) {
+                    base64Data = hash.split('data=')[1];
+                } else {
+                    base64Data = hash.substring(1); // Remover o '#'
                 }
                 
-                console.log('Hash limpo:', hash.substring(0, 50) + '...');
+                // Decodificar
+                const decodedStr = safeBase64Decode(base64Data);
+                if (!decodedStr) {
+                    throw new Error('Failed to decode Base64');
+                }
                 
-                // 4. DECODIFICAR BASE64
-                try {
-                    // Tentar decodificar direto
-                    const jsonStr = atob(hash);
-                    console.log('JSON decodificado:', jsonStr.substring(0, 100) + '...');
-                    const dados = JSON.parse(jsonStr);
-                    processarDados(dados);
-                } catch (e) {
-                    console.log('Erro na primeira tentativa:', e);
-                    
-                    try {
-                        // Tentar com decodeURIComponent primeiro
-                        const decodedHash = decodeURIComponent(hash);
-                        const jsonStr = atob(decodedHash);
-                        const dados = JSON.parse(jsonStr);
-                        processarDados(dados);
-                    } catch (e2) {
-                        console.log('Erro na segunda tentativa:', e2);
+                const data = JSON.parse(decodedStr);
+                
+                times = data.times || [];
+                escolhasAnteriores = data.escolhas || {};
+                
+                // CORREÇÃO: Converter prazo para timestamp de forma segura
+                if (data.prazo) {
+                    // Se vier no formato "YYYY-MM-DD HH:MM:SS"
+                    if (typeof data.prazo === 'string') {
+                        const [date, time] = data.prazo.split(' ');
+                        const [year, month, day] = date.split('-').map(Number);
+                        const [hour, minute] = time.split(':').map(Number);
                         
-                        // Última tentativa: adicionar padding
-                        let base64 = hash;
-                        while (base64.length % 4 !== 0) {
-                            base64 += '=';
-                        }
-                        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-                        const jsonStr = atob(base64);
-                        const dados = JSON.parse(jsonStr);
-                        processarDados(dados);
+                        // Criar data em Brasília (UTC-3)
+                        const prazoDate = new Date(Date.UTC(year, month-1, day, hour, minute, 0));
+                        prazoDate.setHours(prazoDate.getHours() - 3); // Ajustar UTC-3
+                        prazoFinal = prazoDate.getTime();
+                    } else {
+                        prazoFinal = new Date(data.prazo).getTime();
                     }
                 }
                 
-            } catch (error) {
-                console.error('❌ Erro fatal:', error);
-                
-                // MOSTRAR ERRO AMIGÁVEL
-                document.getElementById('loading').innerHTML = `
-                    <div style="color: #f72585;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <h3 style="margin-bottom: 10px;">Erro ao carregar</h3>
-                        <p style="color: #6c757d; margin-bottom: 20px;">${error.message}</p>
-                        <button onclick="window.Telegram.WebApp.close()" 
-                                style="background: #4361ee; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700;">
-                            <i class="fas fa-arrow-left"></i> Voltar
-                        </button>
-                    </div>
-                `;
+                return true;
+            } catch (e) {
+                console.error('Erro ao carregar dados:', e);
+                showError('Erro ao carregar dados. Por favor, tente novamente.');
+                return false;
             }
         }
-        
-        // ========== PROCESSAR DADOS ==========
-        function processarDados(dados) {
-            console.log('✅ Dados processados:', dados);
-            
-            // TIMES
-            if (dados.times && Array.isArray(dados.times)) {
-                times = dados.times.sort((a, b) => a.localeCompare(b, 'pt-BR'));
-            }
-            
-            // ESCOLHAS ANTERIORES
-            if (dados.escolhas) {
-                Object.entries(dados.escolhas).forEach(([item, time]) => {
-                    escolhas.push({ item, time });
-                });
-            }
-            
-            // PRAZO
-            if (dados.prazo) {
-                // Formato: "2026-12-31 23:59:59"
-                const [data, hora] = dados.prazo.split(' ');
-                const [ano, mes, dia] = data.split('-').map(Number);
-                const [h, m, s] = hora.split(':').map(Number);
-                prazoFinal = new Date(ano, mes - 1, dia, h, m, s);
-            }
-            
-            // RENDERIZAR
-            renderizarCategorias();
-            atualizarProgresso();
-            
-            if (prazoFinal) {
-                iniciarContador();
-            }
-            
-            // ESCONDER LOADING
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('content').style.display = 'block';
+
+        function showError(message) {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.style.display = 'block';
+            errorContainer.innerHTML = `<div class="error-box"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
+            errorContainer.style.display = 'block';
         }
-        
-        // ========== RENDERIZAR ==========
-        function renderizarCategorias() {
-            const container = document.getElementById('items-container');
-            container.innerHTML = '';
+
+        function renderForm() {
+            if (times.length === 0) {
+                showError('Nenhum time disponível para seleção.');
+                return;
+            }
             
-            CATEGORIAS.forEach((categoria, index) => {
-                const escolhaAnterior = escolhas.find(e => e.item === categoria);
-                const valorSelecionado = escolhaAnterior ? escolhaAnterior.time : '';
+            const table = document.getElementById('itemsTable');
+            table.innerHTML = ''; // Limpar tabela
+            
+            itens.forEach(item => {
+                const tr = document.createElement('tr');
+                const valorAtual = escolhasAnteriores[item] || "";
                 
-                let icone = '🏆';
-                if (categoria.includes('Turno')) icone = '🥇';
-                else if (categoria.includes('Visitante')) icone = '✈️';
-                else if (categoria.includes('Mandante')) icone = '🏠';
-                else if (categoria.includes('Ataque')) icone = '⚽';
-                else if (categoria.includes('Defesa')) icone = '🛡️';
-                else if (categoria.includes('Colocado')) icone = '📊';
-                else if (categoria.includes('Estrela')) icone = '⭐';
-                
-                const card = document.createElement('div');
-                card.className = 'item-card';
-                
-                let options = '<option value="">🔽 Selecione...</option>';
-                if (times.length > 0) {
-                    options += times.map(time => 
-                        `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>${time}</option>`
-                    ).join('');
-                }
-                
-                card.innerHTML = `
-                    <div class="item-info">
-                        <div class="item-icon">${icone}</div>
-                        <div class="item-details">
-                            <h4>${categoria}</h4>
-                        </div>
-                    </div>
-                    <div class="item-select">
-                        <select onchange="salvarEscolha('${categoria}', this.value)">
-                            ${options}
+                tr.innerHTML = `
+                    <td><strong>${item}</strong></td>
+                    <td>
+                        <select name="${item}" required>
+                            <option value="">Selecione...</option>
+                            ${times.map(t => `<option value="${t.replace(/"/g, '&quot;')}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
                         </select>
-                    </div>
+                    </td>
                 `;
-                
-                container.appendChild(card);
+                table.appendChild(tr);
             });
         }
-        
-        // ========== SALVAR ESCOLHA ==========
-        function salvarEscolha(categoria, time) {
-            escolhas = escolhas.filter(e => e.item !== categoria);
-            if (time) {
-                escolhas.push({ item: categoria, time: time });
-            }
-            atualizarProgresso();
-        }
-        
-        // ========== PROGRESSO ==========
-        function atualizarProgresso() {
-            const percent = Math.round((escolhas.length / CATEGORIAS.length) * 100);
-            document.getElementById('progress-percent').innerHTML = `${percent}%`;
-            document.getElementById('progress-fill').style.width = `${percent}%`;
-            
-            const btn = document.getElementById('btn-enviar');
-            const completo = escolhas.length === CATEGORIAS.length;
-            btn.disabled = !completo;
-            btn.innerHTML = completo ? 
-                '<i class="fas fa-paper-plane"></i> Enviar' : 
-                `<i class="fas fa-lock"></i> Faltam ${CATEGORIAS.length - escolhas.length}`;
-        }
-        
-        // ========== CONTADOR ==========
-        function iniciarContador() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            countdownInterval = setInterval(atualizarContador, 1000);
-            atualizarContador();
-        }
-        
-        function atualizarContador() {
-            if (!prazoFinal) return;
-            
-            const agora = new Date();
-            const diff = prazoFinal - agora;
-            
-            if (diff <= 0) {
-                document.getElementById('countdown-timer').innerHTML = 'ENCERRADO';
-                document.getElementById('countdown-timer').style.color = '#f72585';
-                clearInterval(countdownInterval);
+
+        function startTimer() {
+            if (!prazoFinal) {
+                document.getElementById('countdown').innerHTML = "⏳ Prazo não definido";
                 return;
             }
             
-            const horas = Math.floor(diff / (1000 * 60 * 60));
-            const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+            const timerEl = document.getElementById('countdown');
             
-            let timerStr = '';
-            if (horas > 24) {
-                const dias = Math.floor(horas / 24);
-                timerStr = `${dias}d ${horas % 24}h`;
-            } else {
-                timerStr = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            function updateTimer() {
+                const now = new Date().getTime();
+                const diff = prazoFinal - now;
+                
+                if (diff < 0) {
+                    timerEl.innerHTML = "🏁 PRAZO ENCERRADO";
+                    const btnSend = document.querySelector('.btn-send');
+                    if (btnSend) {
+                        btnSend.disabled = true;
+                        btnSend.title = "Prazo encerrado";
+                    }
+                    return;
+                }
+                
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                let timerText = '⏳ Encerra em: ';
+                if (d > 0) timerText += `${d}d `;
+                timerText += `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
+                
+                timerEl.innerHTML = timerText;
             }
             
-            document.getElementById('countdown-timer').innerHTML = timerStr;
+            updateTimer();
+            setInterval(updateTimer, 1000);
         }
-        
-        // ========== ENVIAR ==========
-        function enviarEscolhas() {
-            if (escolhas.length !== CATEGORIAS.length) {
-                alert('❌ Preencha todas as categorias!');
+
+        document.getElementById('extrasForm').onsubmit = (e) => {
+            e.preventDefault();
+            
+            const btnSend = document.querySelector('.btn-send');
+            if (btnSend.disabled) {
+                tg.showAlert('Prazo já encerrado!');
                 return;
             }
             
-            if (prazoFinal && new Date() > prazoFinal) {
-                alert('❌ Prazo encerrado!');
+            const formData = new FormData(e.target);
+            const escolhas = [];
+            
+            // Validar se todas as opções foram selecionadas
+            let todasPreenchidas = true;
+            itens.forEach(item => {
+                const value = formData.get(item);
+                if (!value) {
+                    todasPreenchidas = false;
+                }
+            });
+            
+            if (!todasPreenchidas) {
+                tg.showAlert('❌ Selecione um time para todas as categorias!');
                 return;
             }
             
-            const dadosEnvio = {
-                escolhas: escolhas.map(e => ({
-                    item: e.item,
-                    time: e.time
-                }))
-            };
+            formData.forEach((value, key) => {
+                escolhas.push({ item: key, time: value });
+            });
             
-            const btn = document.getElementById('btn-enviar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-            btn.disabled = true;
-            
-            tg.sendData(JSON.stringify(dadosEnvio));
+            // Enviar para o bot
+            tg.sendData(JSON.stringify({ escolhas: escolhas }));
+        };
+
+        // Inicializar
+        if (loadDataFromHash()) {
+            renderForm();
+            startTimer();
+        } else {
+            showError('Não foi possível carregar os dados. Reinicie pelo bot.');
         }
-        
-        // ========== EVENTOS ==========
-        document.getElementById('btn-enviar').onclick = enviarEscolhas;
-        document.getElementById('btn-cancelar').onclick = () => tg.close();
-        
-        // ========== INICIAR ==========
-        window.onload = carregarDados;
     </script>
 </body>
 </html>
