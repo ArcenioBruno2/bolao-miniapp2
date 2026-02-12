@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontos Extras</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .timer { text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 8px 4px; border-bottom: 1px solid rgba(128,128,128,0.2); font-size: 0.9em; }
+        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .btn-container { margin-top: 20px; display: flex; gap: 10px; position: sticky; bottom: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-send { background-color: #2ecc71; color: white; }
+        .btn-cancel { background-color: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="timer" id="countdown">Carregando...</div>
+    
+    <form id="extrasForm">
+        <table>
+            <tbody id="itemsTable"></tbody>
+        </table>
+        <div class="btn-container">
+            <button type="button" class="btn-cancel" onclick="window.Telegram.WebApp.close()">Cancelar</button>
+            <button type="submit" class="btn-send">Confirmar Escolhas</button>
+        </div>
+    </form>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const itens = [
+            "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
+            "Melhor Mandante", "Melhor Ataque", "Melhor Defesa", "2º Colocado Final",
+            "3º Colocado Final", "4º Colocado Final", "17º Colocado Final", "18º Colocado Final",
+            "19º Colocado Final", "20º Colocado Final", "Time Estrela"
+        ];
+
+        let times = [];
+        let escolhasAnteriores = {};
+        let prazoFinal = 0;
+
+        // Decodificar dados da URL
+        try {
+            const hashData = window.location.hash.split('data=')[1];
+            if (hashData) {
+                const decoded = JSON.parse(atob(hashData));
+                times = decoded.times || [];
+                escolhasAnteriores = decoded.escolhas || {};
+                prazoFinal = new Date(decoded.prazo).getTime();
+            }
+        } catch (e) {
+            console.error("Erro ao carregar dados:", e);
+        }
+
+        function renderForm() {
+            const table = document.getElementById('itemsTable');
+            itens.forEach(item => {
+                const tr = document.createElement('tr');
+                const valorAtual = escolhasAnteriores[item] || "";
+                tr.innerHTML = `
+                    <td><strong>${item}</strong></td>
+                    <td>
+                        <select name="${item}" required>
+                            <option value="">Selecione...</option>
+                            ${times.map(t => `<option value="${t}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
+                        </select>
+                    </td>
+                `;
+                table.appendChild(tr);
+            });
+        }
+
+        function startTimer() {
+            if (!prazoFinal) return;
+            const timerEl = document.getElementById('countdown');
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = prazoFinal - now;
+                if (diff < 0) {
+                    timerEl.innerHTML = "🏁 PRAZO ENCERRADO";
+                    document.querySelector('.btn-send').disabled = true;
+                    return;
+                }
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                timerEl.innerHTML = `⏳ Encerra em: ${d}d ${h}h ${m}m ${s}s`;
+            }, 1000);
+        }
+
+        document.getElementById('extrasForm').onsubmit = (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const escolhas = [];
+            formData.forEach((value, key) => {
+                escolhas.push({ item: key, time: value });
+            });
+            tg.sendData(JSON.stringify({ escolhas }));
+        };
+
+        renderForm();
+        startTimer();
+    </script>
+</body>
+</html>
