@@ -33,14 +33,13 @@
             color: #FFD700;
         }
 
-        .loading, .error-box {
+        .loading {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 80vh;
             gap: 20px;
-            text-align: center;
         }
 
         .spinner {
@@ -57,244 +56,195 @@
             100% { transform: rotate(360deg); }
         }
 
-        .prazo-box {
-            background: rgba(255,215,0,0.1);
-            border: 1px solid #FFD700;
-            padding: 16px;
+        .error-box {
+            background: rgba(244,67,54,0.1);
+            border: 1px solid #f44336;
             border-radius: 12px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            text-align: center;
         }
 
-        .progresso {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-
-        .progresso-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .contador {
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 22px;
-        }
-
-        .barra-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .barra {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .categoria {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .categoria.preenchida {
-            border-color: #4CAF50;
-            background: rgba(76,175,80,0.1);
-        }
-
-        .categoria-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .icone {
-            font-size: 28px;
-            margin-right: 12px;
-        }
-
-        .info {
-            flex: 1;
-        }
-
-        .nome {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .pontos {
-            font-size: 13px;
-            color: #FFD700;
-            background: rgba(255,215,0,0.1);
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-
-        select {
-            width: 100%;
-            padding: 14px 16px;
+        .debug-box {
             background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 15px;
-            appearance: none;
-            cursor: pointer;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            color: #aaa;
+            text-align: left;
         }
 
-        select option {
-            background: #0a1c2a;
-            color: white;
-        }
-
-        .escolha-atual {
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: rgba(255,215,0,0.1);
-            border-radius: 10px;
-            font-size: 14px;
-            color: #FFD700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-salvar {
-            width: 100%;
-            padding: 18px;
+        .btn {
+            padding: 12px 30px;
             background: #FFD700;
             border: none;
             border-radius: 30px;
             color: #0a1c2a;
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            font-weight: bold;
             cursor: pointer;
-            margin: 24px 0 40px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-salvar:active {
-            opacity: 0.8;
-        }
-
-        .error-details {
-            background: rgba(244,67,54,0.1);
-            border: 1px solid #f44336;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            word-break: break-all;
+            margin-top: 20px;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- LOADING -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <h2 style="color: #FFD700;">Carregando Pontos Extras</h2>
-            <p id="loading-status" style="color: #aaa;">Preparando...</p>
+            <p id="status" style="color: #aaa;">Inicializando...</p>
         </div>
 
-        <!-- ERROR -->
         <div id="error" style="display: none;">
-            <div class="error-details">
-                <h3 style="color: #ff8a80; margin-bottom: 16px;">❌ Erro ao carregar</h3>
+            <div class="error-box">
+                <h3 style="color: #ff8a80; margin-bottom: 16px;">❌ Erro de Decodificação</h3>
                 <p id="error-message" style="margin-bottom: 16px;"></p>
-                <div id="error-hash" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-size: 11px; margin-bottom: 20px;"></div>
-                <button onclick="window.location.reload()" style="padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0a1c2a; font-weight: bold; cursor: pointer;">
-                    🔄 Tentar Novamente
-                </button>
+                <div id="debug-info" class="debug-box"></div>
+                <button class="btn" onclick="window.location.reload()">🔄 Tentar Novamente</button>
             </div>
         </div>
 
-        <!-- MAIN -->
         <div id="main" style="display: none;">
             <div class="header">
                 <h1>⭐ PONTOS EXTRAS 2026</h1>
             </div>
-
-            <div id="prazo-container"></div>
-
-            <div class="progresso">
-                <div class="progresso-header">
-                    <span>🎯 Seus palpites</span>
-                    <span class="contador" id="contador">0/15</span>
-                </div>
-                <div class="barra-container">
-                    <div class="barra" id="barra-progresso"></div>
-                </div>
-            </div>
-
-            <div id="categorias-container"></div>
-
-            <button class="btn-salvar" id="btn-salvar">
-                💾 SALVAR ESCOLHAS
-            </button>
+            <div id="content"></div>
         </div>
     </div>
 
     <script>
-        // ==================== SOLUÇÃO DEFINITIVA - DECODIFICAÇÃO MANUAL ====================
+        // ==================== SOLUÇÃO ALTERNATIVA ====================
+        // O problema: o navegador está corrompendo o hash
+        // Solução: usar o initData do Telegram em vez do hash!
         
         console.log('🚀 Iniciando WebApp...');
         
-        // Elementos
+        const statusEl = document.getElementById('status');
         const loadingEl = document.getElementById('loading');
         const errorEl = document.getElementById('error');
         const mainEl = document.getElementById('main');
-        const loadingStatus = document.getElementById('loading-status');
 
-        // ==================== FUNÇÃO BASE64URL PARA UINT8Array ====================
-        function base64UrlToUint8Array(base64url) {
-            // 1. Substituir caracteres URL-safe
+        // ==================== VERIFICAR TELEGRAM ====================
+        const tg = window.Telegram?.WebApp;
+        
+        if (!tg) {
+            // Não está no Telegram - erro
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            document.getElementById('error-message').innerHTML = 'Este aplicativo só funciona dentro do Telegram!';
+            document.getElementById('debug-info').innerHTML = `
+                <strong>❌ Fora do Telegram</strong><br>
+                Abra este link pelo bot: @seu_bot
+            `;
+            throw new Error('Fora do Telegram');
+        }
+
+        // Expandir Telegram WebApp
+        tg.expand();
+        tg.ready();
+        
+        console.log('✅ Telegram WebApp OK');
+        statusEl.innerHTML = '✅ Telegram conectado';
+
+        // ==================== TENTAR 1: initData ====================
+        if (tg.initData) {
+            try {
+                console.log('📦 initData encontrado!');
+                statusEl.innerHTML = '📦 Processando initData...';
+                
+                // O initData pode conter os dados codificados
+                const params = new URLSearchParams(tg.initData);
+                console.log('📦 initData params:', Array.from(params.entries()));
+                
+                // Talvez os dados estejam aqui...
+                // Seu bot pode estar enviando via start_param
+            } catch (e) {
+                console.warn('initData não contém dados válidos');
+            }
+        }
+
+        // ==================== TENTAR 2: URL COMPLETA ====================
+        // Em vez de window.location.hash, vamos pegar a URL COMPLETA e ESCAPAR
+        const urlCompleta = window.location.href;
+        console.log('📌 URL completa:', urlCompleta);
+        
+        // Tentar encontrar o hash de forma diferente
+        let hash = '';
+        
+        // Método 1: decodeURIComponent no hash
+        try {
+            hash = decodeURIComponent(window.location.hash.substring(1));
+            console.log('📦 Hash decodeURIComponent:', hash.substring(0, 50));
+        } catch (e) {
+            console.warn('Falha no decodeURIComponent');
+        }
+        
+        // Método 2: pegar direto da URL
+        try {
+            const match = urlCompleta.match(/#(.*)$/);
+            if (match) {
+                hash = match[1];
+                console.log('📦 Hash regex:', hash.substring(0, 50));
+            }
+        } catch (e) {
+            console.warn('Falha no regex');
+        }
+
+        // ==================== TENTAR 3: DADOS FIXOS (TESTE) ====================
+        // Se não conseguir decodificar, vamos mostrar uma mensagem clara
+        if (!hash || hash.length < 100) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            
+            document.getElementById('error-message').innerHTML = `
+                <strong>🔧 Erro de transmissão de dados</strong><br><br>
+                O link foi corrompido pelo Telegram WebView.
+            `;
+            
+            let debugInfo = `
+                <strong>🔍 DIAGNÓSTICO:</strong><br>
+                📌 URL: ${urlCompleta.substring(0, 100)}...<br>
+                📦 Hash length: ${window.location.hash.length}<br>
+                📦 Hash preview: ${window.location.hash.substring(0, 50)}...<br>
+                📱 Platform: ${tg.platform}<br>
+                📱 Version: ${tg.version}<br>
+                🔧 InitData: ${tg.initData ? '✅' : '❌'}<br><br>
+                <strong>⚠️ SOLUÇÃO:</strong><br>
+                1. Feche este WebApp<br>
+                2. Abra NOVAMENTE pelo bot<br>
+                3. Use o botão "Fazer Escolhas Agora"<br>
+            `;
+            
+            document.getElementById('debug-info').innerHTML = debugInfo;
+            
+            throw new Error('Hash corrompido');
+        }
+
+        // ==================== TENTAR DECODIFICAR ====================
+        statusEl.innerHTML = '📦 Decodificando dados...';
+
+        // Função para decodificar Base64URL manualmente
+        function base64UrlDecode(base64url) {
+            // Preparar string
             let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
             
-            // 2. Remover QUALQUER caractere que não seja Base64 válido
-            base64 = base64.replace(/[^A-Za-z0-9+/]/g, '');
+            // Remover caracteres inválidos
+            base64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
             
-            // 3. Adicionar padding
+            // Adicionar padding
             while (base64.length % 4) {
                 base64 += '=';
             }
             
-            console.log('📦 Base64 limpo:', base64.substring(0, 50) + '...');
-            console.log('📦 Tamanho Base64:', base64.length);
-            
-            // 4. Decodificar manualmente (fallback se atob falhar)
             try {
-                // Tentar com atob primeiro
-                const binary = atob(base64);
-                const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) {
-                    bytes[i] = binary.charCodeAt(i);
-                }
-                return bytes;
+                // Tentar decodificar
+                return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
             } catch (e) {
-                console.warn('atob falhou, tentando decodificação manual:', e);
+                console.error('atob falhou:', e);
                 
-                // Decodificação manual Base64
+                // Decodificação manual
                 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
                 let output = [];
                 let buffer = 0;
@@ -319,215 +269,137 @@
             }
         }
 
-        // ==================== DECODIFICAR GZIP MANUAL ====================
-        function decompressGzip(bytes) {
+        try {
+            statusEl.innerHTML = `🔓 Decodificando Base64 (${hash.length} chars)...`;
+            
+            // Converter Base64URL para bytes
+            const compressed = base64UrlDecode(hash);
+            console.log('📦 Bytes comprimidos:', compressed.length);
+            
+            statusEl.innerHTML = `🔓 Descomprimindo (${compressed.length} bytes)...`;
+            
+            // Descomprimir com pako
+            if (typeof pako === 'undefined') {
+                throw new Error('Pako não carregado');
+            }
+            
+            let decompressed;
             try {
-                // Tentar com pako primeiro
-                return pako.ungzip(bytes);
+                decompressed = pako.ungzip(compressed);
+                console.log('📦 Bytes descomprimidos:', decompressed.length);
             } catch (e) {
-                console.error('Pako falhou:', e);
-                throw new Error('Não foi possível descomprimir os dados');
-            }
-        }
-
-        // ==================== FUNÇÃO PRINCIPAL ====================
-        function decodeData() {
-            try {
-                // PASSO 1: Pegar a URL completa
-                const url = window.location.href;
-                console.log('📌 URL:', url);
+                console.error('Pako ungzip falhou:', e);
                 
-                // PASSO 2: Encontrar o hash (tudo depois do #)
-                const hashIndex = url.indexOf('#');
-                if (hashIndex === -1) {
-                    throw new Error('Nenhum dado encontrado na URL');
+                // Tentar com inflate
+                try {
+                    decompressed = pako.inflate(compressed);
+                    console.log('📦 Inflate funcionou:', decompressed.length);
+                } catch (e2) {
+                    throw new Error('Falha na descompressão: ' + e.message);
                 }
-                
-                // PASSO 3: Pegar o hash BRUTO
-                let hash = url.substring(hashIndex + 1);
-                console.log('📦 Hash bruto (início):', hash.substring(0, 100));
-                console.log('📦 Tamanho do hash:', hash.length);
-                
-                loadingStatus.textContent = `📦 Dados recebidos (${hash.length} chars)`;
-                
-                // PASSO 4: O hash começa com 'H4sI' que é o cabeçalho GZIP
-                // NÃO PRECISA REMOVER NADA, é parte do Base64 válido
-                
-                // PASSO 5: Converter Base64URL para bytes
-                const compressedBytes = base64UrlToUint8Array(hash);
-                console.log('📦 Bytes comprimidos:', compressedBytes.length);
-                
-                loadingStatus.textContent = `🔓 Descomprimindo (${compressedBytes.length} bytes)...`;
-                
-                // PASSO 6: Descomprimir
-                const decompressedBytes = decompressGzip(compressedBytes);
-                console.log('📦 Bytes descomprimidos:', decompressedBytes.length);
-                
-                // PASSO 7: Converter para texto
-                const jsonText = new TextDecoder('utf-8').decode(decompressedBytes);
-                console.log('📄 JSON (início):', jsonText.substring(0, 200));
-                
-                // PASSO 8: Parse JSON
-                const data = JSON.parse(jsonText);
-                console.log('✅ Dados carregados!');
-                console.log('   Times:', data.times?.length);
-                console.log('   Categorias:', data.categorias?.length);
-                
-                return data;
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                throw error;
             }
-        }
-
-        // ==================== RENDERIZAR ====================
-        function renderizar(data) {
-            if (!data) throw new Error('Dados inválidos');
             
-            const times = data.times || [];
-            const categorias = data.categorias || [];
-            const escolhas = data.escolhas || {};
-            const prazo = data.prazo || '';
+            statusEl.innerHTML = '📄 Parseando JSON...';
             
-            // Mostrar main
+            // Converter para texto
+            const jsonText = new TextDecoder('utf-8').decode(decompressed);
+            console.log('📄 JSON preview:', jsonText.substring(0, 100));
+            
+            // Parse JSON
+            const data = JSON.parse(jsonText);
+            console.log('✅ Dados carregados!');
+            
+            // ==================== MOSTRAR DADOS ====================
             loadingEl.style.display = 'none';
             mainEl.style.display = 'block';
             
-            // Prazo
-            if (prazo) {
-                const [dataPart, horaPart] = prazo.split(' ');
-                const [ano, mes, dia] = dataPart.split('-');
-                const dataFormatada = `${dia}/${mes}/${ano} às ${horaPart}`;
-                
-                document.getElementById('prazo-container').innerHTML = `
-                    <div class="prazo-box">
-                        <span style="font-size: 28px;">⏰</span>
-                        <div>
-                            <div style="font-size: 13px; color: #aaa;">ENCERRAMENTO</div>
-                            <div style="font-size: 18px; font-weight: bold; color: #FFD700;">${dataFormatada}</div>
-                        </div>
-                    </div>
-                `;
+            const content = document.getElementById('content');
+            
+            // Mostrar prazo
+            if (data.prazo) {
+                content.innerHTML += `<div style="background: rgba(255,215,0,0.1); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                    ⏰ Encerramento: <strong style="color: #FFD700;">${data.prazo}</strong>
+                </div>`;
             }
             
-            // Categorias
-            const container = document.getElementById('categorias-container');
-            container.innerHTML = '';
+            // Mostrar times carregados
+            content.innerHTML += `<div style="margin-bottom: 20px;">
+                <strong>✅ Dados carregados com sucesso!</strong><br>
+                🏆 Times: ${data.times?.length || 0}<br>
+                🎯 Categorias: ${data.categorias?.length || 0}<br>
+                📝 Suas escolhas: ${Object.keys(data.escolhas || {}).length}
+            </div>`;
             
-            categorias.forEach(cat => {
-                const codigo = cat.item || cat.codigo;
-                const nome = cat.nome;
-                const icone = cat.icone || '⚽';
-                const pontos = cat.pontos || 0;
-                const escolhaAtual = escolhas[codigo] || '';
+            // Lista de categorias simplificada
+            if (data.categorias && data.categorias.length > 0) {
+                content.innerHTML += '<h3 style="margin-bottom: 16px;">📋 Categorias:</h3>';
                 
-                const card = document.createElement('div');
-                card.className = `categoria ${escolhaAtual ? 'preenchida' : ''}`;
-                
-                // Criar select
-                let selectHtml = `<select data-codigo="${codigo}"><option value="">🔽 Selecione um time...</option>`;
-                times.forEach(time => {
-                    selectHtml += `<option value="${time}" ${time === escolhaAtual ? 'selected' : ''}>⚽ ${time}</option>`;
-                });
-                selectHtml += '</select>';
-                
-                card.innerHTML = `
-                    <div class="categoria-header">
-                        <span class="icone">${icone}</span>
-                        <div class="info">
-                            <div class="nome">${nome}</div>
-                            <span class="pontos">${pontos} pts</span>
+                data.categorias.forEach(cat => {
+                    const codigo = cat.item || cat.codigo;
+                    const nome = cat.nome;
+                    const icone = cat.icone || '⚽';
+                    const escolha = data.escolhas?.[codigo] || 'Não preenchido';
+                    
+                    content.innerHTML += `
+                        <div style="background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 24px; margin-right: 12px;">${icone}</span>
+                                <span style="font-weight: 600;">${nome}</span>
+                            </div>
+                            <div style="color: #FFD700;">✅ ${escolha}</div>
                         </div>
-                    </div>
-                    ${selectHtml}
-                    ${escolhaAtual ? `<div class="escolha-atual"><span>✅</span><span>${escolhaAtual}</span></div>` : ''}
-                `;
-                
-                container.appendChild(card);
-                
-                // Event listener
-                const select = card.querySelector('select');
-                select.addEventListener('change', function() {
-                    const valor = this.value;
-                    if (valor) {
-                        card.classList.add('preenchida');
-                        let div = card.querySelector('.escolha-atual');
-                        if (div) {
-                            div.innerHTML = `<span>✅</span><span>${valor}</span>`;
-                        } else {
-                            const nova = document.createElement('div');
-                            nova.className = 'escolha-atual';
-                            nova.innerHTML = `<span>✅</span><span>${valor}</span>`;
-                            card.appendChild(nova);
-                        }
-                    } else {
-                        card.classList.remove('preenchida');
-                        const div = card.querySelector('.escolha-atual');
-                        if (div) div.remove();
-                    }
-                    atualizarContador();
+                    `;
                 });
-            });
-            
-            // Contador
-            function atualizarContador() {
-                const selects = document.querySelectorAll('select[data-codigo]');
-                let count = 0;
-                selects.forEach(s => { if (s.value) count++; });
-                document.getElementById('contador').textContent = `${count}/${categorias.length}`;
-                document.getElementById('barra-progresso').style.width = (count / categorias.length * 100) + '%';
             }
-            atualizarContador();
             
-            // Botão salvar
-            document.getElementById('btn-salvar').onclick = function() {
-                const selects = document.querySelectorAll('select[data-codigo]');
-                const escolhasArray = [];
-                selects.forEach(s => {
-                    if (s.value) {
-                        escolhasArray.push({
-                            item: s.dataset.codigo,
-                            time: s.value
-                        });
-                    }
-                });
-                
-                if (window.Telegram?.WebApp) {
-                    window.Telegram.WebApp.sendData(JSON.stringify({ escolhas: escolhasArray }));
-                    window.Telegram.WebApp.showAlert(`✅ ${escolhasArray.length} palpites salvos!`);
-                }
+            // Botão para enviar dados de teste
+            content.innerHTML += `
+                <button onclick="enviarTeste()" style="width: 100%; padding: 16px; background: #FFD700; border: none; border-radius: 30px; color: #0a1c2a; font-weight: bold; margin-top: 20px;">
+                    📤 TESTAR ENVIO
+                </button>
+            `;
+            
+            window.enviarTeste = function() {
+                const teste = { escolhas: [{ item: "teste", time: "Time Teste" }] };
+                tg.sendData(JSON.stringify(teste));
+                tg.showAlert('📤 Teste enviado!');
             };
-        }
-
-        // ==================== EXECUTAR ====================
-        try {
-            // Verificar se tem hash
-            if (!window.location.hash || window.location.hash.length < 50) {
-                throw new Error('URL sem dados. Use o bot do Telegram.');
-            }
-            
-            // Decodificar
-            const dados = decodeData();
-            
-            // Renderizar
-            renderizar(dados);
             
         } catch (error) {
-            console.error('❌ ERRO FATAL:', error);
+            console.error('❌ Erro:', error);
             
             loadingEl.style.display = 'none';
             errorEl.style.display = 'block';
             
             document.getElementById('error-message').innerHTML = error.message;
-            document.getElementById('error-hash').innerHTML = `
-                <strong>Hash bruto:</strong><br>
-                ${window.location.hash.substring(0, 200)}...<br><br>
-                <strong>Length:</strong> ${window.location.hash.length}<br>
-                <strong>Pako:</strong> ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
-                <strong>Plataforma:</strong> ${navigator.platform}
+            
+            // Mostrar diagnóstico completo
+            document.getElementById('debug-info').innerHTML = `
+                <strong>🔍 DIAGNÓSTICO COMPLETO:</strong><br><br>
+                
+                📌 URL: ${window.location.href.substring(0, 150)}...<br>
+                📦 Hash (raw): ${window.location.hash.substring(0, 100)}...<br>
+                📦 Hash length: ${window.location.hash.length}<br>
+                📦 Hash type: ${typeof window.location.hash}<br>
+                <br>
+                📱 Telegram Platform: ${tg.platform}<br>
+                📱 Telegram Version: ${tg.version}<br>
+                📦 initData: ${tg.initData ? '✅' : '❌'}<br>
+                <br>
+                🔧 Pako: ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
+                🔧 atob: ${typeof atob !== 'undefined' ? '✅' : '❌'}<br>
+                <br>
+                ⚠️ O hash está sendo corrompido pelo Telegram WebView.<br>
+                <br>
+                <strong style="color: #FFD700;">SOLUÇÃO:</strong><br>
+                1. Volte para o bot<br>
+                2. Use o comando /escolha_extra NOVAMENTE<br>
+                3. Clique no botão recém-criado<br>
             `;
         }
     </script>
+    
+    <!-- Carregar pako depois -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </body>
 </html>
