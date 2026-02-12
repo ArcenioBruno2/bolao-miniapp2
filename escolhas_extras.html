@@ -302,10 +302,20 @@
                 font-size: 28px;
             }
         }
+        
+        /* Ambiente de teste */
+        .test-banner {
+            background: #ff9800;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <!-- TELA DE CARREGAMENTO -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
         <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;" id="loading-message">
@@ -316,7 +326,6 @@
         </div>
     </div>
     
-    <!-- CONTEÚDO PRINCIPAL (será exibido após carregamento) -->
     <div class="container" id="main-content" style="display: none;"></div>
     
     <script>
@@ -326,7 +335,6 @@
         tg.ready();
         
         // ============ VARIÁVEIS GLOBAIS ============
-        let dadosCompletos = null;
         let times = [];
         let categorias = [];
         let escolhasAnteriores = {};
@@ -335,162 +343,173 @@
         let usuarioId = null;
         let usuarioNome = '';
         
-        // ============ MÉTODO PRIORITÁRIO: PEGAR DADOS DO TELEGRAM (NÃO CORTA) ============
-        function getDataFromTelegram() {
-            try {
-                console.log('📱 Tentando obter dados via Telegram WebApp...');
-                
-                // Verifica se initDataUnsafe existe
-                if (!tg.initDataUnsafe) {
-                    console.log('❌ tg.initDataUnsafe não disponível');
-                    return null;
-                }
-                
-                console.log('📦 initDataUnsafe:', tg.initDataUnsafe);
-                
-                // Tenta obter o start_param
-                if (tg.initDataUnsafe.start_param) {
-                    console.log('✅ start_param encontrado:', tg.initDataUnsafe.start_param);
-                    
-                    const param = tg.initDataUnsafe.start_param;
-                    
-                    // Verifica se é o formato correto
-                    if (param && param.startsWith('escolha_extra_')) {
-                        const base64Data = param.replace('escolha_extra_', '');
-                        console.log('✅ Base64 extraído do start_param (tamanho):', base64Data.length);
-                        return base64Data;
-                    } else {
-                        console.log('⚠️ start_param não está no formato esperado:', param);
-                    }
-                } else {
-                    console.log('⚠️ start_param não encontrado em initDataUnsafe');
-                }
-                
-                return null;
-            } catch (e) {
-                console.error('❌ Erro ao ler start_param:', e);
-                return null;
-            }
+        // ============ DETECTAR AMBIENTE ============
+        function isRunningInTelegram() {
+            return tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length > 0;
         }
         
-        // ============ FALLBACK: LER DA URL (caso o método principal falhe) ============
-        function getDataFromURL() {
-            try {
-                console.log('🔗 Tentando obter dados da URL...');
-                
-                // 1. Tenta hash puro (formato: #BASE64)
-                if (window.location.hash && window.location.hash.length > 1) {
-                    let hash = window.location.hash.substring(1); // Remove o #
-                    console.log('📍 Hash encontrado (tamanho):', hash.length);
-                    return hash;
-                }
-                
-                // 2. Tenta parâmetro ?data=
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('data')) {
-                    const data = urlParams.get('data');
-                    console.log('📍 Parâmetro ?data= encontrado (tamanho):', data.length);
-                    return data;
-                }
-                
-                // 3. Tenta hash com #data=
-                if (window.location.hash.includes('#data=')) {
-                    const data = window.location.hash.replace('#data=', '');
-                    console.log('📍 Hash #data= encontrado (tamanho):', data.length);
-                    return data;
-                }
-                
-                console.log('❌ Nenhum dado encontrado na URL');
-                return null;
-                
-            } catch (e) {
-                console.error('❌ Erro ao ler URL:', e);
-                return null;
-            }
+        function isRunningInTestMode() {
+            // Verifica se está abrindo direto no navegador
+            return window.location.protocol === 'file:' || 
+                   window.location.hostname.includes('github.io') ||
+                   window.location.hostname === 'localhost' ||
+                   window.location.hostname === '127.0.0.1';
+        }
+        
+        // ============ CARREGAR DADOS DE TESTE ============
+        function loadTestData() {
+            console.log('🧪 MODO DE TESTE - Carregando dados simulados');
+            
+            // Times de exemplo
+            times = [
+                "América Mineiro", "Atlético Goianiense", "Atlético Mineiro", 
+                "Bahia", "Botafogo", "Corinthians", "Coritiba", 
+                "Cruzeiro", "Cuiabá", "Flamengo", "Fluminense", 
+                "Fortaleza", "Goiás", "Grêmio", "Internacional", 
+                "Palmeiras", "Red Bull Bragantino", "Santos", 
+                "São Paulo", "Vasco da Gama"
+            ];
+            
+            // Categorias
+            categorias = [
+                {"item": "campeao_geral", "nome": "Campeão Geral", "pontos": 20, "icone": "🏆"},
+                {"item": "campeao_turno1", "nome": "Campeão 1º Turno", "pontos": 10, "icone": "🥇"},
+                {"item": "campeao_turno2", "nome": "Campeão 2º Turno", "pontos": 10, "icone": "🥈"},
+                {"item": "melhor_visitante", "nome": "Melhor Visitante", "pontos": 5, "icone": "✈️"},
+                {"item": "melhor_mandante", "nome": "Melhor Mandante", "pontos": 5, "icone": "🏠"},
+                {"item": "melhor_ataque", "nome": "Melhor Ataque", "pontos": 5, "icone": "⚽"},
+                {"item": "melhor_defesa", "nome": "Melhor Defesa", "pontos": 5, "icone": "🛡️"},
+                {"item": "segundo_colocado", "nome": "2º Colocado Final", "pontos": 10, "icone": "🥉"},
+                {"item": "terceiro_colocado", "nome": "3º Colocado Final", "pontos": 10, "icone": "4️⃣"},
+                {"item": "quarto_colocado", "nome": "4º Colocado Final", "pontos": 10, "icone": "5️⃣"},
+                {"item": "decimo_setimo", "nome": "17º Colocado", "pontos": 10, "icone": "⬇️"},
+                {"item": "decimo_oitavo", "nome": "18º Colocado", "pontos": 10, "icone": "⬇️⬇️"},
+                {"item": "decimo_nono", "nome": "19º Colocado", "pontos": 10, "icone": "⬇️⬇️⬇️"},
+                {"item": "vigesimo", "nome": "20º Colocado", "pontos": 10, "icone": "🚫"},
+                {"item": "time_estrela", "nome": "Time Estrela", "pontos": 0, "icone": "⭐"}
+            ];
+            
+            // Escolhas vazias
+            escolhasAnteriores = {};
+            
+            // Prazo futuro
+            const futuro = new Date();
+            futuro.setDate(futuro.getDate() + 7);
+            prazo = futuro.toISOString().replace('T', ' ').substring(0, 19);
+            
+            usuarioId = 123456789;
+            usuarioNome = "Usuário Teste";
+            
+            return true;
         }
         
         // ============ DECODIFICAR DADOS ============
         function decodeDataFromURL() {
             try {
-                console.log('=== DECODIFICANDO DADOS (VERSÃO CORRIGIDA) ===');
+                console.log('=== DECODIFICANDO DADOS ===');
+                console.log('📱 initDataUnsafe:', tg.initDataUnsafe);
                 
-                // ============ TENTAR MÉTODO PRIORITÁRIO PRIMEIRO ============
-                let base64Data = getDataFromTelegram();
-                let fonte = 'Telegram start_param';
-                
-                // ============ FALLBACK PARA URL ============
-                if (!base64Data) {
-                    console.log('⚠️ Método Telegram falhou, tentando URL...');
-                    base64Data = getDataFromURL();
-                    fonte = 'URL';
-                }
-                
-                // ============ VERIFICA SE ENCONTROU ALGO ============
-                if (!base64Data || base64Data.length < 10) {
-                    console.error('❌ Nenhum dado encontrado em nenhuma fonte');
-                    throw new Error('Dados não encontrados');
-                }
-                
-                console.log(`✅ Dados obtidos via ${fonte} (tamanho): ${base64Data.length} caracteres`);
-                console.log('📦 Preview:', base64Data.substring(0, 50) + '...');
-                
-                // ============ DECODIFICAÇÃO BASE64 ============
-                console.log('🔄 Decodificando Base64...');
-                let decodedString;
-                
-                try {
-                    // Tenta decodificar normalmente
-                    decodedString = atob(base64Data);
-                    console.log('✅ Base64 decodificado com sucesso');
-                } catch (e1) {
-                    console.error('❌ Erro no atob padrão:', e1);
+                // ============ MODO 1: TELEGRAM (PRODUÇÃO) ============
+                if (isRunningInTelegram()) {
+                    console.log('✅ Rodando no Telegram WebApp');
                     
-                    try {
-                        // Tenta com decodeURIComponent
-                        console.log('🔄 Tentando decodeURIComponent + atob...');
-                        const cleaned = decodeURIComponent(base64Data);
-                        decodedString = atob(cleaned);
-                        console.log('✅ Sucesso com decodeURIComponent');
-                    } catch (e2) {
-                        console.error('❌ Todas as tentativas falharam:', e2);
-                        throw new Error('Erro ao decodificar Base64');
+                    if (tg.initDataUnsafe.start_param) {
+                        const param = tg.initDataUnsafe.start_param;
+                        console.log('📦 start_param:', param);
+                        
+                        if (param.startsWith('escolha_extra_')) {
+                            const base64Data = param.replace('escolha_extra_', '');
+                            console.log('✅ Base64 extraído do Telegram');
+                            return processBase64Data(base64Data);
+                        }
+                    }
+                    
+                    console.log('⚠️ Telegram sem start_param - usando fallback da URL');
+                }
+                
+                // ============ MODO 2: URL FALLBACK (HASH) ============
+                console.log('🔗 Tentando ler da URL...');
+                
+                let base64Data = null;
+                
+                // Hash puro: #BASE64
+                if (window.location.hash && window.location.hash.length > 1) {
+                    base64Data = window.location.hash.substring(1);
+                    console.log('✅ Lido do hash');
+                }
+                
+                // Parâmetro ?data=
+                if (!base64Data) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.has('data')) {
+                        base64Data = urlParams.get('data');
+                        console.log('✅ Lido do ?data=');
                     }
                 }
                 
-                console.log('📦 String decodificada (primeiros 100 chars):', decodedString.substring(0, 100) + '...');
+                // Hash #data=
+                if (!base64Data && window.location.hash.includes('#data=')) {
+                    base64Data = window.location.hash.replace('#data=', '');
+                    console.log('✅ Lido do #data=');
+                }
                 
-                // ============ PARSE JSON ============
-                console.log('🔄 Parseando JSON...');
-                let dados;
+                if (base64Data) {
+                    return processBase64Data(base64Data);
+                }
+                
+                // ============ MODO 3: TESTE LOCAL ============
+                if (isRunningInTestMode()) {
+                    console.log('🧪 Modo de teste detectado');
+                    
+                    // Mostra aviso visual
+                    const warning = document.createElement('div');
+                    warning.className = 'test-banner';
+                    warning.innerHTML = '🧪 MODO DE TESTE - Dados simulados';
+                    document.body.prepend(warning);
+                    
+                    return loadTestData();
+                }
+                
+                throw new Error('Nenhuma fonte de dados encontrada');
+                
+            } catch (e) {
+                console.error('❌ Erro na decodificação:', e);
+                mostrarErroVisivel(
+                    'Erro ao Carregar Dados',
+                    'Não foi possível carregar as informações.',
+                    e.message
+                );
+                return false;
+            }
+        }
+        
+        // ============ PROCESSAR BASE64 ============
+        function processBase64Data(base64Data) {
+            try {
+                console.log('🔄 Processando Base64...');
+                
+                // Remove espaços e quebras de linha
+                base64Data = base64Data.trim();
+                
+                // Decodifica
+                let decodedString;
                 
                 try {
-                    dados = JSON.parse(decodedString);
-                    console.log('✅ JSON parseado com sucesso!');
+                    decodedString = atob(base64Data);
                 } catch (e) {
-                    console.error('❌ Erro no JSON.parse:', e);
-                    console.error('📄 String que causou erro (início):', decodedString.substring(0, 200));
-                    throw new Error('Erro ao interpretar dados JSON');
+                    console.error('❌ Erro no atob:', e);
+                    // Tenta com decodeURIComponent
+                    const cleaned = decodeURIComponent(base64Data);
+                    decodedString = atob(cleaned);
                 }
                 
-                // ============ VALIDAÇÃO DOS DADOS ============
-                console.log('🔍 Validando estrutura dos dados...');
+                console.log('📦 JSON decodificado');
                 
-                if (!dados.times) {
-                    console.error('❌ Campo "times" ausente!');
-                    throw new Error('Dados incompletos: times não encontrados');
-                }
+                // Parse
+                const dados = JSON.parse(decodedString);
+                console.log('✅ JSON parseado');
                 
-                if (!dados.categorias) {
-                    console.error('❌ Campo "categorias" ausente!');
-                    throw new Error('Dados incompletos: categorias não encontradas');
-                }
-                
-                if (!dados.prazo) {
-                    console.error('❌ Campo "prazo" ausente!');
-                    throw new Error('Dados incompletos: prazo não encontrado');
-                }
-                
-                // ============ EXTRAI DADOS ============
+                // Extrai dados
                 times = dados.times || [];
                 categorias = dados.categorias || [];
                 escolhasAnteriores = dados.escolhas || {};
@@ -498,40 +517,16 @@
                 usuarioId = dados.usuario?.id || null;
                 usuarioNome = dados.usuario?.nome || 'Usuário';
                 
-                // ============ LOG DE SUCESSO ============
-                console.log('✅ Dados carregados com sucesso:');
+                console.log(`✅ Dados carregados:`);
                 console.log(`   • Times: ${times.length}`);
                 console.log(`   • Categorias: ${categorias.length}`);
-                console.log(`   • Escolhas anteriores: ${Object.keys(escolhasAnteriores).length}`);
-                console.log(`   • Prazo: ${prazo}`);
-                console.log(`   • Usuário: ${usuarioNome} (ID: ${usuarioId})`);
+                console.log(`   • Escolhas: ${Object.keys(escolhasAnteriores).length}`);
                 
-                // Verifica formato das categorias
-                if (categorias.length > 0) {
-                    const primeira = categorias[0];
-                    console.log('📋 Formato da primeira categoria:', primeira);
-                    
-                    if (!primeira.item) {
-                        console.error('❌ Categoria sem campo "item"!');
-                        throw new Error('Formato de categorias inválido');
-                    }
-                }
-                
-                dadosCompletos = dados;
                 return true;
                 
             } catch (e) {
-                console.error('=== ERRO NA DECODIFICAÇÃO ===');
-                console.error(e);
-                
-                // Mostra erro visível para o usuário
-                mostrarErroVisivel(
-                    'Erro ao Carregar Dados',
-                    'Não foi possível carregar as informações. Por favor, tente novamente.',
-                    e.message
-                );
-                
-                return false;
+                console.error('❌ Erro ao processar Base64:', e);
+                throw e;
             }
         }
         
@@ -545,100 +540,38 @@
             loadingMsg.innerHTML = `❌ ${titulo}`;
             loadingDetail.innerHTML = mensagem;
             
-            // Botão de fechar
+            // Botão fechar
             const closeBtn = document.createElement('button');
             closeBtn.className = 'close-button';
             closeBtn.innerHTML = 'FECHAR';
-            closeBtn.onclick = () => tg.close();
+            closeBtn.onclick = () => {
+                if (tg && typeof tg.close === 'function') {
+                    tg.close();
+                } else {
+                    window.close();
+                }
+            };
             closeBtn.style.marginTop = '24px';
-            
             loading.appendChild(closeBtn);
             
-            // Informações de debug
+            // Debug info
             const debug = document.createElement('div');
             debug.className = 'debug-info';
-            debug.innerHTML = `<strong>Debug:</strong> ${detalhe}<br>
-                               <strong>initDataUnsafe:</strong> ${JSON.stringify(tg.initDataUnsafe)}<br>
-                               <strong>URL:</strong> ${window.location.href.substring(0, 200)}...`;
+            debug.innerHTML = `
+                <strong>🔍 Debug:</strong><br>
+                • Erro: ${detalhe}<br>
+                • Ambiente Telegram: ${isRunningInTelegram()}<br>
+                • initDataUnsafe: ${JSON.stringify(tg.initDataUnsafe)}<br>
+                • Hash: ${window.location.hash.substring(0, 50)}...<br>
+                • URL: ${window.location.href.substring(0, 100)}...
+            `;
             loading.appendChild(debug);
         }
         
-        // ============ ATUALIZAR CRONÔMETRO ============
-        function atualizarCronometro() {
-            if (!prazo) return;
-            
-            try {
-                let prazoStr = prazo;
-                if (prazoStr.includes(' ')) {
-                    prazoStr = prazoStr.replace(' ', 'T');
-                }
-                if (!prazoStr.includes('Z') && !prazoStr.includes('+')) {
-                    prazoStr += '-03:00';
-                }
-                
-                const prazoDate = new Date(prazoStr);
-                const agora = new Date();
-                
-                if (isNaN(prazoDate.getTime())) {
-                    console.error('Data inválida');
-                    return;
-                }
-                
-                const diff = prazoDate - agora;
-                
-                if (diff <= 0) {
-                    document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
-                    document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
-                    
-                    document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
-                    document.getElementById('btn-enviar').disabled = true;
-                    
-                    clearInterval(timerInterval);
-                    return;
-                }
-                
-                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const segundos = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                document.getElementById('timer').innerHTML = 
-                    `${String(dias).padStart(2, '0')} DIAS ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-                
-                if (diff < 3600000) {
-                    document.getElementById('timer').style.color = '#ff6b6b';
-                }
-                
-                document.getElementById('deadline-info').innerHTML = 
-                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
-                    
-            } catch (e) {
-                console.error('Erro no cronômetro:', e);
-            }
-        }
-        
-        // ============ RENDERIZAR CATEGORIAS ============
+        // ============ RENDERIZAR ============
         function renderizarCategorias() {
             const container = document.getElementById('main-content');
-            if (!container) return;
             
-            if (!categorias || categorias.length === 0) {
-                mostrarErroVisivel(
-                    'Erro de Configuração',
-                    'Categorias não carregadas. Contate o administrador.'
-                );
-                return;
-            }
-            
-            if (!times || times.length === 0) {
-                mostrarErroVisivel(
-                    'Times não Importados',
-                    'Aguardando administrador importar os times.'
-                );
-                return;
-            }
-            
-            // Constrói o HTML
             let html = `
                 <div class="header">
                     <div class="title">
@@ -677,18 +610,10 @@
             container.style.display = 'block';
             
             const grid = document.getElementById('categorias-grid');
-            if (!grid) return;
-            
-            grid.innerHTML = '';
             let preenchidas = 0;
             
             categorias.forEach(cat => {
                 const itemKey = cat.item || cat.codigo;
-                if (!itemKey) {
-                    console.error('❌ Categoria sem identificador:', cat);
-                    return;
-                }
-                
                 const escolhaAnterior = escolhasAnteriores[itemKey] || '';
                 if (escolhaAnterior) preenchidas++;
                 
@@ -696,7 +621,6 @@
                 card.className = 'categoria-card';
                 
                 let options = '<option value="">⚽ Selecione um time</option>';
-                
                 times.forEach(time => {
                     const selected = (time === escolhaAnterior) ? 'selected' : '';
                     options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
@@ -718,6 +642,7 @@
             
             atualizarProgresso(preenchidas);
             
+            // Event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -726,14 +651,21 @@
             });
             
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
-            document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
+            document.getElementById('btn-cancelar').addEventListener('click', () => {
+                if (tg && typeof tg.close === 'function') {
+                    tg.close();
+                } else {
+                    window.close();
+                }
+            });
             
-            atualizarCronometro();
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(atualizarCronometro, 1000);
+            // Cronômetro
+            if (prazo) {
+                atualizarCronometro();
+                timerInterval = setInterval(atualizarCronometro, 1000);
+            }
         }
         
-        // ============ ATUALIZAR PROGRESSO ============
         function atualizarProgresso(preenchidas) {
             const total = categorias.length || 15;
             const percent = (preenchidas / total) * 100;
@@ -741,7 +673,51 @@
             document.getElementById('progress-fill').style.width = `${percent}%`;
         }
         
-        // ============ COLETAR ESCOLHAS ============
+        function atualizarCronometro() {
+            if (!prazo) return;
+            
+            try {
+                let prazoStr = prazo;
+                if (prazoStr.includes(' ')) {
+                    prazoStr = prazoStr.replace(' ', 'T');
+                }
+                if (!prazoStr.includes('Z') && !prazoStr.includes('+')) {
+                    prazoStr += '-03:00';
+                }
+                
+                const prazoDate = new Date(prazoStr);
+                const agora = new Date();
+                const diff = prazoDate - agora;
+                
+                if (diff <= 0) {
+                    document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
+                    document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
+                    document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
+                    document.getElementById('btn-enviar').disabled = true;
+                    clearInterval(timerInterval);
+                    return;
+                }
+                
+                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('timer').innerHTML = 
+                    `${String(dias).padStart(2, '0')} DIAS ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+                
+                if (diff < 3600000) {
+                    document.getElementById('timer').style.color = '#ff6b6b';
+                }
+                
+                document.getElementById('deadline-info').innerHTML = 
+                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
+                    
+            } catch (e) {
+                console.error('Erro no cronômetro:', e);
+            }
+        }
+        
         function coletarEscolhas() {
             const selects = document.querySelectorAll('.categoria-select');
             const escolhas = [];
@@ -759,30 +735,42 @@
             return escolhas;
         }
         
-        // ============ ENVIAR ESCOLHAS ============
         function enviarEscolhas() {
             const escolhas = coletarEscolhas();
             
             if (escolhas.length === 0) {
-                tg.showAlert('❌ Escolha pelo menos um time!');
+                if (tg && typeof tg.showAlert === 'function') {
+                    tg.showAlert('❌ Escolha pelo menos um time!');
+                } else {
+                    alert('❌ Escolha pelo menos um time!');
+                }
                 return;
             }
             
-            tg.showConfirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`, (confirmed) => {
-                if (confirmed) {
-                    tg.sendData(JSON.stringify({ 
-                        escolhas: escolhas 
-                    }));
+            const confirmar = () => {
+                if (tg && typeof tg.sendData === 'function') {
+                    tg.sendData(JSON.stringify({ escolhas: escolhas }));
                     tg.close();
+                } else {
+                    // Modo de teste
+                    alert('✅ Modo teste - Escolhas salvas!\n\n' + 
+                          JSON.stringify(escolhas, null, 2));
+                    console.log('Escolhas:', escolhas);
                 }
-            });
+            };
+            
+            if (tg && typeof tg.showConfirm === 'function') {
+                tg.showConfirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`, confirmar);
+            } else {
+                if (confirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`)) {
+                    confirmar();
+                }
+            }
         }
         
-        // ============ INICIALIZAÇÃO ============
+        // ============ INIT ============
         function init() {
-            console.log('=== INICIALIZANDO ESCOLHAS EXTRAS ===');
-            console.log('📱 Telegram WebApp disponível:', !!tg);
-            console.log('📦 initDataUnsafe:', tg.initDataUnsafe);
+            console.log('=== INICIALIZANDO ===');
             
             if (!decodeDataFromURL()) {
                 return;
@@ -791,18 +779,13 @@
             try {
                 renderizarCategorias();
                 document.getElementById('loading').style.display = 'none';
-                console.log('=== INICIALIZADO COM SUCESSO ===');
+                console.log('=== PRONTO ===');
             } catch (e) {
                 console.error('❌ Erro ao renderizar:', e);
-                mostrarErroVisivel(
-                    'Erro ao Renderizar',
-                    'Ocorreu um erro ao montar a tela.',
-                    e.message
-                );
+                mostrarErroVisivel('Erro ao Renderizar', e.message);
             }
         }
         
-        // Iniciar quando a página carregar
         window.addEventListener('load', init);
         
         // Timeout de segurança
