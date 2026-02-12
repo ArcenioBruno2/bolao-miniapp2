@@ -4,731 +4,654 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐ Pontos Extras 2026</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- 🔥 BIBLIOTECA PAKO PARA DESCOMPRESSÃO GZIP -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--tg-theme-bg-color, #f5f7fa);
-            color: var(--tg-theme-text-color, #2c3e50);
-            padding: 16px;
+            background: linear-gradient(135deg, #0b1a2e 0%, #1a2f3f 100%);
             min-height: 100vh;
+            padding: 20px 16px;
+            color: white;
         }
-        
-        .container { max-width: 600px; margin: 0 auto; }
-        
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 40px;
+        }
+
         .header {
-            background: var(--tg-theme-secondary-bg-color, #2c3e50);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
-            color: var(--tg-theme-text-color, white);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 28px;
         }
-        
-        .title {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 16px;
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .prazo-box {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            backdrop-filter: blur(10px);
         }
-        
-        .countdown { text-align: center; }
-        .countdown-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.8;
-            margin-bottom: 8px;
+
+        .prazo-icone {
+            font-size: 24px;
         }
-        
-        .timer {
-            font-size: 36px;
-            font-weight: 800;
-            font-family: monospace;
-            color: var(--tg-theme-button-color, #ffd700);
-            letter-spacing: 3px;
+
+        .prazo-texto {
+            font-weight: 600;
+            color: #ffd700;
         }
-        
-        .progress-section {
-            background: var(--tg-theme-secondary-bg-color, white);
-            border-radius: 16px;
+
+        .progresso {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
             padding: 18px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-        
-        .progress-header {
+
+        .progresso-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
-            font-weight: 600;
         }
-        
-        .progress-bar {
+
+        .progresso-titulo {
+            font-size: 16px;
+            color: #a0c0d0;
+        }
+
+        .progresso-contador {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .barra-progresso {
             width: 100%;
             height: 8px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
             overflow: hidden;
         }
-        
-        .progress-fill {
+
+        .barra-preenchimento {
             height: 100%;
-            background: var(--tg-theme-button-color, #667eea);
-            border-radius: 8px;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 4px;
             transition: width 0.3s ease;
         }
-        
+
         .categorias-grid {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        .categoria-card {
-            background: var(--tg-theme-secondary-bg-color, white);
-            border-radius: 16px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .categoria-icone {
-            width: 48px;
-            height: 48px;
-            background: var(--tg-theme-button-color, #667eea);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-        
-        .categoria-info { flex: 1; }
-        .categoria-nome {
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 4px;
-        }
-        
-        .categoria-pontos {
-            font-size: 13px;
-            color: var(--tg-theme-hint-color, #666);
-            font-weight: 600;
-        }
-        
-        .categoria-select {
-            width: 160px;
-            padding: 12px;
-            border: 2px solid rgba(0,0,0,0.1);
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            background: var(--tg-theme-bg-color, white);
-            color: var(--tg-theme-text-color, #2c3e50);
-            cursor: pointer;
-        }
-        
-        .categoria-select:focus {
-            outline: none;
-            border-color: var(--tg-theme-button-color, #667eea);
-        }
-        
-        .categoria-select:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .acoes {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
+            gap: 16px;
             margin-bottom: 30px;
         }
-        
-        .btn {
-            flex: 1;
+
+        .categoria-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
             padding: 16px;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+
+        .categoria-card.preenchida {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+
+        .categoria-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: opacity 0.2s;
+            margin-bottom: 12px;
         }
-        
-        .btn-primary {
-            background: var(--tg-theme-button-color, #667eea);
-            color: var(--tg-theme-button-text-color, white);
+
+        .categoria-icone {
+            font-size: 28px;
+            margin-right: 12px;
         }
-        
-        .btn-secondary {
-            background: rgba(0,0,0,0.05);
-            color: var(--tg-theme-text-color, #2c3e50);
+
+        .categoria-info {
+            flex: 1;
         }
-        
-        .btn:active { opacity: 0.7; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--tg-theme-bg-color, white);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            flex-direction: column;
-            gap: 16px;
-        }
-        
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(0,0,0,0.1);
-            border-top-color: var(--tg-theme-button-color, #667eea);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        
-        .close-button {
-            background: var(--tg-theme-button-color, #d32f2f);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-weight: 700;
+
+        .categoria-nome {
             font-size: 16px;
-            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .categoria-pontos {
+            font-size: 13px;
+            color: #ffd700;
+            background: rgba(255,215,0,0.1);
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status-preenchido {
+            background: #4caf50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .select-wrapper {
+            position: relative;
+            margin-top: 8px;
+        }
+
+        select {
             width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
+            padding: 14px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 14px;
+            color: white;
+            font-size: 15px;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        
-        .debug-info {
-            margin-top: 20px;
-            padding: 12px;
-            background: #f5f5f5;
-            border-radius: 8px;
-            font-size: 11px;
-            color: #999;
-            text-align: left;
-            word-break: break-all;
+
+        select:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(0,0,0,0.5);
         }
-        
-        .test-banner {
-            background: #ff9800;
+
+        select option {
+            background: #1a2f3f;
             color: white;
             padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            text-align: center;
         }
-        
-        @keyframes spin { to { transform: rotate(360deg); } }
-        
+
+        .select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ffd700;
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        .escolha-atual {
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acoes {
+            position: sticky;
+            bottom: 20px;
+            background: rgba(11, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,215,0,0.3);
+            margin-top: 20px;
+        }
+
+        .btn-salvar {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            border: none;
+            border-radius: 30px;
+            color: #0b1a2e;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+        }
+
+        .btn-salvar:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(255,215,0,0.2);
+        }
+
+        .btn-salvar:disabled {
+            opacity: 0.5;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alerta {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+            color: #ff8a80;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        .badge {
+            background: #ffd700;
+            color: #0b1a2e;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
         @media (max-width: 480px) {
-            .categoria-card { flex-wrap: wrap; }
-            .categoria-select { width: 100%; margin-top: 8px; }
-            .timer { font-size: 28px; }
+            body { padding: 16px 12px; }
+            .categoria-card { padding: 14px; }
         }
     </style>
 </head>
 <body>
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;" id="loading-message">
-            Carregando Pontos Extras...
+    <div class="container" id="app">
+        <!-- Loading -->
+        <div v-if="loading" class="loading">
+            <span>⭐ Carregando Pontos Extras...</span>
         </div>
-        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px; margin-top: 8px;" id="loading-detail">
-            Aguarde um momento
+
+        <!-- Conteúdo Principal -->
+        <div v-else>
+            <div class="header">
+                <h1>⭐ PONTOS EXTRAS 2026</h1>
+            </div>
+
+            <!-- Prazo -->
+            <div class="prazo-box" v-if="prazo">
+                <span class="prazo-icone">⏰</span>
+                <span class="prazo-texto">Encerra: {{ formatarData(prazo) }}</span>
+                <span class="badge">{{ tempoRestante }}</span>
+            </div>
+
+            <!-- Progresso -->
+            <div class="progresso">
+                <div class="progresso-header">
+                    <span class="progresso-titulo">🎯 Seus palpites</span>
+                    <span class="progresso-contador">{{ categoriasPreenchidas }}/{{ categorias.length }}</span>
+                </div>
+                <div class="barra-progresso">
+                    <div class="barra-preenchimento" :style="{ width: percentualPreenchido + '%' }"></div>
+                </div>
+            </div>
+
+            <!-- Alerta de alterações -->
+            <div class="alerta" v-if="temAlteracoes">
+                ⚠️ Você tem alterações não salvas!
+            </div>
+
+            <!-- Lista de Categorias -->
+            <div class="categorias-grid">
+                <div v-for="cat in categorias" :key="cat.item" 
+                     class="categoria-card" 
+                     :class="{ 'preenchida': escolhas[cat.item] }">
+                    
+                    <div class="categoria-header">
+                        <span class="categoria-icone">{{ cat.icone }}</span>
+                        <div class="categoria-info">
+                            <div class="categoria-nome">{{ cat.nome }}</div>
+                            <span class="categoria-pontos">{{ cat.pontos }} pontos</span>
+                        </div>
+                        <div v-if="escolhas[cat.item]" class="status-preenchido">
+                            ✅
+                        </div>
+                    </div>
+
+                    <div class="select-wrapper">
+                        <select v-model="escolhasTemp[cat.item]" @change="marcarAlteracao(cat.item)">
+                            <option value="">🔽 Selecione um time...</option>
+                            <option v-for="time in times" :key="time" :value="time">
+                                ⚽ {{ time }}
+                            </option>
+                        </select>
+                        <span class="select-arrow">▼</span>
+                    </div>
+
+                    <div v-if="escolhasTemp[cat.item]" class="escolha-atual">
+                        <span>✅ Escolhido:</span>
+                        <strong>{{ escolhasTemp[cat.item] }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão Salvar -->
+            <div class="acoes">
+                <button class="btn-salvar" @click="salvarEscolhas" :disabled="salvando || !temAlteracoes">
+                    <span v-if="!salvando">💾 SALVAR PALPITES ({{ categoriasPreenchidasTemp }}/{{ categorias.length }})</span>
+                    <span v-else>⏳ SALVANDO...</span>
+                </button>
+                <p style="text-align: center; margin-top: 12px; color: #a0c0d0; font-size: 12px;">
+                    Você pode editar até o prazo final
+                </p>
+            </div>
         </div>
     </div>
-    
-    <div class="container" id="main-content" style="display: none;"></div>
-    
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/gzip-js@0.3.2/lib/gzip.js"></script>
     <script>
-        // ============ TELEGRAM WEBAPP ============
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-        
-        // ============ VARIÁVEIS GLOBAIS ============
-        let times = [];
-        let categorias = [];
-        let escolhasAnteriores = {};
-        let prazo = null;
-        let timerInterval = null;
-        let usuarioId = null;
-        let usuarioNome = '';
-        
-        // ============ DETECTAR AMBIENTE ============
-        function isRunningInTelegram() {
-            return tg.initDataUnsafe && Object.keys(tg.initDataUnsafe).length > 0;
-        }
-        
-        function isRunningInTestMode() {
-            return window.location.protocol === 'file:' || 
-                   window.location.hostname.includes('github.io') ||
-                   window.location.hostname === 'localhost' ||
-                   window.location.hostname === '127.0.0.1';
-        }
-        
-       // ============ 🔥 DECODIFICADOR CORRIGIDO E ROBUSTO ============
-function decodificarBase64ComGzip(base64Url) {
-    try {
-        console.log('🔄 Iniciando decodificação...');
+        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
 
-        // 1. LIMPEZA E PADRONIZAÇÃO
-        // Remove o '#' do início se vier junto
-        // Remove espaços em branco acidentais
-        let base64 = base64Url.trim().replace(/^#/, '');
-
-        // 2. CONVERSÃO URL-SAFE -> STANDARD
-        // Troca '-' por '+' e '_' por '/'
-        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
-
-        // 3. RESTAURAÇÃO DE PADDING (Obrigatório para atob)
-        // O tamanho da string DEVE ser múltiplo de 4. Se não for, adiciona '='
-        while (base64.length % 4 !== 0) {
-            base64 += '=';
-        }
-
-        console.log('📝 Base64 normalizado (início):', base64.substring(0, 20) + '...');
-
-        // 4. DECODIFICAÇÃO BASE64 (atob)
-        // Converte a string Base64 em uma string binária
-        const binaryString = atob(base64);
-
-        // 5. CONVERSÃO PARA ARRAY DE BYTES (Uint8Array)
-        // Necessário para o Pako (GZIP) funcionar
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            bytes[i] = binaryString.charCodeAt(i);
-        }
-
-        // 6. DESCOMPRESSÃO GZIP
-        // Pako descomprime os bytes
-        const decompressed = pako.ungzip(bytes);
-
-        // 7. DECODIFICAÇÃO UTF-8 (Para aceitar acentos e emojis 🏆⚽)
-        const jsonStr = new TextDecoder("utf-8").decode(decompressed);
-
-        console.log('✅ JSON recuperado com sucesso!');
-        return JSON.parse(jsonStr);
-
-    } catch (e) {
-        console.error('❌ CRITICAL ERROR:', e);
-        // Lança o erro para aparecer na tela vermelha de debug
-        throw new Error(`Falha na decodificação: ${e.message}`);
-    }
-}
-        
-        // ============ CARREGAR DADOS DE TESTE ============
-        function loadTestData() {
-            console.log('🧪 MODO DE TESTE - Carregando dados simulados');
-            
-            times = [
-                "América Mineiro", "Atlético Goianiense", "Atlético Mineiro", 
-                "Bahia", "Botafogo", "Corinthians", "Coritiba", 
-                "Cruzeiro", "Cuiabá", "Flamengo", "Fluminense", 
-                "Fortaleza", "Goiás", "Grêmio", "Internacional", 
-                "Palmeiras", "Red Bull Bragantino", "Santos", 
-                "São Paulo", "Vasco da Gama"
-            ];
-            
-            categorias = [
-                {"item": "campeao_geral", "nome": "Campeão Geral", "pontos": 20, "icone": "🏆"},
-                {"item": "campeao_turno1", "nome": "Campeão 1º Turno", "pontos": 10, "icone": "🥇"},
-                {"item": "campeao_turno2", "nome": "Campeão 2º Turno", "pontos": 10, "icone": "🥈"},
-                {"item": "melhor_visitante", "nome": "Melhor Visitante", "pontos": 5, "icone": "✈️"},
-                {"item": "melhor_mandante", "nome": "Melhor Mandante", "pontos": 5, "icone": "🏠"},
-                {"item": "melhor_ataque", "nome": "Melhor Ataque", "pontos": 5, "icone": "⚽"},
-                {"item": "melhor_defesa", "nome": "Melhor Defesa", "pontos": 5, "icone": "🛡️"},
-                {"item": "segundo_colocado", "nome": "2º Colocado Final", "pontos": 10, "icone": "🥉"},
-                {"item": "terceiro_colocado", "nome": "3º Colocado Final", "pontos": 10, "icone": "4️⃣"},
-                {"item": "quarto_colocado", "nome": "4º Colocado Final", "pontos": 10, "icone": "5️⃣"},
-                {"item": "decimo_setimo", "nome": "17º Colocado", "pontos": 10, "icone": "⬇️"},
-                {"item": "decimo_oitavo", "nome": "18º Colocado", "pontos": 10, "icone": "⬇️⬇️"},
-                {"item": "decimo_nono", "nome": "19º Colocado", "pontos": 10, "icone": "⬇️⬇️⬇️"},
-                {"item": "vigesimo", "nome": "20º Colocado", "pontos": 10, "icone": "🚫"},
-                {"item": "time_estrela", "nome": "Time Estrela", "pontos": 0, "icone": "⭐"}
-            ];
-            
-            escolhasAnteriores = {};
-            
-            const futuro = new Date();
-            futuro.setDate(futuro.getDate() + 7);
-            prazo = futuro.toISOString().replace('T', ' ').substring(0, 19);
-            
-            usuarioId = 123456789;
-            usuarioNome = "Usuário Teste";
-            
-            return true;
-        }
-        
-        // ============ OBTER DADOS DA URL ============
-        function getDataFromURL() {
-            console.log('🔗 Lendo dados da URL...');
-            
-            let base64Data = null;
-            
-            // 1. Hash puro: #BASE64
-            if (window.location.hash && window.location.hash.length > 1) {
-                base64Data = window.location.hash.substring(1);
-                console.log('✅ Lido do hash, tamanho:', base64Data.length);
-            }
-            
-            // 2. Parâmetro ?data=
-            if (!base64Data) {
-                const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('data')) {
-                    base64Data = urlParams.get('data');
-                    console.log('✅ Lido do ?data=, tamanho:', base64Data.length);
-                }
-            }
-            
-            // 3. Hash #data=
-            if (!base64Data && window.location.hash.includes('#data=')) {
-                base64Data = window.location.hash.replace('#data=', '');
-                console.log('✅ Lido do #data=, tamanho:', base64Data.length);
-            }
-            
-            return base64Data;
-        }
-        
-        // ============ DECODIFICAR DADOS ============
-        function decodeDataFromURL() {
-            try {
-                console.log('=== DECODIFICANDO DADOS ===');
-                console.log('📱 initDataUnsafe:', tg.initDataUnsafe);
+        const app = createApp({
+            setup() {
+                // ============ ESTADOS ============
+                const loading = ref(true);
+                const salvando = ref(false);
                 
-                // ============ MODO 1: TELEGRAM ============
-                if (isRunningInTelegram()) {
-                    console.log('✅ Rodando no Telegram WebApp');
-                    
-                    if (tg.initDataUnsafe.start_param) {
-                        const param = tg.initDataUnsafe.start_param;
-                        console.log('📦 start_param:', param.substring(0, 50) + '...');
+                // Dados recebidos do Telegram
+                const times = ref([]);
+                const categorias = ref([]);
+                const prazo = ref(null);
+                const usuario = ref({});
+                
+                // Escolhas carregadas do servidor
+                const escolhas = ref({});
+                
+                // Escolhas temporárias (durante edição)
+                const escolhasTemp = ref({});
+                
+                // Controle de alterações
+                const alteracoes = ref(new Set());
+                
+                // Telegram WebApp
+                const tg = window.Telegram?.WebApp;
+                
+                // ============ FUNÇÃO DECODIFICAR DADOS ============
+                // EXATAMENTE como o bot codificou:
+                // JSON -> gzip -> base64url -> URL#base64
+                function decodificarDadosDaURL() {
+                    try {
+                        console.log('🔍 Decodificando dados da URL...');
                         
-                        if (param === 'escolha_extra') {
-                            console.log('⚠️ start_param sem dados, aguardando botão...');
+                        // Pega o hash da URL (tudo após #)
+                        const hash = window.location.hash.substring(1);
+                        
+                        if (!hash) {
+                            console.error('❌ Nenhum dado encontrado na URL');
+                            return null;
                         }
+                        
+                        console.log(`📦 Hash encontrado: ${hash.length} caracteres`);
+                        
+                        // 1. Base64 URL-SAFE -> bytes
+                        let base64 = hash.replace(/-/g, '+').replace(/_/g, '/');
+                        while (base64.length % 4) {
+                            base64 += '=';
+                        }
+                        
+                        console.log(`📦 Base64 convertido: ${base64.length} caracteres`);
+                        
+                        const bytesComprimidos = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                        console.log(`📦 Bytes comprimidos: ${bytesComprimidos.length} bytes`);
+                        
+                        // 2. Descomprimir GZIP
+                        try {
+                            // Usar biblioteca pako para descompressão gzip
+                            const bytesDescomprimidos = pako.ungzip(bytesComprimidos);
+                            console.log(`📦 Bytes descomprimidos: ${bytesDescomprimidos.length} bytes`);
+                            
+                            // 3. JSON
+                            const jsonStr = new TextDecoder('utf-8').decode(bytesDescomprimidos);
+                            console.log(`📦 JSON: ${jsonStr.length} caracteres`);
+                            
+                            // 4. Parse
+                            const dados = JSON.parse(jsonStr);
+                            console.log('✅ Dados decodificados com sucesso!');
+                            
+                            return dados;
+                        } catch (e) {
+                            console.error('❌ Erro na descompressão:', e);
+                            return null;
+                        }
+                    } catch (e) {
+                        console.error('❌ Erro ao decodificar:', e);
+                        return null;
                     }
                 }
-                
-                // ============ MODO 2: DADOS DA URL ============
-                const base64Data = getDataFromURL();
-                
-                if (base64Data) {
-                    console.log('🔄 Processando dados da URL...');
-                    const dados = decodificarBase64ComGzip(base64Data);
-                    
-                    times = dados.times || [];
-                    categorias = dados.categorias || [];
-                    escolhasAnteriores = dados.escolhas || {};
-                    prazo = dados.prazo || null;
-                    usuarioId = dados.usuario?.id || null;
-                    usuarioNome = dados.usuario?.nome || 'Usuário';
-                    
-                    console.log(`✅ Dados carregados: ${times.length} times, ${categorias.length} categorias`);
-                    return true;
-                }
-                
-                // ============ MODO 3: TESTE ============
-                if (isRunningInTestMode()) {
-                    console.log('🧪 Modo de teste');
-                    const banner = document.createElement('div');
-                    banner.className = 'test-banner';
-                    banner.innerHTML = '🧪 MODO DE TESTE - Dados simulados';
-                    document.body.prepend(banner);
-                    
-                    return loadTestData();
-                }
-                
-                throw new Error('Nenhuma fonte de dados encontrada');
-                
-            } catch (e) {
-                console.error('❌ Erro:', e);
-                mostrarErroVisivel(
-                    'Erro ao Carregar Dados',
-                    'Não foi possível carregar as informações.',
-                    e.message
-                );
-                return false;
-            }
-        }
-        
-        // ============ MOSTRAR ERRO ============
-        function mostrarErroVisivel(titulo, mensagem, detalhe = '') {
-            const loading = document.getElementById('loading');
-            const loadingMsg = document.getElementById('loading-message');
-            const loadingDetail = document.getElementById('loading-detail');
-            
-            loadingMsg.style.color = '#d32f2f';
-            loadingMsg.innerHTML = `❌ ${titulo}`;
-            loadingDetail.innerHTML = mensagem;
-            
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'close-button';
-            closeBtn.innerHTML = 'FECHAR';
-            closeBtn.onclick = () => { if (tg.close) tg.close(); else window.close(); };
-            closeBtn.style.marginTop = '24px';
-            loading.appendChild(closeBtn);
-            
-            const debug = document.createElement('div');
-            debug.className = 'debug-info';
-            debug.innerHTML = `
-                <strong>🔍 Debug:</strong><br>
-                • Erro: ${detalhe}<br>
-                • Ambiente Telegram: ${isRunningInTelegram()}<br>
-                • initDataUnsafe: ${JSON.stringify(tg.initDataUnsafe)}<br>
-                • Hash: ${window.location.hash.substring(0, 50)}...<br>
-                • URL: ${window.location.href.substring(0, 100)}...
-            `;
-            loading.appendChild(debug);
-        }
-        
-        // ============ RENDERIZAR ============
-        function renderizarCategorias() {
-    const container = document.getElementById('main-content');
-    
-    // 1. Monta a estrutura base
-    const htmlHeader = `
-        <div class="header">
-            <div class="title">
-                <span>⭐ PONTOS EXTRAS 2026</span>
-            </div>
-            <div class="countdown">
-                <div class="countdown-label">ENCERRA EM:</div>
-                <div class="timer" id="timer">00 DIAS 00:00:00</div>
-                <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
-            </div>
-        </div>
-        
-        <div class="progress-section">
-            <div class="progress-header">
-                <span>📊 SEU PROGRESSO</span>
-                <span id="progress-count">0/${categorias.length}</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        
-        <div class="categorias-grid" id="categorias-grid"></div>
-        
-        <div class="acoes">
-            <button class="btn btn-primary" id="btn-enviar">
-                <span>✅</span> ENVIAR ESCOLHAS
-            </button>
-        </div>
-    `;
-    
-    container.innerHTML = htmlHeader;
-    container.style.display = 'block';
-    
-    // 2. Preenche o Grid (Verifica se existem categorias)
-    const grid = document.getElementById('categorias-grid');
-    
-    if (!categorias || categorias.length === 0) {
-        grid.innerHTML = '<div style="text-align:center; padding:20px;">Nenhuma categoria encontrada.</div>';
-        return;
-    }
 
-    let preenchidas = 0;
-    
-    categorias.forEach(cat => {
-        // Tenta pegar o código do item (compatibilidade com nomes diferentes no DB)
-        const itemKey = cat.item || cat.codigo; 
-        const escolhaAnterior = escolhasAnteriores[itemKey] || '';
-        
-        if (escolhaAnterior) preenchidas++;
-        
-        const card = document.createElement('div');
-        card.className = 'categoria-card';
-        
-        // Monta as opções do Select
-        let options = '<option value="">⚽ Selecione...</option>';
-        times.forEach(time => {
-            const selected = (time === escolhaAnterior) ? 'selected' : '';
-            options += `<option value="${time}" ${selected}>${time}</option>`;
-        });
-        
-        card.innerHTML = `
-            <div class="categoria-icone">${cat.icone || '❓'}</div>
-            <div class="categoria-info">
-                <div class="categoria-nome">${cat.nome || 'Categoria'}</div>
-                <div class="categoria-pontos">${cat.pontos || 0} pts</div>
-            </div>
-            <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
-                ${options}
-            </select>
-        `;
-        
-        grid.appendChild(card);
-    });
-    
-    // 3. Configura Listeners
-    atualizarProgresso(preenchidas);
-    
-    document.querySelectorAll('.categoria-select').forEach(select => {
-        select.addEventListener('change', function() {
-            const totalPreenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
-            atualizarProgresso(totalPreenchidas);
-        });
-    });
-    
-    document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
-    
-    if (prazo) {
-        atualizarCronometro();
-        timerInterval = setInterval(atualizarCronometro, 1000);
-    }
-}
-        
-        function atualizarProgresso(preenchidas) {
-            const total = categorias.length || 15;
-            const percent = (preenchidas / total) * 100;
-            document.getElementById('progress-count').innerHTML = `${preenchidas}/${total}`;
-            document.getElementById('progress-fill').style.width = `${percent}%`;
-        }
-        
-        function atualizarCronometro() {
-            if (!prazo) return;
-            
-            try {
-                let prazoStr = prazo;
-                if (prazoStr.includes(' ')) prazoStr = prazoStr.replace(' ', 'T');
-                if (!prazoStr.includes('Z') && !prazoStr.includes('+')) prazoStr += '-03:00';
-                
-                const prazoDate = new Date(prazoStr);
-                const agora = new Date();
-                const diff = prazoDate - agora;
-                
-                if (diff <= 0) {
-                    document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
-                    document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
-                    document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
-                    document.getElementById('btn-enviar').disabled = true;
-                    clearInterval(timerInterval);
-                    return;
-                }
-                
-                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const segundos = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                document.getElementById('timer').innerHTML = 
-                    `${String(dias).padStart(2, '0')} DIAS ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-                
-                if (diff < 3600000) document.getElementById('timer').style.color = '#ff6b6b';
-                
-                document.getElementById('deadline-info').innerHTML = 
-                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
+                // ============ DADOS COMPUTADOS ============
+                const categoriasPreenchidas = computed(() => {
+                    return Object.values(escolhas.value).filter(Boolean).length;
+                });
+
+                const categoriasPreenchidasTemp = computed(() => {
+                    return Object.values(escolhasTemp.value).filter(Boolean).length;
+                });
+
+                const percentualPreenchido = computed(() => {
+                    return (categoriasPreenchidas.value / categorias.value.length) * 100;
+                });
+
+                const temAlteracoes = computed(() => {
+                    return alteracoes.value.size > 0;
+                });
+
+                const tempoRestante = computed(() => {
+                    if (!prazo.value) return '';
                     
-            } catch (e) {
-                console.error('Erro no cronômetro:', e);
-            }
-        }
-        
-        function coletarEscolhas() {
-            const selects = document.querySelectorAll('.categoria-select');
-            const escolhas = [];
-            
-            selects.forEach(select => {
-                if (select.value) {
-                    escolhas.push({
-                        item: select.dataset.item,
-                        time: select.value,
-                        pontos: parseInt(select.dataset.pontos)
+                    const agora = new Date();
+                    const prazoDate = new Date(prazo.value.replace(' ', 'T') + '-03:00');
+                    const diff = prazoDate - agora;
+                    
+                    if (diff <= 0) return 'ENCERRADO';
+                    
+                    const horas = Math.floor(diff / (1000 * 60 * 60));
+                    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    if (horas > 24) {
+                        const dias = Math.floor(horas / 24);
+                        return `${dias}d ${horas % 24}h`;
+                    }
+                    return `${horas}h ${minutos}m`;
+                });
+
+                // ============ MÉTODOS ============
+                function marcarAlteracao(item) {
+                    alteracoes.value.add(item);
+                    
+                    // Se selecionou vazio, remove
+                    if (!escolhasTemp.value[item]) {
+                        alteracoes.value.delete(item);
+                    }
+                    
+                    // Auto-sync com escolhas originais
+                    if (escolhasTemp.value[item] === escolhas.value[item]) {
+                        alteracoes.value.delete(item);
+                    }
+                }
+
+                function formatarData(dataStr) {
+                    if (!dataStr) return '';
+                    const [data, hora] = dataStr.split(' ');
+                    const [ano, mes, dia] = data.split('-');
+                    return `${dia}/${mes}/${ano} às ${hora}`;
+                }
+
+                function inicializarEscolhasTemp() {
+                    // Começa com as escolhas carregadas
+                    escolhasTemp.value = { ...escolhas.value };
+                    
+                    // Garante que todas categorias existam
+                    categorias.value.forEach(cat => {
+                        if (!escolhasTemp.value[cat.item]) {
+                            escolhasTemp.value[cat.item] = '';
+                        }
                     });
+                    
+                    alteracoes.value.clear();
                 }
-            });
-            
-            return escolhas;
-        }
-        
-        function enviarEscolhas() {
-            const escolhas = coletarEscolhas();
-            
-            if (escolhas.length === 0) {
-                if (tg.showAlert) tg.showAlert('❌ Escolha pelo menos um time!');
-                else alert('❌ Escolha pelo menos um time!');
-                return;
-            }
-            
-            const confirmar = () => {
-                if (tg.sendData) {
-                    tg.sendData(JSON.stringify({ escolhas: escolhas }));
-                    tg.close();
-                } else {
-                    alert('✅ Modo teste - Escolhas salvas!\n\n' + JSON.stringify(escolhas, null, 2));
-                    console.log('Escolhas:', escolhas);
+
+                async function salvarEscolhas() {
+                    if (salvando.value) return;
+                    
+                    salvando.value = true;
+                    
+                    try {
+                        // Monta array de escolhas APENAS com os itens preenchidos
+                        const escolhasArray = [];
+                        
+                        Object.entries(escolhasTemp.value).forEach(([item, time]) => {
+                            if (time && time.trim() !== '') {
+                                escolhasArray.push({
+                                    item: item,
+                                    time: time.trim()
+                                });
+                            }
+                        });
+                        
+                        // Dados para enviar ao bot
+                        const dados = {
+                            escolhas: escolhasArray
+                        };
+                        
+                        console.log(`📤 Enviando ${escolhasArray.length} escolhas...`);
+                        
+                        // Enviar via WebApp
+                        tg.sendData(JSON.stringify(dados));
+                        
+                        // Atualizar estado local
+                        escolhas.value = { ...escolhasTemp.value };
+                        alteracoes.value.clear();
+                        
+                        // Feedback visual
+                        tg.showAlert(`✅ ${escolhasArray.length} palpites salvos com sucesso!`);
+                        
+                    } catch (e) {
+                        console.error('❌ Erro ao salvar:', e);
+                        tg.showAlert('❌ Erro ao salvar. Tente novamente.');
+                    } finally {
+                        salvando.value = false;
+                    }
                 }
-            };
-            
-            if (tg.showConfirm) {
-                tg.showConfirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`, confirmar);
-            } else {
-                if (confirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`)) confirmar();
+
+                // ============ INICIALIZAÇÃO ============
+                onMounted(() => {
+                    console.log('🚀 Inicializando WebApp Pontos Extras...');
+                    
+                    // Expandir Telegram WebApp
+                    if (tg) {
+                        tg.expand();
+                        tg.ready();
+                        tg.enableClosingConfirmation();
+                        console.log('✅ Telegram WebApp inicializado');
+                    }
+                    
+                    // Decodificar dados da URL
+                    const dados = decodificarDadosDaURL();
+                    
+                    if (dados) {
+                        console.log('📊 Dados recebidos:', {
+                            times: dados.times?.length || 0,
+                            categorias: dados.categorias?.length || 0,
+                            escolhas: Object.keys(dados.escolhas || {}).length,
+                            usuario: dados.usuario?.nome
+                        });
+                        
+                        // Carregar dados
+                        times.value = dados.times || [];
+                        categorias.value = dados.categorias || [];
+                        prazo.value = dados.prazo || null;
+                        usuario.value = dados.usuario || {};
+                        escolhas.value = dados.escolhas || {};
+                        
+                        // Inicializar escolhas temporárias
+                        inicializarEscolhasTemp();
+                        
+                        loading.value = false;
+                    } else {
+                        console.error('❌ Falha ao carregar dados');
+                        loading.value = false;
+                        
+                        if (tg) {
+                            tg.showAlert('❌ Erro ao carregar dados. Volte e tente novamente.');
+                        }
+                    }
+                });
+
+                return {
+                    loading,
+                    salvando,
+                    times,
+                    categorias,
+                    prazo,
+                    usuario,
+                    escolhas,
+                    escolhasTemp,
+                    alteracoes,
+                    categoriasPreenchidas,
+                    categoriasPreenchidasTemp,
+                    percentualPreenchido,
+                    temAlteracoes,
+                    tempoRestante,
+                    formatarData,
+                    marcarAlteracao,
+                    salvarEscolhas
+                };
             }
-        }
-        
-        // ============ INIT ============
-        function init() {
-            console.log('=== INICIALIZANDO ===');
-            
-            if (!decodeDataFromURL()) return;
-            
-            try {
-                renderizarCategorias();
-                document.getElementById('loading').style.display = 'none';
-                console.log('=== PRONTO ===');
-            } catch (e) {
-                console.error('❌ Erro ao renderizar:', e);
-                mostrarErroVisivel('Erro ao Renderizar', e.message);
-            }
-        }
-        
-        window.addEventListener('load', init);
-        
-        setTimeout(() => {
-            const loading = document.getElementById('loading');
-            if (loading && loading.style.display !== 'none') {
-                mostrarErroVisivel(
-                    'Tempo Limite',
-                    'O carregamento está demorando muito.',
-                    'Timeout após 10 segundos'
-                );
-            }
-        }, 10000);
+        });
+
+        // Incluir biblioteca pako para descompressão gzip
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js';
+        script.onload = () => {
+            console.log('✅ Pako carregado - pronto para descompressão');
+        };
+        document.head.appendChild(script);
+
+        app.mount('#app');
     </script>
 </body>
 </html>
