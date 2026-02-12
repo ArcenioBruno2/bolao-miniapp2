@@ -1,134 +1,667 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pontos Extras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⭐ Pontos Extras 2026</title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
     <style>
-        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .timer { text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px 4px; border-bottom: 1px solid rgba(128,128,128,0.2); font-size: 0.9em; }
-        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .btn-container { margin-top: 20px; display: flex; gap: 10px; position: sticky; bottom: 10px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-send { background-color: #2ecc71; color: white; }
-        .btn-cancel { background-color: #e74c3c; color: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        /* Header com Cronômetro */
+        .header {
+            background: linear-gradient(145deg, #2c3e50, #1e2a36);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .title i {
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        .countdown {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .countdown-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .timer {
+            font-size: 42px;
+            font-weight: 800;
+            font-family: monospace;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255,215,0,0.5);
+            letter-spacing: 5px;
+        }
+        
+        .timer-unit {
+            font-size: 16px;
+            font-weight: 400;
+            color: rgba(255,255,255,0.7);
+            margin-left: 5px;
+        }
+        
+        /* Progresso */
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress-title {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .progress-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Tabela de Categorias */
+        .categorias-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .categorias-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .categoria-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .categoria-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.1);
+            border-color: #667eea;
+        }
+        
+        .categoria-icone {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+        
+        .categoria-info {
+            flex: 1;
+        }
+        
+        .categoria-nome {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+        
+        .categoria-pontos {
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+            background: rgba(102,126,234,0.1);
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        
+        .categoria-select {
+            width: 180px;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #2c3e50;
+            background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 12px center;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .categoria-select:hover, .categoria-select:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .categoria-select option {
+            font-family: 'Inter', sans-serif;
+            padding: 10px;
+        }
+        
+        /* Botões de Ação */
+        .acoes {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+        }
+        
+        .loading-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsividade */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .categoria-card {
+                flex-wrap: wrap;
+            }
+            
+            .categoria-select {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .timer {
+                font-size: 32px;
+            }
+            
+            .acoes {
+                flex-direction: column;
+            }
+        }
+        
+        /* Estilo para select vazio */
+        .select-vazio {
+            color: #999;
+        }
+        
+        /* Badge de expirado */
+        .expirado {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
-    <div class="timer" id="countdown">Carregando...</div>
-    
-    <form id="extrasForm">
-        <table>
-            <tbody id="itemsTable"></tbody>
-        </table>
-        <div class="btn-container">
-            <button type="button" class="btn-cancel" onclick="window.Telegram.WebApp.close()">Cancelar</button>
-            <button type="submit" class="btn-send">Confirmar Escolhas</button>
+    <div class="loading" id="loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p style="color: #2c3e50; font-weight: 600;">Carregando Pontos Extras...</p>
         </div>
-    </form>
-
+    </div>
+    
+    <div class="container">
+        <!-- Header com Cronômetro -->
+        <div class="header">
+            <div class="title">
+                <i class="fas fa-star"></i> PONTOS EXTRAS 2026
+            </div>
+            <div class="countdown">
+                <div class="countdown-label">
+                    <i class="fas fa-hourglass-half"></i> ENCERRA EM:
+                </div>
+                <div class="timer" id="timer">
+                    00 DIAS 00:00:00
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; opacity: 0.9;" id="deadline-info">
+                    📅 Carregando...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Barra de Progresso -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <span class="progress-title">
+                    <i class="fas fa-check-circle" style="color: #667eea;"></i> SEU PROGRESSO
+                </span>
+                <span class="progress-count" id="progress-count">0/15</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        
+        <!-- Título Categorias -->
+        <div class="categorias-title">
+            <i class="fas fa-list"></i> ESCOLHA SEUS PALPITES
+        </div>
+        
+        <!-- Grid de Categorias -->
+        <div class="categorias-grid" id="categorias-grid">
+            <!-- Será preenchido via JavaScript -->
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="acoes">
+            <button class="btn btn-primary" id="btn-enviar">
+                <i class="fas fa-check-circle"></i> ENVIAR ESCOLHAS
+            </button>
+            <button class="btn btn-secondary" id="btn-cancelar">
+                <i class="fas fa-times-circle"></i> CANCELAR
+            </button>
+        </div>
+    </div>
+    
     <script>
+        // Inicializar Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
-
-        const itens = [
-            "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
-            "Melhor Mandante", "Melhor Ataque", "Melhor Defesa", "2º Colocado Final",
-            "3º Colocado Final", "4º Colocado Final", "17º Colocado Final", "18º Colocado Final",
-            "19º Colocado Final", "20º Colocado Final", "Time Estrela"
-        ];
-
+        tg.ready();
+        tg.setHeaderColor('#2c3e50');
+        tg.setBackgroundColor('#667eea');
+        
+        // Variáveis Globais
         let times = [];
+        let categorias = [];
         let escolhasAnteriores = {};
-        let prazoFinal = 0;
-
-        // === CORREÇÃO: Decodificação robusta com suporte a UTF-8 ===
-        try {
-            // Pega tudo após #data=
-            const rawHash = window.location.hash.split('data=')[1];
-            
-            if (rawHash) {
-                // 1. Decodifica caracteres de URL (ex: %3D vira =, %2F vira /)
-                const base64Clean = decodeURIComponent(rawHash);
-                
-                // 2. Decodifica Base64 para string binária (Latin-1)
-                const binaryString = atob(base64Clean);
-
-                // 3. Converte de Latin-1 para UTF-8 corretamente
-                const jsonString = decodeURIComponent(Array.prototype.map.call(binaryString, function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-
-                const decoded = JSON.parse(jsonString);
-                
-                times = decoded.times || [];
-                escolhasAnteriores = decoded.escolhas || {};
-                
-                // Correção para data (compatibilidade Safari/iOS)
-                let dateStr = decoded.prazo;
-                if(dateStr && dateStr.includes(" ")) {
-                    dateStr = dateStr.replace(" ", "T");
+        let prazo = null;
+        let usuario = {};
+        let timerInterval = null;
+        
+        // Decodificar dados da URL
+        function decodeDataFromURL() {
+            try {
+                const hash = window.location.hash;
+                if (!hash || !hash.includes('#data=')) {
+                    console.error('Sem dados na URL');
+                    return false;
                 }
-                prazoFinal = new Date(dateStr).getTime();
+                
+                const base64Data = decodeURIComponent(hash.replace('#data=', ''));
+                const jsonStr = atob(base64Data);
+                const dados = JSON.parse(jsonStr);
+                
+                times = dados.times || [];
+                categorias = dados.categorias || [];
+                escolhasAnteriores = dados.escolhas || {};
+                prazo = dados.prazo;
+                usuario = dados.usuario || {};
+                
+                console.log('Dados carregados:', dados);
+                return true;
+            } catch (e) {
+                console.error('Erro ao decodificar dados:', e);
+                return false;
             }
-        } catch (e) {
-            console.error("Erro ao carregar dados:", e);
-            alert("Erro ao ler dados. Tente abrir o link novamente.");
         }
-        // === FIM DA CORREÇÃO ===
-
-        function renderForm() {
-            const table = document.getElementById('itemsTable');
-            itens.forEach(item => {
-                const tr = document.createElement('tr');
-                const valorAtual = escolhasAnteriores[item] || "";
-                tr.innerHTML = `
-                    <td><strong>${item}</strong></td>
-                    <td>
-                        <select name="${item}" required>
-                            <option value="">Selecione...</option>
-                            ${times.map(t => `<option value="${t}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
-                        </select>
-                    </td>
-                `;
-                table.appendChild(tr);
-            });
+        
+        // Formatar número com 2 dígitos
+        function pad(num) {
+            return String(num).padStart(2, '0');
         }
-
-        function startTimer() {
-            if (!prazoFinal) return;
-            const timerEl = document.getElementById('countdown');
-            setInterval(() => {
-                const now = new Date().getTime();
-                const diff = prazoFinal - now;
-                if (diff < 0) {
-                    timerEl.innerHTML = "🏁 PRAZO ENCERRADO";
-                    document.querySelector('.btn-send').disabled = true;
-                    return;
+        
+        // Atualizar cronômetro
+        function atualizarCronometro() {
+            if (!prazo) return;
+            
+            const agora = new Date();
+            const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00'); // Brasília
+            
+            const diff = prazoDate - agora;
+            
+            if (diff <= 0) {
+                document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
+                document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO!';
+                
+                // Desabilitar todos os selects
+                document.querySelectorAll('.categoria-select').forEach(select => {
+                    select.disabled = true;
+                });
+                
+                document.getElementById('btn-enviar').disabled = true;
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
                 }
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                timerEl.innerHTML = `⏳ Encerra em: ${d}d ${h}h ${m}m ${s}s`;
-            }, 1000);
+                return;
+            }
+            
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timerStr = `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+            document.getElementById('timer').innerHTML = timerStr;
+            
+            // Alerta visual quando falta pouco
+            if (diff < 3600000) { // 1 hora
+                document.getElementById('timer').style.color = '#ff6b6b';
+            }
         }
-
-        document.getElementById('extrasForm').onsubmit = (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const escolhas = [];
-            formData.forEach((value, key) => {
-                escolhas.push({ item: key, time: value });
+        
+        // Iniciar cronômetro
+        function iniciarCronometro() {
+            atualizarCronometro();
+            timerInterval = setInterval(atualizarCronometro, 1000);
+        }
+        
+        // Renderizar categorias
+        function renderizarCategorias() {
+            const grid = document.getElementById('categorias-grid');
+            grid.innerHTML = '';
+            
+            let preenchidas = 0;
+            
+            categorias.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = 'categoria-card';
+                
+                const escolhaAnterior = escolhasAnteriores[cat.codigo] || '';
+                if (escolhaAnterior) preenchidas++;
+                
+                // Criar options do select
+                let options = '<option value="" ' + (!escolhaAnterior ? 'selected' : '') + '>⚽ Selecione um time</option>';
+                
+                times.forEach(time => {
+                    const selected = (time === escolhaAnterior) ? 'selected' : '';
+                    options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
+                });
+                
+                card.innerHTML = `
+                    <div class="categoria-icone">${cat.icone}</div>
+                    <div class="categoria-info">
+                        <div class="categoria-nome">${cat.nome}</div>
+                        <div class="categoria-pontos">${cat.pontos} pontos</div>
+                    </div>
+                    <select class="categoria-select" data-categoria="${cat.codigo}" data-pontos="${cat.pontos}">
+                        ${options}
+                    </select>
+                `;
+                
+                grid.appendChild(card);
             });
-            tg.sendData(JSON.stringify({ escolhas }));
-        };
-
-        renderForm();
-        startTimer();
+            
+            // Atualizar progresso
+            atualizarProgresso(preenchidas);
+            
+            // Adicionar event listeners
+            document.querySelectorAll('.categoria-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
+                    atualizarProgresso(preenchidas);
+                });
+            });
+        }
+        
+        // Atualizar barra de progresso
+        function atualizarProgresso(preenchidas) {
+            const percent = (preenchidas / 15) * 100;
+            document.getElementById('progress-count').innerHTML = `${preenchidas}/15`;
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+        }
+        
+        // Validar escolhas
+        function validarEscolhas() {
+            const selects = document.querySelectorAll('.categoria-select');
+            const escolhas = [];
+            
+            selects.forEach(select => {
+                const time = select.value;
+                if (time) {
+                    escolhas.push({
+                        categoria: select.dataset.categoria,
+                        time: time,
+                        pontos: parseInt(select.dataset.pontos)
+                    });
+                }
+            });
+            
+            return escolhas;
+        }
+        
+        // Enviar escolhas
+        function enviarEscolhas() {
+            const escolhas = validarEscolhas();
+            
+            if (escolhas.length === 0) {
+                tg.showAlert('❌ Você precisa escolher pelo menos um time!');
+                return;
+            }
+            
+            tg.showConfirm(`✅ Confirmar ${escolhas.length}/15 palpites?`, (confirmed) => {
+                if (confirmed) {
+                    tg.sendData(JSON.stringify({
+                        escolhas: escolhas,
+                        usuario: usuario
+                    }));
+                    tg.close();
+                }
+            });
+        }
+        
+        // Inicialização
+        function init() {
+            if (!decodeDataFromURL()) {
+                document.getElementById('loading').style.display = 'none';
+                tg.showAlert('❌ Erro ao carregar dados. Tente novamente.');
+                return;
+            }
+            
+            renderizarCategorias();
+            iniciarCronometro();
+            
+            // Mostrar data de encerramento
+            if (prazo) {
+                const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00');
+                const prazoFormatado = prazoDate.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                document.getElementById('deadline-info').innerHTML = `📅 Encerra: ${prazoFormatado}`;
+            }
+            
+            // Event Listeners
+            document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
+            document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
+            
+            // Esconder loading
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 500);
+        }
+        
+        // Iniciar quando a página carregar
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
