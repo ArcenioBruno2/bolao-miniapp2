@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Pontos Extras</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        label { display: block; margin-bottom: 10px; font-weight: bold; }
+        input[type="datetime-local"] { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Configurar Prazo</h2>
+    <label for="prazo">Data e Hora de Encerramento:</label>
+    <input type="datetime-local" id="prazo" required>
+    
+    <button onclick="salvar()">Salvar e Notificar Grupo</button>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        function salvar() {
+            const data = document.getElementById('prazo').value;
+            if (!data) return alert("Selecione uma data!");
+            tg.sendData(JSON.stringify({ data_encerramento: data }));
+        }
+    </script>
+</body>
+</html>

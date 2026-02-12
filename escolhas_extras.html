@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pontos Extras</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
+        .timer { text-align: center; font-size: 1.2em; font-weight: bold; margin-bottom: 20px; color: #e74c3c; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 10px 5px; border-bottom: 1px solid #ccc; }
+        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); }
+        .btn-container { margin-top: 20px; display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-send { background-color: #2ecc71; color: white; }
+        .btn-cancel { background-color: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="timer" id="countdown">Carregando cronômetro...</div>
+    
+    <form id="extrasForm">
+        <table>
+            <tbody id="itemsTable">
+                <!-- Itens inseridos via JS -->
+            </tbody>
+        </table>
+        
+        <div class="btn-container">
+            <button type="button" class="btn-cancel" onclick="window.Telegram.WebApp.close()">Cancelar</button>
+            <button type="submit" class="btn-send">Enviar Escolhas</button>
+        </div>
+    </form>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        const itens = [
+            "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
+            "Melhor Mandante", "Melhor Ataque", "Melhor Defesa", "2º Colocado Final",
+            "3º Colocado Final", "4º Colocado Final", "17º Colocado Final", "18º Colocado Final",
+            "19º Colocado Final", "20º Colocado Final", "Time Estrela"
+        ];
+
+        // Estes dados devem ser injetados ou buscados via API
+        // Para este exemplo, simularemos os times e o prazo
+        const times = ["Flamengo", "Palmeiras", "Botafogo", "Fortaleza", "São Paulo", "Internacional", "Bahia", "Cruzeiro"];
+        const prazoFinal = new Date("2026-12-31T23:59:59").getTime();
+
+        function renderForm() {
+            const table = document.getElementById('itemsTable');
+            itens.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${item}</strong></td>
+                    <td>
+                        <select name="${item}" required>
+                            <option value="">Selecione...</option>
+                            ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+                        </select>
+                    </td>
+                `;
+                table.appendChild(tr);
+            });
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = prazoFinal - now;
+                
+                if (diff < 0) {
+                    document.getElementById('countdown').innerHTML = "ENCERRADO";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown').innerHTML = `⏳ ${d}d ${h}h ${m}m ${s}s`;
+            }, 1000);
+        }
+
+        document.getElementById('extrasForm').onsubmit = (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const escolhas = [];
+            formData.forEach((value, key) => {
+                escolhas.push({ item: key, time: value });
+            });
+            tg.sendData(JSON.stringify({ escolhas }));
+        };
+
+        renderForm();
+        startTimer();
+    </script>
+</body>
+</html>
