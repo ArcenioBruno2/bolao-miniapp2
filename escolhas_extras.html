@@ -9,85 +9,112 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #0b1a2e 0%, #1a2f3f 100%);
+            background: linear-gradient(145deg, #0a1c2e 0%, #152a38 100%);
             min-height: 100vh;
-            padding: 20px 16px;
+            padding: 16px;
             color: white;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
-            padding-bottom: 40px;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #ffd700, #ffb347);
+            font-size: 26px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 8px;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,215,0,0.3);
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .erro-box {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid #f44336;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .erro-titulo {
+            color: #ff8a80;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .erro-detalhe {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
         }
 
         .prazo-box {
-            background: rgba(255, 215, 0, 0.15);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 16px;
-            padding: 14px 18px;
-            margin-bottom: 24px;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 14px;
+            padding: 14px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            backdrop-filter: blur(10px);
-        }
-
-        .prazo-icone {
-            font-size: 24px;
-        }
-
-        .prazo-texto {
-            font-weight: 600;
-            color: #ffd700;
         }
 
         .progresso {
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 18px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 16px;
+            padding: 16px;
             margin-bottom: 24px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .progresso-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .progresso-titulo {
-            font-size: 16px;
-            color: #a0c0d0;
+            margin-bottom: 10px;
         }
 
         .progresso-contador {
-            font-size: 24px;
-            font-weight: 700;
-            color: #4caf50;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 20px;
         }
 
         .barra-progresso {
@@ -100,30 +127,17 @@
 
         .barra-preenchimento {
             height: 100%;
-            background: linear-gradient(90deg, #4caf50, #8bc34a);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .categorias-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            margin-bottom: 30px;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.3s;
         }
 
         .categoria-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
+            border-radius: 18px;
             padding: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.2s;
-        }
-
-        .categoria-card.preenchida {
-            background: rgba(76, 175, 80, 0.1);
-            border-color: rgba(76, 175, 80, 0.3);
+            margin-bottom: 16px;
         }
 
         .categoria-header {
@@ -137,63 +151,38 @@
             margin-right: 12px;
         }
 
-        .categoria-info {
-            flex: 1;
-        }
-
         .categoria-nome {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 4px;
         }
 
         .categoria-pontos {
             font-size: 13px;
-            color: #ffd700;
-            background: rgba(255,215,0,0.1);
-            padding: 2px 10px;
+            color: #FFD700;
+            background: rgba(255,215,0,0.15);
+            padding: 3px 10px;
             border-radius: 20px;
-            display: inline-block;
-        }
-
-        .status-preenchido {
-            background: #4caf50;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            margin-left: 10px;
         }
 
         .select-wrapper {
             position: relative;
-            margin-top: 8px;
         }
 
         select {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 14px;
             color: white;
             font-size: 15px;
             appearance: none;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        select:focus {
-            outline: none;
-            border-color: #ffd700;
-            background: rgba(0,0,0,0.5);
         }
 
         select option {
-            background: #1a2f3f;
+            background: #1e3a4a;
             color: white;
             padding: 12px;
         }
@@ -203,455 +192,514 @@
             right: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: #ffd700;
+            color: #FFD700;
             pointer-events: none;
-            font-size: 14px;
         }
 
         .escolha-atual {
-            margin-top: 8px;
+            margin-top: 10px;
             padding: 10px 14px;
             background: rgba(255,215,0,0.1);
             border-radius: 12px;
             font-size: 14px;
-            color: #ffd700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .acoes {
-            position: sticky;
-            bottom: 20px;
-            background: rgba(11, 26, 46, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 16px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,215,0,0.3);
-            margin-top: 20px;
+            color: #FFD700;
         }
 
         .btn-salvar {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #ffd700, #ffb347);
+            padding: 18px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
             border: none;
             border-radius: 30px;
-            color: #0b1a2e;
+            color: #0a1c2e;
             font-size: 18px;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(255,215,0,0.3);
+            margin-top: 20px;
+            margin-bottom: 30px;
+            transition: transform 0.2s;
         }
 
         .btn-salvar:active {
             transform: scale(0.98);
-            box-shadow: 0 2px 8px rgba(255,215,0,0.2);
         }
 
         .btn-salvar:disabled {
             opacity: 0.5;
             transform: none;
-            box-shadow: none;
         }
 
-        .alerta {
-            background: rgba(244, 67, 54, 0.1);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 20px;
-            color: #ff8a80;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            font-size: 18px;
-            color: #ffd700;
-        }
-
-        .badge {
-            background: #ffd700;
-            color: #0b1a2e;
-            padding: 2px 8px;
+        .debug-info {
+            margin-top: 30px;
+            padding: 16px;
+            background: rgba(0,0,0,0.4);
             border-radius: 12px;
             font-size: 12px;
-            font-weight: 600;
-        }
-
-        @media (max-width: 480px) {
-            body { padding: 16px 12px; }
-            .categoria-card { padding: 14px; }
+            color: #aaa;
+            word-break: break-all;
         }
     </style>
+    
+    <!-- Carregar bibliotecas necessárias -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Loading -->
-        <div v-if="loading" class="loading">
-            <span>⭐ Carregando Pontos Extras...</span>
-        </div>
-
-        <!-- Conteúdo Principal -->
-        <div v-else>
-            <div class="header">
-                <h1>⭐ PONTOS EXTRAS 2026</h1>
+    <div class="container">
+        <div id="app">
+            <!-- Tela de Loading -->
+            <div id="tela-loading" class="loading">
+                <div class="spinner"></div>
+                <h3>⭐ Carregando Pontos Extras...</h3>
+                <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 10px;" id="status-loading">Decodificando dados...</p>
             </div>
 
-            <!-- Prazo -->
-            <div class="prazo-box" v-if="prazo">
-                <span class="prazo-icone">⏰</span>
-                <span class="prazo-texto">Encerra: {{ formatarData(prazo) }}</span>
-                <span class="badge">{{ tempoRestante }}</span>
-            </div>
-
-            <!-- Progresso -->
-            <div class="progresso">
-                <div class="progresso-header">
-                    <span class="progresso-titulo">🎯 Seus palpites</span>
-                    <span class="progresso-contador">{{ categoriasPreenchidas }}/{{ categorias.length }}</span>
-                </div>
-                <div class="barra-progresso">
-                    <div class="barra-preenchimento" :style="{ width: percentualPreenchido + '%' }"></div>
+            <!-- Tela de Erro (inicialmente escondida) -->
+            <div id="tela-erro" style="display: none;">
+                <div class="erro-box">
+                    <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
+                    <div class="erro-titulo" id="erro-titulo">Erro ao carregar dados</div>
+                    <p id="erro-mensagem" style="color: rgba(255,255,255,0.8);">Não foi possível carregar as informações.</p>
+                    <div id="erro-detalhe" class="erro-detalhe"></div>
+                    <button onclick="window.location.reload()" style="margin-top: 24px; padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0a1c2e; font-weight: bold; cursor: pointer;">
+                        🔄 TENTAR NOVAMENTE
+                    </button>
                 </div>
             </div>
 
-            <!-- Alerta de alterações -->
-            <div class="alerta" v-if="temAlteracoes">
-                ⚠️ Você tem alterações não salvas!
-            </div>
+            <!-- Tela Principal (inicialmente escondida) -->
+            <div id="tela-principal" style="display: none;">
+                <div class="header">
+                    <h1>⭐ PONTOS EXTRAS 2026</h1>
+                </div>
 
-            <!-- Lista de Categorias -->
-            <div class="categorias-grid">
-                <div v-for="cat in categorias" :key="cat.item" 
-                     class="categoria-card" 
-                     :class="{ 'preenchida': escolhas[cat.item] }">
-                    
-                    <div class="categoria-header">
-                        <span class="categoria-icone">{{ cat.icone }}</span>
-                        <div class="categoria-info">
-                            <div class="categoria-nome">{{ cat.nome }}</div>
-                            <span class="categoria-pontos">{{ cat.pontos }} pontos</span>
-                        </div>
-                        <div v-if="escolhas[cat.item]" class="status-preenchido">
-                            ✅
-                        </div>
+                <!-- Prazo será inserido aqui via JS -->
+                <div id="prazo-container"></div>
+
+                <!-- Progresso -->
+                <div class="progresso">
+                    <div class="progresso-header">
+                        <span>🎯 Seus palpites</span>
+                        <span class="progresso-contador" id="contador">0/0</span>
                     </div>
-
-                    <div class="select-wrapper">
-                        <select v-model="escolhasTemp[cat.item]" @change="marcarAlteracao(cat.item)">
-                            <option value="">🔽 Selecione um time...</option>
-                            <option v-for="time in times" :key="time" :value="time">
-                                ⚽ {{ time }}
-                            </option>
-                        </select>
-                        <span class="select-arrow">▼</span>
-                    </div>
-
-                    <div v-if="escolhasTemp[cat.item]" class="escolha-atual">
-                        <span>✅ Escolhido:</span>
-                        <strong>{{ escolhasTemp[cat.item] }}</strong>
+                    <div class="barra-progresso">
+                        <div class="barra-preenchimento" id="barra-progresso" style="width: 0%;"></div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Botão Salvar -->
-            <div class="acoes">
-                <button class="btn-salvar" @click="salvarEscolhas" :disabled="salvando || !temAlteracoes">
-                    <span v-if="!salvando">💾 SALVAR PALPITES ({{ categoriasPreenchidasTemp }}/{{ categorias.length }})</span>
-                    <span v-else>⏳ SALVANDO...</span>
+                <!-- Lista de Categorias -->
+                <div id="categorias-container"></div>
+
+                <!-- Botão Salvar -->
+                <button class="btn-salvar" id="btn-salvar">
+                    💾 SALVAR PALPITES
                 </button>
-                <p style="text-align: center; margin-top: 12px; color: #a0c0d0; font-size: 12px;">
-                    Você pode editar até o prazo final
-                </p>
+
+                <!-- Debug (opcional, pode remover em produção) -->
+                <div id="debug-info" class="debug-info" style="display: none;"></div>
             </div>
         </div>
     </div>
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://unpkg.com/gzip-js@0.3.2/lib/gzip.js"></script>
     <script>
-        const { createApp, ref, reactive, computed, onMounted, watch } = Vue;
+        // ============================================
+        // DECODIFICAÇÃO - VERSÃO SIMPLIFICADA E ROBUSTA
+        // ============================================
+        
+        console.log('🚀 Iniciando WebApp...');
+        
+        const Telegram = window.Telegram?.WebApp;
+        if (Telegram) {
+            Telegram.expand();
+            Telegram.ready();
+            console.log('✅ Telegram WebApp inicializado');
+        }
 
-        const app = createApp({
-            setup() {
-                // ============ ESTADOS ============
-                const loading = ref(true);
-                const salvando = ref(false);
-                
-                // Dados recebidos do Telegram
-                const times = ref([]);
-                const categorias = ref([]);
-                const prazo = ref(null);
-                const usuario = ref({});
-                
-                // Escolhas carregadas do servidor
-                const escolhas = ref({});
-                
-                // Escolhas temporárias (durante edição)
-                const escolhasTemp = ref({});
-                
-                // Controle de alterações
-                const alteracoes = ref(new Set());
-                
-                // Telegram WebApp
-                const tg = window.Telegram?.WebApp;
-                
-                // ============ FUNÇÃO DECODIFICAR DADOS ============
-                // EXATAMENTE como o bot codificou:
-                // JSON -> gzip -> base64url -> URL#base64
-                function decodificarDadosDaURL() {
-                    try {
-                        console.log('🔍 Decodificando dados da URL...');
-                        
-                        // Pega o hash da URL (tudo após #)
-                        const hash = window.location.hash.substring(1);
-                        
-                        if (!hash) {
-                            console.error('❌ Nenhum dado encontrado na URL');
-                            return null;
-                        }
-                        
-                        console.log(`📦 Hash encontrado: ${hash.length} caracteres`);
-                        
-                        // 1. Base64 URL-SAFE -> bytes
-                        let base64 = hash.replace(/-/g, '+').replace(/_/g, '/');
-                        while (base64.length % 4) {
-                            base64 += '=';
-                        }
-                        
-                        console.log(`📦 Base64 convertido: ${base64.length} caracteres`);
-                        
-                        const bytesComprimidos = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-                        console.log(`📦 Bytes comprimidos: ${bytesComprimidos.length} bytes`);
-                        
-                        // 2. Descomprimir GZIP
-                        try {
-                            // Usar biblioteca pako para descompressão gzip
-                            const bytesDescomprimidos = pako.ungzip(bytesComprimidos);
-                            console.log(`📦 Bytes descomprimidos: ${bytesDescomprimidos.length} bytes`);
-                            
-                            // 3. JSON
-                            const jsonStr = new TextDecoder('utf-8').decode(bytesDescomprimidos);
-                            console.log(`📦 JSON: ${jsonStr.length} caracteres`);
-                            
-                            // 4. Parse
-                            const dados = JSON.parse(jsonStr);
-                            console.log('✅ Dados decodificados com sucesso!');
-                            
-                            return dados;
-                        } catch (e) {
-                            console.error('❌ Erro na descompressão:', e);
-                            return null;
-                        }
-                    } catch (e) {
-                        console.error('❌ Erro ao decodificar:', e);
-                        return null;
-                    }
-                }
+        // Elementos da UI
+        const telaLoading = document.getElementById('tela-loading');
+        const telaErro = document.getElementById('tela-erro');
+        const telaPrincipal = document.getElementById('tela-principal');
+        const statusLoading = document.getElementById('status-loading');
 
-                // ============ DADOS COMPUTADOS ============
-                const categoriasPreenchidas = computed(() => {
-                    return Object.values(escolhas.value).filter(Boolean).length;
-                });
-
-                const categoriasPreenchidasTemp = computed(() => {
-                    return Object.values(escolhasTemp.value).filter(Boolean).length;
-                });
-
-                const percentualPreenchido = computed(() => {
-                    return (categoriasPreenchidas.value / categorias.value.length) * 100;
-                });
-
-                const temAlteracoes = computed(() => {
-                    return alteracoes.value.size > 0;
-                });
-
-                const tempoRestante = computed(() => {
-                    if (!prazo.value) return '';
-                    
-                    const agora = new Date();
-                    const prazoDate = new Date(prazo.value.replace(' ', 'T') + '-03:00');
-                    const diff = prazoDate - agora;
-                    
-                    if (diff <= 0) return 'ENCERRADO';
-                    
-                    const horas = Math.floor(diff / (1000 * 60 * 60));
-                    const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    
-                    if (horas > 24) {
-                        const dias = Math.floor(horas / 24);
-                        return `${dias}d ${horas % 24}h`;
-                    }
-                    return `${horas}h ${minutos}m`;
-                });
-
-                // ============ MÉTODOS ============
-                function marcarAlteracao(item) {
-                    alteracoes.value.add(item);
-                    
-                    // Se selecionou vazio, remove
-                    if (!escolhasTemp.value[item]) {
-                        alteracoes.value.delete(item);
-                    }
-                    
-                    // Auto-sync com escolhas originais
-                    if (escolhasTemp.value[item] === escolhas.value[item]) {
-                        alteracoes.value.delete(item);
-                    }
-                }
-
-                function formatarData(dataStr) {
-                    if (!dataStr) return '';
-                    const [data, hora] = dataStr.split(' ');
-                    const [ano, mes, dia] = data.split('-');
-                    return `${dia}/${mes}/${ano} às ${hora}`;
-                }
-
-                function inicializarEscolhasTemp() {
-                    // Começa com as escolhas carregadas
-                    escolhasTemp.value = { ...escolhas.value };
-                    
-                    // Garante que todas categorias existam
-                    categorias.value.forEach(cat => {
-                        if (!escolhasTemp.value[cat.item]) {
-                            escolhasTemp.value[cat.item] = '';
-                        }
-                    });
-                    
-                    alteracoes.value.clear();
-                }
-
-                async function salvarEscolhas() {
-                    if (salvando.value) return;
-                    
-                    salvando.value = true;
-                    
-                    try {
-                        // Monta array de escolhas APENAS com os itens preenchidos
-                        const escolhasArray = [];
-                        
-                        Object.entries(escolhasTemp.value).forEach(([item, time]) => {
-                            if (time && time.trim() !== '') {
-                                escolhasArray.push({
-                                    item: item,
-                                    time: time.trim()
-                                });
-                            }
-                        });
-                        
-                        // Dados para enviar ao bot
-                        const dados = {
-                            escolhas: escolhasArray
-                        };
-                        
-                        console.log(`📤 Enviando ${escolhasArray.length} escolhas...`);
-                        
-                        // Enviar via WebApp
-                        tg.sendData(JSON.stringify(dados));
-                        
-                        // Atualizar estado local
-                        escolhas.value = { ...escolhasTemp.value };
-                        alteracoes.value.clear();
-                        
-                        // Feedback visual
-                        tg.showAlert(`✅ ${escolhasArray.length} palpites salvos com sucesso!`);
-                        
-                    } catch (e) {
-                        console.error('❌ Erro ao salvar:', e);
-                        tg.showAlert('❌ Erro ao salvar. Tente novamente.');
-                    } finally {
-                        salvando.value = false;
-                    }
-                }
-
-                // ============ INICIALIZAÇÃO ============
-                onMounted(() => {
-                    console.log('🚀 Inicializando WebApp Pontos Extras...');
-                    
-                    // Expandir Telegram WebApp
-                    if (tg) {
-                        tg.expand();
-                        tg.ready();
-                        tg.enableClosingConfirmation();
-                        console.log('✅ Telegram WebApp inicializado');
-                    }
-                    
-                    // Decodificar dados da URL
-                    const dados = decodificarDadosDaURL();
-                    
-                    if (dados) {
-                        console.log('📊 Dados recebidos:', {
-                            times: dados.times?.length || 0,
-                            categorias: dados.categorias?.length || 0,
-                            escolhas: Object.keys(dados.escolhas || {}).length,
-                            usuario: dados.usuario?.nome
-                        });
-                        
-                        // Carregar dados
-                        times.value = dados.times || [];
-                        categorias.value = dados.categorias || [];
-                        prazo.value = dados.prazo || null;
-                        usuario.value = dados.usuario || {};
-                        escolhas.value = dados.escolhas || {};
-                        
-                        // Inicializar escolhas temporárias
-                        inicializarEscolhasTemp();
-                        
-                        loading.value = false;
-                    } else {
-                        console.error('❌ Falha ao carregar dados');
-                        loading.value = false;
-                        
-                        if (tg) {
-                            tg.showAlert('❌ Erro ao carregar dados. Volte e tente novamente.');
-                        }
-                    }
-                });
-
-                return {
-                    loading,
-                    salvando,
-                    times,
-                    categorias,
-                    prazo,
-                    usuario,
-                    escolhas,
-                    escolhasTemp,
-                    alteracoes,
-                    categoriasPreenchidas,
-                    categoriasPreenchidasTemp,
-                    percentualPreenchido,
-                    temAlteracoes,
-                    tempoRestante,
-                    formatarData,
-                    marcarAlteracao,
-                    salvarEscolhas
-                };
+        function mostrarErro(titulo, mensagem, detalhe = '') {
+            console.error('❌ Erro:', titulo, mensagem, detalhe);
+            telaLoading.style.display = 'none';
+            telaErro.style.display = 'block';
+            telaPrincipal.style.display = 'none';
+            
+            document.getElementById('erro-titulo').textContent = titulo || 'Erro ao carregar dados';
+            document.getElementById('erro-mensagem').textContent = mensagem || 'Tente novamente mais tarde.';
+            
+            const elDetalhe = document.getElementById('erro-detalhe');
+            if (detalhe) {
+                elDetalhe.textContent = detalhe;
+                elDetalhe.style.display = 'block';
+            } else {
+                elDetalhe.style.display = 'none';
             }
-        });
+        }
 
-        // Incluir biblioteca pako para descompressão gzip
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js';
-        script.onload = () => {
-            console.log('✅ Pako carregado - pronto para descompressão');
-        };
-        document.head.appendChild(script);
+        // ============ FUNÇÃO PRINCIPAL DE DECODIFICAÇÃO ============
+        function decodificarDados() {
+            try {
+                statusLoading.textContent = '📦 Lendo dados da URL...';
+                
+                // Pega o hash da URL (tudo depois de #)
+                const hash = window.location.hash.substring(1);
+                
+                if (!hash) {
+                    throw new Error('Nenhum dado encontrado na URL');
+                }
+                
+                console.log('🔍 Hash encontrado (primeiros 50 chars):', hash.substring(0, 50) + '...');
+                console.log('📏 Tamanho do hash:', hash.length, 'caracteres');
+                
+                statusLoading.textContent = `🔧 Decodificando Base64 (${hash.length} chars)...`;
+                
+                // 1. Converter base64url para base64 padrão
+                let base64 = hash.replace(/-/g, '+').replace(/_/g, '/');
+                
+                // 2. Adicionar padding se necessário
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                
+                console.log('📏 Base64 após padding:', base64.length, 'chars');
+                
+                // 3. Decodificar base64 para bytes
+                let bytesComprimidos;
+                try {
+                    bytesComprimidos = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                    console.log('📦 Bytes comprimidos:', bytesComprimidos.length, 'bytes');
+                } catch (e) {
+                    throw new Error('Falha na decodificação Base64: ' + e.message);
+                }
+                
+                statusLoading.textContent = `🔓 Descomprimindo GZIP (${bytesComprimidos.length} bytes)...`;
+                
+                // 4. Descomprimir com pako
+                let bytesDescomprimidos;
+                try {
+                    bytesDescomprimidos = pako.ungzip(bytesComprimidos);
+                    console.log('📦 Bytes descomprimidos:', bytesDescomprimidos.length, 'bytes');
+                    console.log('📊 Taxa de compressão:', ((bytesComprimidos.length / bytesDescomprimidos.length) * 100).toFixed(1) + '%');
+                } catch (e) {
+                    throw new Error('Falha na descompressão GZIP: ' + e.message);
+                }
+                
+                statusLoading.textContent = '📄 Parseando JSON...';
+                
+                // 5. Converter bytes para string JSON
+                let jsonStr;
+                try {
+                    jsonStr = new TextDecoder('utf-8').decode(bytesDescomprimidos);
+                    console.log('📄 JSON string (primeiros 100 chars):', jsonStr.substring(0, 100) + '...');
+                } catch (e) {
+                    throw new Error('Falha na decodificação UTF-8: ' + e.message);
+                }
+                
+                // 6. Parse JSON
+                let dados;
+                try {
+                    dados = JSON.parse(jsonStr);
+                    console.log('✅ JSON parseado com sucesso!');
+                } catch (e) {
+                    throw new Error('Falha no parse do JSON: ' + e.message);
+                }
+                
+                return dados;
+                
+            } catch (error) {
+                console.error('❌ Erro na decodificação:', error);
+                throw error;
+            }
+        }
 
-        app.mount('#app');
+        // ============ RENDERIZAÇÃO DA INTERFACE ============
+        function renderizarInterface(dados) {
+            console.log('🎨 Renderizando interface...', dados);
+            
+            // Validar dados
+            if (!dados) {
+                throw new Error('Dados inválidos');
+            }
+            
+            const times = dados.times || [];
+            const categorias = dados.categorias || [];
+            const escolhas = dados.escolhas || {};
+            const prazo = dados.prazo || '';
+            const usuario = dados.usuario || { nome: 'Usuário' };
+            
+            console.log(`📊 Times: ${times.length} | Categorias: ${categorias.length} | Escolhas: ${Object.keys(escolhas).length}`);
+            
+            if (times.length === 0) {
+                throw new Error('Nenhum time importado');
+            }
+            
+            if (categorias.length === 0) {
+                throw new Error('Nenhuma categoria encontrada');
+            }
+            
+            // Esconder loading, mostrar tela principal
+            telaLoading.style.display = 'none';
+            telaPrincipal.style.display = 'block';
+            
+            // ============ PRAZO ============
+            const prazoContainer = document.getElementById('prazo-container');
+            if (prazo) {
+                const [data, hora] = prazo.split(' ');
+                const [ano, mes, dia] = data.split('-');
+                const dataFormatada = `${dia}/${mes}/${ano} às ${hora}`;
+                
+                prazoContainer.innerHTML = `
+                    <div class="prazo-box">
+                        <span style="font-size: 24px;">⏰</span>
+                        <span style="font-weight: 600; color: #FFD700;">Encerra: ${dataFormatada}</span>
+                        <span style="background: #FFD700; color: #0a1c2e; padding: 4px 12px; border-radius: 30px; font-size: 13px; font-weight: bold;">
+                            HORÁRIO DE BRASÍLIA
+                        </span>
+                    </div>
+                `;
+            }
+            
+            // ============ CATEGORIAS ============
+            const categoriasContainer = document.getElementById('categorias-container');
+            categoriasContainer.innerHTML = '';
+            
+            // Contador de preenchidos
+            let preenchidos = 0;
+            
+            // Ordenar categorias por ordem (já devem vir ordenadas, mas garantimos)
+            const categoriasOrdenadas = [...categorias].sort((a, b) => {
+                const ordemA = dados.ordens?.[a.item] || 0;
+                const ordemB = dados.ordens?.[b.item] || 0;
+                return ordemA - ordemB;
+            });
+            
+            categoriasOrdenadas.forEach(cat => {
+                const codigo = cat.item;
+                const nome = cat.nome;
+                const icone = cat.icone || '⚽';
+                const pontos = cat.pontos || 0;
+                
+                const escolhaAtual = escolhas[codigo] || '';
+                const temEscolha = !!escolhaAtual;
+                
+                if (temEscolha) preenchidos++;
+                
+                // Criar card da categoria
+                const card = document.createElement('div');
+                card.className = `categoria-card ${temEscolha ? 'preenchida' : ''}`;
+                card.setAttribute('data-codigo', codigo);
+                
+                // Header
+                const header = document.createElement('div');
+                header.className = 'categoria-header';
+                header.innerHTML = `
+                    <span class="categoria-icone">${icone}</span>
+                    <span class="categoria-nome">${nome}</span>
+                    <span class="categoria-pontos">${pontos} pts</span>
+                `;
+                
+                // Select wrapper
+                const selectWrapper = document.createElement('div');
+                selectWrapper.className = 'select-wrapper';
+                
+                // Criar select
+                const select = document.createElement('select');
+                select.setAttribute('data-codigo', codigo);
+                
+                // Opção vazia
+                const optionVazia = document.createElement('option');
+                optionVazia.value = '';
+                optionVazia.textContent = '🔽 Selecione um time...';
+                select.appendChild(optionVazia);
+                
+                // Opções dos times
+                times.forEach(time => {
+                    const option = document.createElement('option');
+                    option.value = time;
+                    option.textContent = `⚽ ${time}`;
+                    if (time === escolhaAtual) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                // Arrow do select
+                const arrow = document.createElement('span');
+                arrow.className = 'select-arrow';
+                arrow.textContent = '▼';
+                
+                selectWrapper.appendChild(select);
+                selectWrapper.appendChild(arrow);
+                
+                card.appendChild(header);
+                card.appendChild(selectWrapper);
+                
+                // Mostrar escolha atual se houver
+                if (temEscolha) {
+                    const escolhaDiv = document.createElement('div');
+                    escolhaDiv.className = 'escolha-atual';
+                    escolhaDiv.innerHTML = `
+                        <span>✅ Escolhido:</span>
+                        <strong style="margin-left: 8px;">${escolhaAtual}</strong>
+                    `;
+                    card.appendChild(escolhaDiv);
+                }
+                
+                categoriasContainer.appendChild(card);
+                
+                // Adicionar evento de mudança
+                select.addEventListener('change', function(e) {
+                    const cod = this.dataset.codigo;
+                    const valor = this.value;
+                    
+                    // Atualizar contador
+                    atualizarContador();
+                    
+                    // Mostrar/esconder badge de escolha atual
+                    const escolhaDiv = card.querySelector('.escolha-atual');
+                    if (valor) {
+                        if (escolhaDiv) {
+                            escolhaDiv.innerHTML = `
+                                <span>✅ Escolhido:</span>
+                                <strong style="margin-left: 8px;">${valor}</strong>
+                            `;
+                        } else {
+                            const novaEscolhaDiv = document.createElement('div');
+                            novaEscolhaDiv.className = 'escolha-atual';
+                            novaEscolhaDiv.innerHTML = `
+                                <span>✅ Escolhido:</span>
+                                <strong style="margin-left: 8px;">${valor}</strong>
+                            `;
+                            card.appendChild(novaEscolhaDiv);
+                        }
+                        
+                        // Marcar como preenchida
+                        card.classList.add('preenchida');
+                    } else {
+                        if (escolhaDiv) {
+                            escolhaDiv.remove();
+                        }
+                        card.classList.remove('preenchida');
+                    }
+                    
+                    // Marcar que houve alteração
+                    window.escolhasAlteradas = true;
+                });
+            });
+            
+            // ============ CONTADOR INICIAL ============
+            const contadorEl = document.getElementById('contador');
+            const barraEl = document.getElementById('barra-progresso');
+            
+            function atualizarContador() {
+                const selects = document.querySelectorAll('select[data-codigo]');
+                let preenchidosAgora = 0;
+                
+                selects.forEach(select => {
+                    if (select.value) preenchidosAgora++;
+                });
+                
+                contadorEl.textContent = `${preenchidosAgora}/${categorias.length}`;
+                const percentual = (preenchidosAgora / categorias.length) * 100;
+                barraEl.style.width = percentual + '%';
+            }
+            
+            // Inicializar contador
+            atualizarContador();
+            
+            // ============ BOTÃO SALVAR ============
+            const btnSalvar = document.getElementById('btn-salvar');
+            
+            btnSalvar.onclick = function() {
+                // Coletar todas as escolhas
+                const selects = document.querySelectorAll('select[data-codigo]');
+                const escolhasArray = [];
+                
+                selects.forEach(select => {
+                    const item = select.dataset.codigo;
+                    const time = select.value;
+                    
+                    if (time && time.trim() !== '') {
+                        escolhasArray.push({
+                            item: item,
+                            time: time.trim()
+                        });
+                    }
+                });
+                
+                console.log('📤 Enviando escolhas:', escolhasArray);
+                
+                // Enviar para o bot
+                if (Telegram) {
+                    Telegram.sendData(JSON.stringify({
+                        escolhas: escolhasArray
+                    }));
+                    
+                    // Feedback
+                    Telegram.showAlert(`✅ ${escolhasArray.length} palpites salvos com sucesso!`);
+                } else {
+                    alert('Fora do Telegram. Escolhas: ' + JSON.stringify(escolhasArray));
+                }
+            };
+            
+            // Debug (opcional)
+            if (window.location.hash.includes('debug')) {
+                const debugEl = document.getElementById('debug-info');
+                debugEl.style.display = 'block';
+                debugEl.innerHTML = `
+                    <strong>🔍 DEBUG INFO</strong><br>
+                    Times: ${times.length}<br>
+                    Categorias: ${categorias.length}<br>
+                    Escolhas carregadas: ${Object.keys(escolhas).length}<br>
+                    Usuário: ${usuario.nome || 'N/A'}<br>
+                    Prazo: ${prazo || 'N/A'}<br>
+                    Hash length: ${window.location.hash.length}
+                `;
+            }
+        }
+
+        // ============ EXECUÇÃO PRINCIPAL ============
+        try {
+            // Tentar decodificar os dados
+            const dados = decodificarDados();
+            
+            // Se chegou aqui, sucesso!
+            console.log('✅ Dados decodificados:', dados);
+            
+            // Renderizar interface
+            renderizarInterface(dados);
+            
+        } catch (error) {
+            console.error('❌ Erro fatal:', error);
+            
+            // Mostrar erro detalhado
+            mostrarErro(
+                'Falha na decodificação',
+                'Não foi possível carregar os dados do bolão.',
+                error.message + '\n\nHash: ' + window.location.hash.substring(0, 100) + '...'
+            );
+            
+            // Tentar mostrar o hash para debug
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                console.log('Hash completo:', hash);
+            }
+        }
+
+        // Verificar se pako foi carregado
+        if (typeof pako === 'undefined') {
+            mostrarErro(
+                'Biblioteca não carregada',
+                'Erro ao carregar pako.min.js. Verifique sua conexão.',
+                'Tente recarregar a página.'
+            );
+        }
     </script>
 </body>
 </html>
