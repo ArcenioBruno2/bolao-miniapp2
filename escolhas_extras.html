@@ -13,7 +13,7 @@
         }
 
         body {
-            background: #0b1a2e;
+            background: #0a1c2a;
             color: white;
             padding: 16px;
         }
@@ -31,7 +31,6 @@
         .header h1 {
             font-size: 26px;
             color: #FFD700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .loading, .error-box {
@@ -159,7 +158,7 @@
         }
 
         select option {
-            background: #0b1a2e;
+            background: #0a1c2a;
             color: white;
         }
 
@@ -181,7 +180,7 @@
             background: #FFD700;
             border: none;
             border-radius: 30px;
-            color: #0b1a2e;
+            color: #0a1c2a;
             font-size: 18px;
             font-weight: 700;
             display: flex;
@@ -197,11 +196,6 @@
             opacity: 0.8;
         }
 
-        .btn-salvar:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .error-details {
             background: rgba(244,67,54,0.1);
             border: 1px solid #f44336;
@@ -210,43 +204,32 @@
             margin: 20px 0;
             text-align: left;
             word-break: break-all;
-            font-family: monospace;
-            font-size: 12px;
-            color: #ff8a80;
-        }
-
-        .debug-info {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 20px;
-            font-size: 11px;
-            color: #aaa;
-            word-break: break-all;
-            display: none;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </head>
 <body>
     <div class="container">
+        <!-- LOADING -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <h2 style="color: #FFD700;">Carregando Pontos Extras</h2>
-            <p id="loading-status" style="color: #aaa;">Inicializando...</p>
+            <p id="loading-status" style="color: #aaa;">Preparando...</p>
         </div>
 
+        <!-- ERROR -->
         <div id="error" style="display: none;">
             <div class="error-details">
-                <h3 style="color: #ff8a80; margin-bottom: 12px;">❌ Erro ao carregar</h3>
+                <h3 style="color: #ff8a80; margin-bottom: 16px;">❌ Erro ao carregar</h3>
                 <p id="error-message" style="margin-bottom: 16px;"></p>
-                <div id="error-hash" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-size: 11px;"></div>
-                <button onclick="window.location.reload()" style="margin-top: 20px; padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0b1a2e; font-weight: bold; cursor: pointer;">
+                <div id="error-hash" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; font-size: 11px; margin-bottom: 20px;"></div>
+                <button onclick="window.location.reload()" style="padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0a1c2a; font-weight: bold; cursor: pointer;">
                     🔄 Tentar Novamente
                 </button>
             </div>
         </div>
 
+        <!-- MAIN -->
         <div id="main" style="display: none;">
             <div class="header">
                 <h1>⭐ PONTOS EXTRAS 2026</h1>
@@ -273,8 +256,7 @@
     </div>
 
     <script>
-        // ==================== SOLUÇÃO DEFINITIVA ====================
-        // Baseado no hash real: #H4sIAAAAAAAC_5WVz27aQBDGX2Xlc5CwC7TkBrSJVJUUhSiXqkIbeyAr2TtkvfYhiFOlJj2l57RSiqIeojb3KlIv9ZvwAs0jdHZ...
+        // ==================== SOLUÇÃO DEFINITIVA - DECODIFICAÇÃO MANUAL ====================
         
         console.log('🚀 Iniciando WebApp...');
         
@@ -284,109 +266,135 @@
         const mainEl = document.getElementById('main');
         const loadingStatus = document.getElementById('loading-status');
 
-        // ==================== FUNÇÃO DE DECODIFICAÇÃO CORRIGIDA ====================
-        function decodeData() {
+        // ==================== FUNÇÃO BASE64URL PARA UINT8Array ====================
+        function base64UrlToUint8Array(base64url) {
+            // 1. Substituir caracteres URL-safe
+            let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+            
+            // 2. Remover QUALQUER caractere que não seja Base64 válido
+            base64 = base64.replace(/[^A-Za-z0-9+/]/g, '');
+            
+            // 3. Adicionar padding
+            while (base64.length % 4) {
+                base64 += '=';
+            }
+            
+            console.log('📦 Base64 limpo:', base64.substring(0, 50) + '...');
+            console.log('📦 Tamanho Base64:', base64.length);
+            
+            // 4. Decodificar manualmente (fallback se atob falhar)
             try {
-                // PASSO 1: Pegar a URL COMPLETA
-                const url = window.location.href;
-                console.log('📌 URL completa:', url);
+                // Tentar com atob primeiro
+                const binary = atob(base64);
+                const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) {
+                    bytes[i] = binary.charCodeAt(i);
+                }
+                return bytes;
+            } catch (e) {
+                console.warn('atob falhou, tentando decodificação manual:', e);
                 
-                // PASSO 2: Encontrar o hash (tudo depois do primeiro #)
-                const hashIndex = url.indexOf('#');
-                if (hashIndex === -1) {
-                    throw new Error('Nenhum hash encontrado na URL');
+                // Decodificação manual Base64
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+                let output = [];
+                let buffer = 0;
+                let bits = 0;
+                
+                for (let i = 0; i < base64.length; i++) {
+                    if (base64[i] === '=') break;
+                    
+                    const val = chars.indexOf(base64[i]);
+                    if (val === -1) continue;
+                    
+                    buffer = (buffer << 6) | val;
+                    bits += 6;
+                    
+                    if (bits >= 8) {
+                        bits -= 8;
+                        output.push((buffer >> bits) & 0xFF);
+                    }
                 }
                 
-                // PEGAR TUDO DEPOIS DO #, SEM MODIFICAR NADA
-                const hash = url.substring(hashIndex + 1);
+                return new Uint8Array(output);
+            }
+        }
+
+        // ==================== DECODIFICAR GZIP MANUAL ====================
+        function decompressGzip(bytes) {
+            try {
+                // Tentar com pako primeiro
+                return pako.ungzip(bytes);
+            } catch (e) {
+                console.error('Pako falhou:', e);
+                throw new Error('Não foi possível descomprimir os dados');
+            }
+        }
+
+        // ==================== FUNÇÃO PRINCIPAL ====================
+        function decodeData() {
+            try {
+                // PASSO 1: Pegar a URL completa
+                const url = window.location.href;
+                console.log('📌 URL:', url);
                 
-                console.log('📦 Hash BRUTO:', hash.substring(0, 50) + '...');
-                console.log('📦 Tamanho do hash BRUTO:', hash.length, 'caracteres');
+                // PASSO 2: Encontrar o hash (tudo depois do #)
+                const hashIndex = url.indexOf('#');
+                if (hashIndex === -1) {
+                    throw new Error('Nenhum dado encontrado na URL');
+                }
+                
+                // PASSO 3: Pegar o hash BRUTO
+                let hash = url.substring(hashIndex + 1);
+                console.log('📦 Hash bruto (início):', hash.substring(0, 100));
+                console.log('📦 Tamanho do hash:', hash.length);
                 
                 loadingStatus.textContent = `📦 Dados recebidos (${hash.length} chars)`;
                 
-                if (hash.length < 100) {
-                    throw new Error('Hash muito curto: ' + hash.length);
-                }
-
-                // PASSO 3: O hash JÁ ESTÁ em Base64URL, mas pode ter caracteres especiais
-                // Precisamos garantir que é uma string válida para atob
-                let base64 = hash;
+                // PASSO 4: O hash começa com 'H4sI' que é o cabeçalho GZIP
+                // NÃO PRECISA REMOVER NADA, é parte do Base64 válido
                 
-                // Substituir caracteres especiais do Base64URL
-                base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                // PASSO 5: Converter Base64URL para bytes
+                const compressedBytes = base64UrlToUint8Array(hash);
+                console.log('📦 Bytes comprimidos:', compressedBytes.length);
                 
-                // Remover qualquer caractere que não seja Base64
-                base64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
+                loadingStatus.textContent = `🔓 Descomprimindo (${compressedBytes.length} bytes)...`;
                 
-                // Adicionar padding
-                while (base64.length % 4) {
-                    base64 += '=';
-                }
+                // PASSO 6: Descomprimir
+                const decompressedBytes = decompressGzip(compressedBytes);
+                console.log('📦 Bytes descomprimidos:', decompressedBytes.length);
                 
-                console.log('📦 Base64 limpo:', base64.substring(0, 50) + '...');
-                console.log('📦 Tamanho Base64:', base64.length);
+                // PASSO 7: Converter para texto
+                const jsonText = new TextDecoder('utf-8').decode(decompressedBytes);
+                console.log('📄 JSON (início):', jsonText.substring(0, 200));
                 
-                loadingStatus.textContent = '🔓 Decodificando Base64...';
-
-                // PASSO 4: Decodificar Base64
-                let compressed;
-                try {
-                    compressed = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-                    console.log('📦 Bytes comprimidos:', compressed.length);
-                } catch (e) {
-                    console.error('Erro atob:', e);
-                    console.error('Base64 problemático:', base64.substring(0, 100));
-                    throw new Error(`Base64 inválido: ${e.message}`);
-                }
-
-                // PASSO 5: Descomprimir GZIP
-                loadingStatus.textContent = `🔓 Descomprimindo (${compressed.length} bytes)...`;
-                
-                let decompressed;
-                try {
-                    decompressed = pako.ungzip(compressed);
-                    console.log('📦 Bytes descomprimidos:', decompressed.length);
-                } catch (e) {
-                    console.error('Erro pako:', e);
-                    throw new Error(`Falha na descompressão GZIP: ${e.message}`);
-                }
-
-                // PASSO 6: Converter para texto
-                loadingStatus.textContent = '📄 Parseando JSON...';
-                
-                const jsonText = new TextDecoder('utf-8').decode(decompressed);
-                console.log('📄 JSON (primeiros 200):', jsonText.substring(0, 200));
-
-                // PASSO 7: Parse JSON
+                // PASSO 8: Parse JSON
                 const data = JSON.parse(jsonText);
                 console.log('✅ Dados carregados!');
                 console.log('   Times:', data.times?.length);
                 console.log('   Categorias:', data.categorias?.length);
-                console.log('   Escolhas:', Object.keys(data.escolhas || {}).length);
                 
                 return data;
                 
             } catch (error) {
-                console.error('❌ Erro na decodificação:', error);
+                console.error('❌ Erro:', error);
                 throw error;
             }
         }
 
-        // ==================== RENDERIZAÇÃO ====================
+        // ==================== RENDERIZAR ====================
         function renderizar(data) {
-            if (!data) throw new Error('Dados vazios');
+            if (!data) throw new Error('Dados inválidos');
             
             const times = data.times || [];
             const categorias = data.categorias || [];
             const escolhas = data.escolhas || {};
             const prazo = data.prazo || '';
             
-            // Esconder loading, mostrar main
+            // Mostrar main
             loadingEl.style.display = 'none';
             mainEl.style.display = 'block';
             
-            // Renderizar prazo
+            // Prazo
             if (prazo) {
                 const [dataPart, horaPart] = prazo.split(' ');
                 const [ano, mes, dia] = dataPart.split('-');
@@ -398,29 +406,31 @@
                         <div>
                             <div style="font-size: 13px; color: #aaa;">ENCERRAMENTO</div>
                             <div style="font-size: 18px; font-weight: bold; color: #FFD700;">${dataFormatada}</div>
-                            <div style="font-size: 12px; color: #888;">Horário de Brasília</div>
                         </div>
                     </div>
                 `;
             }
             
-            // Renderizar categorias
+            // Categorias
             const container = document.getElementById('categorias-container');
             container.innerHTML = '';
-            
-            let preenchidos = 0;
             
             categorias.forEach(cat => {
                 const codigo = cat.item || cat.codigo;
                 const nome = cat.nome;
                 const icone = cat.icone || '⚽';
                 const pontos = cat.pontos || 0;
-                
                 const escolhaAtual = escolhas[codigo] || '';
-                if (escolhaAtual) preenchidos++;
                 
                 const card = document.createElement('div');
                 card.className = `categoria ${escolhaAtual ? 'preenchida' : ''}`;
+                
+                // Criar select
+                let selectHtml = `<select data-codigo="${codigo}"><option value="">🔽 Selecione um time...</option>`;
+                times.forEach(time => {
+                    selectHtml += `<option value="${time}" ${time === escolhaAtual ? 'selected' : ''}>⚽ ${time}</option>`;
+                });
+                selectHtml += '</select>';
                 
                 card.innerHTML = `
                     <div class="categoria-header">
@@ -430,20 +440,8 @@
                             <span class="pontos">${pontos} pts</span>
                         </div>
                     </div>
-                    <select data-codigo="${codigo}">
-                        <option value="">🔽 Selecione um time...</option>
-                        ${times.map(time => `
-                            <option value="${time}" ${time === escolhaAtual ? 'selected' : ''}>
-                                ⚽ ${time}
-                            </option>
-                        `).join('')}
-                    </select>
-                    ${escolhaAtual ? `
-                        <div class="escolha-atual">
-                            <span>✅</span>
-                            <span>${escolhaAtual}</span>
-                        </div>
-                    ` : ''}
+                    ${selectHtml}
+                    ${escolhaAtual ? `<div class="escolha-atual"><span>✅</span><span>${escolhaAtual}</span></div>` : ''}
                 `;
                 
                 container.appendChild(card);
@@ -452,26 +450,22 @@
                 const select = card.querySelector('select');
                 select.addEventListener('change', function() {
                     const valor = this.value;
-                    const cod = this.dataset.codigo;
-                    
                     if (valor) {
                         card.classList.add('preenchida');
-                        
-                        let escolhaDiv = card.querySelector('.escolha-atual');
-                        if (escolhaDiv) {
-                            escolhaDiv.innerHTML = `<span>✅</span><span>${valor}</span>`;
+                        let div = card.querySelector('.escolha-atual');
+                        if (div) {
+                            div.innerHTML = `<span>✅</span><span>${valor}</span>`;
                         } else {
-                            const novaDiv = document.createElement('div');
-                            novaDiv.className = 'escolha-atual';
-                            novaDiv.innerHTML = `<span>✅</span><span>${valor}</span>`;
-                            card.appendChild(novaDiv);
+                            const nova = document.createElement('div');
+                            nova.className = 'escolha-atual';
+                            nova.innerHTML = `<span>✅</span><span>${valor}</span>`;
+                            card.appendChild(nova);
                         }
                     } else {
                         card.classList.remove('preenchida');
-                        const escolhaDiv = card.querySelector('.escolha-atual');
-                        if (escolhaDiv) escolhaDiv.remove();
+                        const div = card.querySelector('.escolha-atual');
+                        if (div) div.remove();
                     }
-                    
                     atualizarContador();
                 });
             });
@@ -481,43 +475,36 @@
                 const selects = document.querySelectorAll('select[data-codigo]');
                 let count = 0;
                 selects.forEach(s => { if (s.value) count++; });
-                
                 document.getElementById('contador').textContent = `${count}/${categorias.length}`;
                 document.getElementById('barra-progresso').style.width = (count / categorias.length * 100) + '%';
             }
-            
             atualizarContador();
             
             // Botão salvar
             document.getElementById('btn-salvar').onclick = function() {
                 const selects = document.querySelectorAll('select[data-codigo]');
                 const escolhasArray = [];
-                
-                selects.forEach(select => {
-                    if (select.value) {
+                selects.forEach(s => {
+                    if (s.value) {
                         escolhasArray.push({
-                            item: select.dataset.codigo,
-                            time: select.value
+                            item: s.dataset.codigo,
+                            time: s.value
                         });
                     }
                 });
                 
-                console.log('📤 Enviando:', escolhasArray.length, 'escolhas');
-                
                 if (window.Telegram?.WebApp) {
                     window.Telegram.WebApp.sendData(JSON.stringify({ escolhas: escolhasArray }));
                     window.Telegram.WebApp.showAlert(`✅ ${escolhasArray.length} palpites salvos!`);
-                } else {
-                    alert('Escolhas: ' + JSON.stringify(escolhasArray));
                 }
             };
         }
 
         // ==================== EXECUTAR ====================
         try {
-            // Verificar se temos o hash
-            if (!window.location.hash || window.location.hash.length < 10) {
-                throw new Error('URL sem dados. Use o bot do Telegram para abrir este link.');
+            // Verificar se tem hash
+            if (!window.location.hash || window.location.hash.length < 50) {
+                throw new Error('URL sem dados. Use o bot do Telegram.');
             }
             
             // Decodificar
@@ -537,9 +524,8 @@
                 <strong>Hash bruto:</strong><br>
                 ${window.location.hash.substring(0, 200)}...<br><br>
                 <strong>Length:</strong> ${window.location.hash.length}<br>
-                <strong>Tipo:</strong> ${typeof window.location.hash}<br>
                 <strong>Pako:</strong> ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
-                <strong>User Agent:</strong> ${navigator.userAgent}
+                <strong>Plataforma:</strong> ${navigator.platform}
             `;
         }
     </script>
