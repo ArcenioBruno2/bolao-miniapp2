@@ -11,9 +11,6 @@
     <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- Pako para descompressão -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -237,13 +234,16 @@
             animation: spin 0.8s linear infinite;
         }
         
-        .error-box {
-            background: #ffebee;
-            border-radius: 16px;
-            padding: 24px;
+        .error-container {
             text-align: center;
+            padding: 24px;
             max-width: 400px;
-            margin: 20px;
+            margin: 0 auto;
+        }
+        
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
         }
         
         .error-title {
@@ -255,19 +255,33 @@
         
         .error-message {
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             line-height: 1.5;
         }
         
-        .close-btn {
+        .close-button {
             background: var(--tg-theme-button-color, #d32f2f);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-weight: 700;
             font-size: 16px;
             cursor: pointer;
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #999;
+            text-align: left;
+            word-break: break-all;
         }
         
         @keyframes spin {
@@ -302,7 +316,6 @@
     </div>
     
     <div class="container" id="main-content" style="display: none;">
-        <!-- Header com Cronômetro -->
         <div class="header">
             <div class="title">
                 <span>⭐ PONTOS EXTRAS 2026</span>
@@ -314,7 +327,6 @@
             </div>
         </div>
         
-        <!-- Barra de Progresso -->
         <div class="progress-section">
             <div class="progress-header">
                 <span>📊 SEU PROGRESSO</span>
@@ -325,10 +337,8 @@
             </div>
         </div>
         
-        <!-- Grid de Categorias -->
         <div class="categorias-grid" id="categorias-grid"></div>
         
-        <!-- Botões -->
         <div class="acoes">
             <button class="btn btn-primary" id="btn-enviar">
                 <span>✅</span> ENVIAR
@@ -340,7 +350,7 @@
     </div>
     
     <script>
-        // ============ INICIALIZAÇÃO TELEGRAM ============
+        // ============ TELEGRAM WEBAPP ============
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
@@ -351,101 +361,98 @@
         let escolhasAnteriores = {};
         let prazo = null;
         let timerInterval = null;
+        let usuarioId = null;
+        let usuarioNome = '';
         
-        // ============ FUNÇÃO DE DESCOMPRESSÃO ============
-        function descomprimirDados(base64String) {
-            try {
-                console.log('Iniciando descompressão...');
-                
-                // 1. Reverter substituições de URL
-                let base64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
-                
-                // 2. Adicionar padding se necessário
-                while (base64.length % 4) {
-                    base64 += '=';
-                }
-                
-                console.log(`Base64 após correção: ${base64.length} caracteres`);
-                
-                // 3. Decodificar base64
-                const binaryString = atob(base64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                
-                console.log(`Bytes decodificados: ${bytes.length}`);
-                
-                // 4. Descomprimir com pako
-                const decompressed = pako.inflate(bytes, { to: 'string' });
-                
-                console.log(`Descomprimido: ${decompressed.length} caracteres`);
-                
-                // 5. Parse JSON
-                const dados = JSON.parse(decompressed);
-                
-                console.log('Dados parseados com sucesso!');
-                
-                return dados;
-                
-            } catch (e) {
-                console.error('Erro na descompressão:', e);
-                throw e;
-            }
-        }
-        
-        // ============ DECODIFICAR DADOS DA URL ============
+        // ============ DECODIFICAR DADOS - VERSÃO SIMPLES ============
         function decodeDataFromURL() {
             try {
-                console.log('=== INICIANDO DECODIFICAÇÃO ===');
-                console.log('Hash completo:', window.location.hash);
+                console.log('=== DECODIFICANDO DADOS ===');
                 
-                // 1. Verificar se existe hash
-                if (!window.location.hash || window.location.hash.length < 10) {
-                    throw new Error('Hash não encontrado ou muito curto');
+                // 1. Pegar hash da URL
+                let hash = window.location.hash;
+                console.log('Hash original:', hash.substring(0, 50) + '...');
+                
+                if (!hash || hash.length < 10) {
+                    throw new Error('Hash não encontrado');
                 }
                 
-                // 2. Extrair dados - formato #d=BASE64
-                let hash = window.location.hash;
-                
+                // 2. Extrair base64
                 if (hash.includes('#d=')) {
                     hash = hash.replace('#d=', '');
-                } else if (hash.includes('#data=')) {
-                    hash = hash.replace('#data=', '');
                 } else {
                     hash = hash.replace('#', '');
                 }
                 
-                // 3. Remover espaços e quebras de linha
-                hash = hash.trim();
+                console.log('Hash limpo:', hash.substring(0, 50) + '...');
                 
-                console.log('Hash extraído:', hash.substring(0, 50) + '...');
-                console.log('Tamanho do hash:', hash.length);
+                // 3. Decodificar base64
+                let decodedString;
+                try {
+                    decodedString = atob(hash);
+                } catch (e) {
+                    console.error('Erro no atob:', e);
+                    throw new Error('Erro ao decodificar base64');
+                }
                 
-                // 4. Descomprimir dados
-                const dados = descomprimirDados(hash);
+                console.log('String decodificada:', decodedString.substring(0, 100) + '...');
                 
-                // 5. Extrair dados compactados
-                // Formato: {t: times, c: categorias, e: escolhas, p: prazo, u: usuario}
+                // 4. Parse do payload (formato: times|categorias|escolhas|prazo|user_id|user_nome)
+                const parts = decodedString.split('|');
+                console.log('Partes:', parts.length);
                 
-                times = dados.t || [];
+                if (parts.length < 6) {
+                    throw new Error('Formato de dados inválido');
+                }
                 
-                // Converter categorias do formato compactado
-                categorias = (dados.c || []).map(cat => ({
-                    item: cat.i,
-                    nome: cat.n,
-                    pontos: cat.p,
-                    icone: cat.e
-                }));
+                // TIMES: separados por vírgula
+                const timesStr = parts[0];
+                times = timesStr.split(',').filter(t => t.trim() !== '');
+                console.log('Times carregados:', times.length);
                 
-                escolhasAnteriores = dados.e || {};
-                prazo = dados.p || null;
+                // CATEGORIAS: formato codigo:nome: pontos:icone; ...
+                const categoriasStr = parts[1];
+                categorias = [];
                 
-                console.log('=== DADOS CARREGADOS ===');
-                console.log(`Times: ${times.length}`);
-                console.log(`Categorias: ${categorias.length}`);
-                console.log(`Escolhas anteriores: ${Object.keys(escolhasAnteriores).length}`);
-                console.log(`Prazo: ${prazo}`);
+                if (categoriasStr) {
+                    const cats = categoriasStr.split(';');
+                    cats.forEach(cat => {
+                        const catParts = cat.split(':');
+                        if (catParts.length >= 4) {
+                            categorias.push({
+                                item: catParts[0],
+                                nome: catParts[1],
+                                pontos: parseInt(catParts[2]) || 0,
+                                icone: catParts[3] || '⚽'
+                            });
+                        }
+                    });
+                }
+                console.log('Categorias carregadas:', categorias.length);
+                
+                // ESCOLHAS: formato codigo=time; ...
+                const escolhasStr = parts[2];
+                escolhasAnteriores = {};
+                
+                if (escolhasStr) {
+                    const escs = escolhasStr.split(';');
+                    escs.forEach(esc => {
+                        const escParts = esc.split('=');
+                        if (escParts.length === 2) {
+                            escolhasAnteriores[escParts[0]] = escParts[1];
+                        }
+                    });
+                }
+                console.log('Escolhas anteriores:', Object.keys(escolhasAnteriores).length);
+                
+                // PRAZO
+                prazo = parts[3];
+                console.log('Prazo:', prazo);
+                
+                // USUÁRIO
+                usuarioId = parts[4];
+                usuarioNome = parts[5] || 'Usuário';
+                console.log('Usuário:', usuarioNome);
                 
                 return true;
                 
@@ -456,24 +463,15 @@
             }
         }
         
-        // ============ FUNÇÕES DE FORMATAÇÃO ============
-        function pad(num) {
-            return String(num).padStart(2, '0');
-        }
-        
         // ============ ATUALIZAR CRONÔMETRO ============
         function atualizarCronometro() {
             if (!prazo) return;
             
             try {
                 let prazoStr = prazo;
-                
-                // Converter para formato ISO
                 if (prazoStr.includes(' ')) {
                     prazoStr = prazoStr.replace(' ', 'T');
                 }
-                
-                // Adicionar timezone de Brasília
                 if (!prazoStr.includes('Z') && !prazoStr.includes('+')) {
                     prazoStr += '-03:00';
                 }
@@ -482,7 +480,7 @@
                 const agora = new Date();
                 
                 if (isNaN(prazoDate.getTime())) {
-                    console.error('Data inválida:', prazo);
+                    console.error('Data inválida');
                     return;
                 }
                 
@@ -492,7 +490,6 @@
                     document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
                     document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
                     
-                    // Desabilitar tudo
                     document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
                     document.getElementById('btn-enviar').disabled = true;
                     
@@ -506,20 +503,14 @@
                 const segundos = Math.floor((diff % (1000 * 60)) / 1000);
                 
                 document.getElementById('timer').innerHTML = 
-                    `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+                    `${String(dias).padStart(2, '0')} DIAS ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
                 
-                // Alerta visual quando falta pouco
                 if (diff < 3600000) {
                     document.getElementById('timer').style.color = '#ff6b6b';
                 }
                 
-                // Formatar data de encerramento
                 document.getElementById('deadline-info').innerHTML = 
-                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR', { 
-                        timeZone: 'America/Sao_Paulo',
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })}`;
+                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
                     
             } catch (e) {
                 console.error('Erro no cronômetro:', e);
@@ -535,9 +526,7 @@
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                const itemKey = cat.item;
-                const escolhaAnterior = escolhasAnteriores[itemKey] || '';
-                
+                const escolhaAnterior = escolhasAnteriores[cat.item] || '';
                 if (escolhaAnterior) preenchidas++;
                 
                 const card = document.createElement('div');
@@ -551,12 +540,12 @@
                 });
                 
                 card.innerHTML = `
-                    <div class="categoria-icone">${cat.icone || '⚽'}</div>
+                    <div class="categoria-icone">${cat.icone}</div>
                     <div class="categoria-info">
                         <div class="categoria-nome">${cat.nome}</div>
-                        <div class="categoria-pontos">${cat.pontos || 0} pontos</div>
+                        <div class="categoria-pontos">${cat.pontos} pontos</div>
                     </div>
-                    <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
+                    <select class="categoria-select" data-item="${cat.item}" data-pontos="${cat.pontos}">
                         ${options}
                     </select>
                 `;
@@ -566,7 +555,6 @@
             
             atualizarProgresso(preenchidas);
             
-            // Event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -620,7 +608,7 @@
         }
         
         // ============ MOSTRAR ERRO ============
-        function mostrarErro(titulo, mensagem) {
+        function mostrarErro(titulo, mensagem, detalhe = '') {
             const loading = document.getElementById('loading');
             const loadingMsg = document.getElementById('loading-message');
             const loadingDetail = document.getElementById('loading-detail');
@@ -629,40 +617,34 @@
             loadingMsg.innerHTML = `❌ ${titulo}`;
             loadingDetail.innerHTML = mensagem;
             
-            // Adicionar botão de fechar
+            // Botão fechar
             const closeBtn = document.createElement('button');
-            closeBtn.className = 'close-btn';
+            closeBtn.className = 'close-button';
             closeBtn.innerHTML = 'FECHAR';
             closeBtn.onclick = () => tg.close();
-            closeBtn.style.marginTop = '20px';
+            closeBtn.style.marginTop = '24px';
             
             loading.appendChild(closeBtn);
+            
+            // Debug info
+            if (detalhe) {
+                const debug = document.createElement('div');
+                debug.className = 'debug-info';
+                debug.innerHTML = `<strong>Debug:</strong> ${detalhe}`;
+                loading.appendChild(debug);
+            }
         }
         
         // ============ INICIALIZAÇÃO ============
         function init() {
-            console.log('=== INICIALIZANDO WEB APP ===');
-            
-            const loading = document.getElementById('loading');
-            const mainContent = document.getElementById('main-content');
-            
-            // Verificar se pako foi carregado
-            if (typeof pako === 'undefined') {
-                mostrarErro(
-                    'Erro de Carregamento',
-                    'Biblioteca de compressão não carregada. Tente novamente.'
-                );
-                return;
-            }
+            console.log('=== INICIALIZANDO ===');
             
             // Decodificar dados
             if (!decodeDataFromURL()) {
                 mostrarErro(
                     'Erro ao Carregar Dados',
-                    'Não foi possível carregar as informações dos Pontos Extras.\n\n' +
-                    '• Verifique se o link é válido\n' +
-                    '• Tente novamente mais tarde\n' +
-                    '• Entre em contato com o administrador'
+                    'Não foi possível carregar as informações.',
+                    'Formato de dados inválido'
                 );
                 return;
             }
@@ -671,8 +653,7 @@
             if (!times || times.length === 0) {
                 mostrarErro(
                     'Times não Importados',
-                    'O administrador ainda não importou a lista de times.\n\n' +
-                    'Aguarde o convite no grupo oficial.'
+                    'Aguardando administrador importar os times.'
                 );
                 return;
             }
@@ -680,42 +661,40 @@
             if (!categorias || categorias.length === 0) {
                 mostrarErro(
                     'Erro de Configuração',
-                    'Categorias de pontuação não foram carregadas.\n\n' +
-                    'Entre em contato com o administrador.'
+                    'Categorias não carregadas.'
                 );
                 return;
             }
             
-            // Renderizar interface
+            // Renderizar
             renderizarCategorias();
             
-            // Iniciar cronômetro
+            // Cronômetro
             atualizarCronometro();
             timerInterval = setInterval(atualizarCronometro, 1000);
             
-            // Event listeners
+            // Eventos
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
             
             // Mostrar conteúdo
-            loading.style.display = 'none';
-            mainContent.style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
             
-            console.log('=== WEB APP INICIALIZADO COM SUCESSO ===');
+            console.log('=== INICIALIZADO COM SUCESSO ===');
         }
         
-        // Iniciar quando a página carregar
+        // Iniciar
         window.addEventListener('load', init);
         
-        // Timeout de segurança
+        // Timeout
         setTimeout(() => {
             const loading = document.getElementById('loading');
             if (loading.style.display !== 'none') {
                 mostrarErro(
-                    'Tempo Limite Excedido',
-                    'O carregamento está demorando mais que o esperado.\n\n' +
-                    '• Verifique sua conexão\n' +
-                    '• Clique em FECHAR e tente novamente'
+                    'Tempo Limite',
+                    'O carregamento está demorando muito.',
+                    'Timeout após 10 segundos'
                 );
             }
         }, 10000);
