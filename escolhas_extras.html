@@ -15,17 +15,20 @@
         body {
             background: #0f2128;
             color: white;
-            padding: 16px;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
+            padding: 16px;
         }
 
         .header {
             text-align: center;
             margin-bottom: 24px;
+            padding-top: 16px;
         }
 
         .header h1 {
@@ -39,7 +42,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 80vh;
+            min-height: 90vh;
             gap: 20px;
         }
 
@@ -216,15 +219,22 @@
             color: #ff8888;
         }
 
-        .hash-info {
-            background: #0a1a1a;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 12px;
+        .init-data {
+            background: #1a2f3a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            word-break: break-word;
             font-family: monospace;
-            word-break: break-all;
-            margin-top: 20px;
+            font-size: 12px;
             color: #aaa;
+            border: 1px solid #FFD700;
+        }
+
+        .telegram-logo {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 16px;
         }
     </style>
     
@@ -234,26 +244,28 @@
 <body>
     <div class="container">
         <div id="app">
-            <!-- Loading -->
+            <!-- Loading Screen -->
             <div id="loading-screen" class="loading">
                 <div class="spinner"></div>
-                <h2 style="color: #FFD700;">Carregando...</h2>
-                <p id="loading-status" style="color: #aaa;">Decodificando dados</p>
+                <h2 style="color: #FFD700;">Carregando Pontos Extras</h2>
+                <p id="loading-status" style="color: #aaa;">Aguardando dados do Telegram...</p>
             </div>
 
-            <!-- Erro -->
+            <!-- Error Screen -->
             <div id="error-screen" style="display: none;">
                 <div class="erro">
-                    <h3 style="color: #ff8888; margin-bottom: 12px;">❌ Erro ao carregar</h3>
-                    <p id="error-message"></p>
-                    <div id="error-details" style="margin-top: 16px; font-size: 12px; background: #331111; padding: 12px; border-radius: 6px;"></div>
-                    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0f2128; font-weight: bold; cursor: pointer;">
+                    <h3 style="color: #ff8888; margin-bottom: 16px;">❌ Erro de Conexão</h3>
+                    <p id="error-message" style="margin-bottom: 16px;"></p>
+                    <div id="error-help" style="background: #331111; padding: 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
+                        ⚠️ Este WebApp só funciona dentro do Telegram, acessando pelo bot.
+                    </div>
+                    <button onclick="window.location.reload()" style="padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0f2128; font-weight: bold; cursor: pointer;">
                         🔄 Tentar Novamente
                     </button>
                 </div>
             </div>
 
-            <!-- Conteúdo Principal -->
+            <!-- Main Content -->
             <div id="main-screen" style="display: none;">
                 <div class="header">
                     <h1>⭐ PONTOS EXTRAS 2026</h1>
@@ -285,19 +297,31 @@
     </div>
 
     <script>
-        // ==================== DECODIFICADOR SIMPLIFICADO ====================
-        // Baseado no log: JSON 1640 bytes -> GZIP 633 bytes -> Base64 844 chars
+        // ==================== TELEGRAM WEBAPP ====================
+        console.log('🚀 Iniciando WebApp de Pontos Extras...');
         
-        console.log('🚀 Iniciando WebApp...');
+        // Inicializar Telegram WebApp
+        const tg = window.Telegram?.WebApp;
         
-        const Telegram = window.Telegram?.WebApp;
-        if (Telegram) {
-            Telegram.expand();
-            Telegram.ready();
-            console.log('✅ Telegram WebApp ready');
+        if (!tg) {
+            // Não está no Telegram
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('error-screen').style.display = 'block';
+            document.getElementById('error-message').innerHTML = 'Este aplicativo só funciona dentro do Telegram.';
+            document.getElementById('error-help').style.display = 'block';
+            throw new Error('Fora do Telegram');
         }
 
-        // Elementos da UI
+        // Expandir e preparar
+        tg.expand();
+        tg.ready();
+        tg.enableClosingConfirmation();
+        
+        console.log('✅ Telegram WebApp inicializado');
+        console.log('📍 Platform:', tg.platform);
+        console.log('📍 Version:', tg.version);
+
+        // ==================== ELEMENTOS DA UI ====================
         const loadingScreen = document.getElementById('loading-screen');
         const errorScreen = document.getElementById('error-screen');
         const mainScreen = document.getElementById('main-screen');
@@ -306,19 +330,19 @@
         // ==================== FUNÇÃO DE DECODIFICAÇÃO ====================
         function decodeDataFromHash() {
             try {
-                // 1. Pegar o hash da URL (tudo após #)
+                // 1. Pegar o hash da URL
                 const hash = window.location.hash.substring(1);
                 
                 if (!hash) {
-                    throw new Error('❌ Nenhum dado encontrado na URL');
+                    throw new Error('Nenhum dado encontrado na URL');
                 }
 
-                console.log('📦 Hash length:', hash.length);
-                console.log('📦 Hash preview:', hash.substring(0, 50) + '...');
+                console.log('📦 Hash encontrado:', hash.substring(0, 30) + '...');
+                console.log('📦 Tamanho do hash:', hash.length, 'caracteres');
                 
-                loadingStatus.textContent = `📦 Dados: ${hash.length} caracteres`;
+                loadingStatus.textContent = `📦 Dados recebidos (${hash.length} chars)`;
 
-                // 2. Converter base64url -> base64
+                // 2. Converter base64url para base64
                 let base64 = hash.replace(/-/g, '+').replace(/_/g, '/');
                 
                 // 3. Adicionar padding
@@ -326,27 +350,25 @@
                     base64 += '=';
                 }
                 
-                console.log('📦 Base64 length:', base64.length);
-                loadingStatus.textContent = '🔓 Decodificando Base64...';
+                console.log('📦 Base64 após padding:', base64.length, 'caracteres');
 
-                // 4. Decodificar base64
+                // 4. Decodificar Base64
                 let compressed;
                 try {
                     compressed = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-                    console.log('📦 Compressed size:', compressed.length, 'bytes');
+                    console.log('📦 Bytes comprimidos:', compressed.length, 'bytes');
                 } catch (e) {
                     throw new Error('Erro na decodificação Base64: ' + e.message);
                 }
 
                 // 5. Descomprimir GZIP
-                loadingStatus.textContent = `📦 Descomprimindo (${compressed.length} bytes)...`;
+                loadingStatus.textContent = `🔓 Descomprimindo (${compressed.length} bytes)...`;
                 
                 let decompressed;
                 try {
                     decompressed = pako.ungzip(compressed);
-                    console.log('📦 Decompressed size:', decompressed.length, 'bytes');
+                    console.log('📦 Bytes descomprimidos:', decompressed.length, 'bytes');
                 } catch (e) {
-                    console.error('Erro pako:', e);
                     throw new Error('Erro na descompressão GZIP: ' + e.message);
                 }
 
@@ -354,11 +376,11 @@
                 loadingStatus.textContent = '📄 Parseando JSON...';
                 
                 const jsonText = new TextDecoder('utf-8').decode(decompressed);
-                console.log('📄 JSON preview:', jsonText.substring(0, 200) + '...');
+                console.log('📄 JSON (primeiros 100 chars):', jsonText.substring(0, 100) + '...');
 
                 // 7. Parse JSON
                 const data = JSON.parse(jsonText);
-                console.log('✅ Dados carregados:', data);
+                console.log('✅ Dados decodificados com sucesso!');
                 
                 return data;
 
@@ -369,27 +391,27 @@
         }
 
         // ==================== RENDERIZAR INTERFACE ====================
-        function renderizarDados(data) {
-            if (!data) throw new Error('Dados vazios');
+        function renderizarInterface(data) {
+            if (!data) throw new Error('Dados inválidos');
             
-            // Extrair dados
             const times = data.times || [];
             const categorias = data.categorias || [];
             const escolhasSalvas = data.escolhas || {};
             const prazo = data.prazo || '';
-            const usuario = data.usuario || {};
             
-            console.log(`📊 Times: ${times.length}, Categorias: ${categorias.length}, Escolhas: ${Object.keys(escolhasSalvas).length}`);
+            console.log(`📊 Times: ${times.length}`);
+            console.log(`📊 Categorias: ${categorias.length}`);
+            console.log(`📊 Escolhas salvas: ${Object.keys(escolhasSalvas).length}`);
             
             if (times.length === 0) {
-                throw new Error('Nenhum time carregado');
+                throw new Error('Nenhum time importado');
             }
             
             if (categorias.length === 0) {
-                throw new Error('Nenhuma categoria carregada');
+                throw new Error('Nenhuma categoria encontrada');
             }
 
-            // Esconder loading, mostrar main
+            // Mostrar tela principal
             loadingScreen.style.display = 'none';
             mainScreen.style.display = 'block';
 
@@ -402,10 +424,11 @@
                 
                 prazoContainer.innerHTML = `
                     <div class="prazo-box">
-                        <span style="font-size: 24px;">⏰</span>
+                        <span style="font-size: 28px;">⏰</span>
                         <div>
-                            <div style="font-weight: bold; color: #FFD700;">Encerramento</div>
-                            <div style="font-size: 15px;">${dataFormatada} (Brasília)</div>
+                            <div style="font-size: 13px; color: #aaa;">ENCERRAMENTO</div>
+                            <div style="font-size: 16px; font-weight: bold; color: #FFD700;">${dataFormatada}</div>
+                            <div style="font-size: 12px; color: #888;">Horário de Brasília</div>
                         </div>
                     </div>
                 `;
@@ -415,12 +438,18 @@
             const container = document.getElementById('categorias-container');
             container.innerHTML = '';
 
-            // Guardar escolhas atuais para referência
+            // Armazenar estado
             window.escolhasAtuais = { ...escolhasSalvas };
             window.escolhasTemp = { ...escolhasSalvas };
 
-            // Renderizar cada categoria
-            categorias.forEach((cat, index) => {
+            // Ordenar categorias
+            const categoriasOrdenadas = [...categorias].sort((a, b) => {
+                const ordemA = a.ordem || 0;
+                const ordemB = b.ordem || 0;
+                return ordemA - ordemB;
+            });
+
+            categoriasOrdenadas.forEach(cat => {
                 const codigo = cat.item || cat.codigo;
                 const nome = cat.nome;
                 const icone = cat.icone || '⚽';
@@ -429,6 +458,7 @@
                 const escolhaAtual = escolhasSalvas[codigo] || '';
                 const temEscolha = !!escolhaAtual;
 
+                // Criar card
                 const card = document.createElement('div');
                 card.className = `categoria ${temEscolha ? 'preenchida' : ''}`;
                 card.dataset.codigo = codigo;
@@ -451,7 +481,7 @@
                 // Opção vazia
                 const emptyOption = document.createElement('option');
                 emptyOption.value = '';
-                emptyOption.textContent = '🔽 Escolha um time...';
+                emptyOption.textContent = '🔽 Selecione um time...';
                 select.appendChild(emptyOption);
                 
                 // Opções dos times
@@ -468,13 +498,13 @@
                 card.appendChild(header);
                 card.appendChild(select);
 
-                // Mostrar escolha atual
+                // Escolha atual
                 if (temEscolha) {
                     const escolhaDiv = document.createElement('div');
                     escolhaDiv.className = 'escolha-atual';
                     escolhaDiv.innerHTML = `
                         <span>✅</span>
-                        <span style="font-weight: 600;">${escolhaAtual}</span>
+                        <span>${escolhaAtual}</span>
                     `;
                     card.appendChild(escolhaDiv);
                 }
@@ -482,7 +512,7 @@
                 container.appendChild(card);
 
                 // Evento de mudança
-                select.addEventListener('change', function(e) {
+                select.addEventListener('change', function() {
                     const cod = this.dataset.codigo;
                     const valor = this.value;
                     
@@ -494,17 +524,11 @@
                         
                         let escolhaDiv = card.querySelector('.escolha-atual');
                         if (escolhaDiv) {
-                            escolhaDiv.innerHTML = `
-                                <span>✅</span>
-                                <span style="font-weight: 600;">${valor}</span>
-                            `;
+                            escolhaDiv.innerHTML = `<span>✅</span><span>${valor}</span>`;
                         } else {
                             const novaDiv = document.createElement('div');
                             novaDiv.className = 'escolha-atual';
-                            novaDiv.innerHTML = `
-                                <span>✅</span>
-                                <span style="font-weight: 600;">${valor}</span>
-                            `;
+                            novaDiv.innerHTML = `<span>✅</span><span>${valor}</span>`;
                             card.appendChild(novaDiv);
                         }
                     } else {
@@ -514,7 +538,6 @@
                     }
                     
                     atualizarContador();
-                    window.escolhasModificadas = true;
                 });
             });
 
@@ -554,29 +577,56 @@
                 
                 console.log('📤 Enviando escolhas:', escolhasArray.length);
                 
-                const payload = JSON.stringify({ escolhas: escolhasArray });
+                // Enviar para o bot
+                tg.sendData(JSON.stringify({
+                    escolhas: escolhasArray
+                }));
                 
-                if (Telegram) {
-                    Telegram.sendData(payload);
-                    Telegram.showAlert(`✅ ${escolhasArray.length} palpites salvos!`);
-                } else {
-                    alert('Escolhas: ' + payload);
-                }
+                // Feedback
+                tg.showAlert(`✅ ${escolhasArray.length} palpites salvos!`);
             };
         }
 
         // ==================== INICIALIZAÇÃO ====================
         try {
-            // Verificar se pako carregou
+            // Verificar pako
             if (typeof pako === 'undefined') {
                 throw new Error('Biblioteca pako não carregada');
+            }
+            
+            // Verificar hash
+            if (!window.location.hash || window.location.hash.length < 10) {
+                loadingStatus.textContent = '⏳ Aguardando dados do Telegram...';
+                
+                // Se não tem hash, aguardar initData
+                if (tg.initData) {
+                    console.log('📦 initData encontrado:', tg.initData.substring(0, 50) + '...');
+                    loadingStatus.textContent = '📦 Processando initData...';
+                    
+                    // Tenta decodificar o initData como base64?
+                    try {
+                        // Forçar recarregamento com hash? Não, melhor usar o initData
+                        console.warn('Usando initData como fallback');
+                    } catch(e) {
+                        console.warn('Fallback falhou');
+                    }
+                }
+                
+                // Aguardar 2 segundos e tentar de qualquer jeito
+                setTimeout(() => {
+                    if (!window.location.hash || window.location.hash.length < 10) {
+                        mostrarErro('Dados não encontrados', 
+                            'Este link precisa ser aberto pelo bot do Telegram.',
+                            'Use /escolha_extra no bot para acessar corretamente.');
+                    }
+                }, 2000);
             }
             
             // Decodificar dados
             const dados = decodeDataFromHash();
             
             // Renderizar
-            renderizarDados(dados);
+            renderizarInterface(dados);
             
         } catch (error) {
             console.error('❌ Erro fatal:', error);
@@ -586,14 +636,15 @@
             
             document.getElementById('error-message').innerHTML = error.message;
             
-            const details = document.getElementById('error-details');
-            details.innerHTML = `
-                <strong>Hash:</strong> ${window.location.hash.substring(0, 100)}...<br>
-                <strong>Hash length:</strong> ${window.location.hash.length}<br>
-                <strong>User Agent:</strong> ${navigator.userAgent}<br>
-                <strong>Pako:</strong> ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
-                <strong>Telegram:</strong> ${Telegram ? '✅' : '❌'}<br>
-            `;
+            // Mostrar ajuda baseada no erro
+            const helpEl = document.getElementById('error-help');
+            if (error.message.includes('Base64')) {
+                helpEl.innerHTML = '🔧 Erro na decodificação. Tente abrir novamente pelo bot.';
+            } else if (error.message.includes('GZIP')) {
+                helpEl.innerHTML = '🔧 Erro na descompressão. Verifique sua conexão.';
+            } else if (error.message.includes('JSON')) {
+                helpEl.innerHTML = '🔧 Erro no formato dos dados. Contate o administrador.';
+            }
         }
     </script>
 </body>
