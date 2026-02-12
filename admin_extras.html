@@ -181,6 +181,16 @@
             font-size: 16px;
         }
         
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #856404;
+        }
+        
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -236,14 +246,14 @@
             <div class="info-box">
                 <i class="fas fa-info-circle"></i>
                 <div class="info-text">
-                    <strong>⚠️ HORA EXATA - SEM CONVERSÃO!</strong><br>
-                    A hora que você escolher será a hora do encerramento em Brasília.
+                    <strong>⚠️ HORÁRIO DE BRASÍLIA FIXO!</strong><br>
+                    O horário selecionado será INTERPRETADO como Brasília, independente do seu fuso.
                 </div>
             </div>
             
             <div class="form-label">
                 <i class="fas fa-calendar-check"></i>
-                Data e Hora de Encerramento
+                Data e Hora de Encerramento (BRASÍLIA)
             </div>
             
             <div class="datetime-container">
@@ -251,9 +261,10 @@
                 <input type="datetime-local" id="prazo" required>
             </div>
             
-            <div class="timezone-hint">
-                <i class="fas fa-check-circle"></i>
-                <span id="preview-text">Selecione uma data</span>
+            <div class="warning-box" id="timezone-warning">
+                <i class="fas fa-globe-americas"></i>
+                Seu fuso horário: <span id="user-timezone">carregando...</span><br>
+                <strong>A hora que você escolher SERÁ a hora de Brasília</strong>
             </div>
             
             <div class="preview-box">
@@ -278,7 +289,7 @@
             </div>
         </div>
         <div class="footer-note">
-            <i class="fas fa-clock"></i> HORA SELECIONADA = HORA DO ENCERRAMENTO
+            <i class="fas fa-clock"></i> DATA SELECIONADA = HORA DE BRASÍLIA
         </div>
     </div>
 
@@ -287,19 +298,36 @@
         tg.expand();
         tg.ready();
         
-        // CORREÇÃO: PEGAR A HORA EXATA QUE O USUÁRIO ESCOLHEU
+        // Detectar fuso horário do usuário
+        function getTimezoneInfo() {
+            const offset = new Date().getTimezoneOffset();
+            const hours = -offset / 60;
+            const sign = hours >= 0 ? '+' : '';
+            return {
+                offset: offset,
+                offsetStr: `UTC${sign}${hours}`,
+                name: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+        }
+        
+        // Configurar data mínima baseada em Brasília
         function configurarDataMinima() {
             const agora = new Date();
             
-            const ano = agora.getFullYear();
-            const mes = String(agora.getMonth() + 1).padStart(2, '0');
-            const dia = String(agora.getDate()).padStart(2, '0');
-            const hora = String(agora.getHours()).padStart(2, '0');
-            const minuto = String(agora.getMinutes()).padStart(2, '0');
+            // Obter hora em Brasília (UTC-3)
+            const agoraBrasilia = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+            
+            const ano = agoraBrasilia.getFullYear();
+            const mes = String(agoraBrasilia.getMonth() + 1).padStart(2, '0');
+            const dia = String(agoraBrasilia.getDate()).padStart(2, '0');
+            const hora = String(agoraBrasilia.getHours()).padStart(2, '0');
+            const minuto = String(agoraBrasilia.getMinutes()).padStart(2, '0');
             
             const dataMinima = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-            document.getElementById('prazo').min = dataMinima;
-            document.getElementById('prazo').value = dataMinima;
+            
+            const input = document.getElementById('prazo');
+            input.min = dataMinima;
+            input.value = dataMinima;
             
             atualizarPreview(dataMinima);
         }
@@ -310,11 +338,15 @@
             const [data, hora] = valor.split('T');
             const [ano, mes, dia] = data.split('-');
             
-            document.getElementById('preview-text').innerHTML = 
-                `Encerramento: <strong>${dia}/${mes}/${ano} às ${hora}</strong> (Brasília)`;
-            
             document.getElementById('preview-date').innerHTML = 
                 `${dia}/${mes}/${ano} ${hora}`;
+        }
+        
+        // Mostrar info do fuso horário
+        function mostrarTimezoneInfo() {
+            const tz = getTimezoneInfo();
+            document.getElementById('user-timezone').innerHTML = 
+                `${tz.offsetStr} (${tz.name})`;
         }
         
         document.getElementById('prazo').addEventListener('change', function(e) {
@@ -329,27 +361,30 @@
             const dataLocal = document.getElementById('prazo').value;
             
             if (!dataLocal) {
-                alert('❌ Selecione uma data!');
+                tg.showAlert('❌ Selecione uma data!');
                 return;
             }
             
-            // Validar se é futura
-            const agora = new Date();
+            // Validar se a data EM BRASÍLIA é futura
             const [ano, mes, dia] = dataLocal.split('T')[0].split('-').map(Number);
             const [hora, minuto] = dataLocal.split('T')[1].split(':').map(Number);
             
-            const dataSelecionada = new Date(ano, mes - 1, dia, hora, minuto, 0);
+            // Criar data em Brasília (UTC-3)
+            const dataSelecionada = new Date(Date.UTC(ano, mes-1, dia, hora, minuto, 0));
+            dataSelecionada.setHours(dataSelecionada.getHours() - 3); // Ajustar para UTC-3
             
-            if (dataSelecionada <= agora) {
-                alert('❌ A data deve ser futura!');
+            const agora = new Date();
+            const agoraBrasilia = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+            
+            if (dataSelecionada <= agoraBrasilia) {
+                tg.showAlert('❌ A data em Brasília deve ser futura!');
                 return;
             }
             
-            // CORREÇÃO: ENVIAR A DATA EXATA NO FORMATO QUE O PYTHON ESPERA
-            // Formato: "YYYY-MM-DD HH:MM:SS" - SEM CONVERSÃO
+            // CORREÇÃO: Enviar a data EXATA que o usuário escolheu (será interpretada como Brasília)
             const dataFormatada = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')} ${String(hora).padStart(2, '0')}:${String(minuto).padStart(2, '0')}:00`;
             
-            console.log('📤 Enviando data EXATA:', dataFormatada);
+            console.log('📤 Enviando data (Brasília):', dataFormatada);
             
             const btn = document.querySelector('.btn-primary');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
@@ -357,7 +392,8 @@
             
             // Enviar para o bot
             tg.sendData(JSON.stringify({ 
-                data_encerramento: dataFormatada
+                data_encerramento: dataFormatada,
+                timezone: 'America/Sao_Paulo' // Opcional: informar que é Brasília
             }));
         }
         
@@ -365,6 +401,8 @@
             tg.close();
         }
         
+        // Inicializar
+        mostrarTimezoneInfo();
         configurarDataMinima();
     </script>
 </body>
