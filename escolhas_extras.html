@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐ Pontos Extras 2026</title>
     
-    <!-- Fontes e Ícones -->
+    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Telegram WebApp -->
+    <!-- Telegram WebApp - OBRIGATÓRIO -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
@@ -20,186 +19,118 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--tg-theme-bg-color, #f5f7fa);
+            color: var(--tg-theme-text-color, #2c3e50);
+            padding: 16px;
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
         }
         
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
         }
         
         /* Header com Cronômetro */
         .header {
-            background: linear-gradient(145deg, #2c3e50, #1e2a36);
+            background: var(--tg-theme-secondary-bg-color, #2c3e50);
             border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
+            padding: 24px;
+            margin-bottom: 20px;
+            color: var(--tg-theme-text-color, white);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
         
         .title {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .title i {
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+            gap: 8px;
         }
         
         .countdown {
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-            padding: 20px;
             text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.1);
         }
         
         .countdown-label {
-            font-size: 14px;
+            font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.9;
-            margin-bottom: 10px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 8px;
         }
         
         .timer {
-            font-size: 42px;
+            font-size: 36px;
             font-weight: 800;
             font-family: monospace;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255,215,0,0.5);
-            letter-spacing: 5px;
+            color: var(--tg-theme-button-color, #ffd700);
+            letter-spacing: 3px;
         }
         
-        .timer-unit {
-            font-size: 16px;
-            font-weight: 400;
-            color: rgba(255,255,255,0.7);
-            margin-left: 5px;
-        }
-        
-        /* Progresso */
+        /* Barra de Progresso */
         .progress-section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            background: var(--tg-theme-secondary-bg-color, white);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .progress-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .progress-title {
-            font-weight: 700;
-            color: #2c3e50;
-        }
-        
-        .progress-count {
-            background: #667eea;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
+            margin-bottom: 12px;
             font-weight: 600;
-            font-size: 14px;
         }
         
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background: #e0e0e0;
-            border-radius: 10px;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 8px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 10px;
+            background: var(--tg-theme-button-color, #667eea);
+            border-radius: 8px;
             transition: width 0.3s ease;
         }
         
-        /* Tabela de Categorias */
-        .categorias-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
+        /* Grid de Categorias */
         .categorias-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
         
         .categoria-card {
-            background: white;
+            background: var(--tg-theme-secondary-bg-color, white);
             border-radius: 16px;
             padding: 16px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             border: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .categoria-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 20px rgba(102,126,234,0.1);
-            border-color: #667eea;
         }
         
         .categoria-icone {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            border-radius: 15px;
+            width: 48px;
+            height: 48px;
+            background: var(--tg-theme-button-color, #667eea);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 26px;
+            font-size: 24px;
             color: white;
-            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
         }
         
         .categoria-info {
@@ -208,96 +139,74 @@
         
         .categoria-nome {
             font-weight: 700;
-            color: #2c3e50;
+            font-size: 15px;
             margin-bottom: 4px;
-            font-size: 16px;
         }
         
         .categoria-pontos {
-            font-size: 14px;
-            color: #667eea;
+            font-size: 13px;
+            color: var(--tg-theme-hint-color, #666);
             font-weight: 600;
-            background: rgba(102,126,234,0.1);
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
         }
         
         .categoria-select {
-            width: 180px;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
+            width: 160px;
+            padding: 12px;
+            border: 2px solid rgba(0,0,0,0.1);
             border-radius: 12px;
             font-family: 'Inter', sans-serif;
             font-size: 14px;
-            font-weight: 500;
-            color: #2c3e50;
-            background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>') no-repeat right 12px center;
-            appearance: none;
-            -webkit-appearance: none;
+            background: var(--tg-theme-bg-color, white);
+            color: var(--tg-theme-text-color, #2c3e50);
             cursor: pointer;
-            transition: all 0.3s ease;
         }
         
-        .categoria-select:hover, .categoria-select:focus {
-            border-color: #667eea;
+        .categoria-select:focus {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            border-color: var(--tg-theme-button-color, #667eea);
         }
         
-        .categoria-select option {
-            font-family: 'Inter', sans-serif;
-            padding: 10px;
-        }
-        
-        /* Botões de Ação */
+        /* Botões */
         .acoes {
             display: flex;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 30px;
         }
         
         .btn {
             flex: 1;
-            padding: 16px 24px;
+            padding: 16px;
             border: none;
-            border-radius: 16px;
+            border-radius: 14px;
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            transition: opacity 0.2s;
         }
         
         .btn-primary {
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(102,126,234,0.4);
+            background: var(--tg-theme-button-color, #667eea);
+            color: var(--tg-theme-button-text-color, white);
         }
         
         .btn-secondary {
-            background: #f0f0f0;
-            color: #666;
-            border: 1px solid #ddd;
+            background: rgba(0,0,0,0.05);
+            color: var(--tg-theme-text-color, #2c3e50);
         }
         
-        .btn-secondary:hover {
-            background: #e0e0e0;
+        .btn:active {
+            opacity: 0.7;
         }
         
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
         
         /* Loading */
@@ -307,133 +216,82 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.7);
+            background: var(--tg-theme-bg-color, white);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            backdrop-filter: blur(5px);
-        }
-        
-        .loading-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
         }
         
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f0f0f0;
-            border-top: 4px solid #667eea;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-top-color: var(--tg-theme-button-color, #667eea);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
+            animation: spin 0.8s linear infinite;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
-        /* Responsividade */
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            
+        /* Responsivo */
+        @media (max-width: 480px) {
             .categoria-card {
                 flex-wrap: wrap;
             }
             
             .categoria-select {
                 width: 100%;
-                margin-top: 10px;
+                margin-top: 8px;
             }
             
             .timer {
-                font-size: 32px;
+                font-size: 28px;
             }
-            
-            .acoes {
-                flex-direction: column;
-            }
-        }
-        
-        /* Estilo para select vazio */
-        .select-vazio {
-            color: #999;
-        }
-        
-        /* Badge de expirado */
-        .expirado {
-            background: #ff6b6b;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="loading" id="loading">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <p style="color: #2c3e50; font-weight: 600;">Carregando Pontos Extras...</p>
-        </div>
+        <div class="spinner"></div>
     </div>
     
     <div class="container">
         <!-- Header com Cronômetro -->
         <div class="header">
             <div class="title">
-                <i class="fas fa-star"></i> PONTOS EXTRAS 2026
+                <span>⭐ PONTOS EXTRAS 2026</span>
             </div>
             <div class="countdown">
-                <div class="countdown-label">
-                    <i class="fas fa-hourglass-half"></i> ENCERRA EM:
-                </div>
-                <div class="timer" id="timer">
-                    00 DIAS 00:00:00
-                </div>
-                <div style="margin-top: 10px; font-size: 14px; opacity: 0.9;" id="deadline-info">
-                    📅 Carregando...
-                </div>
+                <div class="countdown-label">ENCERRA EM:</div>
+                <div class="timer" id="timer">00 DIAS 00:00:00</div>
+                <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
             </div>
         </div>
         
         <!-- Barra de Progresso -->
         <div class="progress-section">
             <div class="progress-header">
-                <span class="progress-title">
-                    <i class="fas fa-check-circle" style="color: #667eea;"></i> SEU PROGRESSO
-                </span>
-                <span class="progress-count" id="progress-count">0/15</span>
+                <span>📊 SEU PROGRESSO</span>
+                <span id="progress-count">0/15</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
             </div>
         </div>
         
-        <!-- Título Categorias -->
-        <div class="categorias-title">
-            <i class="fas fa-list"></i> ESCOLHA SEUS PALPITES
-        </div>
-        
         <!-- Grid de Categorias -->
-        <div class="categorias-grid" id="categorias-grid">
-            <!-- Será preenchido via JavaScript -->
-        </div>
+        <div class="categorias-grid" id="categorias-grid"></div>
         
-        <!-- Botões de Ação -->
+        <!-- Botões -->
         <div class="acoes">
             <button class="btn btn-primary" id="btn-enviar">
-                <i class="fas fa-check-circle"></i> ENVIAR ESCOLHAS
+                <span>✅</span> ENVIAR
             </button>
             <button class="btn btn-secondary" id="btn-cancelar">
-                <i class="fas fa-times-circle"></i> CANCELAR
+                <span>❌</span> CANCELAR
             </button>
         </div>
     </div>
@@ -443,15 +301,12 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
-        tg.setHeaderColor('#2c3e50');
-        tg.setBackgroundColor('#667eea');
         
-        // Variáveis Globais
+        // Variáveis globais
         let times = [];
         let categorias = [];
         let escolhasAnteriores = {};
         let prazo = null;
-        let usuario = {};
         let timerInterval = null;
         
         // Decodificar dados da URL
@@ -471,17 +326,15 @@
                 categorias = dados.categorias || [];
                 escolhasAnteriores = dados.escolhas || {};
                 prazo = dados.prazo;
-                usuario = dados.usuario || {};
                 
-                console.log('Dados carregados:', dados);
                 return true;
             } catch (e) {
-                console.error('Erro ao decodificar dados:', e);
+                console.error('Erro ao decodificar:', e);
                 return false;
             }
         }
         
-        // Formatar número com 2 dígitos
+        // Formatar número
         function pad(num) {
             return String(num).padStart(2, '0');
         }
@@ -491,24 +344,17 @@
             if (!prazo) return;
             
             const agora = new Date();
-            const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00'); // Brasília
-            
+            const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00');
             const diff = prazoDate - agora;
             
             if (diff <= 0) {
                 document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
-                document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO!';
+                document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
                 
-                // Desabilitar todos os selects
-                document.querySelectorAll('.categoria-select').forEach(select => {
-                    select.disabled = true;
-                });
-                
+                document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
                 document.getElementById('btn-enviar').disabled = true;
                 
-                if (timerInterval) {
-                    clearInterval(timerInterval);
-                }
+                clearInterval(timerInterval);
                 return;
             }
             
@@ -517,38 +363,31 @@
             const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const segundos = Math.floor((diff % (1000 * 60)) / 1000);
             
-            const timerStr = `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
-            document.getElementById('timer').innerHTML = timerStr;
+            document.getElementById('timer').innerHTML = 
+                `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
             
-            // Alerta visual quando falta pouco
-            if (diff < 3600000) { // 1 hora
+            // Alerta visual
+            if (diff < 3600000) {
                 document.getElementById('timer').style.color = '#ff6b6b';
             }
-        }
-        
-        // Iniciar cronômetro
-        function iniciarCronometro() {
-            atualizarCronometro();
-            timerInterval = setInterval(atualizarCronometro, 1000);
         }
         
         // Renderizar categorias
         function renderizarCategorias() {
             const grid = document.getElementById('categorias-grid');
-            grid.innerHTML = '';
+            if (!grid) return;
             
+            grid.innerHTML = '';
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                const card = document.createElement('div');
-                card.className = 'categoria-card';
-                
                 const escolhaAnterior = escolhasAnteriores[cat.codigo] || '';
                 if (escolhaAnterior) preenchidas++;
                 
-                // Criar options do select
-                let options = '<option value="" ' + (!escolhaAnterior ? 'selected' : '') + '>⚽ Selecione um time</option>';
+                const card = document.createElement('div');
+                card.className = 'categoria-card';
                 
+                let options = '<option value="">⚽ Selecione um time</option>';
                 times.forEach(time => {
                     const selected = (time === escolhaAnterior) ? 'selected' : '';
                     options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
@@ -568,10 +407,9 @@
                 grid.appendChild(card);
             });
             
-            // Atualizar progresso
             atualizarProgresso(preenchidas);
             
-            // Adicionar event listeners
+            // Event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -580,24 +418,23 @@
             });
         }
         
-        // Atualizar barra de progresso
+        // Atualizar progresso
         function atualizarProgresso(preenchidas) {
             const percent = (preenchidas / 15) * 100;
             document.getElementById('progress-count').innerHTML = `${preenchidas}/15`;
             document.getElementById('progress-fill').style.width = `${percent}%`;
         }
         
-        // Validar escolhas
-        function validarEscolhas() {
+        // Coletar escolhas
+        function coletarEscolhas() {
             const selects = document.querySelectorAll('.categoria-select');
             const escolhas = [];
             
             selects.forEach(select => {
-                const time = select.value;
-                if (time) {
+                if (select.value) {
                     escolhas.push({
                         categoria: select.dataset.categoria,
-                        time: time,
+                        time: select.value,
                         pontos: parseInt(select.dataset.pontos)
                     });
                 }
@@ -608,59 +445,51 @@
         
         // Enviar escolhas
         function enviarEscolhas() {
-            const escolhas = validarEscolhas();
+            const escolhas = coletarEscolhas();
             
             if (escolhas.length === 0) {
-                tg.showAlert('❌ Você precisa escolher pelo menos um time!');
+                tg.showAlert('❌ Escolha pelo menos um time!');
                 return;
             }
             
             tg.showConfirm(`✅ Confirmar ${escolhas.length}/15 palpites?`, (confirmed) => {
                 if (confirmed) {
-                    tg.sendData(JSON.stringify({
-                        escolhas: escolhas,
-                        usuario: usuario
-                    }));
+                    tg.sendData(JSON.stringify({ escolhas: escolhas }));
                     tg.close();
                 }
             });
         }
         
-        // Inicialização
+        // Inicializar
         function init() {
             if (!decodeDataFromURL()) {
-                document.getElementById('loading').style.display = 'none';
-                tg.showAlert('❌ Erro ao carregar dados. Tente novamente.');
+                tg.showAlert('❌ Erro ao carregar dados');
+                setTimeout(() => tg.close(), 2000);
                 return;
             }
             
             renderizarCategorias();
-            iniciarCronometro();
+            atualizarCronometro();
+            timerInterval = setInterval(atualizarCronometro, 1000);
             
-            // Mostrar data de encerramento
+            // Data de encerramento
             if (prazo) {
                 const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00');
-                const prazoFormatado = prazoDate.toLocaleString('pt-BR', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                document.getElementById('deadline-info').innerHTML = `📅 Encerra: ${prazoFormatado}`;
+                document.getElementById('deadline-info').innerHTML = 
+                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
             }
             
-            // Event Listeners
+            // Eventos dos botões
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
             
             // Esconder loading
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-            }, 500);
+            }, 300);
         }
         
-        // Iniciar quando a página carregar
+        // Iniciar
         window.addEventListener('load', init);
     </script>
 </body>
