@@ -8,20 +8,17 @@
     <style>
         body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .timer { text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; }
-        .error-box { background: #ffebee; color: #c62828; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; }
         table { width: 100%; border-collapse: collapse; }
         td { padding: 8px 4px; border-bottom: 1px solid rgba(128,128,128,0.2); font-size: 0.9em; }
         select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
         .btn-container { margin-top: 20px; display: flex; gap: 10px; position: sticky; bottom: 10px; }
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-send { background-color: #2ecc71; color: white; }
-        .btn-send:disabled { background-color: #95a5a6; cursor: not-allowed; }
         .btn-cancel { background-color: #e74c3c; color: white; }
     </style>
 </head>
 <body>
     <div class="timer" id="countdown">Carregando...</div>
-    <div id="error-container" style="display: none;"></div>
     
     <form id="extrasForm">
         <table>
@@ -36,7 +33,6 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
         const itens = [
             "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
@@ -49,100 +45,52 @@
         let escolhasAnteriores = {};
         let prazoFinal = 0;
 
-        // CORREÇÃO: Função segura para decodificar Base64
-        function safeBase64Decode(str) {
-            try {
-                // Remover caracteres inválidos para Base64
-                let base64 = str.replace(/[^A-Za-z0-9+/=]/g, '');
-                // Adicionar padding se necessário
-                while (base64.length % 4) {
-                    base64 += '=';
-                }
-                return atob(base64);
-            } catch (e) {
-                console.error('Erro no Base64:', e);
-                return null;
-            }
-        }
+        // === CORREÇÃO: Decodificação robusta com suporte a UTF-8 ===
+        try {
+            // Pega tudo após #data=
+            const rawHash = window.location.hash.split('data=')[1];
+            
+            if (rawHash) {
+                // 1. Decodifica caracteres de URL (ex: %3D vira =, %2F vira /)
+                const base64Clean = decodeURIComponent(rawHash);
+                
+                // 2. Decodifica Base64 para string binária (Latin-1)
+                const binaryString = atob(base64Clean);
 
-        // CORREÇÃO: Decodificar dados da URL de forma robusta
-        function loadDataFromHash() {
-            try {
-                const hash = window.location.hash;
-                if (!hash) {
-                    throw new Error('No hash data');
-                }
-                
-                // Extrair o Base64
-                let base64Data = '';
-                if (hash.includes('data=')) {
-                    base64Data = hash.split('data=')[1];
-                } else {
-                    base64Data = hash.substring(1); // Remover o '#'
-                }
-                
-                // Decodificar
-                const decodedStr = safeBase64Decode(base64Data);
-                if (!decodedStr) {
-                    throw new Error('Failed to decode Base64');
-                }
-                
-                const data = JSON.parse(decodedStr);
-                
-                times = data.times || [];
-                escolhasAnteriores = data.escolhas || {};
-                
-                // CORREÇÃO: Converter prazo para timestamp de forma segura
-                if (data.prazo) {
-                    // Se vier no formato "YYYY-MM-DD HH:MM:SS"
-                    if (typeof data.prazo === 'string') {
-                        const [date, time] = data.prazo.split(' ');
-                        const [year, month, day] = date.split('-').map(Number);
-                        const [hour, minute] = time.split(':').map(Number);
-                        
-                        // Criar data em Brasília (UTC-3)
-                        const prazoDate = new Date(Date.UTC(year, month-1, day, hour, minute, 0));
-                        prazoDate.setHours(prazoDate.getHours() - 3); // Ajustar UTC-3
-                        prazoFinal = prazoDate.getTime();
-                    } else {
-                        prazoFinal = new Date(data.prazo).getTime();
-                    }
-                }
-                
-                return true;
-            } catch (e) {
-                console.error('Erro ao carregar dados:', e);
-                showError('Erro ao carregar dados. Por favor, tente novamente.');
-                return false;
-            }
-        }
+                // 3. Converte de Latin-1 para UTF-8 corretamente
+                const jsonString = decodeURIComponent(Array.prototype.map.call(binaryString, function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
 
-        function showError(message) {
-            const errorContainer = document.getElementById('error-container');
-            errorContainer.style.display = 'block';
-            errorContainer.innerHTML = `<div class="error-box"><i class="fas fa-exclamation-triangle"></i> ${message}</div>`;
-            errorContainer.style.display = 'block';
+                const decoded = JSON.parse(jsonString);
+                
+                times = decoded.times || [];
+                escolhasAnteriores = decoded.escolhas || {};
+                
+                // Correção para data (compatibilidade Safari/iOS)
+                let dateStr = decoded.prazo;
+                if(dateStr && dateStr.includes(" ")) {
+                    dateStr = dateStr.replace(" ", "T");
+                }
+                prazoFinal = new Date(dateStr).getTime();
+            }
+        } catch (e) {
+            console.error("Erro ao carregar dados:", e);
+            alert("Erro ao ler dados. Tente abrir o link novamente.");
         }
+        // === FIM DA CORREÇÃO ===
 
         function renderForm() {
-            if (times.length === 0) {
-                showError('Nenhum time disponível para seleção.');
-                return;
-            }
-            
             const table = document.getElementById('itemsTable');
-            table.innerHTML = ''; // Limpar tabela
-            
             itens.forEach(item => {
                 const tr = document.createElement('tr');
                 const valorAtual = escolhasAnteriores[item] || "";
-                
                 tr.innerHTML = `
                     <td><strong>${item}</strong></td>
                     <td>
                         <select name="${item}" required>
                             <option value="">Selecione...</option>
-                            ${times.map(t => `<option value="${t.replace(/"/g, '&quot;')}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
+                            ${times.map(t => `<option value="${t}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
                         </select>
                     </td>
                 `;
@@ -151,84 +99,36 @@
         }
 
         function startTimer() {
-            if (!prazoFinal) {
-                document.getElementById('countdown').innerHTML = "⏳ Prazo não definido";
-                return;
-            }
-            
+            if (!prazoFinal) return;
             const timerEl = document.getElementById('countdown');
-            
-            function updateTimer() {
+            setInterval(() => {
                 const now = new Date().getTime();
                 const diff = prazoFinal - now;
-                
                 if (diff < 0) {
                     timerEl.innerHTML = "🏁 PRAZO ENCERRADO";
-                    const btnSend = document.querySelector('.btn-send');
-                    if (btnSend) {
-                        btnSend.disabled = true;
-                        btnSend.title = "Prazo encerrado";
-                    }
+                    document.querySelector('.btn-send').disabled = true;
                     return;
                 }
-                
                 const d = Math.floor(diff / (1000 * 60 * 60 * 24));
                 const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 const s = Math.floor((diff % (1000 * 60)) / 1000);
-                
-                let timerText = '⏳ Encerra em: ';
-                if (d > 0) timerText += `${d}d `;
-                timerText += `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m ${s.toString().padStart(2, '0')}s`;
-                
-                timerEl.innerHTML = timerText;
-            }
-            
-            updateTimer();
-            setInterval(updateTimer, 1000);
+                timerEl.innerHTML = `⏳ Encerra em: ${d}d ${h}h ${m}m ${s}s`;
+            }, 1000);
         }
 
         document.getElementById('extrasForm').onsubmit = (e) => {
             e.preventDefault();
-            
-            const btnSend = document.querySelector('.btn-send');
-            if (btnSend.disabled) {
-                tg.showAlert('Prazo já encerrado!');
-                return;
-            }
-            
             const formData = new FormData(e.target);
             const escolhas = [];
-            
-            // Validar se todas as opções foram selecionadas
-            let todasPreenchidas = true;
-            itens.forEach(item => {
-                const value = formData.get(item);
-                if (!value) {
-                    todasPreenchidas = false;
-                }
-            });
-            
-            if (!todasPreenchidas) {
-                tg.showAlert('❌ Selecione um time para todas as categorias!');
-                return;
-            }
-            
             formData.forEach((value, key) => {
                 escolhas.push({ item: key, time: value });
             });
-            
-            // Enviar para o bot
-            tg.sendData(JSON.stringify({ escolhas: escolhas }));
+            tg.sendData(JSON.stringify({ escolhas }));
         };
 
-        // Inicializar
-        if (loadDataFromHash()) {
-            renderForm();
-            startTimer();
-        } else {
-            showError('Não foi possível carregar os dados. Reinicie pelo bot.');
-        }
+        renderForm();
+        startTimer();
     </script>
 </body>
 </html>
