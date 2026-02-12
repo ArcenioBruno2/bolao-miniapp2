@@ -2,111 +2,920 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pontos Extras</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>⭐ Pontos Extras - Bolão</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; padding: 15px; background-color: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .timer { text-align: center; font-size: 1.1em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; background: var(--tg-theme-secondary-bg-color); padding: 10px; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; }
-        td { padding: 8px 4px; border-bottom: 1px solid rgba(128,128,128,0.2); font-size: 0.9em; }
-        select { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc; background: var(--tg-theme-bg-color); color: var(--tg-theme-text-color); }
-        .btn-container { margin-top: 20px; display: flex; gap: 10px; position: sticky; bottom: 10px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-send { background-color: #2ecc71; color: white; }
-        .btn-cancel { background-color: #e74c3c; color: white; }
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 16px;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px 20px;
+            box-shadow: var(--card-shadow);
+            animation: slideUp 0.4s ease-out;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .countdown-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
+        }
+        
+        .countdown-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .countdown-timer {
+            font-size: 42px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+        
+        .countdown-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+        
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .header-text h2 {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .header-text p {
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        .stats-badge {
+            background: linear-gradient(135deg, #f1f5f9, #e6eaf0);
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .info-alert {
+            background: linear-gradient(135deg, #fff8e7, #fff3d4);
+            border-left: 6px solid var(--warning);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .info-alert i {
+            font-size: 20px;
+            color: var(--warning);
+            flex-shrink: 0;
+        }
+        
+        .info-alert-text {
+            font-size: 13px;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+        
+        .info-alert-text strong {
+            color: var(--warning);
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .item-card {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--light-gray);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .item-card:hover {
+            background: white;
+            border-color: var(--primary);
+            box-shadow: var(--card-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 800;
+        }
+        
+        .item-details h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .item-details span {
+            font-size: 12px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .item-select {
+            min-width: 160px;
+        }
+        
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            background: white;
+            color: var(--dark);
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        select:hover {
+            border-color: var(--primary);
+        }
+        
+        .select-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            pointer-events: none;
+            font-size: 14px;
+        }
+        
+        select option {
+            padding: 12px;
+        }
+        
+        .progress-section {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .progress-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .progress-percent {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--light-gray);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 50px;
+            transition: width 0.3s ease;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            background: linear-gradient(135deg, #cccccc, #aaaaaa);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            color: white;
+        }
+        
+        .btn-icon {
+            font-size: 16px;
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 24px;
+        }
+        
+        .loading-spinner {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: linear-gradient(135deg, #ffeaea, #ffdbdb);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        @media (max-width: 500px) {
+            .item-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .item-info {
+                width: 100%;
+            }
+            
+            .item-select {
+                width: 100%;
+            }
+            
+            .countdown-timer {
+                font-size: 34px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="timer" id="countdown">Carregando...</div>
-    
-    <form id="extrasForm">
-        <table>
-            <tbody id="itemsTable"></tbody>
-        </table>
-        <div class="btn-container">
-            <button type="button" class="btn-cancel" onclick="window.Telegram.WebApp.close()">Cancelar</button>
-            <button type="submit" class="btn-send">Confirmar Escolhas</button>
+    <div class="app-container">
+        <div id="loading" class="loading-container" style="display: flex;">
+            <div class="loading-spinner">
+                <i class="fas fa-star"></i>
+            </div>
+            <div style="font-size: 16px; color: var(--gray); font-weight: 600;">
+                Carregando Pontos Extras...
+            </div>
         </div>
-    </form>
+        
+        <div id="content" style="display: none;">
+            <div class="main-card">
+                <!-- CONTADOR REGRESSIVO -->
+                <div class="countdown-section">
+                    <div class="countdown-label">
+                        <i class="fas fa-clock"></i>
+                        TEMPO RESTANTE
+                    </div>
+                    <div class="countdown-timer" id="countdown-timer">--:--:--</div>
+                    <div class="countdown-subtitle" id="countdown-subtitle">
+                        Para encerramento dos Pontos Extras
+                    </div>
+                </div>
+                
+                <!-- HEADER -->
+                <div class="header-section">
+                    <div class="header-title">
+                        <div class="header-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="header-text">
+                            <h2>⚽ Pontos Extras</h2>
+                            <p>Escolha seus palpites especiais</p>
+                        </div>
+                    </div>
+                    <div class="stats-badge">
+                        <i class="fas fa-list"></i>
+                        <span id="progress-counter">0/15</span>
+                    </div>
+                </div>
+                
+                <!-- ALERTA DE PRAZO -->
+                <div id="prazo-alerta" class="info-alert" style="display: none;">
+                    <i class="fas fa-hourglass-end"></i>
+                    <div class="info-alert-text">
+                        <strong>⏰ Prazo encerrado!</strong> Os Pontos Extras estão encerrados.
+                    </div>
+                </div>
+                
+                <!-- LISTA DE ITENS -->
+                <div id="items-container" class="items-grid"></div>
+                
+                <!-- PROGRESSO -->
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <div class="progress-title">
+                            <i class="fas fa-check-circle"></i>
+                            Progresso
+                        </div>
+                        <div class="progress-percent" id="progress-percent">0%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <!-- BOTÕES -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="btn-enviar" disabled>
+                        <i class="fas fa-paper-plane btn-icon"></i>
+                        Enviar Escolhas
+                    </button>
+                    <button class="btn btn-secondary" id="btn-cancelar">
+                        <i class="fas fa-times btn-icon"></i>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-
-        const itens = [
-            "Campeão Geral", "Campeão 1º Turno", "Campeão 2º Turno", "Melhor Visitante",
-            "Melhor Mandante", "Melhor Ataque", "Melhor Defesa", "2º Colocado Final",
-            "3º Colocado Final", "4º Colocado Final", "17º Colocado Final", "18º Colocado Final",
-            "19º Colocado Final", "20º Colocado Final", "Time Estrela"
+        tg.ready();
+        
+        // ========== CONFIGURAÇÃO ==========
+        // 20 CATEGORIAS DE PONTOS EXTRAS
+        const ITENS_EXTRAS = [
+            "🏆 Campeão Geral",
+            "🥇 Campeão 1º Turno",
+            "🥈 Campeão 2º Turno",
+            "✈️ Melhor Visitante",
+            "🏠 Melhor Mandante",
+            "⚽ Melhor Ataque",
+            "🛡️ Melhor Defesa",
+            "🥉 2º Colocado",
+            "🏅 3º Colocado",
+            "🎖️ 4º Colocado",
+            "⬇️ 17º Colocado",
+            "⬇️ 18º Colocado",
+            "⬇️ 19º Colocado",
+            "⬇️ 20º Colocado",
+            "⭐ Time Estrela"
         ];
-
-        let times = [];
-        let escolhasAnteriores = {};
-        let prazoFinal = 0;
-
-        // Decodificar dados da URL
-        try {
-            const hashData = window.location.hash.split('data=')[1];
-            if (hashData) {
-                const decoded = JSON.parse(atob(hashData));
-                times = decoded.times || [];
-                escolhasAnteriores = decoded.escolhas || {};
-                prazoFinal = new Date(decoded.prazo).getTime();
-            }
-        } catch (e) {
-            console.error("Erro ao carregar dados:", e);
-        }
-
-        function renderForm() {
-            const table = document.getElementById('itemsTable');
-            itens.forEach(item => {
-                const tr = document.createElement('tr');
-                const valorAtual = escolhasAnteriores[item] || "";
-                tr.innerHTML = `
-                    <td><strong>${item}</strong></td>
-                    <td>
-                        <select name="${item}" required>
-                            <option value="">Selecione...</option>
-                            ${times.map(t => `<option value="${t}" ${t === valorAtual ? 'selected' : ''}>${t}</option>`).join('')}
-                        </select>
-                    </td>
-                `;
-                table.appendChild(tr);
-            });
-        }
-
-        function startTimer() {
-            if (!prazoFinal) return;
-            const timerEl = document.getElementById('countdown');
-            setInterval(() => {
-                const now = new Date().getTime();
-                const diff = prazoFinal - now;
-                if (diff < 0) {
-                    timerEl.innerHTML = "🏁 PRAZO ENCERRADO";
-                    document.querySelector('.btn-send').disabled = true;
-                    return;
+        
+        let dadosOriginais = {};
+        let escolhas = [];
+        let prazoFinal = null;
+        let countdownInterval = null;
+        let timesOrdenados = [];
+        
+        // ========== FUNÇÕES DE DATA (UTC-3 BRASÍLIA) ==========
+        function parseDataBrasilia(dataStr) {
+            if (!dataStr) return null;
+            
+            try {
+                // Formato esperado: "2026-12-31 23:59:59"
+                let dataLimpo = dataStr.trim();
+                
+                // Substituir espaço por T e garantir UTC-3
+                if (dataLimpo.includes(' ')) {
+                    dataLimpo = dataLimpo.replace(' ', 'T') + '-03:00';
+                } else if (!dataLimpo.includes('T')) {
+                    dataLimpo = dataLimpo + 'T00:00:00-03:00';
+                } else if (!dataLimpo.includes('-03:00') && !dataLimpo.includes('Z')) {
+                    dataLimpo = dataLimpo + '-03:00';
                 }
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const s = Math.floor((diff % (1000 * 60)) / 1000);
-                timerEl.innerHTML = `⏳ Encerra em: ${d}d ${h}h ${m}m ${s}s`;
-            }, 1000);
+                
+                const dt = new Date(dataLimpo);
+                return isNaN(dt.getTime()) ? null : dt;
+                
+            } catch (e) {
+                console.error('Erro ao parsear data:', e);
+                return null;
+            }
         }
-
-        document.getElementById('extrasForm').onsubmit = (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const escolhas = [];
-            formData.forEach((value, key) => {
-                escolhas.push({ item: key, time: value });
+        
+        function formatarDataBrasilia(data) {
+            if (!data) return 'Data não definida';
+            
+            const dt = parseDataBrasilia(data);
+            if (!dt) return 'Data inválida';
+            
+            const dia = dt.getDate().toString().padStart(2, '0');
+            const mes = (dt.getMonth() + 1).toString().padStart(2, '0');
+            const ano = dt.getFullYear();
+            const hora = dt.getHours().toString().padStart(2, '0');
+            const min = dt.getMinutes().toString().padStart(2, '0');
+            
+            return `${dia}/${mes}/${ano} ${hora}:${min}`;
+        }
+        
+        // ========== CARREGAMENTO DE DADOS ==========
+        function carregarDados() {
+            try {
+                // Tentar obter dados da URL (hash ou query param)
+                let dadosBase64 = null;
+                
+                // Verificar hash da URL
+                if (window.location.hash) {
+                    const hash = window.location.hash.substring(1); // remove #
+                    if (hash.startsWith('data=')) {
+                        dadosBase64 = hash.substring(5);
+                    } else {
+                        dadosBase64 = hash;
+                    }
+                }
+                
+                // Verificar query params
+                if (!dadosBase64) {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    dadosBase64 = urlParams.get('data');
+                }
+                
+                if (!dadosBase64) {
+                    throw new Error('Parâmetro data não encontrado na URL');
+                }
+                
+                // Decodificar Base64
+                try {
+                    dadosBase64 = decodeURIComponent(dadosBase64);
+                    const dadosJson = atob(dadosBase64);
+                    dadosOriginais = JSON.parse(dadosJson);
+                } catch (e1) {
+                    // Tentar sem decodeURIComponent
+                    try {
+                        const dadosJson = atob(dadosBase64);
+                        dadosOriginais = JSON.parse(dadosJson);
+                    } catch (e2) {
+                        // Tentar com padding
+                        let base64 = dadosBase64;
+                        while (base64.length % 4 !== 0) {
+                            base64 += '=';
+                        }
+                        const dadosJson = atob(base64);
+                        dadosOriginais = JSON.parse(dadosJson);
+                    }
+                }
+                
+                console.log('✅ Dados carregados:', dadosOriginais);
+                
+                // ===== PROCESSAR TIMES (20 TIMES EM ORDEM ALFABÉTICA) =====
+                if (dadosOriginais.times && Array.isArray(dadosOriginais.times)) {
+                    // Ordenar alfabeticamente
+                    timesOrdenados = [...dadosOriginais.times].sort((a, b) => 
+                        a.localeCompare(b, 'pt-BR')
+                    );
+                } else {
+                    // Fallback com 20 times do Brasileirão
+                    timesOrdenados = [
+                        "Athletico-PR", "Atlético-GO", "Atlético-MG", "Bahia", "Botafogo",
+                        "Corinthians", "Criciúma", "Cruzeiro", "Cuiabá", "Flamengo",
+                        "Fluminense", "Fortaleza", "Grêmio", "Internacional", "Juventude",
+                        "Palmeiras", "Red Bull Bragantino", "São Paulo", "Vasco", "Vitória"
+                    ].sort();
+                }
+                
+                console.log(`⚽ ${timesOrdenados.length} times carregados em ordem alfabética`);
+                
+                // ===== PROCESSAR ESCOLHAS ANTERIORES =====
+                escolhas = [];
+                if (dadosOriginais.escolhas) {
+                    Object.entries(dadosOriginais.escolhas).forEach(([item, time]) => {
+                        escolhas.push({
+                            item: item,
+                            time: time
+                        });
+                    });
+                }
+                
+                // ===== PROCESSAR PRAZO =====
+                if (dadosOriginais.prazo) {
+                    prazoFinal = parseDataBrasilia(dadosOriginais.prazo);
+                }
+                
+                // Atualizar interface
+                atualizarInterface();
+                
+                // Esconder loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados:', error);
+                document.getElementById('loading').innerHTML = `
+                    <div style="color: var(--danger);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
+                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
+                            Erro ao carregar dados
+                        </div>
+                        <div style="font-size: 13px; color: var(--gray);">
+                            ${error.message}<br>
+                            Clique em Cancelar e tente novamente.
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // ========== RENDERIZAÇÃO ==========
+        function renderizarItens() {
+            const container = document.getElementById('items-container');
+            container.innerHTML = '';
+            
+            ITENS_EXTRAS.forEach((item, index) => {
+                // Buscar escolha anterior
+                const escolhaAnterior = escolhas.find(e => e.item === item);
+                const valorSelecionado = escolhaAnterior ? escolhaAnterior.time : '';
+                
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-icon">
+                            ${index + 1}
+                        </div>
+                        <div class="item-details">
+                            <h4>${item}</h4>
+                            <span>
+                                <i class="fas fa-futbol"></i>
+                                Selecione um time
+                            </span>
+                        </div>
+                    </div>
+                    <div class="item-select">
+                        <div class="custom-select">
+                            <select id="select-${index}" onchange="salvarEscolha('${item}', this.value)">
+                                <option value="">Selecione...</option>
+                                ${timesOrdenados.map(time => 
+                                    `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>
+                                        ${time}
+                                    </option>`
+                                ).join('')}
+                            </select>
+                            <i class="fas fa-chevron-down select-icon"></i>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
             });
-            tg.sendData(JSON.stringify({ escolhas }));
+        }
+        
+        function salvarEscolha(item, time) {
+            // Remover escolha anterior deste item
+            escolhas = escolhas.filter(e => e.item !== item);
+            
+            // Adicionar nova escolha se não for vazia
+            if (time) {
+                escolhas.push({
+                    item: item,
+                    time: time
+                });
+            }
+            
+            // Atualizar progresso
+            atualizarProgresso();
+            verificarBotaoEnviar();
+        }
+        
+        function atualizarProgresso() {
+            const preenchidas = escolhas.length;
+            const total = ITENS_EXTRAS.length;
+            const percent = Math.round((preenchidas / total) * 100);
+            
+            document.getElementById('progress-counter').innerHTML = `${preenchidas}/${total}`;
+            document.getElementById('progress-percent').innerHTML = `${percent}%`;
+            document.getElementById('progress-fill').style.width = `${percent}%`;
+        }
+        
+        function verificarBotaoEnviar() {
+            const btn = document.getElementById('btn-enviar');
+            const completo = escolhas.length === ITENS_EXTRAS.length;
+            
+            btn.disabled = !completo;
+            
+            if (completo) {
+                btn.innerHTML = '<i class="fas fa-paper-plane btn-icon"></i> Enviar Escolhas';
+            } else {
+                btn.innerHTML = `<i class="fas fa-lock btn-icon"></i> Faltam ${ITENS_EXTRAS.length - escolhas.length}`;
+            }
+        }
+        
+        // ========== CONTADOR REGRESSIVO ==========
+        function iniciarContador() {
+            if (!prazoFinal) return;
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+            countdownInterval = setInterval(atualizarContador, 1000);
+            atualizarContador();
+        }
+        
+        function atualizarContador() {
+            if (!prazoFinal) {
+                document.getElementById('countdown-timer').innerHTML = '--:--:--';
+                return;
+            }
+            
+            const agora = new Date();
+            const diff = prazoFinal - agora;
+            
+            if (diff <= 0) {
+                document.getElementById('countdown-timer').innerHTML = 'ENCERRADO';
+                document.getElementById('countdown-subtitle').innerHTML = 'Prazo finalizado';
+                document.getElementById('countdown-timer').style.color = '#f72585';
+                document.getElementById('prazo-alerta').style.display = 'flex';
+                
+                // Desabilitar selects
+                document.querySelectorAll('select').forEach(select => {
+                    select.disabled = true;
+                });
+                
+                // Desabilitar botão enviar
+                const btn = document.getElementById('btn-enviar');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
+                
+                clearInterval(countdownInterval);
+                return;
+            }
+            
+            // Calcular dias, horas, minutos, segundos
+            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            let timerStr = '';
+            if (dias > 0) {
+                timerStr = `${dias}d ${horas}h ${minutos}m`;
+                document.getElementById('countdown-timer').style.fontSize = '32px';
+            } else {
+                timerStr = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+                document.getElementById('countdown-timer').style.fontSize = '42px';
+            }
+            
+            document.getElementById('countdown-timer').innerHTML = timerStr;
+            document.getElementById('countdown-timer').style.color = 'white';
+            
+            // Alerta visual quando faltar menos de 1 hora
+            if (dias === 0 && horas === 0 && minutos < 60) {
+                document.getElementById('countdown-subtitle').innerHTML = '⏰ Últimos minutos! Envie logo.';
+            }
+        }
+        
+        // ========== ENVIO DOS DADOS ==========
+        function enviarEscolhas() {
+            if (escolhas.length !== ITENS_EXTRAS.length) {
+                alert(`❌ Preencha todas as ${ITENS_EXTRAS.length} categorias!`);
+                return;
+            }
+            
+            // Verificar se prazo já expirou
+            if (prazoFinal && new Date() > prazoFinal) {
+                alert('❌ Prazo encerrado! Não é mais possível enviar palpites.');
+                return;
+            }
+            
+            // Preparar dados
+            const dadosEnvio = {
+                escolhas: escolhas.map(e => ({
+                    item: e.item,
+                    time: e.time
+                }))
+            };
+            
+            // Efeito visual
+            const btn = document.getElementById('btn-enviar');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
+            btn.disabled = true;
+            
+            // Enviar para o bot
+            setTimeout(() => {
+                if (tg && tg.sendData) {
+                    tg.sendData(JSON.stringify(dadosEnvio));
+                } else {
+                    console.log('📤 Dados prontos para envio:', dadosEnvio);
+                    alert('✅ Escolhas salvas! (Modo simulação)');
+                    tg.close();
+                }
+            }, 300);
+        }
+        
+        // ========== ATUALIZAÇÃO GERAL ==========
+        function atualizarInterface() {
+            renderizarItens();
+            atualizarProgresso();
+            verificarBotaoEnviar();
+            
+            if (prazoFinal) {
+                iniciarContador();
+                
+                // Verificar se já está encerrado
+                if (new Date() > prazoFinal) {
+                    document.getElementById('prazo-alerta').style.display = 'flex';
+                }
+            }
+            
+            // Mostrar data do prazo
+            if (dadosOriginais.prazo) {
+                const dataFormatada = formatarDataBrasilia(dadosOriginais.prazo);
+                document.getElementById('countdown-subtitle').innerHTML = 
+                    `Encerramento: ${dataFormatada}`;
+            }
+        }
+        
+        // ========== EVENT LISTENERS ==========
+        document.getElementById('btn-enviar').onclick = enviarEscolhas;
+        
+        document.getElementById('btn-cancelar').onclick = () => {
+            if (escolhas.length > 0 && escolhas.length < ITENS_EXTRAS.length) {
+                if (confirm('⚠️ Tem certeza? Suas escolhas não salvas serão perdidas.')) {
+                    tg.close();
+                }
+            } else {
+                tg.close();
+            }
         };
-
-        renderForm();
-        startTimer();
+        
+        // ========== INICIALIZAÇÃO ==========
+        window.onload = function() {
+            carregarDados();
+        };
     </script>
 </body>
 </html>
