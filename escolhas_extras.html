@@ -302,26 +302,6 @@
                 font-size: 28px;
             }
         }
-        
-        /* Mensagem de erro visível */
-        .error-box {
-            background: #ffebee;
-            border: 1px solid #ef9a9a;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: #b71c1c;
-        }
-        
-        .error-box h3 {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        
-        .error-box p {
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
@@ -355,47 +335,104 @@
         let usuarioId = null;
         let usuarioNome = '';
         
-        // ============ DECODIFICAR DADOS - VERSÃO CORRIGIDA ============
+        // ============ MÉTODO PRIORITÁRIO: PEGAR DADOS DO TELEGRAM (NÃO CORTA) ============
+        function getDataFromTelegram() {
+            try {
+                console.log('📱 Tentando obter dados via Telegram WebApp...');
+                
+                // Verifica se initDataUnsafe existe
+                if (!tg.initDataUnsafe) {
+                    console.log('❌ tg.initDataUnsafe não disponível');
+                    return null;
+                }
+                
+                console.log('📦 initDataUnsafe:', tg.initDataUnsafe);
+                
+                // Tenta obter o start_param
+                if (tg.initDataUnsafe.start_param) {
+                    console.log('✅ start_param encontrado:', tg.initDataUnsafe.start_param);
+                    
+                    const param = tg.initDataUnsafe.start_param;
+                    
+                    // Verifica se é o formato correto
+                    if (param && param.startsWith('escolha_extra_')) {
+                        const base64Data = param.replace('escolha_extra_', '');
+                        console.log('✅ Base64 extraído do start_param (tamanho):', base64Data.length);
+                        return base64Data;
+                    } else {
+                        console.log('⚠️ start_param não está no formato esperado:', param);
+                    }
+                } else {
+                    console.log('⚠️ start_param não encontrado em initDataUnsafe');
+                }
+                
+                return null;
+            } catch (e) {
+                console.error('❌ Erro ao ler start_param:', e);
+                return null;
+            }
+        }
+        
+        // ============ FALLBACK: LER DA URL (caso o método principal falhe) ============
+        function getDataFromURL() {
+            try {
+                console.log('🔗 Tentando obter dados da URL...');
+                
+                // 1. Tenta hash puro (formato: #BASE64)
+                if (window.location.hash && window.location.hash.length > 1) {
+                    let hash = window.location.hash.substring(1); // Remove o #
+                    console.log('📍 Hash encontrado (tamanho):', hash.length);
+                    return hash;
+                }
+                
+                // 2. Tenta parâmetro ?data=
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('data')) {
+                    const data = urlParams.get('data');
+                    console.log('📍 Parâmetro ?data= encontrado (tamanho):', data.length);
+                    return data;
+                }
+                
+                // 3. Tenta hash com #data=
+                if (window.location.hash.includes('#data=')) {
+                    const data = window.location.hash.replace('#data=', '');
+                    console.log('📍 Hash #data= encontrado (tamanho):', data.length);
+                    return data;
+                }
+                
+                console.log('❌ Nenhum dado encontrado na URL');
+                return null;
+                
+            } catch (e) {
+                console.error('❌ Erro ao ler URL:', e);
+                return null;
+            }
+        }
+        
+        // ============ DECODIFICAR DADOS ============
         function decodeDataFromURL() {
             try {
                 console.log('=== DECODIFICANDO DADOS (VERSÃO CORRIGIDA) ===');
                 
-                // ============ ESTRATÉGIA 1: TENTAR HASH PRIMEIRO ============
-                let hash = window.location.hash;
-                console.log('Hash original:', hash ? hash.substring(0, 50) + '...' : 'VAZIO');
+                // ============ TENTAR MÉTODO PRIORITÁRIO PRIMEIRO ============
+                let base64Data = getDataFromTelegram();
+                let fonte = 'Telegram start_param';
                 
-                let base64Data = null;
-                
-                // Tenta extrair do hash (formato: #BASE64)
-                if (hash && hash.length > 1) {
-                    // Remove o # do início
-                    base64Data = hash.substring(1);
-                    console.log('✅ Extraído do hash (sem #):', base64Data.substring(0, 50) + '...');
-                }
-                
-                // ============ ESTRATÉGIA 2: FALLBACK PARA URL SEARCH ============
+                // ============ FALLBACK PARA URL ============
                 if (!base64Data) {
-                    console.log('⚠️ Hash vazio, tentando URL search...');
-                    const urlParams = new URLSearchParams(window.location.search);
-                    
-                    if (urlParams.has('data')) {
-                        base64Data = urlParams.get('data');
-                        console.log('✅ Extraído do parâmetro ?data=:', base64Data.substring(0, 50) + '...');
-                    }
-                }
-                
-                // ============ ESTRATÉGIA 3: FALLBACK PARA HASH COM #data= ============
-                if (!base64Data && window.location.hash.includes('#data=')) {
-                    console.log('⚠️ Tentando formato #data=...');
-                    base64Data = window.location.hash.replace('#data=', '');
-                    console.log('✅ Extraído de #data=:', base64Data.substring(0, 50) + '...');
+                    console.log('⚠️ Método Telegram falhou, tentando URL...');
+                    base64Data = getDataFromURL();
+                    fonte = 'URL';
                 }
                 
                 // ============ VERIFICA SE ENCONTROU ALGO ============
                 if (!base64Data || base64Data.length < 10) {
-                    console.error('❌ Nenhum dado encontrado na URL');
-                    throw new Error('Dados não encontrados na URL');
+                    console.error('❌ Nenhum dado encontrado em nenhuma fonte');
+                    throw new Error('Dados não encontrados');
                 }
+                
+                console.log(`✅ Dados obtidos via ${fonte} (tamanho): ${base64Data.length} caracteres`);
+                console.log('📦 Preview:', base64Data.substring(0, 50) + '...');
                 
                 // ============ DECODIFICAÇÃO BASE64 ============
                 console.log('🔄 Decodificando Base64...');
@@ -431,14 +468,13 @@
                     console.log('✅ JSON parseado com sucesso!');
                 } catch (e) {
                     console.error('❌ Erro no JSON.parse:', e);
-                    console.error('📄 String que causou erro:', decodedString);
+                    console.error('📄 String que causou erro (início):', decodedString.substring(0, 200));
                     throw new Error('Erro ao interpretar dados JSON');
                 }
                 
                 // ============ VALIDAÇÃO DOS DADOS ============
                 console.log('🔍 Validando estrutura dos dados...');
                 
-                // Verifica campos obrigatórios
                 if (!dados.times) {
                     console.error('❌ Campo "times" ausente!');
                     throw new Error('Dados incompletos: times não encontrados');
@@ -470,7 +506,7 @@
                 console.log(`   • Prazo: ${prazo}`);
                 console.log(`   • Usuário: ${usuarioNome} (ID: ${usuarioId})`);
                 
-                // Verifica se categorias têm o formato correto
+                // Verifica formato das categorias
                 if (categorias.length > 0) {
                     const primeira = categorias[0];
                     console.log('📋 Formato da primeira categoria:', primeira);
@@ -505,12 +541,11 @@
             const loadingMsg = document.getElementById('loading-message');
             const loadingDetail = document.getElementById('loading-detail');
             
-            // Altera a mensagem de loading para mostrar o erro
             loadingMsg.style.color = '#d32f2f';
             loadingMsg.innerHTML = `❌ ${titulo}`;
             loadingDetail.innerHTML = mensagem;
             
-            // Adiciona botão de fechar
+            // Botão de fechar
             const closeBtn = document.createElement('button');
             closeBtn.className = 'close-button';
             closeBtn.innerHTML = 'FECHAR';
@@ -519,14 +554,13 @@
             
             loading.appendChild(closeBtn);
             
-            // Adiciona informações de debug
-            if (detalhe) {
-                const debug = document.createElement('div');
-                debug.className = 'debug-info';
-                debug.innerHTML = `<strong>Debug:</strong> ${detalhe}<br>
-                                   <strong>URL:</strong> ${window.location.href.substring(0, 200)}...`;
-                loading.appendChild(debug);
-            }
+            // Informações de debug
+            const debug = document.createElement('div');
+            debug.className = 'debug-info';
+            debug.innerHTML = `<strong>Debug:</strong> ${detalhe}<br>
+                               <strong>initDataUnsafe:</strong> ${JSON.stringify(tg.initDataUnsafe)}<br>
+                               <strong>URL:</strong> ${window.location.href.substring(0, 200)}...`;
+            loading.appendChild(debug);
         }
         
         // ============ ATUALIZAR CRONÔMETRO ============
@@ -588,7 +622,6 @@
             const container = document.getElementById('main-content');
             if (!container) return;
             
-            // Verifica se há categorias
             if (!categorias || categorias.length === 0) {
                 mostrarErroVisivel(
                     'Erro de Configuração',
@@ -597,7 +630,6 @@
                 return;
             }
             
-            // Verifica se há times
             if (!times || times.length === 0) {
                 mostrarErroVisivel(
                     'Times não Importados',
@@ -651,7 +683,6 @@
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                // Usa 'item' como chave (nunca 'codigo')
                 const itemKey = cat.item || cat.codigo;
                 if (!itemKey) {
                     console.error('❌ Categoria sem identificador:', cat);
@@ -687,7 +718,6 @@
             
             atualizarProgresso(preenchidas);
             
-            // Adicionar event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -695,11 +725,9 @@
                 });
             });
             
-            // Botões
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
             
-            // Iniciar cronômetro
             atualizarCronometro();
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(atualizarCronometro, 1000);
@@ -753,22 +781,17 @@
         // ============ INICIALIZAÇÃO ============
         function init() {
             console.log('=== INICIALIZANDO ESCOLHAS EXTRAS ===');
+            console.log('📱 Telegram WebApp disponível:', !!tg);
+            console.log('📦 initDataUnsafe:', tg.initDataUnsafe);
             
-            // Tenta decodificar os dados
             if (!decodeDataFromURL()) {
-                // Erro já foi mostrado na função
                 return;
             }
             
-            // Renderiza a interface
             try {
                 renderizarCategorias();
-                
-                // Esconde o loading
                 document.getElementById('loading').style.display = 'none';
-                
                 console.log('=== INICIALIZADO COM SUCESSO ===');
-                
             } catch (e) {
                 console.error('❌ Erro ao renderizar:', e);
                 mostrarErroVisivel(
