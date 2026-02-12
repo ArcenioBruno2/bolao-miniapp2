@@ -7,6 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Mesmo estilo moderno que você aprovou */
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -182,6 +183,9 @@
             gap: 6px;
             margin-top: 6px;
             padding-left: 8px;
+            background: rgba(76, 201, 240, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
         }
         
         .timezone-hint i {
@@ -189,73 +193,11 @@
             font-size: 12px;
         }
         
-        .preview-section {
-            background: linear-gradient(135deg, #f1f5f9 0%, #e6eaf0 100%);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .preview-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .preview-card {
-            background: white;
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid var(--light-gray);
-        }
-        
-        .preview-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 20px;
-        }
-        
-        .preview-info {
-            flex: 1;
-        }
-        
-        .preview-name {
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-        
-        .preview-message {
-            font-size: 12px;
-            color: var(--gray);
-        }
-        
-        .preview-badge {
-            background: rgba(76, 201, 240, 0.1);
-            color: var(--success);
-            padding: 4px 10px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-        
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
+            margin-top: 24px;
         }
         
         .btn {
@@ -298,18 +240,24 @@
             font-size: 12px;
         }
         
-        @media (max-width: 380px) {
-            .main-card {
-                padding: 20px 16px;
-            }
-            
-            .header-title {
-                font-size: 22px;
-            }
-            
-            .action-buttons {
-                grid-template-columns: 1fr;
-            }
+        .preview-date {
+            background: linear-gradient(135deg, #f1f5f9, #e6eaf0);
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .preview-date i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+        
+        .preview-date span {
+            font-weight: 700;
+            color: var(--primary);
         }
     </style>
 </head>
@@ -327,8 +275,8 @@
             <div class="info-box">
                 <i class="fas fa-info-circle info-icon"></i>
                 <div class="info-text">
-                    <strong>Horário de Brasília (UTC-3)</strong><br>
-                    O prazo será convertido automaticamente para o fuso local.
+                    <strong>⚠️ IMPORTANTE: Horário de Brasília (UTC-3)</strong><br>
+                    A hora que você escolher será EXATAMENTE a hora do encerramento.
                 </div>
             </div>
             
@@ -345,26 +293,7 @@
                 
                 <div class="timezone-hint">
                     <i class="fas fa-check-circle"></i>
-                    Fuso horário: <strong>Brasília (UTC-3)</strong>
-                </div>
-            </div>
-            
-            <div class="preview-section">
-                <div class="preview-title">
-                    <i class="fas fa-eye"></i>
-                    Prévia da mensagem
-                </div>
-                <div class="preview-card">
-                    <div class="preview-avatar">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="preview-info">
-                        <div class="preview-name">⚽ Pontos Extras</div>
-                        <div class="preview-message">
-                            🎯 Palpites liberados! Prazo: <span id="preview-date">__/__/____ __:__</span>
-                        </div>
-                    </div>
-                    <div class="preview-badge">Novo</div>
+                    <span id="preview-horario">Nenhuma data selecionada</span>
                 </div>
             </div>
             
@@ -380,7 +309,7 @@
             </div>
         </div>
         <div class="footer-note">
-            <i class="fas fa-clock"></i> O bot notificará o grupo automaticamente
+            <i class="fas fa-clock"></i> Horário de Brasília (sem conversão)
         </div>
     </div>
 
@@ -389,18 +318,16 @@
         tg.expand();
         tg.ready();
         
-        // Configurar data mínima como agora (Brasília)
+        // CORREÇÃO: Trabalhar 100% com HORÁRIO LOCAL (Brasília)
         function configurarDataMinima() {
             const agora = new Date();
             
-            // Ajustar para UTC-3 (Brasília)
-            const brasiliaTime = new Date(agora.getTime() - (3 * 60 * 60 * 1000));
-            
-            const ano = brasiliaTime.getFullYear();
-            const mes = String(brasiliaTime.getMonth() + 1).padStart(2, '0');
-            const dia = String(brasiliaTime.getDate()).padStart(2, '0');
-            const hora = String(brasiliaTime.getHours()).padStart(2, '0');
-            const minuto = String(brasiliaTime.getMinutes()).padStart(2, '0');
+            // Ajustar para o fuso do navegador (que já é o horário local do usuário)
+            const ano = agora.getFullYear();
+            const mes = String(agora.getMonth() + 1).padStart(2, '0');
+            const dia = String(agora.getDate()).padStart(2, '0');
+            const hora = String(agora.getHours()).padStart(2, '0');
+            const minuto = String(agora.getMinutes()).padStart(2, '0');
             
             const dataMinima = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
             document.getElementById('prazo').min = dataMinima;
@@ -411,7 +338,7 @@
         
         function atualizarPreview(valor) {
             if (!valor) {
-                document.getElementById('preview-date').innerHTML = '__/__/____ __:__';
+                document.getElementById('preview-horario').innerHTML = 'Nenhuma data selecionada';
                 return;
             }
             
@@ -420,13 +347,13 @@
                 const [ano, mes, dia] = data.split('-');
                 const [h, m] = hora.split(':');
                 
-                document.getElementById('preview-date').innerHTML = `${dia}/${mes}/${ano} ${h}:${m}`;
+                document.getElementById('preview-horario').innerHTML = 
+                    `✅ Encerramento: <strong>${dia}/${mes}/${ano} às ${h}:${m}</strong> (Brasília)`;
             } catch (e) {
                 console.error('Erro ao atualizar preview:', e);
             }
         }
         
-        // Atualizar preview quando o usuário mudar a data
         document.getElementById('prazo').addEventListener('change', function(e) {
             atualizarPreview(e.target.value);
         });
@@ -436,41 +363,39 @@
         });
         
         function salvar() {
-            const data = document.getElementById('prazo').value;
+            const dataLocal = document.getElementById('prazo').value;
             
-            if (!data) {
-                mostrarAlerta('❌ Selecione uma data e hora!');
+            if (!dataLocal) {
+                alert('❌ Selecione uma data e hora!');
                 return;
             }
             
-            // Validar se a data é futura
+            // Validar se a data é futura (comparação local)
             const agora = new Date();
-            const dataSelecionada = new Date(data + ':00-03:00'); // Forçar UTC-3
+            const [ano, mes, dia] = dataLocal.split('T')[0].split('-').map(Number);
+            const [hora, minuto] = dataLocal.split('T')[1].split(':').map(Number);
+            
+            const dataSelecionada = new Date(ano, mes - 1, dia, hora, minuto, 0);
             
             if (dataSelecionada <= agora) {
-                mostrarAlerta('❌ A data deve ser futura!');
+                alert('❌ A data deve ser futura!');
                 return;
             }
             
-            // Formatar para o banco de dados (ISO com UTC-3)
-            const ano = dataSelecionada.getFullYear();
-            const mes = String(dataSelecionada.getMonth() + 1).padStart(2, '0');
-            const dia = String(dataSelecionada.getDate()).padStart(2, '0');
-            const hora = String(dataSelecionada.getHours()).padStart(2, '0');
-            const minuto = String(dataSelecionada.getMinutes()).padStart(2, '0');
-            const segundo = '00';
+            // CORREÇÃO CRÍTICA: Enviar no formato que o Python espera
+            // Formato: YYYY-MM-DD HH:MM:SS (sem fuso, interpretado como Brasília)
+            const dataFormatada = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')} ${String(hora).padStart(2, '0')}:${String(minuto).padStart(2, '0')}:00`;
             
-            const dataFormatada = `${ano}-${mes}-${dia} ${hora}:${minuto}:${segundo}`;
+            console.log('📤 Enviando data (Brasília):', dataFormatada);
             
-            // Efeito visual de sucesso
+            // Efeito visual
             const btn = document.querySelector('.btn-primary');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Salvando...';
             btn.disabled = true;
             
             setTimeout(() => {
                 tg.sendData(JSON.stringify({ 
-                    data_encerramento: dataFormatada,
-                    fuso: 'America/Sao_Paulo'
+                    data_encerramento: dataFormatada
                 }));
             }, 300);
         }
@@ -479,44 +404,8 @@
             tg.close();
         }
         
-        function mostrarAlerta(mensagem) {
-            // Criar alerta customizado
-            const alerta = document.createElement('div');
-            alerta.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: linear-gradient(135deg, #ff6b6b, #ff4757);
-                color: white;
-                padding: 12px 24px;
-                border-radius: 50px;
-                font-weight: 600;
-                font-size: 14px;
-                box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
-                z-index: 9999;
-                animation: slideDown 0.3s ease-out;
-            `;
-            alerta.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right: 8px;"></i> ${mensagem}`;
-            document.body.appendChild(alerta);
-            
-            setTimeout(() => {
-                alerta.remove();
-            }, 3000);
-        }
-        
         // Inicializar
         configurarDataMinima();
-        
-        // Adicionar estilo de animação
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideDown {
-                from { opacity: 0; transform: translate(-50%, -20px); }
-                to { opacity: 1; transform: translate(-50%, 0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
