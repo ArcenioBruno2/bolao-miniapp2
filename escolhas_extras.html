@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>⭐ Pontos Extras - Bolão</title>
+    <title>⭐ Pontos Extras</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Mesmo estilo moderno */
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -18,31 +17,22 @@
             --light: #f8f9fa;
             --gray: #6c757d;
             --light-gray: #e9ecef;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
         
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--dark);
             min-height: 100vh;
-            width: 100%;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
             padding: 16px;
         }
         
         .app-container {
-            width: 100%;
             max-width: 700px;
             margin: 0 auto;
         }
@@ -51,76 +41,41 @@
             background: white;
             border-radius: 24px;
             padding: 24px 20px;
-            box-shadow: var(--card-shadow);
-            animation: slideUp 0.4s ease-out;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             margin-bottom: 20px;
         }
         
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
         .countdown-section {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
             border-radius: 20px;
             padding: 20px;
             margin-bottom: 24px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(67, 97, 238, 0.3);
-        }
-        
-        .countdown-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            color: white;
         }
         
         .countdown-timer {
             font-size: 42px;
             font-weight: 800;
-            color: white;
             letter-spacing: 2px;
-            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             line-height: 1.2;
-        }
-        
-        .countdown-subtitle {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 8px;
-            font-weight: 500;
         }
         
         .items-grid {
             display: grid;
-            grid-template-columns: 1fr;
             gap: 16px;
             margin-bottom: 24px;
         }
         
         .item-card {
-            background: var(--light);
+            background: #f8f9fa;
             border-radius: 16px;
             padding: 16px;
-            border: 1px solid var(--light-gray);
-            transition: var(--transition);
+            border: 1px solid #e9ecef;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-        }
-        
-        .item-card:hover {
-            background: white;
-            border-color: var(--primary);
-            box-shadow: var(--card-shadow);
-            transform: translateY(-2px);
         }
         
         .item-info {
@@ -139,24 +94,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--primary);
-            font-size: 18px;
+            color: #4361ee;
+            font-size: 20px;
             font-weight: 800;
         }
         
         .item-details h4 {
             font-size: 16px;
             font-weight: 700;
-            color: var(--dark);
+            color: #212529;
             margin-bottom: 4px;
-        }
-        
-        .item-details span {
-            font-size: 12px;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 4px;
         }
         
         .item-select {
@@ -166,80 +113,44 @@
         select {
             width: 100%;
             padding: 12px 16px;
-            border: 2px solid var(--light-gray);
+            border: 2px solid #e9ecef;
             border-radius: 12px;
             font-size: 14px;
-            font-weight: 500;
             background: white;
-            color: var(--dark);
-            appearance: none;
-            -webkit-appearance: none;
             cursor: pointer;
-            transition: var(--transition);
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            background-size: 16px;
         }
         
         select:focus {
-            border-color: var(--primary);
+            border-color: #4361ee;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-        }
-        
-        select:hover {
-            border-color: var(--primary);
         }
         
         .progress-section {
-            background: var(--light);
+            background: #f8f9fa;
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 20px;
         }
         
-        .progress-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .progress-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .progress-percent {
-            font-weight: 700;
-            color: var(--primary);
-        }
-        
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: var(--light-gray);
+            background: #e9ecef;
             border-radius: 50px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            background: linear-gradient(90deg, #4361ee, #3a0ca3);
             border-radius: 50px;
-            transition: width 0.3s ease;
+            transition: width 0.3s;
         }
         
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-top: 8px;
         }
         
         .btn {
@@ -249,37 +160,25 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
         
-        .btn:active {
-            transform: scale(0.98);
-        }
-        
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
             color: white;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
         
         .btn-primary:disabled {
-            background: linear-gradient(135deg, #cccccc, #aaaaaa);
-            box-shadow: none;
+            background: #cccccc;
             cursor: not-allowed;
-            transform: none !important;
         }
         
         .btn-secondary {
             background: linear-gradient(135deg, #ff6b6b, #ff4757);
             color: white;
-        }
-        
-        .btn-icon {
-            font-size: 16px;
         }
         
         .loading-container {
@@ -289,43 +188,13 @@
             border-radius: 24px;
         }
         
-        .loading-spinner {
-            font-size: 48px;
-            color: var(--primary);
-            margin-bottom: 20px;
-            animation: spin 1.5s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .error-message {
-            background: linear-gradient(135deg, #ffeaea, #ffdbdb);
-            border: 1px solid rgba(247, 37, 133, 0.3);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--danger);
-            font-weight: 600;
-        }
-        
         @media (max-width: 600px) {
             .item-card {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 12px;
             }
             
-            .item-info {
-                width: 100%;
-            }
-            
-            .item-select {
+            .item-info, .item-select {
                 width: 100%;
             }
             
@@ -341,40 +210,38 @@
 </head>
 <body>
     <div class="app-container">
-        <div id="loading" class="loading-container" style="display: flex;">
-            <div class="loading-spinner">
-                <i class="fas fa-star"></i>
+        <!-- LOADING -->
+        <div id="loading" class="loading-container">
+            <div style="font-size: 48px; color: #4361ee; margin-bottom: 20px;">
+                <i class="fas fa-star fa-spin"></i>
             </div>
-            <div style="font-size: 16px; color: var(--gray); font-weight: 600;">
+            <div style="font-size: 16px; color: #6c757d;">
                 Carregando Pontos Extras...
             </div>
         </div>
         
+        <!-- CONTEÚDO PRINCIPAL -->
         <div id="content" style="display: none;">
             <div class="main-card">
-                <!-- CONTADOR REGRESSIVO -->
+                <!-- CONTADOR -->
                 <div class="countdown-section">
-                    <div class="countdown-label">
-                        <i class="fas fa-clock"></i>
-                        TEMPO RESTANTE
+                    <div style="font-size: 14px; margin-bottom: 10px;">
+                        <i class="fas fa-clock"></i> TEMPO RESTANTE
                     </div>
                     <div class="countdown-timer" id="countdown-timer">--:--:--</div>
-                    <div class="countdown-subtitle" id="countdown-subtitle">
-                        Para encerramento dos Pontos Extras
+                    <div style="font-size: 13px; opacity: 0.9; margin-top: 8px;" id="countdown-subtitle">
+                        Para encerramento
                     </div>
                 </div>
                 
-                <!-- LISTA DAS 15 CATEGORIAS -->
+                <!-- LISTA DE CATEGORIAS -->
                 <div id="items-container" class="items-grid"></div>
                 
                 <!-- PROGRESSO -->
                 <div class="progress-section">
-                    <div class="progress-header">
-                        <div class="progress-title">
-                            <i class="fas fa-check-circle"></i>
-                            Progresso
-                        </div>
-                        <div class="progress-percent" id="progress-percent">0%</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="font-weight: 700;">Progresso</span>
+                        <span style="color: #4361ee; font-weight: 700;" id="progress-percent">0%</span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
@@ -384,12 +251,10 @@
                 <!-- BOTÕES -->
                 <div class="action-buttons">
                     <button class="btn btn-primary" id="btn-enviar" disabled>
-                        <i class="fas fa-paper-plane btn-icon"></i>
-                        Enviar Escolhas
+                        <i class="fas fa-paper-plane"></i> Enviar
                     </button>
                     <button class="btn btn-secondary" id="btn-cancelar">
-                        <i class="fas fa-times btn-icon"></i>
-                        Cancelar
+                        <i class="fas fa-times"></i> Sair
                     </button>
                 </div>
             </div>
@@ -401,10 +266,10 @@
         tg.expand();
         tg.ready();
         
-        // ========== AS 15 CATEGORIAS EXATAS DO SEU SISTEMA ==========
-        const CATEGORIAS_EXTRAS = [
+        // ========== AS 15 CATEGORIAS ==========
+        const CATEGORIAS = [
             "Campeão Geral",
-            "Campeão 1º Turno", 
+            "Campeão 1º Turno",
             "Campeão 2º Turno",
             "Melhor Visitante",
             "Melhor Mandante",
@@ -420,143 +285,77 @@
             "Time Estrela"
         ];
         
-        let dadosOriginais = null;
         let escolhas = [];
         let prazoFinal = null;
+        let times = [];
         let countdownInterval = null;
-        let timesOrdenados = [];
         
-        // ========== FUNÇÃO PARA PARSE DE DATA (BRASÍLIA) ==========
-        function parseDataBrasilia(dataStr) {
-            if (!dataStr) return null;
-            
-            try {
-                // Formato recebido do bot: "2026-12-31 23:59:59"
-                // Interpretar como horário de Brasília (sem conversão)
-                const [data, hora] = dataStr.split(' ');
-                const [ano, mes, dia] = data.split('-').map(Number);
-                const [h, m, s] = hora.split(':').map(Number);
-                
-                // Criar data no fuso horário local (que é Brasília para o usuário)
-                return new Date(ano, mes - 1, dia, h, m, s);
-            } catch (e) {
-                console.error('Erro ao parsear data:', e);
-                return null;
-            }
-        }
-        
-        // ========== CARREGAR DADOS ==========
+        // ========== CORREÇÃO: CARREGAR DADOS SEM ERRO ==========
         function carregarDados() {
             try {
                 console.log('📥 Carregando dados...');
                 
-                // Tentar obter dados do hash da URL
-                let dadosBase64 = null;
+                // 1. PEGAR O HASH DA URL
+                let hash = window.location.hash;
+                console.log('Hash original:', hash);
                 
-                if (window.location.hash) {
-                    const hash = window.location.hash.substring(1);
-                    if (hash.startsWith('data=')) {
-                        dadosBase64 = hash.substring(5);
-                    } else {
-                        dadosBase64 = hash;
-                    }
+                if (!hash || hash === '#') {
+                    throw new Error('Nenhum dado encontrado na URL');
                 }
                 
-                if (!dadosBase64) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    dadosBase64 = urlParams.get('data');
+                // 2. REMOVER O # DO INÍCIO
+                hash = hash.substring(1);
+                console.log('Hash sem #:', hash);
+                
+                // 3. SE TIVER 'data=', REMOVER
+                if (hash.startsWith('data=')) {
+                    hash = hash.substring(5);
                 }
                 
-                if (!dadosBase64) {
-                    throw new Error('Parâmetro data não encontrado');
-                }
+                console.log('Hash limpo:', hash.substring(0, 50) + '...');
                 
-                console.log('🔑 Base64 recebido, tamanho:', dadosBase64.length);
-                
-                // Decodificar Base64
+                // 4. DECODIFICAR BASE64
                 try {
-                    dadosBase64 = decodeURIComponent(dadosBase64);
-                    const dadosJson = atob(dadosBase64);
-                    dadosOriginais = JSON.parse(dadosJson);
+                    // Tentar decodificar direto
+                    const jsonStr = atob(hash);
+                    console.log('JSON decodificado:', jsonStr.substring(0, 100) + '...');
+                    const dados = JSON.parse(jsonStr);
+                    processarDados(dados);
                 } catch (e) {
-                    // Tentar sem decodeURIComponent
+                    console.log('Erro na primeira tentativa:', e);
+                    
                     try {
-                        const dadosJson = atob(dadosBase64);
-                        dadosOriginais = JSON.parse(dadosJson);
+                        // Tentar com decodeURIComponent primeiro
+                        const decodedHash = decodeURIComponent(hash);
+                        const jsonStr = atob(decodedHash);
+                        const dados = JSON.parse(jsonStr);
+                        processarDados(dados);
                     } catch (e2) {
-                        // Tentar com padding
-                        let base64 = dadosBase64;
-                        while (base64.length % 4 !== 0) base64 += '=';
-                        const dadosJson = atob(base64);
-                        dadosOriginais = JSON.parse(dadosJson);
+                        console.log('Erro na segunda tentativa:', e2);
+                        
+                        // Última tentativa: adicionar padding
+                        let base64 = hash;
+                        while (base64.length % 4 !== 0) {
+                            base64 += '=';
+                        }
+                        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonStr = atob(base64);
+                        const dados = JSON.parse(jsonStr);
+                        processarDados(dados);
                     }
                 }
-                
-                console.log('✅ Dados carregados:', dadosOriginais);
-                
-                // ===== PROCESSAR TIMES =====
-                if (dadosOriginais.times && Array.isArray(dadosOriginais.times)) {
-                    // Ordenar alfabeticamente
-                    timesOrdenados = [...dadosOriginais.times].sort((a, b) => 
-                        a.localeCompare(b, 'pt-BR')
-                    );
-                    console.log(`⚽ ${timesOrdenados.length} times carregados`);
-                } else {
-                    // Fallback para testes
-                    timesOrdenados = [
-                        "Athletico-PR", "Atlético-MG", "Bahia", "Botafogo", "Corinthians",
-                        "Cruzeiro", "Cuiabá", "Flamengo", "Fluminense", "Fortaleza",
-                        "Grêmio", "Internacional", "Juventude", "Palmeiras", "Red Bull Bragantino",
-                        "São Paulo", "Vasco", "Vitória"
-                    ].sort();
-                }
-                
-                // ===== PROCESSAR ESCOLHAS ANTERIORES =====
-                escolhas = [];
-                if (dadosOriginais.escolhas) {
-                    Object.entries(dadosOriginais.escolhas).forEach(([item, time]) => {
-                        escolhas.push({
-                            item: item,
-                            time: time
-                        });
-                    });
-                }
-                
-                // ===== PROCESSAR PRAZO =====
-                if (dadosOriginais.prazo) {
-                    prazoFinal = parseDataBrasilia(dadosOriginais.prazo);
-                    console.log('📅 Prazo final:', prazoFinal);
-                }
-                
-                // Renderizar tudo
-                renderizarCategorias();
-                atualizarProgresso();
-                verificarBotaoEnviar();
-                
-                if (prazoFinal) {
-                    iniciarContador();
-                }
-                
-                // Esconder loading
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('content').style.display = 'block';
                 
             } catch (error) {
-                console.error('❌ Erro crítico:', error);
+                console.error('❌ Erro fatal:', error);
                 
-                // Mostrar erro amigável
+                // MOSTRAR ERRO AMIGÁVEL
                 document.getElementById('loading').innerHTML = `
-                    <div style="color: var(--danger);">
+                    <div style="color: #f72585;">
                         <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 10px;">
-                            Erro ao carregar
-                        </div>
-                        <div style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
-                            ${error.message}
-                        </div>
+                        <h3 style="margin-bottom: 10px;">Erro ao carregar</h3>
+                        <p style="color: #6c757d; margin-bottom: 20px;">${error.message}</p>
                         <button onclick="window.Telegram.WebApp.close()" 
-                                style="background: var(--primary); color: white; border: none; 
-                                       padding: 12px 24px; border-radius: 12px; font-weight: 700;">
+                                style="background: #4361ee; color: white; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700;">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </button>
                     </div>
@@ -564,17 +363,53 @@
             }
         }
         
-        // ========== RENDERIZAR AS 15 CATEGORIAS ==========
+        // ========== PROCESSAR DADOS ==========
+        function processarDados(dados) {
+            console.log('✅ Dados processados:', dados);
+            
+            // TIMES
+            if (dados.times && Array.isArray(dados.times)) {
+                times = dados.times.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+            }
+            
+            // ESCOLHAS ANTERIORES
+            if (dados.escolhas) {
+                Object.entries(dados.escolhas).forEach(([item, time]) => {
+                    escolhas.push({ item, time });
+                });
+            }
+            
+            // PRAZO
+            if (dados.prazo) {
+                // Formato: "2026-12-31 23:59:59"
+                const [data, hora] = dados.prazo.split(' ');
+                const [ano, mes, dia] = data.split('-').map(Number);
+                const [h, m, s] = hora.split(':').map(Number);
+                prazoFinal = new Date(ano, mes - 1, dia, h, m, s);
+            }
+            
+            // RENDERIZAR
+            renderizarCategorias();
+            atualizarProgresso();
+            
+            if (prazoFinal) {
+                iniciarContador();
+            }
+            
+            // ESCONDER LOADING
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }
+        
+        // ========== RENDERIZAR ==========
         function renderizarCategorias() {
             const container = document.getElementById('items-container');
             container.innerHTML = '';
             
-            CATEGORIAS_EXTRAS.forEach((categoria, index) => {
-                // Buscar escolha anterior
+            CATEGORIAS.forEach((categoria, index) => {
                 const escolhaAnterior = escolhas.find(e => e.item === categoria);
                 const valorSelecionado = escolhaAnterior ? escolhaAnterior.time : '';
                 
-                // Ícone diferente para cada tipo
                 let icone = '🏆';
                 if (categoria.includes('Turno')) icone = '🥇';
                 else if (categoria.includes('Visitante')) icone = '✈️';
@@ -587,29 +422,23 @@
                 const card = document.createElement('div');
                 card.className = 'item-card';
                 
-                const selectId = `select-${index}`;
+                let options = '<option value="">🔽 Selecione...</option>';
+                if (times.length > 0) {
+                    options += times.map(time => 
+                        `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>${time}</option>`
+                    ).join('');
+                }
                 
                 card.innerHTML = `
                     <div class="item-info">
-                        <div class="item-icon">
-                            ${icone}
-                        </div>
+                        <div class="item-icon">${icone}</div>
                         <div class="item-details">
                             <h4>${categoria}</h4>
-                            <span>
-                                <i class="fas fa-futbol"></i>
-                                Selecione o time
-                            </span>
                         </div>
                     </div>
                     <div class="item-select">
-                        <select id="${selectId}" onchange="salvarEscolha('${categoria}', this.value)">
-                            <option value="">🔽 Selecione um time...</option>
-                            ${timesOrdenados.map(time => 
-                                `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>
-                                    ${time}
-                                </option>`
-                            ).join('')}
+                        <select onchange="salvarEscolha('${categoria}', this.value)">
+                            ${options}
                         </select>
                     </div>
                 `;
@@ -620,49 +449,28 @@
         
         // ========== SALVAR ESCOLHA ==========
         function salvarEscolha(categoria, time) {
-            // Remover escolha anterior
             escolhas = escolhas.filter(e => e.item !== categoria);
-            
-            // Adicionar nova escolha
             if (time) {
-                escolhas.push({
-                    item: categoria,
-                    time: time
-                });
+                escolhas.push({ item: categoria, time: time });
             }
-            
-            console.log(`✅ ${categoria}: ${time || 'removido'}`);
-            
             atualizarProgresso();
-            verificarBotaoEnviar();
         }
         
-        // ========== ATUALIZAR PROGRESSO ==========
+        // ========== PROGRESSO ==========
         function atualizarProgresso() {
-            const preenchidas = escolhas.length;
-            const total = CATEGORIAS_EXTRAS.length;
-            const percent = Math.round((preenchidas / total) * 100);
-            
+            const percent = Math.round((escolhas.length / CATEGORIAS.length) * 100);
             document.getElementById('progress-percent').innerHTML = `${percent}%`;
             document.getElementById('progress-fill').style.width = `${percent}%`;
-        }
-        
-        // ========== VERIFICAR BOTÃO ENVIAR ==========
-        function verificarBotaoEnviar() {
+            
             const btn = document.getElementById('btn-enviar');
-            const completo = escolhas.length === CATEGORIAS_EXTRAS.length;
-            
+            const completo = escolhas.length === CATEGORIAS.length;
             btn.disabled = !completo;
-            
-            if (completo) {
-                btn.innerHTML = '<i class="fas fa-paper-plane btn-icon"></i> Enviar Escolhas';
-            } else {
-                const faltam = CATEGORIAS_EXTRAS.length - escolhas.length;
-                btn.innerHTML = `<i class="fas fa-lock btn-icon"></i> Faltam ${faltam}`;
-            }
+            btn.innerHTML = completo ? 
+                '<i class="fas fa-paper-plane"></i> Enviar' : 
+                `<i class="fas fa-lock"></i> Faltam ${CATEGORIAS.length - escolhas.length}`;
         }
         
-        // ========== CONTADOR REGRESSIVO ==========
+        // ========== CONTADOR ==========
         function iniciarContador() {
             if (countdownInterval) clearInterval(countdownInterval);
             countdownInterval = setInterval(atualizarContador, 1000);
@@ -677,22 +485,11 @@
             
             if (diff <= 0) {
                 document.getElementById('countdown-timer').innerHTML = 'ENCERRADO';
-                document.getElementById('countdown-subtitle').innerHTML = 'Prazo finalizado';
                 document.getElementById('countdown-timer').style.color = '#f72585';
-                
-                // Desabilitar selects
-                document.querySelectorAll('select').forEach(select => {
-                    select.disabled = true;
-                });
-                
-                document.getElementById('btn-enviar').disabled = true;
-                document.getElementById('btn-enviar').innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
-                
                 clearInterval(countdownInterval);
                 return;
             }
             
-            // Calcular tempo restante
             const horas = Math.floor(diff / (1000 * 60 * 60));
             const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const segundos = Math.floor((diff % (1000 * 60)) / 1000);
@@ -700,32 +497,26 @@
             let timerStr = '';
             if (horas > 24) {
                 const dias = Math.floor(horas / 24);
-                const hRest = horas % 24;
-                timerStr = `${dias}d ${hRest}h ${minutos}m`;
-                document.getElementById('countdown-timer').style.fontSize = '32px';
+                timerStr = `${dias}d ${horas % 24}h`;
             } else {
                 timerStr = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-                document.getElementById('countdown-timer').style.fontSize = '42px';
             }
             
             document.getElementById('countdown-timer').innerHTML = timerStr;
-            document.getElementById('countdown-timer').style.color = 'white';
         }
         
-        // ========== ENVIAR ESCOLHAS ==========
+        // ========== ENVIAR ==========
         function enviarEscolhas() {
-            if (escolhas.length !== CATEGORIAS_EXTRAS.length) {
-                alert(`❌ Preencha todas as ${CATEGORIAS_EXTRAS.length} categorias!`);
+            if (escolhas.length !== CATEGORIAS.length) {
+                alert('❌ Preencha todas as categorias!');
                 return;
             }
             
-            // Verificar prazo
             if (prazoFinal && new Date() > prazoFinal) {
-                alert('❌ Prazo encerrado! Não é mais possível enviar.');
+                alert('❌ Prazo encerrado!');
                 return;
             }
             
-            // Formatar dados para envio
             const dadosEnvio = {
                 escolhas: escolhas.map(e => ({
                     item: e.item,
@@ -733,34 +524,16 @@
                 }))
             };
             
-            console.log('📤 Enviando:', dadosEnvio);
-            
             const btn = document.getElementById('btn-enviar');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             btn.disabled = true;
             
-            setTimeout(() => {
-                if (tg && tg.sendData) {
-                    tg.sendData(JSON.stringify(dadosEnvio));
-                } else {
-                    alert('✅ Escolhas salvas com sucesso!');
-                    tg.close();
-                }
-            }, 300);
+            tg.sendData(JSON.stringify(dadosEnvio));
         }
         
-        // ========== EVENT LISTENERS ==========
+        // ========== EVENTOS ==========
         document.getElementById('btn-enviar').onclick = enviarEscolhas;
-        
-        document.getElementById('btn-cancelar').onclick = () => {
-            if (escolhas.length > 0 && escolhas.length < CATEGORIAS_EXTRAS.length) {
-                if (confirm('⚠️ Deseja realmente sair? Suas escolhas não serão salvas.')) {
-                    tg.close();
-                }
-            } else {
-                tg.close();
-            }
-        };
+        document.getElementById('btn-cancelar').onclick = () => tg.close();
         
         // ========== INICIAR ==========
         window.onload = carregarDados;
