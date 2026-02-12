@@ -302,9 +302,30 @@
                 font-size: 28px;
             }
         }
+        
+        /* Mensagem de erro visível */
+        .error-box {
+            background: #ffebee;
+            border: 1px solid #ef9a9a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: #b71c1c;
+        }
+        
+        .error-box h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .error-box p {
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+    <!-- TELA DE CARREGAMENTO -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
         <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;" id="loading-message">
@@ -315,39 +336,8 @@
         </div>
     </div>
     
-    <div class="container" id="main-content" style="display: none;">
-        <div class="header">
-            <div class="title">
-                <span>⭐ PONTOS EXTRAS 2026</span>
-            </div>
-            <div class="countdown">
-                <div class="countdown-label">ENCERRA EM:</div>
-                <div class="timer" id="timer">00 DIAS 00:00:00</div>
-                <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
-            </div>
-        </div>
-        
-        <div class="progress-section">
-            <div class="progress-header">
-                <span>📊 SEU PROGRESSO</span>
-                <span id="progress-count">0/15</span>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-            </div>
-        </div>
-        
-        <div class="categorias-grid" id="categorias-grid"></div>
-        
-        <div class="acoes">
-            <button class="btn btn-primary" id="btn-enviar">
-                <span>✅</span> ENVIAR
-            </button>
-            <button class="btn btn-secondary" id="btn-cancelar">
-                <span>❌</span> CANCELAR
-            </button>
-        </div>
-    </div>
+    <!-- CONTEÚDO PRINCIPAL (será exibido após carregamento) -->
+    <div class="container" id="main-content" style="display: none;"></div>
     
     <script>
         // ============ TELEGRAM WEBAPP ============
@@ -356,6 +346,7 @@
         tg.ready();
         
         // ============ VARIÁVEIS GLOBAIS ============
+        let dadosCompletos = null;
         let times = [];
         let categorias = [];
         let escolhasAnteriores = {};
@@ -364,53 +355,106 @@
         let usuarioId = null;
         let usuarioNome = '';
         
-        // ============ DECODIFICAR DADOS - VERSÃO JSON ============
+        // ============ DECODIFICAR DADOS - VERSÃO CORRIGIDA ============
         function decodeDataFromURL() {
             try {
-                console.log('=== DECODIFICANDO DADOS (JSON) ===');
+                console.log('=== DECODIFICANDO DADOS (VERSÃO CORRIGIDA) ===');
                 
-                // 1. Pegar hash da URL
+                // ============ ESTRATÉGIA 1: TENTAR HASH PRIMEIRO ============
                 let hash = window.location.hash;
-                console.log('Hash original:', hash.substring(0, 50) + '...');
+                console.log('Hash original:', hash ? hash.substring(0, 50) + '...' : 'VAZIO');
                 
-                if (!hash || hash.length < 10) {
-                    throw new Error('Hash não encontrado');
+                let base64Data = null;
+                
+                // Tenta extrair do hash (formato: #BASE64)
+                if (hash && hash.length > 1) {
+                    // Remove o # do início
+                    base64Data = hash.substring(1);
+                    console.log('✅ Extraído do hash (sem #):', base64Data.substring(0, 50) + '...');
                 }
                 
-                // 2. Extrair base64 após #data=
-                let base64Data = '';
-                if (hash.includes('#data=')) {
-                    base64Data = hash.replace('#data=', '');
-                } else {
-                    // Fallback: tentar remover apenas o #
-                    base64Data = hash.replace('#', '');
+                // ============ ESTRATÉGIA 2: FALLBACK PARA URL SEARCH ============
+                if (!base64Data) {
+                    console.log('⚠️ Hash vazio, tentando URL search...');
+                    const urlParams = new URLSearchParams(window.location.search);
+                    
+                    if (urlParams.has('data')) {
+                        base64Data = urlParams.get('data');
+                        console.log('✅ Extraído do parâmetro ?data=:', base64Data.substring(0, 50) + '...');
+                    }
                 }
                 
-                console.log('Base64 extraído:', base64Data.substring(0, 50) + '...');
+                // ============ ESTRATÉGIA 3: FALLBACK PARA HASH COM #data= ============
+                if (!base64Data && window.location.hash.includes('#data=')) {
+                    console.log('⚠️ Tentando formato #data=...');
+                    base64Data = window.location.hash.replace('#data=', '');
+                    console.log('✅ Extraído de #data=:', base64Data.substring(0, 50) + '...');
+                }
                 
-                // 3. Decodificar base64
+                // ============ VERIFICA SE ENCONTROU ALGO ============
+                if (!base64Data || base64Data.length < 10) {
+                    console.error('❌ Nenhum dado encontrado na URL');
+                    throw new Error('Dados não encontrados na URL');
+                }
+                
+                // ============ DECODIFICAÇÃO BASE64 ============
+                console.log('🔄 Decodificando Base64...');
                 let decodedString;
+                
                 try {
+                    // Tenta decodificar normalmente
                     decodedString = atob(base64Data);
-                } catch (e) {
-                    console.error('Erro no atob:', e);
-                    throw new Error('Erro ao decodificar base64');
+                    console.log('✅ Base64 decodificado com sucesso');
+                } catch (e1) {
+                    console.error('❌ Erro no atob padrão:', e1);
+                    
+                    try {
+                        // Tenta com decodeURIComponent
+                        console.log('🔄 Tentando decodeURIComponent + atob...');
+                        const cleaned = decodeURIComponent(base64Data);
+                        decodedString = atob(cleaned);
+                        console.log('✅ Sucesso com decodeURIComponent');
+                    } catch (e2) {
+                        console.error('❌ Todas as tentativas falharam:', e2);
+                        throw new Error('Erro ao decodificar Base64');
+                    }
                 }
                 
-                console.log('String decodificada:', decodedString.substring(0, 100) + '...');
+                console.log('📦 String decodificada (primeiros 100 chars):', decodedString.substring(0, 100) + '...');
                 
-                // 4. Parse do JSON
+                // ============ PARSE JSON ============
+                console.log('🔄 Parseando JSON...');
                 let dados;
+                
                 try {
                     dados = JSON.parse(decodedString);
+                    console.log('✅ JSON parseado com sucesso!');
                 } catch (e) {
-                    console.error('Erro no JSON.parse:', e);
+                    console.error('❌ Erro no JSON.parse:', e);
+                    console.error('📄 String que causou erro:', decodedString);
                     throw new Error('Erro ao interpretar dados JSON');
                 }
                 
-                console.log('Dados parseados com sucesso:', Object.keys(dados));
+                // ============ VALIDAÇÃO DOS DADOS ============
+                console.log('🔍 Validando estrutura dos dados...');
                 
-                // 5. Extrair dados do JSON
+                // Verifica campos obrigatórios
+                if (!dados.times) {
+                    console.error('❌ Campo "times" ausente!');
+                    throw new Error('Dados incompletos: times não encontrados');
+                }
+                
+                if (!dados.categorias) {
+                    console.error('❌ Campo "categorias" ausente!');
+                    throw new Error('Dados incompletos: categorias não encontradas');
+                }
+                
+                if (!dados.prazo) {
+                    console.error('❌ Campo "prazo" ausente!');
+                    throw new Error('Dados incompletos: prazo não encontrado');
+                }
+                
+                // ============ EXTRAI DADOS ============
                 times = dados.times || [];
                 categorias = dados.categorias || [];
                 escolhasAnteriores = dados.escolhas || {};
@@ -418,18 +462,70 @@
                 usuarioId = dados.usuario?.id || null;
                 usuarioNome = dados.usuario?.nome || 'Usuário';
                 
-                console.log('Times carregados:', times.length);
-                console.log('Categorias carregadas:', categorias.length);
-                console.log('Escolhas anteriores:', Object.keys(escolhasAnteriores).length);
-                console.log('Prazo:', prazo);
-                console.log('Usuário:', usuarioNome);
+                // ============ LOG DE SUCESSO ============
+                console.log('✅ Dados carregados com sucesso:');
+                console.log(`   • Times: ${times.length}`);
+                console.log(`   • Categorias: ${categorias.length}`);
+                console.log(`   • Escolhas anteriores: ${Object.keys(escolhasAnteriores).length}`);
+                console.log(`   • Prazo: ${prazo}`);
+                console.log(`   • Usuário: ${usuarioNome} (ID: ${usuarioId})`);
                 
+                // Verifica se categorias têm o formato correto
+                if (categorias.length > 0) {
+                    const primeira = categorias[0];
+                    console.log('📋 Formato da primeira categoria:', primeira);
+                    
+                    if (!primeira.item) {
+                        console.error('❌ Categoria sem campo "item"!');
+                        throw new Error('Formato de categorias inválido');
+                    }
+                }
+                
+                dadosCompletos = dados;
                 return true;
                 
             } catch (e) {
                 console.error('=== ERRO NA DECODIFICAÇÃO ===');
                 console.error(e);
+                
+                // Mostra erro visível para o usuário
+                mostrarErroVisivel(
+                    'Erro ao Carregar Dados',
+                    'Não foi possível carregar as informações. Por favor, tente novamente.',
+                    e.message
+                );
+                
                 return false;
+            }
+        }
+        
+        // ============ MOSTRAR ERRO VISÍVEL ============
+        function mostrarErroVisivel(titulo, mensagem, detalhe = '') {
+            const loading = document.getElementById('loading');
+            const loadingMsg = document.getElementById('loading-message');
+            const loadingDetail = document.getElementById('loading-detail');
+            
+            // Altera a mensagem de loading para mostrar o erro
+            loadingMsg.style.color = '#d32f2f';
+            loadingMsg.innerHTML = `❌ ${titulo}`;
+            loadingDetail.innerHTML = mensagem;
+            
+            // Adiciona botão de fechar
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-button';
+            closeBtn.innerHTML = 'FECHAR';
+            closeBtn.onclick = () => tg.close();
+            closeBtn.style.marginTop = '24px';
+            
+            loading.appendChild(closeBtn);
+            
+            // Adiciona informações de debug
+            if (detalhe) {
+                const debug = document.createElement('div');
+                debug.className = 'debug-info';
+                debug.innerHTML = `<strong>Debug:</strong> ${detalhe}<br>
+                                   <strong>URL:</strong> ${window.location.href.substring(0, 200)}...`;
+                loading.appendChild(debug);
             }
         }
         
@@ -489,6 +585,65 @@
         
         // ============ RENDERIZAR CATEGORIAS ============
         function renderizarCategorias() {
+            const container = document.getElementById('main-content');
+            if (!container) return;
+            
+            // Verifica se há categorias
+            if (!categorias || categorias.length === 0) {
+                mostrarErroVisivel(
+                    'Erro de Configuração',
+                    'Categorias não carregadas. Contate o administrador.'
+                );
+                return;
+            }
+            
+            // Verifica se há times
+            if (!times || times.length === 0) {
+                mostrarErroVisivel(
+                    'Times não Importados',
+                    'Aguardando administrador importar os times.'
+                );
+                return;
+            }
+            
+            // Constrói o HTML
+            let html = `
+                <div class="header">
+                    <div class="title">
+                        <span>⭐ PONTOS EXTRAS 2026</span>
+                    </div>
+                    <div class="countdown">
+                        <div class="countdown-label">ENCERRA EM:</div>
+                        <div class="timer" id="timer">00 DIAS 00:00:00</div>
+                        <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span>📊 SEU PROGRESSO</span>
+                        <span id="progress-count">0/${categorias.length}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <div class="categorias-grid" id="categorias-grid"></div>
+                
+                <div class="acoes">
+                    <button class="btn btn-primary" id="btn-enviar">
+                        <span>✅</span> ENVIAR
+                    </button>
+                    <button class="btn btn-secondary" id="btn-cancelar">
+                        <span>❌</span> CANCELAR
+                    </button>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            container.style.display = 'block';
+            
             const grid = document.getElementById('categorias-grid');
             if (!grid) return;
             
@@ -496,7 +651,14 @@
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                const escolhaAnterior = escolhasAnteriores[cat.item] || '';
+                // Usa 'item' como chave (nunca 'codigo')
+                const itemKey = cat.item || cat.codigo;
+                if (!itemKey) {
+                    console.error('❌ Categoria sem identificador:', cat);
+                    return;
+                }
+                
+                const escolhaAnterior = escolhasAnteriores[itemKey] || '';
                 if (escolhaAnterior) preenchidas++;
                 
                 const card = document.createElement('div');
@@ -510,12 +672,12 @@
                 });
                 
                 card.innerHTML = `
-                    <div class="categoria-icone">${cat.icone}</div>
+                    <div class="categoria-icone">${cat.icone || '⚽'}</div>
                     <div class="categoria-info">
-                        <div class="categoria-nome">${cat.nome}</div>
-                        <div class="categoria-pontos">${cat.pontos} pontos</div>
+                        <div class="categoria-nome">${cat.nome || 'Categoria'}</div>
+                        <div class="categoria-pontos">${cat.pontos || 0} pontos</div>
                     </div>
-                    <select class="categoria-select" data-item="${cat.item}" data-pontos="${cat.pontos}">
+                    <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
                         ${options}
                     </select>
                 `;
@@ -525,12 +687,22 @@
             
             atualizarProgresso(preenchidas);
             
+            // Adicionar event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
                     atualizarProgresso(preenchidas);
                 });
             });
+            
+            // Botões
+            document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
+            document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
+            
+            // Iniciar cronômetro
+            atualizarCronometro();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(atualizarCronometro, 1000);
         }
         
         // ============ ATUALIZAR PROGRESSO ============
@@ -578,91 +750,43 @@
             });
         }
         
-        // ============ MOSTRAR ERRO ============
-        function mostrarErro(titulo, mensagem, detalhe = '') {
-            const loading = document.getElementById('loading');
-            const loadingMsg = document.getElementById('loading-message');
-            const loadingDetail = document.getElementById('loading-detail');
-            
-            loadingMsg.style.color = '#d32f2f';
-            loadingMsg.innerHTML = `❌ ${titulo}`;
-            loadingDetail.innerHTML = mensagem;
-            
-            // Botão fechar
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'close-button';
-            closeBtn.innerHTML = 'FECHAR';
-            closeBtn.onclick = () => tg.close();
-            closeBtn.style.marginTop = '24px';
-            
-            loading.appendChild(closeBtn);
-            
-            // Debug info
-            if (detalhe) {
-                const debug = document.createElement('div');
-                debug.className = 'debug-info';
-                debug.innerHTML = `<strong>Debug:</strong> ${detalhe}`;
-                loading.appendChild(debug);
-            }
-        }
-        
         // ============ INICIALIZAÇÃO ============
         function init() {
-            console.log('=== INICIALIZANDO ===');
+            console.log('=== INICIALIZANDO ESCOLHAS EXTRAS ===');
             
-            // Decodificar dados
+            // Tenta decodificar os dados
             if (!decodeDataFromURL()) {
-                mostrarErro(
-                    'Erro ao Carregar Dados',
-                    'Não foi possível carregar as informações.',
-                    'Verifique se o link foi gerado corretamente'
-                );
+                // Erro já foi mostrado na função
                 return;
             }
             
-            // Validar dados
-            if (!times || times.length === 0) {
-                mostrarErro(
-                    'Times não Importados',
-                    'Aguardando administrador importar os times.'
+            // Renderiza a interface
+            try {
+                renderizarCategorias();
+                
+                // Esconde o loading
+                document.getElementById('loading').style.display = 'none';
+                
+                console.log('=== INICIALIZADO COM SUCESSO ===');
+                
+            } catch (e) {
+                console.error('❌ Erro ao renderizar:', e);
+                mostrarErroVisivel(
+                    'Erro ao Renderizar',
+                    'Ocorreu um erro ao montar a tela.',
+                    e.message
                 );
-                return;
             }
-            
-            if (!categorias || categorias.length === 0) {
-                mostrarErro(
-                    'Erro de Configuração',
-                    'Categorias não carregadas.'
-                );
-                return;
-            }
-            
-            // Renderizar
-            renderizarCategorias();
-            
-            // Cronômetro
-            atualizarCronometro();
-            timerInterval = setInterval(atualizarCronometro, 1000);
-            
-            // Eventos
-            document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
-            document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
-            
-            // Mostrar conteúdo
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            
-            console.log('=== INICIALIZADO COM SUCESSO ===');
         }
         
-        // Iniciar
+        // Iniciar quando a página carregar
         window.addEventListener('load', init);
         
-        // Timeout
+        // Timeout de segurança
         setTimeout(() => {
             const loading = document.getElementById('loading');
-            if (loading.style.display !== 'none') {
-                mostrarErro(
+            if (loading && loading.style.display !== 'none') {
+                mostrarErroVisivel(
                     'Tempo Limite',
                     'O carregamento está demorando muito.',
                     'Timeout após 10 segundos'
