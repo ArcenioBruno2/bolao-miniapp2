@@ -8,7 +8,7 @@
     <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Telegram WebApp - OBRIGATÓRIO -->
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
@@ -31,7 +31,6 @@
             margin: 0 auto;
         }
         
-        /* Header com Cronômetro */
         .header {
             background: var(--tg-theme-secondary-bg-color, #2c3e50);
             border-radius: 20px;
@@ -70,7 +69,6 @@
             letter-spacing: 3px;
         }
         
-        /* Barra de Progresso */
         .progress-section {
             background: var(--tg-theme-secondary-bg-color, white);
             border-radius: 16px;
@@ -102,7 +100,6 @@
             transition: width 0.3s ease;
         }
         
-        /* Grid de Categorias */
         .categorias-grid {
             display: flex;
             flex-direction: column;
@@ -166,7 +163,6 @@
             border-color: var(--tg-theme-button-color, #667eea);
         }
         
-        /* Botões */
         .acoes {
             display: flex;
             gap: 12px;
@@ -209,7 +205,6 @@
             cursor: not-allowed;
         }
         
-        /* Loading */
         .loading {
             position: fixed;
             top: 0;
@@ -221,6 +216,8 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            flex-direction: column;
+            gap: 16px;
         }
         
         .spinner {
@@ -232,11 +229,16 @@
             animation: spin 0.8s linear infinite;
         }
         
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            padding: 20px;
+        }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* Responsivo */
         @media (max-width: 480px) {
             .categoria-card {
                 flex-wrap: wrap;
@@ -256,9 +258,12 @@
 <body>
     <div class="loading" id="loading">
         <div class="spinner"></div>
+        <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;">
+            Carregando Pontos Extras...
+        </div>
     </div>
     
-    <div class="container">
+    <div class="container" id="main-content" style="display: none;">
         <!-- Header com Cronômetro -->
         <div class="header">
             <div class="title">
@@ -313,19 +318,40 @@
         function decodeDataFromURL() {
             try {
                 const hash = window.location.hash;
+                console.log('Hash:', hash); // Debug
+                
                 if (!hash || !hash.includes('#data=')) {
                     console.error('Sem dados na URL');
                     return false;
                 }
                 
                 const base64Data = decodeURIComponent(hash.replace('#data=', ''));
+                console.log('Base64:', base64Data); // Debug
+                
                 const jsonStr = atob(base64Data);
+                console.log('JSON:', jsonStr); // Debug
+                
                 const dados = JSON.parse(jsonStr);
+                console.log('Dados parseados:', dados); // Debug
                 
                 times = dados.times || [];
-                categorias = dados.categorias || [];
+                
+                // IMPORTANTE: O backend envia 'codigo' mas o frontend espera 'item'
+                // Vamos converter automaticamente
+                categorias = (dados.categorias || []).map(cat => ({
+                    item: cat.codigo || cat.item,  // Pega codigo ou item
+                    codigo: cat.codigo,
+                    nome: cat.nome,
+                    pontos: cat.pontos,
+                    icone: cat.icone
+                }));
+                
                 escolhasAnteriores = dados.escolhas || {};
                 prazo = dados.prazo;
+                
+                console.log('Times:', times.length);
+                console.log('Categorias:', categorias.length);
+                console.log('Escolhas anteriores:', Object.keys(escolhasAnteriores).length);
                 
                 return true;
             } catch (e) {
@@ -343,32 +369,47 @@
         function atualizarCronometro() {
             if (!prazo) return;
             
-            const agora = new Date();
-            const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00');
-            const diff = prazoDate - agora;
-            
-            if (diff <= 0) {
-                document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
-                document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
+            try {
+                const agora = new Date();
+                // Converter prazo para formato de data
+                let prazoStr = prazo;
+                if (prazoStr.includes(' ')) {
+                    prazoStr = prazoStr.replace(' ', 'T');
+                }
+                const prazoDate = new Date(prazoStr + '-03:00');
                 
-                document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
-                document.getElementById('btn-enviar').disabled = true;
+                if (isNaN(prazoDate.getTime())) {
+                    console.error('Data inválida:', prazo);
+                    return;
+                }
                 
-                clearInterval(timerInterval);
-                return;
-            }
-            
-            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const segundos = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            document.getElementById('timer').innerHTML = 
-                `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
-            
-            // Alerta visual
-            if (diff < 3600000) {
-                document.getElementById('timer').style.color = '#ff6b6b';
+                const diff = prazoDate - agora;
+                
+                if (diff <= 0) {
+                    document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
+                    document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
+                    
+                    document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
+                    document.getElementById('btn-enviar').disabled = true;
+                    
+                    clearInterval(timerInterval);
+                    return;
+                }
+                
+                const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const segundos = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('timer').innerHTML = 
+                    `${pad(dias)} DIAS ${pad(horas)}:${pad(minutos)}:${pad(segundos)}`;
+                
+                // Alerta visual quando falta pouco
+                if (diff < 3600000) {
+                    document.getElementById('timer').style.color = '#ff6b6b';
+                }
+            } catch (e) {
+                console.error('Erro no cronômetro:', e);
             }
         }
         
@@ -381,25 +422,30 @@
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                const escolhaAnterior = escolhasAnteriores[cat.codigo] || '';
+                // IMPORTANTE: Usar 'item' como chave
+                const itemKey = cat.item || cat.codigo;
+                const escolhaAnterior = escolhasAnteriores[itemKey] || '';
+                
                 if (escolhaAnterior) preenchidas++;
                 
                 const card = document.createElement('div');
                 card.className = 'categoria-card';
                 
                 let options = '<option value="">⚽ Selecione um time</option>';
+                
+                // Adicionar times
                 times.forEach(time => {
                     const selected = (time === escolhaAnterior) ? 'selected' : '';
                     options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
                 });
                 
                 card.innerHTML = `
-                    <div class="categoria-icone">${cat.icone}</div>
+                    <div class="categoria-icone">${cat.icone || '⚽'}</div>
                     <div class="categoria-info">
                         <div class="categoria-nome">${cat.nome}</div>
-                        <div class="categoria-pontos">${cat.pontos} pontos</div>
+                        <div class="categoria-pontos">${cat.pontos || 0} pontos</div>
                     </div>
-                    <select class="categoria-select" data-categoria="${cat.codigo}" data-pontos="${cat.pontos}">
+                    <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
                         ${options}
                     </select>
                 `;
@@ -433,7 +479,7 @@
             selects.forEach(select => {
                 if (select.value) {
                     escolhas.push({
-                        categoria: select.dataset.categoria,
+                        item: select.dataset.item,  // IMPORTANTE: enviar 'item'
                         time: select.value,
                         pontos: parseInt(select.dataset.pontos)
                     });
@@ -454,7 +500,9 @@
             
             tg.showConfirm(`✅ Confirmar ${escolhas.length}/15 palpites?`, (confirmed) => {
                 if (confirmed) {
-                    tg.sendData(JSON.stringify({ escolhas: escolhas }));
+                    tg.sendData(JSON.stringify({ 
+                        escolhas: escolhas 
+                    }));
                     tg.close();
                 }
             });
@@ -462,34 +510,90 @@
         
         // Inicializar
         function init() {
+            console.log('Inicializando...');
+            
+            const loading = document.getElementById('loading');
+            const mainContent = document.getElementById('main-content');
+            
             if (!decodeDataFromURL()) {
-                tg.showAlert('❌ Erro ao carregar dados');
-                setTimeout(() => tg.close(), 2000);
+                loading.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
+                        <div style="color: #ff6b6b; font-weight: 600; margin-bottom: 10px;">
+                            Erro ao carregar dados
+                        </div>
+                        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px;">
+                            Clique em OK para fechar
+                        </div>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    tg.close();
+                }, 2000);
                 return;
             }
             
+            // Verificar se tem times
+            if (!times || times.length === 0) {
+                loading.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <div style="color: #ff6b6b; font-weight: 600; margin-bottom: 10px;">
+                            Times não importados
+                        </div>
+                        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px;">
+                            Aguarde o administrador importar os times
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Verificar se tem categorias
+            if (!categorias || categorias.length === 0) {
+                loading.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <div style="color: #ff6b6b; font-weight: 600; margin-bottom: 10px;">
+                            Categorias não carregadas
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Renderizar interface
             renderizarCategorias();
             atualizarCronometro();
             timerInterval = setInterval(atualizarCronometro, 1000);
             
             // Data de encerramento
             if (prazo) {
-                const prazoDate = new Date(prazo.replace(' ', 'T') + '-03:00');
-                document.getElementById('deadline-info').innerHTML = 
-                    `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
+                try {
+                    let prazoStr = prazo;
+                    if (prazoStr.includes(' ')) {
+                        prazoStr = prazoStr.replace(' ', 'T');
+                    }
+                    const prazoDate = new Date(prazoStr + '-03:00');
+                    document.getElementById('deadline-info').innerHTML = 
+                        `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
+                } catch (e) {
+                    console.error('Erro ao formatar data:', e);
+                    document.getElementById('deadline-info').innerHTML = `📅 Encerra: ${prazo}`;
+                }
             }
             
             // Eventos dos botões
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
             
-            // Esconder loading
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 300);
+            // Mostrar conteúdo e esconder loading
+            loading.style.display = 'none';
+            mainContent.style.display = 'block';
         }
         
-        // Iniciar
+        // Iniciar quando a página carregar
         window.addEventListener('load', init);
     </script>
 </body>
