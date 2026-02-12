@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Mesmo estilo moderno que você aprovou */
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -18,23 +17,18 @@
             --light: #f8f9fa;
             --gray: #6c757d;
             --light-gray: #e9ecef;
-            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
         }
         
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: var(--dark);
             min-height: 100vh;
-            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -44,31 +38,19 @@
         .app-container {
             width: 100%;
             max-width: 500px;
-            margin: 0 auto;
         }
         
         .main-card {
             background: white;
             border-radius: 24px;
             padding: 24px 20px;
-            box-shadow: var(--card-shadow);
-            animation: slideUp 0.4s ease-out;
-        }
-        
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .header-section {
-            text-align: center;
-            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         
         .header-icon {
             width: 64px;
             height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -76,72 +58,59 @@
             margin: 0 auto 16px;
             color: white;
             font-size: 32px;
-            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
         }
         
         .header-title {
             font-size: 24px;
             font-weight: 800;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            text-align: center;
+            color: #212529;
             margin-bottom: 8px;
         }
         
         .header-subtitle {
+            text-align: center;
+            color: #6c757d;
             font-size: 14px;
-            color: var(--gray);
+            margin-bottom: 24px;
         }
         
         .info-box {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: #f8f9fa;
+            border-left: 6px solid #f8961e;
             border-radius: 16px;
             padding: 16px;
             margin-bottom: 24px;
-            border-left: 6px solid var(--warning);
             display: flex;
             align-items: center;
             gap: 12px;
         }
         
-        .info-icon {
+        .info-box i {
+            color: #f8961e;
             font-size: 24px;
-            color: var(--warning);
-            flex-shrink: 0;
         }
         
         .info-text {
             font-size: 13px;
-            color: var(--dark);
-            line-height: 1.4;
+            color: #212529;
         }
         
         .info-text strong {
-            color: var(--warning);
-        }
-        
-        .form-section {
-            margin-bottom: 24px;
+            color: #f8961e;
         }
         
         .form-label {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 15px;
             font-weight: 700;
-            color: var(--dark);
+            color: #212529;
             margin-bottom: 10px;
-        }
-        
-        .form-label i {
-            color: var(--primary);
         }
         
         .datetime-container {
             position: relative;
-            margin-bottom: 8px;
         }
         
         .datetime-icon {
@@ -149,48 +118,67 @@
             left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
-            font-size: 16px;
-            pointer-events: none;
+            color: #6c757d;
             z-index: 1;
         }
         
         input[type="datetime-local"] {
             width: 100%;
             padding: 16px 16px 16px 48px;
-            border: 2px solid var(--light-gray);
+            border: 2px solid #e9ecef;
             border-radius: 14px;
             font-size: 16px;
-            background: var(--light);
-            color: var(--dark);
-            transition: var(--transition);
-            -webkit-appearance: none;
-            appearance: none;
+            background: #f8f9fa;
+            transition: all 0.3s;
         }
         
         input[type="datetime-local"]:focus {
-            border-color: var(--primary);
+            border-color: #4361ee;
             background: white;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+            box-shadow: 0 0 0 4px rgba(67,97,238,0.1);
         }
         
         .timezone-hint {
-            font-size: 12px;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 6px;
-            padding-left: 8px;
-            background: rgba(76, 201, 240, 0.1);
-            padding: 8px 12px;
+            margin-top: 12px;
+            padding: 12px;
+            background: #e9ecef;
             border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            color: #212529;
         }
         
         .timezone-hint i {
-            color: var(--success);
-            font-size: 12px;
+            color: #4cc9f0;
+            margin-right: 8px;
+        }
+        
+        .preview-box {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        
+        .preview-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .preview-date {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: #4361ee;
+            text-align: center;
+            font-size: 16px;
         }
         
         .action-buttons {
@@ -207,11 +195,11 @@
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.3s;
         }
         
         .btn:active {
@@ -219,9 +207,8 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
             color: white;
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
         }
         
         .btn-secondary {
@@ -229,87 +216,69 @@
             color: white;
         }
         
-        .btn-icon {
-            font-size: 16px;
-        }
-        
         .footer-note {
             text-align: center;
             margin-top: 20px;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255,255,255,0.8);
             font-size: 12px;
-        }
-        
-        .preview-date {
-            background: linear-gradient(135deg, #f1f5f9, #e6eaf0);
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .preview-date i {
-            color: var(--primary);
-            font-size: 18px;
-        }
-        
-        .preview-date span {
-            font-weight: 700;
-            color: var(--primary);
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="main-card">
-            <div class="header-section">
-                <div class="header-icon">
-                    <i class="fas fa-trophy"></i>
-                </div>
-                <h1 class="header-title">Pontos Extras</h1>
-                <p class="header-subtitle">Configurar prazo de encerramento</p>
+            <div class="header-icon">
+                <i class="fas fa-trophy"></i>
             </div>
+            <h1 class="header-title">Pontos Extras</h1>
+            <p class="header-subtitle">Configurar prazo de encerramento</p>
             
             <div class="info-box">
-                <i class="fas fa-info-circle info-icon"></i>
+                <i class="fas fa-info-circle"></i>
                 <div class="info-text">
-                    <strong>⚠️ IMPORTANTE: Horário de Brasília (UTC-3)</strong><br>
-                    A hora que você escolher será EXATAMENTE a hora do encerramento.
+                    <strong>⚠️ HORA EXATA - SEM CONVERSÃO!</strong><br>
+                    A hora que você escolher será a hora do encerramento em Brasília.
                 </div>
             </div>
             
-            <div class="form-section">
-                <div class="form-label">
-                    <i class="fas fa-calendar-check"></i>
-                    Data e Hora de Encerramento
+            <div class="form-label">
+                <i class="fas fa-calendar-check"></i>
+                Data e Hora de Encerramento
+            </div>
+            
+            <div class="datetime-container">
+                <i class="fas fa-calendar-alt datetime-icon"></i>
+                <input type="datetime-local" id="prazo" required>
+            </div>
+            
+            <div class="timezone-hint">
+                <i class="fas fa-check-circle"></i>
+                <span id="preview-text">Selecione uma data</span>
+            </div>
+            
+            <div class="preview-box">
+                <div class="preview-title">
+                    <i class="fas fa-clock"></i>
+                    Encerramento em Brasília:
                 </div>
-                
-                <div class="datetime-container">
-                    <i class="fas fa-calendar-alt datetime-icon"></i>
-                    <input type="datetime-local" id="prazo" required>
-                </div>
-                
-                <div class="timezone-hint">
-                    <i class="fas fa-check-circle"></i>
-                    <span id="preview-horario">Nenhuma data selecionada</span>
+                <div class="preview-date" id="preview-date">
+                    --/--/---- --:--
                 </div>
             </div>
             
             <div class="action-buttons">
                 <button class="btn btn-primary" onclick="salvar()">
-                    <i class="fas fa-save btn-icon"></i>
+                    <i class="fas fa-save"></i>
                     Salvar
                 </button>
                 <button class="btn btn-secondary" onclick="fechar()">
-                    <i class="fas fa-times btn-icon"></i>
+                    <i class="fas fa-times"></i>
                     Cancelar
                 </button>
             </div>
         </div>
         <div class="footer-note">
-            <i class="fas fa-clock"></i> Horário de Brasília (sem conversão)
+            <i class="fas fa-clock"></i> HORA SELECIONADA = HORA DO ENCERRAMENTO
         </div>
     </div>
 
@@ -318,11 +287,10 @@
         tg.expand();
         tg.ready();
         
-        // CORREÇÃO: Trabalhar 100% com HORÁRIO LOCAL (Brasília)
+        // CORREÇÃO: PEGAR A HORA EXATA QUE O USUÁRIO ESCOLHEU
         function configurarDataMinima() {
             const agora = new Date();
             
-            // Ajustar para o fuso do navegador (que já é o horário local do usuário)
             const ano = agora.getFullYear();
             const mes = String(agora.getMonth() + 1).padStart(2, '0');
             const dia = String(agora.getDate()).padStart(2, '0');
@@ -337,21 +305,16 @@
         }
         
         function atualizarPreview(valor) {
-            if (!valor) {
-                document.getElementById('preview-horario').innerHTML = 'Nenhuma data selecionada';
-                return;
-            }
+            if (!valor) return;
             
-            try {
-                const [data, hora] = valor.split('T');
-                const [ano, mes, dia] = data.split('-');
-                const [h, m] = hora.split(':');
-                
-                document.getElementById('preview-horario').innerHTML = 
-                    `✅ Encerramento: <strong>${dia}/${mes}/${ano} às ${h}:${m}</strong> (Brasília)`;
-            } catch (e) {
-                console.error('Erro ao atualizar preview:', e);
-            }
+            const [data, hora] = valor.split('T');
+            const [ano, mes, dia] = data.split('-');
+            
+            document.getElementById('preview-text').innerHTML = 
+                `Encerramento: <strong>${dia}/${mes}/${ano} às ${hora}</strong> (Brasília)`;
+            
+            document.getElementById('preview-date').innerHTML = 
+                `${dia}/${mes}/${ano} ${hora}`;
         }
         
         document.getElementById('prazo').addEventListener('change', function(e) {
@@ -366,11 +329,11 @@
             const dataLocal = document.getElementById('prazo').value;
             
             if (!dataLocal) {
-                alert('❌ Selecione uma data e hora!');
+                alert('❌ Selecione uma data!');
                 return;
             }
             
-            // Validar se a data é futura (comparação local)
+            // Validar se é futura
             const agora = new Date();
             const [ano, mes, dia] = dataLocal.split('T')[0].split('-').map(Number);
             const [hora, minuto] = dataLocal.split('T')[1].split(':').map(Number);
@@ -382,29 +345,26 @@
                 return;
             }
             
-            // CORREÇÃO CRÍTICA: Enviar no formato que o Python espera
-            // Formato: YYYY-MM-DD HH:MM:SS (sem fuso, interpretado como Brasília)
+            // CORREÇÃO: ENVIAR A DATA EXATA NO FORMATO QUE O PYTHON ESPERA
+            // Formato: "YYYY-MM-DD HH:MM:SS" - SEM CONVERSÃO
             const dataFormatada = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')} ${String(hora).padStart(2, '0')}:${String(minuto).padStart(2, '0')}:00`;
             
-            console.log('📤 Enviando data (Brasília):', dataFormatada);
+            console.log('📤 Enviando data EXATA:', dataFormatada);
             
-            // Efeito visual
             const btn = document.querySelector('.btn-primary');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Salvando...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
             btn.disabled = true;
             
-            setTimeout(() => {
-                tg.sendData(JSON.stringify({ 
-                    data_encerramento: dataFormatada
-                }));
-            }, 300);
+            // Enviar para o bot
+            tg.sendData(JSON.stringify({ 
+                data_encerramento: dataFormatada
+            }));
         }
         
         function fechar() {
             tg.close();
         }
         
-        // Inicializar
         configurarDataMinima();
     </script>
 </body>
