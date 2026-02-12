@@ -1,409 +1,261 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⚙️ Admin - Pontos Extras</title>
+    
+    <!-- Fontes e Ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --dark: #212529;
-            --light: #f8f9fa;
-            --gray: #6c757d;
-            --light-gray: #e9ecef;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2c3e50, #1e2a36);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        
-        .app-container {
-            width: 100%;
-            max-width: 500px;
-        }
-        
-        .main-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        
-        .header-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
+            padding: 20px;
             color: white;
-            font-size: 32px;
         }
         
-        .header-title {
-            font-size: 24px;
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        h1 {
+            font-size: 28px;
             font-weight: 800;
-            text-align: center;
-            color: #212529;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .header-subtitle {
-            text-align: center;
-            color: #6c757d;
+        .subtitle {
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 30px;
             font-size: 14px;
-            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.95);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 0 3px rgba(255,215,0,0.2);
         }
         
         .info-box {
-            background: #f8f9fa;
-            border-left: 6px solid #f8961e;
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .info-box i {
-            color: #f8961e;
-            font-size: 24px;
-        }
-        
-        .info-text {
-            font-size: 13px;
-            color: #212529;
-        }
-        
-        .info-text strong {
-            color: #f8961e;
-        }
-        
-        .form-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 10px;
-        }
-        
-        .datetime-container {
-            position: relative;
-        }
-        
-        .datetime-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-            z-index: 1;
-        }
-        
-        input[type="datetime-local"] {
-            width: 100%;
-            padding: 16px 16px 16px 48px;
-            border: 2px solid #e9ecef;
-            border-radius: 14px;
-            font-size: 16px;
-            background: #f8f9fa;
-            transition: all 0.3s;
-        }
-        
-        input[type="datetime-local"]:focus {
-            border-color: #4361ee;
-            background: white;
-            outline: none;
-            box-shadow: 0 0 0 4px rgba(67,97,238,0.1);
-        }
-        
-        .timezone-hint {
-            margin-top: 12px;
-            padding: 12px;
-            background: #e9ecef;
-            border-radius: 8px;
-            font-size: 14px;
-            text-align: center;
-            color: #212529;
-        }
-        
-        .timezone-hint i {
-            color: #4cc9f0;
-            margin-right: 8px;
-        }
-        
-        .preview-box {
-            background: #f1f5f9;
+            background: rgba(255,215,0,0.1);
+            border-left: 4px solid #ffd700;
+            padding: 15px;
             border-radius: 12px;
-            padding: 16px;
-            margin-top: 20px;
-        }
-        
-        .preview-title {
+            margin-bottom: 30px;
             font-size: 14px;
-            font-weight: 700;
-            color: #212529;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .preview-date {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 700;
-            color: #4361ee;
-            text-align: center;
-            font-size: 16px;
-        }
-        
-        .warning-box {
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 16px;
-            font-size: 13px;
-            color: #856404;
-        }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 24px;
+            color: rgba(255,255,255,0.9);
         }
         
         .btn {
-            padding: 16px;
+            width: 100%;
+            padding: 18px;
             border: none;
-            border-radius: 14px;
-            font-size: 16px;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
             font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
+            gap: 10px;
+            background: linear-gradient(145deg, #ffd700, #ffb700);
+            color: #2c3e50;
+            box-shadow: 0 10px 20px rgba(255,215,0,0.3);
         }
         
-        .btn:active {
-            transform: scale(0.98);
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255,215,0,0.4);
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #4361ee, #3a0ca3);
-            color: white;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
         
-        .btn-secondary {
-            background: linear-gradient(135deg, #ff6b6b, #ff4757);
-            color: white;
-        }
-        
-        .footer-note {
-            text-align: center;
-            margin-top: 20px;
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
+        .datetime-preview {
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            text-align: right;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="main-card">
-            <div class="header-icon">
-                <i class="fas fa-trophy"></i>
-            </div>
-            <h1 class="header-title">Pontos Extras</h1>
-            <p class="header-subtitle">Configurar prazo de encerramento</p>
-            
-            <div class="info-box">
-                <i class="fas fa-info-circle"></i>
-                <div class="info-text">
-                    <strong>⚠️ HORÁRIO DE BRASÍLIA FIXO!</strong><br>
-                    O horário selecionado será INTERPRETADO como Brasília, independente do seu fuso.
-                </div>
-            </div>
-            
-            <div class="form-label">
-                <i class="fas fa-calendar-check"></i>
-                Data e Hora de Encerramento (BRASÍLIA)
-            </div>
-            
-            <div class="datetime-container">
-                <i class="fas fa-calendar-alt datetime-icon"></i>
-                <input type="datetime-local" id="prazo" required>
-            </div>
-            
-            <div class="warning-box" id="timezone-warning">
-                <i class="fas fa-globe-americas"></i>
-                Seu fuso horário: <span id="user-timezone">carregando...</span><br>
-                <strong>A hora que você escolher SERÁ a hora de Brasília</strong>
-            </div>
-            
-            <div class="preview-box">
-                <div class="preview-title">
-                    <i class="fas fa-clock"></i>
-                    Encerramento em Brasília:
-                </div>
-                <div class="preview-date" id="preview-date">
-                    --/--/---- --:--
-                </div>
-            </div>
-            
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="salvar()">
-                    <i class="fas fa-save"></i>
-                    Salvar
-                </button>
-                <button class="btn btn-secondary" onclick="fechar()">
-                    <i class="fas fa-times"></i>
-                    Cancelar
-                </button>
+    <div class="container">
+        <h1>
+            <i class="fas fa-cog"></i> Configurar
+        </h1>
+        <div class="subtitle">
+            ⚙️ Painel Administrativo - Pontos Extras 2026
+        </div>
+        
+        <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <strong>IMPORTANTE:</strong> Antes de configurar, use /importar_times para carregar os 20 times da planilha Bolão2026.xlsx
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <i class="far fa-calendar-alt"></i> DATA E HORA DE ENCERRAMENTO (BRASÍLIA)
+            </label>
+            <input 
+                type="datetime-local" 
+                id="data_encerramento" 
+                min="2026-01-01T00:00"
+                required
+            >
+            <div class="datetime-preview" id="preview">
+                📅 Selecione uma data e hora
             </div>
         </div>
-        <div class="footer-note">
-            <i class="fas fa-clock"></i> DATA SELECIONADA = HORA DE BRASÍLIA
-        </div>
+        
+        <button class="btn" id="btn-salvar">
+            <i class="fas fa-check-circle"></i> ATIVAR PONTOS EXTRAS
+        </button>
     </div>
-
+    
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
+        tg.setHeaderColor('#1e2a36');
+        tg.setBackgroundColor('#2c3e50');
         
-        // Detectar fuso horário do usuário
-        function getTimezoneInfo() {
-            const offset = new Date().getTimezoneOffset();
-            const hours = -offset / 60;
-            const sign = hours >= 0 ? '+' : '';
-            return {
-                offset: offset,
-                offsetStr: `UTC${sign}${hours}`,
-                name: Intl.DateTimeFormat().resolvedOptions().timeZone
-            };
+        const inputData = document.getElementById('data_encerramento');
+        const preview = document.getElementById('preview');
+        const btnSalvar = document.getElementById('btn-salvar');
+        
+        // Formatar data para o fuso de Brasília
+        function formatarDataParaBrasilia(dataStr) {
+            if (!dataStr) return null;
+            
+            const data = new Date(dataStr);
+            
+            // Ajustar para Brasília (UTC-3)
+            const brasilia = new Date(data.getTime() - (3 * 60 * 60 * 1000));
+            
+            const ano = brasilia.getFullYear();
+            const mes = String(brasilia.getMonth() + 1).padStart(2, '0');
+            const dia = String(brasilia.getDate()).padStart(2, '0');
+            const hora = String(brasilia.getHours()).padStart(2, '0');
+            const min = String(brasilia.getMinutes()).padStart(2, '0');
+            
+            return `${ano}-${mes}-${dia} ${hora}:${min}:00`;
         }
         
-        // Configurar data mínima baseada em Brasília
-        function configurarDataMinima() {
-            const agora = new Date();
-            
-            // Obter hora em Brasília (UTC-3)
-            const agoraBrasilia = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
-            
-            const ano = agoraBrasilia.getFullYear();
-            const mes = String(agoraBrasilia.getMonth() + 1).padStart(2, '0');
-            const dia = String(agoraBrasilia.getDate()).padStart(2, '0');
-            const hora = String(agoraBrasilia.getHours()).padStart(2, '0');
-            const minuto = String(agoraBrasilia.getMinutes()).padStart(2, '0');
-            
-            const dataMinima = `${ano}-${mes}-${dia}T${hora}:${minuto}`;
-            
-            const input = document.getElementById('prazo');
-            input.min = dataMinima;
-            input.value = dataMinima;
-            
-            atualizarPreview(dataMinima);
-        }
-        
-        function atualizarPreview(valor) {
-            if (!valor) return;
-            
-            const [data, hora] = valor.split('T');
-            const [ano, mes, dia] = data.split('-');
-            
-            document.getElementById('preview-date').innerHTML = 
-                `${dia}/${mes}/${ano} ${hora}`;
-        }
-        
-        // Mostrar info do fuso horário
-        function mostrarTimezoneInfo() {
-            const tz = getTimezoneInfo();
-            document.getElementById('user-timezone').innerHTML = 
-                `${tz.offsetStr} (${tz.name})`;
-        }
-        
-        document.getElementById('prazo').addEventListener('change', function(e) {
-            atualizarPreview(e.target.value);
+        // Atualizar preview
+        inputData.addEventListener('change', function() {
+            if (this.value) {
+                const dataObj = new Date(this.value);
+                const dataBr = dataObj.toLocaleString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                preview.innerHTML = `📅 Encerramento: ${dataBr} (Brasília)`;
+            } else {
+                preview.innerHTML = '📅 Selecione uma data e hora';
+            }
         });
         
-        document.getElementById('prazo').addEventListener('input', function(e) {
-            atualizarPreview(e.target.value);
-        });
-        
-        function salvar() {
-            const dataLocal = document.getElementById('prazo').value;
+        // Salvar configuração
+        btnSalvar.addEventListener('click', function() {
+            const dataValue = inputData.value;
             
-            if (!dataLocal) {
-                tg.showAlert('❌ Selecione uma data!');
+            if (!dataValue) {
+                tg.showAlert('❌ Selecione a data e hora de encerramento!');
                 return;
             }
             
-            // Validar se a data EM BRASÍLIA é futura
-            const [ano, mes, dia] = dataLocal.split('T')[0].split('-').map(Number);
-            const [hora, minuto] = dataLocal.split('T')[1].split(':').map(Number);
-            
-            // Criar data em Brasília (UTC-3)
-            const dataSelecionada = new Date(Date.UTC(ano, mes-1, dia, hora, minuto, 0));
-            dataSelecionada.setHours(dataSelecionada.getHours() - 3); // Ajustar para UTC-3
-            
+            // Validar se é futura
             const agora = new Date();
-            const agoraBrasilia = new Date(agora.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+            const selecionado = new Date(dataValue);
             
-            if (dataSelecionada <= agoraBrasilia) {
-                tg.showAlert('❌ A data em Brasília deve ser futura!');
+            if (selecionado <= agora) {
+                tg.showAlert('❌ A data deve ser futura!');
                 return;
             }
             
-            // CORREÇÃO: Enviar a data EXATA que o usuário escolheu (será interpretada como Brasília)
-            const dataFormatada = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')} ${String(hora).padStart(2, '0')}:${String(minuto).padStart(2, '0')}:00`;
+            const prazoFormatado = formatarDataParaBrasilia(dataValue);
             
-            console.log('📤 Enviando data (Brasília):', dataFormatada);
-            
-            const btn = document.querySelector('.btn-primary');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-            btn.disabled = true;
-            
-            // Enviar para o bot
-            tg.sendData(JSON.stringify({ 
-                data_encerramento: dataFormatada,
-                timezone: 'America/Sao_Paulo' // Opcional: informar que é Brasília
-            }));
-        }
+            tg.showConfirm(`⚠️ Ativar Pontos Extras com encerramento em ${preview.innerText.replace('📅 Encerramento: ', '')}?`, (confirmed) => {
+                if (confirmed) {
+                    tg.sendData(JSON.stringify({
+                        data_encerramento: prazoFormatado
+                    }));
+                    tg.showAlert('✅ Pontos Extras ativados com sucesso!');
+                    tg.close();
+                }
+            });
+        });
         
-        function fechar() {
-            tg.close();
-        }
+        // Setar data mínima (agora + 1 hora)
+        const agora = new Date();
+        agora.setHours(agora.getHours() + 1);
+        const ano = agora.getFullYear();
+        const mes = String(agora.getMonth() + 1).padStart(2, '0');
+        const dia = String(agora.getDate()).padStart(2, '0');
+        const hora = String(agora.getHours()).padStart(2, '0');
+        const min = String(agora.getMinutes()).padStart(2, '0');
         
-        // Inicializar
-        mostrarTimezoneInfo();
-        configurarDataMinima();
+        inputData.min = `${ano}-${mes}-${dia}T${hora}:${min}`;
     </script>
 </body>
 </html>
