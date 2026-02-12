@@ -5,18 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐ Pontos Extras 2026</title>
     
-    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- 🔥 BIBLIOTECA PAKO PARA DESCOMPRESSÃO GZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -26,10 +22,7 @@
             min-height: 100vh;
         }
         
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
+        .container { max-width: 600px; margin: 0 auto; }
         
         .header {
             background: var(--tg-theme-secondary-bg-color, #2c3e50);
@@ -49,10 +42,7 @@
             gap: 8px;
         }
         
-        .countdown {
-            text-align: center;
-        }
-        
+        .countdown { text-align: center; }
         .countdown-label {
             font-size: 13px;
             text-transform: uppercase;
@@ -130,10 +120,7 @@
             color: white;
         }
         
-        .categoria-info {
-            flex: 1;
-        }
-        
+        .categoria-info { flex: 1; }
         .categoria-nome {
             font-weight: 700;
             font-size: 15px;
@@ -201,14 +188,8 @@
             color: var(--tg-theme-text-color, #2c3e50);
         }
         
-        .btn:active {
-            opacity: 0.7;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn:active { opacity: 0.7; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .loading {
             position: fixed;
@@ -232,31 +213,6 @@
             border-top-color: var(--tg-theme-button-color, #667eea);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-        }
-        
-        .error-container {
-            text-align: center;
-            padding: 24px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        
-        .error-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-        
-        .error-title {
-            color: #d32f2f;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-        
-        .error-message {
-            color: #666;
-            margin-bottom: 24px;
-            line-height: 1.5;
         }
         
         .close-button {
@@ -284,26 +240,6 @@
             word-break: break-all;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @media (max-width: 480px) {
-            .categoria-card {
-                flex-wrap: wrap;
-            }
-            
-            .categoria-select {
-                width: 100%;
-                margin-top: 8px;
-            }
-            
-            .timer {
-                font-size: 28px;
-            }
-        }
-        
-        /* Ambiente de teste */
         .test-banner {
             background: #ff9800;
             color: white;
@@ -312,6 +248,14 @@
             margin-bottom: 16px;
             font-size: 14px;
             text-align: center;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        @media (max-width: 480px) {
+            .categoria-card { flex-wrap: wrap; }
+            .categoria-select { width: 100%; margin-top: 8px; }
+            .timer { font-size: 28px; }
         }
     </style>
 </head>
@@ -349,18 +293,65 @@
         }
         
         function isRunningInTestMode() {
-            // Verifica se está abrindo direto no navegador
             return window.location.protocol === 'file:' || 
                    window.location.hostname.includes('github.io') ||
                    window.location.hostname === 'localhost' ||
                    window.location.hostname === '127.0.0.1';
         }
         
+        // ============ 🔥 DECODIFICADOR UNIVERSAL COM GZIP ============
+        function decodificarBase64ComGzip(base64Url) {
+            try {
+                console.log('🔄 Decodificando Base64 URL-safe com GZIP...');
+                
+                // 1. Converte URL-safe para Base64 padrão
+                let base64 = base64Url
+                    .replace(/-/g, '+')
+                    .replace(/_/g, '/');
+                
+                // 2. Restaura padding
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                
+                // 3. Decodifica Base64
+                const compressedData = atob(base64);
+                
+                // 4. Converte string para Uint8Array
+                const compressed = new Uint8Array(compressedData.length);
+                for (let i = 0; i < compressedData.length; i++) {
+                    compressed[i] = compressedData.charCodeAt(i);
+                }
+                
+                // 5. Descomprime com pako.ungzip
+                const decompressed = pako.ungzip(compressed, { to: 'string' });
+                
+                console.log('✅ Descompressão GZIP bem-sucedida');
+                return JSON.parse(decompressed);
+                
+            } catch (e) {
+                console.error('❌ Erro na descompressão GZIP:', e);
+                
+                // FALLBACK: tenta decodificar como JSON puro (sem compressão)
+                try {
+                    console.log('⚠️ Tentando fallback sem GZIP...');
+                    let base64 = base64Url
+                        .replace(/-/g, '+')
+                        .replace(/_/g, '/');
+                    while (base64.length % 4) base64 += '=';
+                    const jsonStr = atob(base64);
+                    return JSON.parse(jsonStr);
+                } catch (e2) {
+                    console.error('❌ Fallback também falhou:', e2);
+                    throw new Error('Formato de dados inválido');
+                }
+            }
+        }
+        
         // ============ CARREGAR DADOS DE TESTE ============
         function loadTestData() {
             console.log('🧪 MODO DE TESTE - Carregando dados simulados');
             
-            // Times de exemplo
             times = [
                 "América Mineiro", "Atlético Goianiense", "Atlético Mineiro", 
                 "Bahia", "Botafogo", "Corinthians", "Coritiba", 
@@ -370,7 +361,6 @@
                 "São Paulo", "Vasco da Gama"
             ];
             
-            // Categorias
             categorias = [
                 {"item": "campeao_geral", "nome": "Campeão Geral", "pontos": 20, "icone": "🏆"},
                 {"item": "campeao_turno1", "nome": "Campeão 1º Turno", "pontos": 10, "icone": "🥇"},
@@ -389,10 +379,8 @@
                 {"item": "time_estrela", "nome": "Time Estrela", "pontos": 0, "icone": "⭐"}
             ];
             
-            // Escolhas vazias
             escolhasAnteriores = {};
             
-            // Prazo futuro
             const futuro = new Date();
             futuro.setDate(futuro.getDate() + 7);
             prazo = futuro.toISOString().replace('T', ' ').substring(0, 19);
@@ -403,69 +391,81 @@
             return true;
         }
         
+        // ============ OBTER DADOS DA URL ============
+        function getDataFromURL() {
+            console.log('🔗 Lendo dados da URL...');
+            
+            let base64Data = null;
+            
+            // 1. Hash puro: #BASE64
+            if (window.location.hash && window.location.hash.length > 1) {
+                base64Data = window.location.hash.substring(1);
+                console.log('✅ Lido do hash, tamanho:', base64Data.length);
+            }
+            
+            // 2. Parâmetro ?data=
+            if (!base64Data) {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('data')) {
+                    base64Data = urlParams.get('data');
+                    console.log('✅ Lido do ?data=, tamanho:', base64Data.length);
+                }
+            }
+            
+            // 3. Hash #data=
+            if (!base64Data && window.location.hash.includes('#data=')) {
+                base64Data = window.location.hash.replace('#data=', '');
+                console.log('✅ Lido do #data=, tamanho:', base64Data.length);
+            }
+            
+            return base64Data;
+        }
+        
         // ============ DECODIFICAR DADOS ============
         function decodeDataFromURL() {
             try {
                 console.log('=== DECODIFICANDO DADOS ===');
                 console.log('📱 initDataUnsafe:', tg.initDataUnsafe);
                 
-                // ============ MODO 1: TELEGRAM (PRODUÇÃO) ============
+                // ============ MODO 1: TELEGRAM ============
                 if (isRunningInTelegram()) {
                     console.log('✅ Rodando no Telegram WebApp');
                     
                     if (tg.initDataUnsafe.start_param) {
                         const param = tg.initDataUnsafe.start_param;
-                        console.log('📦 start_param:', param);
+                        console.log('📦 start_param:', param.substring(0, 50) + '...');
                         
-                        if (param.startsWith('escolha_extra_')) {
-                            const base64Data = param.replace('escolha_extra_', '');
-                            console.log('✅ Base64 extraído do Telegram');
-                            return processBase64Data(base64Data);
+                        if (param === 'escolha_extra') {
+                            console.log('⚠️ start_param sem dados, aguardando botão...');
                         }
                     }
-                    
-                    console.log('⚠️ Telegram sem start_param - usando fallback da URL');
                 }
                 
-                // ============ MODO 2: URL FALLBACK (HASH) ============
-                console.log('🔗 Tentando ler da URL...');
-                
-                let base64Data = null;
-                
-                // Hash puro: #BASE64
-                if (window.location.hash && window.location.hash.length > 1) {
-                    base64Data = window.location.hash.substring(1);
-                    console.log('✅ Lido do hash');
-                }
-                
-                // Parâmetro ?data=
-                if (!base64Data) {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if (urlParams.has('data')) {
-                        base64Data = urlParams.get('data');
-                        console.log('✅ Lido do ?data=');
-                    }
-                }
-                
-                // Hash #data=
-                if (!base64Data && window.location.hash.includes('#data=')) {
-                    base64Data = window.location.hash.replace('#data=', '');
-                    console.log('✅ Lido do #data=');
-                }
+                // ============ MODO 2: DADOS DA URL ============
+                const base64Data = getDataFromURL();
                 
                 if (base64Data) {
-                    return processBase64Data(base64Data);
+                    console.log('🔄 Processando dados da URL...');
+                    const dados = decodificarBase64ComGzip(base64Data);
+                    
+                    times = dados.times || [];
+                    categorias = dados.categorias || [];
+                    escolhasAnteriores = dados.escolhas || {};
+                    prazo = dados.prazo || null;
+                    usuarioId = dados.usuario?.id || null;
+                    usuarioNome = dados.usuario?.nome || 'Usuário';
+                    
+                    console.log(`✅ Dados carregados: ${times.length} times, ${categorias.length} categorias`);
+                    return true;
                 }
                 
-                // ============ MODO 3: TESTE LOCAL ============
+                // ============ MODO 3: TESTE ============
                 if (isRunningInTestMode()) {
-                    console.log('🧪 Modo de teste detectado');
-                    
-                    // Mostra aviso visual
-                    const warning = document.createElement('div');
-                    warning.className = 'test-banner';
-                    warning.innerHTML = '🧪 MODO DE TESTE - Dados simulados';
-                    document.body.prepend(warning);
+                    console.log('🧪 Modo de teste');
+                    const banner = document.createElement('div');
+                    banner.className = 'test-banner';
+                    banner.innerHTML = '🧪 MODO DE TESTE - Dados simulados';
+                    document.body.prepend(banner);
                     
                     return loadTestData();
                 }
@@ -473,7 +473,7 @@
                 throw new Error('Nenhuma fonte de dados encontrada');
                 
             } catch (e) {
-                console.error('❌ Erro na decodificação:', e);
+                console.error('❌ Erro:', e);
                 mostrarErroVisivel(
                     'Erro ao Carregar Dados',
                     'Não foi possível carregar as informações.',
@@ -483,54 +483,7 @@
             }
         }
         
-        // ============ PROCESSAR BASE64 ============
-        function processBase64Data(base64Data) {
-            try {
-                console.log('🔄 Processando Base64...');
-                
-                // Remove espaços e quebras de linha
-                base64Data = base64Data.trim();
-                
-                // Decodifica
-                let decodedString;
-                
-                try {
-                    decodedString = atob(base64Data);
-                } catch (e) {
-                    console.error('❌ Erro no atob:', e);
-                    // Tenta com decodeURIComponent
-                    const cleaned = decodeURIComponent(base64Data);
-                    decodedString = atob(cleaned);
-                }
-                
-                console.log('📦 JSON decodificado');
-                
-                // Parse
-                const dados = JSON.parse(decodedString);
-                console.log('✅ JSON parseado');
-                
-                // Extrai dados
-                times = dados.times || [];
-                categorias = dados.categorias || [];
-                escolhasAnteriores = dados.escolhas || {};
-                prazo = dados.prazo || null;
-                usuarioId = dados.usuario?.id || null;
-                usuarioNome = dados.usuario?.nome || 'Usuário';
-                
-                console.log(`✅ Dados carregados:`);
-                console.log(`   • Times: ${times.length}`);
-                console.log(`   • Categorias: ${categorias.length}`);
-                console.log(`   • Escolhas: ${Object.keys(escolhasAnteriores).length}`);
-                
-                return true;
-                
-            } catch (e) {
-                console.error('❌ Erro ao processar Base64:', e);
-                throw e;
-            }
-        }
-        
-        // ============ MOSTRAR ERRO VISÍVEL ============
+        // ============ MOSTRAR ERRO ============
         function mostrarErroVisivel(titulo, mensagem, detalhe = '') {
             const loading = document.getElementById('loading');
             const loadingMsg = document.getElementById('loading-message');
@@ -540,21 +493,13 @@
             loadingMsg.innerHTML = `❌ ${titulo}`;
             loadingDetail.innerHTML = mensagem;
             
-            // Botão fechar
             const closeBtn = document.createElement('button');
             closeBtn.className = 'close-button';
             closeBtn.innerHTML = 'FECHAR';
-            closeBtn.onclick = () => {
-                if (tg && typeof tg.close === 'function') {
-                    tg.close();
-                } else {
-                    window.close();
-                }
-            };
+            closeBtn.onclick = () => { if (tg.close) tg.close(); else window.close(); };
             closeBtn.style.marginTop = '24px';
             loading.appendChild(closeBtn);
             
-            // Debug info
             const debug = document.createElement('div');
             debug.className = 'debug-info';
             debug.innerHTML = `
@@ -642,7 +587,6 @@
             
             atualizarProgresso(preenchidas);
             
-            // Event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -652,14 +596,9 @@
             
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => {
-                if (tg && typeof tg.close === 'function') {
-                    tg.close();
-                } else {
-                    window.close();
-                }
+                if (tg.close) tg.close(); else window.close();
             });
             
-            // Cronômetro
             if (prazo) {
                 atualizarCronometro();
                 timerInterval = setInterval(atualizarCronometro, 1000);
@@ -678,12 +617,8 @@
             
             try {
                 let prazoStr = prazo;
-                if (prazoStr.includes(' ')) {
-                    prazoStr = prazoStr.replace(' ', 'T');
-                }
-                if (!prazoStr.includes('Z') && !prazoStr.includes('+')) {
-                    prazoStr += '-03:00';
-                }
+                if (prazoStr.includes(' ')) prazoStr = prazoStr.replace(' ', 'T');
+                if (!prazoStr.includes('Z') && !prazoStr.includes('+')) prazoStr += '-03:00';
                 
                 const prazoDate = new Date(prazoStr);
                 const agora = new Date();
@@ -706,9 +641,7 @@
                 document.getElementById('timer').innerHTML = 
                     `${String(dias).padStart(2, '0')} DIAS ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
                 
-                if (diff < 3600000) {
-                    document.getElementById('timer').style.color = '#ff6b6b';
-                }
+                if (diff < 3600000) document.getElementById('timer').style.color = '#ff6b6b';
                 
                 document.getElementById('deadline-info').innerHTML = 
                     `📅 Encerra: ${prazoDate.toLocaleString('pt-BR')}`;
@@ -739,32 +672,25 @@
             const escolhas = coletarEscolhas();
             
             if (escolhas.length === 0) {
-                if (tg && typeof tg.showAlert === 'function') {
-                    tg.showAlert('❌ Escolha pelo menos um time!');
-                } else {
-                    alert('❌ Escolha pelo menos um time!');
-                }
+                if (tg.showAlert) tg.showAlert('❌ Escolha pelo menos um time!');
+                else alert('❌ Escolha pelo menos um time!');
                 return;
             }
             
             const confirmar = () => {
-                if (tg && typeof tg.sendData === 'function') {
+                if (tg.sendData) {
                     tg.sendData(JSON.stringify({ escolhas: escolhas }));
                     tg.close();
                 } else {
-                    // Modo de teste
-                    alert('✅ Modo teste - Escolhas salvas!\n\n' + 
-                          JSON.stringify(escolhas, null, 2));
+                    alert('✅ Modo teste - Escolhas salvas!\n\n' + JSON.stringify(escolhas, null, 2));
                     console.log('Escolhas:', escolhas);
                 }
             };
             
-            if (tg && typeof tg.showConfirm === 'function') {
+            if (tg.showConfirm) {
                 tg.showConfirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`, confirmar);
             } else {
-                if (confirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`)) {
-                    confirmar();
-                }
+                if (confirm(`✅ Confirmar ${escolhas.length}/${categorias.length} palpites?`)) confirmar();
             }
         }
         
@@ -772,9 +698,7 @@
         function init() {
             console.log('=== INICIALIZANDO ===');
             
-            if (!decodeDataFromURL()) {
-                return;
-            }
+            if (!decodeDataFromURL()) return;
             
             try {
                 renderizarCategorias();
@@ -788,7 +712,6 @@
         
         window.addEventListener('load', init);
         
-        // Timeout de segurança
         setTimeout(() => {
             const loading = document.getElementById('loading');
             if (loading && loading.style.display !== 'none') {
