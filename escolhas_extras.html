@@ -366,102 +366,65 @@
         
         // ============ DECODIFICAR DADOS - VERSÃO SIMPLES ============
         function decodeDataFromURL() {
-            try {
-                console.log('=== DECODIFICANDO DADOS ===');
-                
-                // 1. Pegar hash da URL
-                let hash = window.location.hash;
-                console.log('Hash original:', hash.substring(0, 50) + '...');
-                
-                if (!hash || hash.length < 10) {
-                    throw new Error('Hash não encontrado');
-                }
-                
-                // 2. Extrair base64
-                if (hash.includes('#d=')) {
-                    hash = hash.replace('#d=', '');
-                } else {
-                    hash = hash.replace('#', '');
-                }
-                
-                console.log('Hash limpo:', hash.substring(0, 50) + '...');
-                
-                // 3. Decodificar base64
-                let decodedString;
-                try {
-                    decodedString = atob(hash);
-                } catch (e) {
-                    console.error('Erro no atob:', e);
-                    throw new Error('Erro ao decodificar base64');
-                }
-                
-                console.log('String decodificada:', decodedString.substring(0, 100) + '...');
-                
-                // 4. Parse do payload (formato: times|categorias|escolhas|prazo|user_id|user_nome)
-                const parts = decodedString.split('|');
-                console.log('Partes:', parts.length);
-                
-                if (parts.length < 6) {
-                    throw new Error('Formato de dados inválido');
-                }
-                
-                // TIMES: separados por vírgula
-                const timesStr = parts[0];
-                times = timesStr.split(',').filter(t => t.trim() !== '');
-                console.log('Times carregados:', times.length);
-                
-                // CATEGORIAS: formato codigo:nome: pontos:icone; ...
-                const categoriasStr = parts[1];
-                categorias = [];
-                
-                if (categoriasStr) {
-                    const cats = categoriasStr.split(';');
-                    cats.forEach(cat => {
-                        const catParts = cat.split(':');
-                        if (catParts.length >= 4) {
-                            categorias.push({
-                                item: catParts[0],
-                                nome: catParts[1],
-                                pontos: parseInt(catParts[2]) || 0,
-                                icone: catParts[3] || '⚽'
-                            });
-                        }
-                    });
-                }
-                console.log('Categorias carregadas:', categorias.length);
-                
-                // ESCOLHAS: formato codigo=time; ...
-                const escolhasStr = parts[2];
-                escolhasAnteriores = {};
-                
-                if (escolhasStr) {
-                    const escs = escolhasStr.split(';');
-                    escs.forEach(esc => {
-                        const escParts = esc.split('=');
-                        if (escParts.length === 2) {
-                            escolhasAnteriores[escParts[0]] = escParts[1];
-                        }
-                    });
-                }
-                console.log('Escolhas anteriores:', Object.keys(escolhasAnteriores).length);
-                
-                // PRAZO
-                prazo = parts[3];
-                console.log('Prazo:', prazo);
-                
-                // USUÁRIO
-                usuarioId = parts[4];
-                usuarioNome = parts[5] || 'Usuário';
-                console.log('Usuário:', usuarioNome);
-                
-                return true;
-                
-            } catch (e) {
-                console.error('=== ERRO NA DECODIFICAÇÃO ===');
-                console.error(e);
-                return false;
-            }
+    try {
+        let hash = window.location.hash;
+        if (!hash || hash.length < 5) return false;
+
+        // 1. Pega o dado puro
+        let base64 = hash.replace('#d=', '').replace('#', '');
+        
+        // 2. Converte de URL-Safe para Base64 normal
+        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+        
+        // 3. Adiciona preenchimento (padding)
+        while (base64.length % 4) { base64 += '='; }
+
+        // 4. Decodificação UTF-8 robusta para aceitar emojis
+        const binaryString = atob(base64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
         }
+        const decodedString = new TextDecoder().decode(bytes);
+        
+        const parts = decodedString.split('|');
+        if (parts.length < 6) throw new Error('Dados incompletos');
+
+        times = parts[0].split(',').filter(t => t.trim() !== '');
+        
+        categorias = [];
+        if (parts[1]) {
+            parts[1].split(';').forEach(cat => {
+                const p = cat.split(':');
+                if (p.length >= 4) {
+                    categorias.push({
+                        item: p[0],
+                        nome: p[1],
+                        pontos: parseInt(p[2]),
+                        icone: p[3]
+                    });
+                }
+            });
+        }
+
+        escolhasAnteriores = {};
+        if (parts[2]) {
+            parts[2].split(';').forEach(esc => {
+                const e = esc.split('=');
+                if (e.length === 2) escolhasAnteriores[e[0]] = e[1];
+            });
+        }
+
+        prazo = parts[3];
+        usuarioId = parts[4];
+        usuarioNome = parts[5];
+        
+        return true;
+    } catch (e) {
+        console.error('Erro ao decodificar:', e);
+        return false;
+    }
+}
         
         // ============ ATUALIZAR CRONÔMETRO ============
         function atualizarCronometro() {
