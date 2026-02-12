@@ -300,53 +300,44 @@
         }
         
         // ============ 🔥 DECODIFICADOR UNIVERSAL COM GZIP ============
-        function decodificarBase64ComGzip(base64Url) {
-            try {
-                console.log('🔄 Decodificando Base64 URL-safe com GZIP...');
-                
-                // 1. Converte URL-safe para Base64 padrão
-                let base64 = base64Url
-                    .replace(/-/g, '+')
-                    .replace(/_/g, '/');
-                
-                // 2. Restaura padding
-                while (base64.length % 4) {
-                    base64 += '=';
-                }
-                
-                // 3. Decodifica Base64
-                const compressedData = atob(base64);
-                
-                // 4. Converte string para Uint8Array
-                const compressed = new Uint8Array(compressedData.length);
-                for (let i = 0; i < compressedData.length; i++) {
-                    compressed[i] = compressedData.charCodeAt(i);
-                }
-                
-                // 5. Descomprime com pako.ungzip
-                const decompressed = pako.ungzip(compressed, { to: 'string' });
-                
-                console.log('✅ Descompressão GZIP bem-sucedida');
-                return JSON.parse(decompressed);
-                
-            } catch (e) {
-                console.error('❌ Erro na descompressão GZIP:', e);
-                
-                // FALLBACK: tenta decodificar como JSON puro (sem compressão)
-                try {
-                    console.log('⚠️ Tentando fallback sem GZIP...');
-                    let base64 = base64Url
-                        .replace(/-/g, '+')
-                        .replace(/_/g, '/');
-                    while (base64.length % 4) base64 += '=';
-                    const jsonStr = atob(base64);
-                    return JSON.parse(jsonStr);
-                } catch (e2) {
-                    console.error('❌ Fallback também falhou:', e2);
-                    throw new Error('Formato de dados inválido');
-                }
-            }
+       // ============ 🔥 DECODIFICADOR UNIVERSAL COM GZIP (CORRIGIDO) ============
+function decodificarBase64ComGzip(base64Url) {
+    try {
+        console.log('🔄 Decodificando Base64 URL-safe com GZIP...');
+        
+        // 1. Converte URL-safe para Base64 padrão
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        
+        // 2. Restaura padding
+        while (base64.length % 4) {
+            base64 += '=';
         }
+        
+        // 3. Decodifica Base64 para Binary String
+        const compressedData = atob(base64);
+        
+        // 4. Converte string binária para Uint8Array
+        const compressed = new Uint8Array(compressedData.length);
+        for (let i = 0; i < compressedData.length; i++) {
+            compressed[i] = compressedData.charCodeAt(i);
+        }
+        
+        // 5. Descomprime com pako (Retornando Uint8Array, NÃO string)
+        // Remover { to: 'string' } é crucial para funcionar com TextDecoder
+        const decompressed = pako.ungzip(compressed);
+        
+        // 6. Decodifica UTF-8 corretamente (Resolve problemas de Emojis/Acentos)
+        const jsonStr = new TextDecoder("utf-8").decode(decompressed);
+        
+        console.log('✅ Descompressão GZIP bem-sucedida');
+        return JSON.parse(jsonStr);
+        
+    } catch (e) {
+        console.error('❌ Erro na descompressão GZIP:', e);
+        // Lança o erro para ser capturado pela função principal e exibir na tela
+        throw new Error(`Falha ao processar dados: ${e.message}`);
+    }
+}
         
         // ============ CARREGAR DADOS DE TESTE ============
         function loadTestData() {
@@ -515,95 +506,101 @@
         
         // ============ RENDERIZAR ============
         function renderizarCategorias() {
-            const container = document.getElementById('main-content');
-            
-            let html = `
-                <div class="header">
-                    <div class="title">
-                        <span>⭐ PONTOS EXTRAS 2026</span>
-                    </div>
-                    <div class="countdown">
-                        <div class="countdown-label">ENCERRA EM:</div>
-                        <div class="timer" id="timer">00 DIAS 00:00:00</div>
-                        <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
-                    </div>
-                </div>
-                
-                <div class="progress-section">
-                    <div class="progress-header">
-                        <span>📊 SEU PROGRESSO</span>
-                        <span id="progress-count">0/${categorias.length}</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
-                    </div>
-                </div>
-                
-                <div class="categorias-grid" id="categorias-grid"></div>
-                
-                <div class="acoes">
-                    <button class="btn btn-primary" id="btn-enviar">
-                        <span>✅</span> ENVIAR
-                    </button>
-                    <button class="btn btn-secondary" id="btn-cancelar">
-                        <span>❌</span> CANCELAR
-                    </button>
-                </div>
-            `;
-            
-            container.innerHTML = html;
-            container.style.display = 'block';
-            
-            const grid = document.getElementById('categorias-grid');
-            let preenchidas = 0;
-            
-            categorias.forEach(cat => {
-                const itemKey = cat.item || cat.codigo;
-                const escolhaAnterior = escolhasAnteriores[itemKey] || '';
-                if (escolhaAnterior) preenchidas++;
-                
-                const card = document.createElement('div');
-                card.className = 'categoria-card';
-                
-                let options = '<option value="">⚽ Selecione um time</option>';
-                times.forEach(time => {
-                    const selected = (time === escolhaAnterior) ? 'selected' : '';
-                    options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
-                });
-                
-                card.innerHTML = `
-                    <div class="categoria-icone">${cat.icone || '⚽'}</div>
-                    <div class="categoria-info">
-                        <div class="categoria-nome">${cat.nome || 'Categoria'}</div>
-                        <div class="categoria-pontos">${cat.pontos || 0} pontos</div>
-                    </div>
-                    <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
-                        ${options}
-                    </select>
-                `;
-                
-                grid.appendChild(card);
-            });
-            
-            atualizarProgresso(preenchidas);
-            
-            document.querySelectorAll('.categoria-select').forEach(select => {
-                select.addEventListener('change', function() {
-                    const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
-                    atualizarProgresso(preenchidas);
-                });
-            });
-            
-            document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
-            document.getElementById('btn-cancelar').addEventListener('click', () => {
-                if (tg.close) tg.close(); else window.close();
-            });
-            
-            if (prazo) {
-                atualizarCronometro();
-                timerInterval = setInterval(atualizarCronometro, 1000);
-            }
-        }
+    const container = document.getElementById('main-content');
+    
+    // 1. Monta a estrutura base
+    const htmlHeader = `
+        <div class="header">
+            <div class="title">
+                <span>⭐ PONTOS EXTRAS 2026</span>
+            </div>
+            <div class="countdown">
+                <div class="countdown-label">ENCERRA EM:</div>
+                <div class="timer" id="timer">00 DIAS 00:00:00</div>
+                <div style="margin-top: 12px; font-size: 13px; opacity: 0.8;" id="deadline-info"></div>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-header">
+                <span>📊 SEU PROGRESSO</span>
+                <span id="progress-count">0/${categorias.length}</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        
+        <div class="categorias-grid" id="categorias-grid"></div>
+        
+        <div class="acoes">
+            <button class="btn btn-primary" id="btn-enviar">
+                <span>✅</span> ENVIAR ESCOLHAS
+            </button>
+        </div>
+    `;
+    
+    container.innerHTML = htmlHeader;
+    container.style.display = 'block';
+    
+    // 2. Preenche o Grid (Verifica se existem categorias)
+    const grid = document.getElementById('categorias-grid');
+    
+    if (!categorias || categorias.length === 0) {
+        grid.innerHTML = '<div style="text-align:center; padding:20px;">Nenhuma categoria encontrada.</div>';
+        return;
+    }
+
+    let preenchidas = 0;
+    
+    categorias.forEach(cat => {
+        // Tenta pegar o código do item (compatibilidade com nomes diferentes no DB)
+        const itemKey = cat.item || cat.codigo; 
+        const escolhaAnterior = escolhasAnteriores[itemKey] || '';
+        
+        if (escolhaAnterior) preenchidas++;
+        
+        const card = document.createElement('div');
+        card.className = 'categoria-card';
+        
+        // Monta as opções do Select
+        let options = '<option value="">⚽ Selecione...</option>';
+        times.forEach(time => {
+            const selected = (time === escolhaAnterior) ? 'selected' : '';
+            options += `<option value="${time}" ${selected}>${time}</option>`;
+        });
+        
+        card.innerHTML = `
+            <div class="categoria-icone">${cat.icone || '❓'}</div>
+            <div class="categoria-info">
+                <div class="categoria-nome">${cat.nome || 'Categoria'}</div>
+                <div class="categoria-pontos">${cat.pontos || 0} pts</div>
+            </div>
+            <select class="categoria-select" data-item="${itemKey}" data-pontos="${cat.pontos || 0}">
+                ${options}
+            </select>
+        `;
+        
+        grid.appendChild(card);
+    });
+    
+    // 3. Configura Listeners
+    atualizarProgresso(preenchidas);
+    
+    document.querySelectorAll('.categoria-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const totalPreenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
+            atualizarProgresso(totalPreenchidas);
+        });
+    });
+    
+    document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
+    
+    if (prazo) {
+        atualizarCronometro();
+        timerInterval = setInterval(atualizarCronometro, 1000);
+    }
+}
         
         function atualizarProgresso(preenchidas) {
             const total = categorias.length || 15;
