@@ -11,6 +11,9 @@
     <!-- Telegram WebApp -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
+    <!-- Pako para descompressão -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -163,6 +166,11 @@
             border-color: var(--tg-theme-button-color, #667eea);
         }
         
+        .categoria-select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
         .acoes {
             display: flex;
             gap: 12px;
@@ -229,10 +237,37 @@
             animation: spin 0.8s linear infinite;
         }
         
-        .error-message {
-            color: #ff6b6b;
+        .error-box {
+            background: #ffebee;
+            border-radius: 16px;
+            padding: 24px;
             text-align: center;
-            padding: 20px;
+            max-width: 400px;
+            margin: 20px;
+        }
+        
+        .error-title {
+            color: #d32f2f;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .error-message {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .close-btn {
+            background: var(--tg-theme-button-color, #d32f2f);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
         }
         
         @keyframes spin {
@@ -258,8 +293,11 @@
 <body>
     <div class="loading" id="loading">
         <div class="spinner"></div>
-        <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;">
+        <div style="color: var(--tg-theme-text-color, #2c3e50); font-weight: 600;" id="loading-message">
             Carregando Pontos Extras...
+        </div>
+        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px; margin-top: 8px;" id="loading-detail">
+            Aguarde um momento
         </div>
     </div>
     
@@ -302,105 +340,118 @@
     </div>
     
     <script>
-        // ============ CORREÇÃO COMPLETA ============
-        
-        // Inicializar Telegram WebApp
+        // ============ INICIALIZAÇÃO TELEGRAM ============
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
         
-        // Variáveis globais
+        // ============ VARIÁVEIS GLOBAIS ============
         let times = [];
         let categorias = [];
         let escolhasAnteriores = {};
         let prazo = null;
         let timerInterval = null;
         
-        // ============ FUNÇÃO DE DECODIFICAÇÃO CORRIGIDA ============
+        // ============ FUNÇÃO DE DESCOMPRESSÃO ============
+        function descomprimirDados(base64String) {
+            try {
+                console.log('Iniciando descompressão...');
+                
+                // 1. Reverter substituições de URL
+                let base64 = base64String.replace(/-/g, '+').replace(/_/g, '/');
+                
+                // 2. Adicionar padding se necessário
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                
+                console.log(`Base64 após correção: ${base64.length} caracteres`);
+                
+                // 3. Decodificar base64
+                const binaryString = atob(base64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                console.log(`Bytes decodificados: ${bytes.length}`);
+                
+                // 4. Descomprimir com pako
+                const decompressed = pako.inflate(bytes, { to: 'string' });
+                
+                console.log(`Descomprimido: ${decompressed.length} caracteres`);
+                
+                // 5. Parse JSON
+                const dados = JSON.parse(decompressed);
+                
+                console.log('Dados parseados com sucesso!');
+                
+                return dados;
+                
+            } catch (e) {
+                console.error('Erro na descompressão:', e);
+                throw e;
+            }
+        }
+        
+        // ============ DECODIFICAR DADOS DA URL ============
         function decodeDataFromURL() {
             try {
-                console.log('Iniciando decodificação...');
+                console.log('=== INICIANDO DECODIFICAÇÃO ===');
                 console.log('Hash completo:', window.location.hash);
                 
                 // 1. Verificar se existe hash
                 if (!window.location.hash || window.location.hash.length < 10) {
-                    console.error('Hash não encontrado ou muito curto');
-                    return false;
+                    throw new Error('Hash não encontrado ou muito curto');
                 }
                 
-                // 2. Extrair o base64 - remove o '#data='
+                // 2. Extrair dados - formato #d=BASE64
                 let hash = window.location.hash;
                 
-                // Verificar formato
-                if (hash.includes('#data=')) {
+                if (hash.includes('#d=')) {
+                    hash = hash.replace('#d=', '');
+                } else if (hash.includes('#data=')) {
                     hash = hash.replace('#data=', '');
                 } else {
-                    // Se não tiver #data=, remove só o #
                     hash = hash.replace('#', '');
                 }
                 
-                console.log('Hash após limpeza:', hash.substring(0, 50) + '...');
+                // 3. Remover espaços e quebras de linha
+                hash = hash.trim();
                 
-                // 3. Decodificar base64
-                try {
-                    // Tentar decodificar diretamente
-                    let jsonStr = atob(hash);
-                    console.log('JSON decodificado:', jsonStr.substring(0, 100) + '...');
-                    
-                    // 4. Parse do JSON
-                    let dados = JSON.parse(jsonStr);
-                    console.log('Dados parseados com sucesso!');
-                    
-                    // 5. Extrair dados
-                    times = dados.times || [];
-                    
-                    // IMPORTANTE: Garantir que categorias tenham 'item'
-                    categorias = (dados.categorias || []).map(cat => ({
-                        item: cat.item || cat.codigo || '',  // Prioriza 'item'
-                        nome: cat.nome || '',
-                        pontos: cat.pontos || 0,
-                        icone: cat.icone || '⚽'
-                    })).filter(cat => cat.item); // Remove categorias sem item
-                    
-                    escolhasAnteriores = dados.escolhas || {};
-                    prazo = dados.prazo || null;
-                    
-                    console.log(`Times carregados: ${times.length}`);
-                    console.log(`Categorias carregadas: ${categorias.length}`);
-                    console.log(`Escolhas anteriores: ${Object.keys(escolhasAnteriores).length}`);
-                    
-                    return true;
-                    
-                } catch (e) {
-                    console.error('Erro no decode base64:', e);
-                    
-                    // Tentativa alternativa: decodificar URL component
-                    try {
-                        console.log('Tentando decode alternativo...');
-                        let decodedHash = decodeURIComponent(hash);
-                        let jsonStr = atob(decodedHash);
-                        let dados = JSON.parse(jsonStr);
-                        
-                        times = dados.times || [];
-                        categorias = (dados.categorias || []).map(cat => ({
-                            item: cat.item || cat.codigo || '',
-                            nome: cat.nome || '',
-                            pontos: cat.pontos || 0,
-                            icone: cat.icone || '⚽'
-                        })).filter(cat => cat.item);
-                        escolhasAnteriores = dados.escolhas || {};
-                        prazo = dados.prazo || null;
-                        
-                        console.log('Decode alternativo bem-sucedido!');
-                        return true;
-                    } catch (e2) {
-                        console.error('Erro no decode alternativo:', e2);
-                        return false;
-                    }
-                }
+                console.log('Hash extraído:', hash.substring(0, 50) + '...');
+                console.log('Tamanho do hash:', hash.length);
+                
+                // 4. Descomprimir dados
+                const dados = descomprimirDados(hash);
+                
+                // 5. Extrair dados compactados
+                // Formato: {t: times, c: categorias, e: escolhas, p: prazo, u: usuario}
+                
+                times = dados.t || [];
+                
+                // Converter categorias do formato compactado
+                categorias = (dados.c || []).map(cat => ({
+                    item: cat.i,
+                    nome: cat.n,
+                    pontos: cat.p,
+                    icone: cat.e
+                }));
+                
+                escolhasAnteriores = dados.e || {};
+                prazo = dados.p || null;
+                
+                console.log('=== DADOS CARREGADOS ===');
+                console.log(`Times: ${times.length}`);
+                console.log(`Categorias: ${categorias.length}`);
+                console.log(`Escolhas anteriores: ${Object.keys(escolhasAnteriores).length}`);
+                console.log(`Prazo: ${prazo}`);
+                
+                return true;
                 
             } catch (e) {
-                console.error('Erro geral na decodificação:', e);
+                console.error('=== ERRO NA DECODIFICAÇÃO ===');
+                console.error(e);
                 return false;
             }
         }
@@ -415,13 +466,14 @@
             if (!prazo) return;
             
             try {
-                // Converter prazo para formato ISO
                 let prazoStr = prazo;
+                
+                // Converter para formato ISO
                 if (prazoStr.includes(' ')) {
                     prazoStr = prazoStr.replace(' ', 'T');
                 }
                 
-                // Adicionar fuso horário de Brasília se não tiver
+                // Adicionar timezone de Brasília
                 if (!prazoStr.includes('Z') && !prazoStr.includes('+')) {
                     prazoStr += '-03:00';
                 }
@@ -440,7 +492,7 @@
                     document.getElementById('timer').innerHTML = '00 DIAS 00:00:00';
                     document.getElementById('deadline-info').innerHTML = '⏰ PRAZO ENCERRADO';
                     
-                    // Desabilitar selects e botão
+                    // Desabilitar tudo
                     document.querySelectorAll('.categoria-select').forEach(s => s.disabled = true);
                     document.getElementById('btn-enviar').disabled = true;
                     
@@ -483,7 +535,6 @@
             let preenchidas = 0;
             
             categorias.forEach(cat => {
-                // Usar 'item' como chave
                 const itemKey = cat.item;
                 const escolhaAnterior = escolhasAnteriores[itemKey] || '';
                 
@@ -494,7 +545,6 @@
                 
                 let options = '<option value="">⚽ Selecione um time</option>';
                 
-                // Adicionar opções de times
                 times.forEach(time => {
                     const selected = (time === escolhaAnterior) ? 'selected' : '';
                     options += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
@@ -516,7 +566,7 @@
             
             atualizarProgresso(preenchidas);
             
-            // Adicionar event listeners
+            // Event listeners
             document.querySelectorAll('.categoria-select').forEach(select => {
                 select.addEventListener('change', function() {
                     const preenchidas = document.querySelectorAll('.categoria-select option:checked:not([value=""])').length;
@@ -540,7 +590,7 @@
             selects.forEach(select => {
                 if (select.value) {
                     escolhas.push({
-                        item: select.dataset.item,  // IMPORTANTE: enviar 'item'
+                        item: select.dataset.item,
                         time: select.value,
                         pontos: parseInt(select.dataset.pontos)
                     });
@@ -561,91 +611,78 @@
             
             tg.showConfirm(`✅ Confirmar ${escolhas.length}/15 palpites?`, (confirmed) => {
                 if (confirmed) {
-                    // Enviar dados para o bot
                     tg.sendData(JSON.stringify({ 
                         escolhas: escolhas 
                     }));
-                    
-                    // Fechar WebApp
                     tg.close();
                 }
             });
         }
         
+        // ============ MOSTRAR ERRO ============
+        function mostrarErro(titulo, mensagem) {
+            const loading = document.getElementById('loading');
+            const loadingMsg = document.getElementById('loading-message');
+            const loadingDetail = document.getElementById('loading-detail');
+            
+            loadingMsg.style.color = '#d32f2f';
+            loadingMsg.innerHTML = `❌ ${titulo}`;
+            loadingDetail.innerHTML = mensagem;
+            
+            // Adicionar botão de fechar
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'close-btn';
+            closeBtn.innerHTML = 'FECHAR';
+            closeBtn.onclick = () => tg.close();
+            closeBtn.style.marginTop = '20px';
+            
+            loading.appendChild(closeBtn);
+        }
+        
         // ============ INICIALIZAÇÃO ============
         function init() {
-            console.log('Inicializando WebApp...');
+            console.log('=== INICIALIZANDO WEB APP ===');
             
             const loading = document.getElementById('loading');
             const mainContent = document.getElementById('main-content');
             
-            // Tentar decodificar dados
-            if (!decodeDataFromURL()) {
-                console.error('Falha ao decodificar dados');
-                
-                loading.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">❌</div>
-                        <div style="color: #ff6b6b; font-weight: 700; font-size: 18px; margin-bottom: 10px;">
-                            Erro ao carregar dados
-                        </div>
-                        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px; margin-bottom: 20px;">
-                            Não foi possível carregar as informações dos Pontos Extras.
-                        </div>
-                        <button onclick="window.Telegram.WebApp.close()" 
-                                style="background: var(--tg-theme-button-color, #667eea); 
-                                       color: white; 
-                                       border: none; 
-                                       padding: 12px 24px; 
-                                       border-radius: 12px; 
-                                       font-weight: 600;
-                                       cursor: pointer;">
-                            FECHAR
-                        </button>
-                    </div>
-                `;
+            // Verificar se pako foi carregado
+            if (typeof pako === 'undefined') {
+                mostrarErro(
+                    'Erro de Carregamento',
+                    'Biblioteca de compressão não carregada. Tente novamente.'
+                );
                 return;
             }
             
-            // Verificar se carregou os dados necessários
+            // Decodificar dados
+            if (!decodeDataFromURL()) {
+                mostrarErro(
+                    'Erro ao Carregar Dados',
+                    'Não foi possível carregar as informações dos Pontos Extras.\n\n' +
+                    '• Verifique se o link é válido\n' +
+                    '• Tente novamente mais tarde\n' +
+                    '• Entre em contato com o administrador'
+                );
+                return;
+            }
+            
+            // Validar dados
             if (!times || times.length === 0) {
-                loading.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-                        <div style="color: #ff6b6b; font-weight: 700; font-size: 18px; margin-bottom: 10px;">
-                            Times não importados
-                        </div>
-                        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px; margin-bottom: 20px;">
-                            O administrador ainda não importou a lista de times.
-                            Aguarde o convite no grupo.
-                        </div>
-                        <button onclick="window.Telegram.WebApp.close()" 
-                                style="background: var(--tg-theme-button-color, #667eea); 
-                                       color: white; 
-                                       border: none; 
-                                       padding: 12px 24px; 
-                                       border-radius: 12px; 
-                                       font-weight: 600;
-                                       cursor: pointer;">
-                            FECHAR
-                        </button>
-                    </div>
-                `;
+                mostrarErro(
+                    'Times não Importados',
+                    'O administrador ainda não importou a lista de times.\n\n' +
+                    'Aguarde o convite no grupo oficial.'
+                );
                 return;
             }
             
             if (!categorias || categorias.length === 0) {
-                loading.innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-                        <div style="color: #ff6b6b; font-weight: 700; font-size: 18px; margin-bottom: 10px;">
-                            Categorias não carregadas
-                        </div>
-                        <div style="color: var(--tg-theme-hint-color, #666); font-size: 14px;">
-                            Erro ao carregar categorias de pontuação.
-                        </div>
-                    </div>
-                `;
+                mostrarErro(
+                    'Erro de Configuração',
+                    'Categorias de pontuação não foram carregadas.\n\n' +
+                    'Entre em contato com o administrador.'
+                );
                 return;
             }
             
@@ -656,22 +693,32 @@
             atualizarCronometro();
             timerInterval = setInterval(atualizarCronometro, 1000);
             
-            // Event listeners dos botões
+            // Event listeners
             document.getElementById('btn-enviar').addEventListener('click', enviarEscolhas);
             document.getElementById('btn-cancelar').addEventListener('click', () => tg.close());
             
-            // Mostrar conteúdo e esconder loading
+            // Mostrar conteúdo
             loading.style.display = 'none';
             mainContent.style.display = 'block';
             
-            console.log('WebApp inicializado com sucesso!');
+            console.log('=== WEB APP INICIALIZADO COM SUCESSO ===');
         }
         
         // Iniciar quando a página carregar
         window.addEventListener('load', init);
         
-        // Garantir que o Telegram WebApp está pronto
-        window.Telegram.WebApp.ready();
+        // Timeout de segurança
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            if (loading.style.display !== 'none') {
+                mostrarErro(
+                    'Tempo Limite Excedido',
+                    'O carregamento está demorando mais que o esperado.\n\n' +
+                    '• Verifique sua conexão\n' +
+                    '• Clique em FECHAR e tente novamente'
+                );
+            }
+        }, 10000);
     </script>
 </body>
 </html>
