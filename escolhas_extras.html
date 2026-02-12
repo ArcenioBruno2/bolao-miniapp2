@@ -13,10 +13,9 @@
         }
 
         body {
-            background: linear-gradient(145deg, #0a1c2e 0%, #152a38 100%);
-            min-height: 100vh;
-            padding: 16px;
+            background: #0f2128;
             color: white;
+            padding: 16px;
         }
 
         .container {
@@ -31,10 +30,8 @@
 
         .header h1 {
             font-size: 26px;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+            color: #FFD700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .loading {
@@ -42,14 +39,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 60vh;
+            min-height: 80vh;
             gap: 20px;
         }
 
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid rgba(255,215,0,0.3);
+            border: 4px solid rgba(255,215,0,0.2);
             border-top: 4px solid #FFD700;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -60,47 +57,20 @@
             100% { transform: rotate(360deg); }
         }
 
-        .erro-box {
-            background: rgba(244, 67, 54, 0.15);
-            border: 1px solid #f44336;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .erro-titulo {
-            color: #ff8a80;
-            font-size: 20px;
-            margin-bottom: 12px;
-        }
-
-        .erro-detalhe {
-            color: rgba(255,255,255,0.7);
-            font-size: 14px;
-            margin-top: 12px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            word-break: break-all;
-            font-family: monospace;
-        }
-
         .prazo-box {
-            background: rgba(255,215,0,0.12);
-            border: 1px solid rgba(255,215,0,0.3);
-            border-radius: 14px;
-            padding: 14px;
+            background: #1a2f3a;
+            border-left: 4px solid #FFD700;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .progresso {
-            background: rgba(0,0,0,0.25);
-            border-radius: 16px;
+            background: #1a2f3a;
+            border-radius: 12px;
             padding: 16px;
             margin-bottom: 24px;
         }
@@ -108,110 +78,115 @@
         .progresso-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .progresso-contador {
+        .contador {
             color: #FFD700;
             font-weight: bold;
-            font-size: 20px;
+            font-size: 22px;
         }
 
-        .barra-progresso {
+        .barra-container {
             width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            height: 10px;
+            background: #2a404a;
+            border-radius: 5px;
             overflow: hidden;
         }
 
-        .barra-preenchimento {
+        .barra {
             height: 100%;
             background: linear-gradient(90deg, #4CAF50, #8BC34A);
             width: 0%;
             transition: width 0.3s;
         }
 
-        .categoria-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 18px;
+        .categoria {
+            background: #1a2f3a;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
+            border: 1px solid #2a404a;
+        }
+
+        .categoria.preenchida {
+            border-color: #4CAF50;
+            background: #1a3a3a;
         }
 
         .categoria-header {
             display: flex;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
-        .categoria-icone {
+        .icone {
             font-size: 28px;
             margin-right: 12px;
         }
 
-        .categoria-nome {
+        .info {
+            flex: 1;
+        }
+
+        .nome {
             font-size: 16px;
             font-weight: 600;
+            margin-bottom: 4px;
         }
 
-        .categoria-pontos {
+        .pontos {
             font-size: 13px;
             color: #FFD700;
-            background: rgba(255,215,0,0.15);
-            padding: 3px 10px;
+            background: rgba(255,215,0,0.1);
+            padding: 2px 10px;
             border-radius: 20px;
-            margin-left: 10px;
-        }
-
-        .select-wrapper {
-            position: relative;
+            display: inline-block;
         }
 
         select {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 14px;
+            background: #0f2128;
+            border: 1px solid #2a404a;
+            border-radius: 12px;
             color: white;
             font-size: 15px;
             appearance: none;
             cursor: pointer;
         }
 
+        select:focus {
+            outline: none;
+            border-color: #FFD700;
+        }
+
         select option {
-            background: #1e3a4a;
+            background: #0f2128;
             color: white;
             padding: 12px;
         }
 
-        .select-arrow {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #FFD700;
-            pointer-events: none;
-        }
-
         .escolha-atual {
-            margin-top: 10px;
+            margin-top: 12px;
             padding: 10px 14px;
             background: rgba(255,215,0,0.1);
-            border-radius: 12px;
+            border-radius: 10px;
             font-size: 14px;
             color: #FFD700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-salvar {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
+            background: #FFD700;
             border: none;
             border-radius: 30px;
-            color: #0a1c2e;
+            color: #0f2128;
             font-size: 18px;
             font-weight: 700;
             display: flex;
@@ -219,95 +194,99 @@
             justify-content: center;
             gap: 10px;
             cursor: pointer;
-            margin-top: 20px;
-            margin-bottom: 30px;
-            transition: transform 0.2s;
+            margin: 24px 0 40px;
+            transition: opacity 0.2s;
         }
 
         .btn-salvar:active {
-            transform: scale(0.98);
+            opacity: 0.8;
         }
 
         .btn-salvar:disabled {
             opacity: 0.5;
-            transform: none;
+            cursor: not-allowed;
         }
 
-        .debug-info {
-            margin-top: 30px;
-            padding: 16px;
-            background: rgba(0,0,0,0.4);
+        .erro {
+            background: #442222;
+            border-left: 4px solid #ff4444;
+            padding: 20px;
             border-radius: 12px;
+            margin: 20px 0;
+            color: #ff8888;
+        }
+
+        .hash-info {
+            background: #0a1a1a;
+            padding: 12px;
+            border-radius: 8px;
             font-size: 12px;
-            color: #aaa;
+            font-family: monospace;
             word-break: break-all;
+            margin-top: 20px;
+            color: #aaa;
         }
     </style>
     
-    <!-- Carregar bibliotecas necessárias -->
+    <!-- Pako para descompressão GZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div id="app">
-            <!-- Tela de Loading -->
-            <div id="tela-loading" class="loading">
+            <!-- Loading -->
+            <div id="loading-screen" class="loading">
                 <div class="spinner"></div>
-                <h3>⭐ Carregando Pontos Extras...</h3>
-                <p style="color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 10px;" id="status-loading">Decodificando dados...</p>
+                <h2 style="color: #FFD700;">Carregando...</h2>
+                <p id="loading-status" style="color: #aaa;">Decodificando dados</p>
             </div>
 
-            <!-- Tela de Erro (inicialmente escondida) -->
-            <div id="tela-erro" style="display: none;">
-                <div class="erro-box">
-                    <div style="font-size: 48px; margin-bottom: 16px;">❌</div>
-                    <div class="erro-titulo" id="erro-titulo">Erro ao carregar dados</div>
-                    <p id="erro-mensagem" style="color: rgba(255,255,255,0.8);">Não foi possível carregar as informações.</p>
-                    <div id="erro-detalhe" class="erro-detalhe"></div>
-                    <button onclick="window.location.reload()" style="margin-top: 24px; padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0a1c2e; font-weight: bold; cursor: pointer;">
-                        🔄 TENTAR NOVAMENTE
+            <!-- Erro -->
+            <div id="error-screen" style="display: none;">
+                <div class="erro">
+                    <h3 style="color: #ff8888; margin-bottom: 12px;">❌ Erro ao carregar</h3>
+                    <p id="error-message"></p>
+                    <div id="error-details" style="margin-top: 16px; font-size: 12px; background: #331111; padding: 12px; border-radius: 6px;"></div>
+                    <button onclick="window.location.reload()" style="margin-top: 20px; padding: 12px 30px; background: #FFD700; border: none; border-radius: 30px; color: #0f2128; font-weight: bold; cursor: pointer;">
+                        🔄 Tentar Novamente
                     </button>
                 </div>
             </div>
 
-            <!-- Tela Principal (inicialmente escondida) -->
-            <div id="tela-principal" style="display: none;">
+            <!-- Conteúdo Principal -->
+            <div id="main-screen" style="display: none;">
                 <div class="header">
                     <h1>⭐ PONTOS EXTRAS 2026</h1>
                 </div>
 
-                <!-- Prazo será inserido aqui via JS -->
+                <!-- Prazo -->
                 <div id="prazo-container"></div>
 
                 <!-- Progresso -->
                 <div class="progresso">
                     <div class="progresso-header">
                         <span>🎯 Seus palpites</span>
-                        <span class="progresso-contador" id="contador">0/0</span>
+                        <span class="contador" id="contador">0/15</span>
                     </div>
-                    <div class="barra-progresso">
-                        <div class="barra-preenchimento" id="barra-progresso" style="width: 0%;"></div>
+                    <div class="barra-container">
+                        <div class="barra" id="barra-progresso"></div>
                     </div>
                 </div>
 
-                <!-- Lista de Categorias -->
+                <!-- Categorias -->
                 <div id="categorias-container"></div>
 
                 <!-- Botão Salvar -->
                 <button class="btn-salvar" id="btn-salvar">
-                    💾 SALVAR PALPITES
+                    💾 SALVAR ESCOLHAS
                 </button>
-
-                <!-- Debug (opcional, pode remover em produção) -->
-                <div id="debug-info" class="debug-info" style="display: none;"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // DECODIFICAÇÃO - VERSÃO SIMPLIFICADA E ROBUSTA
-        // ============================================
+        // ==================== DECODIFICADOR SIMPLIFICADO ====================
+        // Baseado no log: JSON 1640 bytes -> GZIP 633 bytes -> Base64 844 chars
         
         console.log('🚀 Iniciando WebApp...');
         
@@ -315,208 +294,165 @@
         if (Telegram) {
             Telegram.expand();
             Telegram.ready();
-            console.log('✅ Telegram WebApp inicializado');
+            console.log('✅ Telegram WebApp ready');
         }
 
         // Elementos da UI
-        const telaLoading = document.getElementById('tela-loading');
-        const telaErro = document.getElementById('tela-erro');
-        const telaPrincipal = document.getElementById('tela-principal');
-        const statusLoading = document.getElementById('status-loading');
+        const loadingScreen = document.getElementById('loading-screen');
+        const errorScreen = document.getElementById('error-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const loadingStatus = document.getElementById('loading-status');
 
-        function mostrarErro(titulo, mensagem, detalhe = '') {
-            console.error('❌ Erro:', titulo, mensagem, detalhe);
-            telaLoading.style.display = 'none';
-            telaErro.style.display = 'block';
-            telaPrincipal.style.display = 'none';
-            
-            document.getElementById('erro-titulo').textContent = titulo || 'Erro ao carregar dados';
-            document.getElementById('erro-mensagem').textContent = mensagem || 'Tente novamente mais tarde.';
-            
-            const elDetalhe = document.getElementById('erro-detalhe');
-            if (detalhe) {
-                elDetalhe.textContent = detalhe;
-                elDetalhe.style.display = 'block';
-            } else {
-                elDetalhe.style.display = 'none';
-            }
-        }
-
-        // ============ FUNÇÃO PRINCIPAL DE DECODIFICAÇÃO ============
-        function decodificarDados() {
+        // ==================== FUNÇÃO DE DECODIFICAÇÃO ====================
+        function decodeDataFromHash() {
             try {
-                statusLoading.textContent = '📦 Lendo dados da URL...';
-                
-                // Pega o hash da URL (tudo depois de #)
+                // 1. Pegar o hash da URL (tudo após #)
                 const hash = window.location.hash.substring(1);
                 
                 if (!hash) {
-                    throw new Error('Nenhum dado encontrado na URL');
+                    throw new Error('❌ Nenhum dado encontrado na URL');
                 }
+
+                console.log('📦 Hash length:', hash.length);
+                console.log('📦 Hash preview:', hash.substring(0, 50) + '...');
                 
-                console.log('🔍 Hash encontrado (primeiros 50 chars):', hash.substring(0, 50) + '...');
-                console.log('📏 Tamanho do hash:', hash.length, 'caracteres');
-                
-                statusLoading.textContent = `🔧 Decodificando Base64 (${hash.length} chars)...`;
-                
-                // 1. Converter base64url para base64 padrão
+                loadingStatus.textContent = `📦 Dados: ${hash.length} caracteres`;
+
+                // 2. Converter base64url -> base64
                 let base64 = hash.replace(/-/g, '+').replace(/_/g, '/');
                 
-                // 2. Adicionar padding se necessário
+                // 3. Adicionar padding
                 while (base64.length % 4) {
                     base64 += '=';
                 }
                 
-                console.log('📏 Base64 após padding:', base64.length, 'chars');
-                
-                // 3. Decodificar base64 para bytes
-                let bytesComprimidos;
+                console.log('📦 Base64 length:', base64.length);
+                loadingStatus.textContent = '🔓 Decodificando Base64...';
+
+                // 4. Decodificar base64
+                let compressed;
                 try {
-                    bytesComprimidos = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-                    console.log('📦 Bytes comprimidos:', bytesComprimidos.length, 'bytes');
+                    compressed = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+                    console.log('📦 Compressed size:', compressed.length, 'bytes');
                 } catch (e) {
-                    throw new Error('Falha na decodificação Base64: ' + e.message);
+                    throw new Error('Erro na decodificação Base64: ' + e.message);
                 }
+
+                // 5. Descomprimir GZIP
+                loadingStatus.textContent = `📦 Descomprimindo (${compressed.length} bytes)...`;
                 
-                statusLoading.textContent = `🔓 Descomprimindo GZIP (${bytesComprimidos.length} bytes)...`;
-                
-                // 4. Descomprimir com pako
-                let bytesDescomprimidos;
+                let decompressed;
                 try {
-                    bytesDescomprimidos = pako.ungzip(bytesComprimidos);
-                    console.log('📦 Bytes descomprimidos:', bytesDescomprimidos.length, 'bytes');
-                    console.log('📊 Taxa de compressão:', ((bytesComprimidos.length / bytesDescomprimidos.length) * 100).toFixed(1) + '%');
+                    decompressed = pako.ungzip(compressed);
+                    console.log('📦 Decompressed size:', decompressed.length, 'bytes');
                 } catch (e) {
-                    throw new Error('Falha na descompressão GZIP: ' + e.message);
+                    console.error('Erro pako:', e);
+                    throw new Error('Erro na descompressão GZIP: ' + e.message);
                 }
+
+                // 6. Converter para texto
+                loadingStatus.textContent = '📄 Parseando JSON...';
                 
-                statusLoading.textContent = '📄 Parseando JSON...';
+                const jsonText = new TextDecoder('utf-8').decode(decompressed);
+                console.log('📄 JSON preview:', jsonText.substring(0, 200) + '...');
+
+                // 7. Parse JSON
+                const data = JSON.parse(jsonText);
+                console.log('✅ Dados carregados:', data);
                 
-                // 5. Converter bytes para string JSON
-                let jsonStr;
-                try {
-                    jsonStr = new TextDecoder('utf-8').decode(bytesDescomprimidos);
-                    console.log('📄 JSON string (primeiros 100 chars):', jsonStr.substring(0, 100) + '...');
-                } catch (e) {
-                    throw new Error('Falha na decodificação UTF-8: ' + e.message);
-                }
-                
-                // 6. Parse JSON
-                let dados;
-                try {
-                    dados = JSON.parse(jsonStr);
-                    console.log('✅ JSON parseado com sucesso!');
-                } catch (e) {
-                    throw new Error('Falha no parse do JSON: ' + e.message);
-                }
-                
-                return dados;
-                
+                return data;
+
             } catch (error) {
                 console.error('❌ Erro na decodificação:', error);
                 throw error;
             }
         }
 
-        // ============ RENDERIZAÇÃO DA INTERFACE ============
-        function renderizarInterface(dados) {
-            console.log('🎨 Renderizando interface...', dados);
+        // ==================== RENDERIZAR INTERFACE ====================
+        function renderizarDados(data) {
+            if (!data) throw new Error('Dados vazios');
             
-            // Validar dados
-            if (!dados) {
-                throw new Error('Dados inválidos');
-            }
+            // Extrair dados
+            const times = data.times || [];
+            const categorias = data.categorias || [];
+            const escolhasSalvas = data.escolhas || {};
+            const prazo = data.prazo || '';
+            const usuario = data.usuario || {};
             
-            const times = dados.times || [];
-            const categorias = dados.categorias || [];
-            const escolhas = dados.escolhas || {};
-            const prazo = dados.prazo || '';
-            const usuario = dados.usuario || { nome: 'Usuário' };
-            
-            console.log(`📊 Times: ${times.length} | Categorias: ${categorias.length} | Escolhas: ${Object.keys(escolhas).length}`);
+            console.log(`📊 Times: ${times.length}, Categorias: ${categorias.length}, Escolhas: ${Object.keys(escolhasSalvas).length}`);
             
             if (times.length === 0) {
-                throw new Error('Nenhum time importado');
+                throw new Error('Nenhum time carregado');
             }
             
             if (categorias.length === 0) {
-                throw new Error('Nenhuma categoria encontrada');
+                throw new Error('Nenhuma categoria carregada');
             }
-            
-            // Esconder loading, mostrar tela principal
-            telaLoading.style.display = 'none';
-            telaPrincipal.style.display = 'block';
-            
+
+            // Esconder loading, mostrar main
+            loadingScreen.style.display = 'none';
+            mainScreen.style.display = 'block';
+
             // ============ PRAZO ============
             const prazoContainer = document.getElementById('prazo-container');
             if (prazo) {
-                const [data, hora] = prazo.split(' ');
-                const [ano, mes, dia] = data.split('-');
-                const dataFormatada = `${dia}/${mes}/${ano} às ${hora}`;
+                const [dataPart, horaPart] = prazo.split(' ');
+                const [ano, mes, dia] = dataPart.split('-');
+                const dataFormatada = `${dia}/${mes}/${ano} às ${horaPart}`;
                 
                 prazoContainer.innerHTML = `
                     <div class="prazo-box">
                         <span style="font-size: 24px;">⏰</span>
-                        <span style="font-weight: 600; color: #FFD700;">Encerra: ${dataFormatada}</span>
-                        <span style="background: #FFD700; color: #0a1c2e; padding: 4px 12px; border-radius: 30px; font-size: 13px; font-weight: bold;">
-                            HORÁRIO DE BRASÍLIA
-                        </span>
+                        <div>
+                            <div style="font-weight: bold; color: #FFD700;">Encerramento</div>
+                            <div style="font-size: 15px;">${dataFormatada} (Brasília)</div>
+                        </div>
                     </div>
                 `;
             }
-            
+
             // ============ CATEGORIAS ============
-            const categoriasContainer = document.getElementById('categorias-container');
-            categoriasContainer.innerHTML = '';
-            
-            // Contador de preenchidos
-            let preenchidos = 0;
-            
-            // Ordenar categorias por ordem (já devem vir ordenadas, mas garantimos)
-            const categoriasOrdenadas = [...categorias].sort((a, b) => {
-                const ordemA = dados.ordens?.[a.item] || 0;
-                const ordemB = dados.ordens?.[b.item] || 0;
-                return ordemA - ordemB;
-            });
-            
-            categoriasOrdenadas.forEach(cat => {
-                const codigo = cat.item;
+            const container = document.getElementById('categorias-container');
+            container.innerHTML = '';
+
+            // Guardar escolhas atuais para referência
+            window.escolhasAtuais = { ...escolhasSalvas };
+            window.escolhasTemp = { ...escolhasSalvas };
+
+            // Renderizar cada categoria
+            categorias.forEach((cat, index) => {
+                const codigo = cat.item || cat.codigo;
                 const nome = cat.nome;
                 const icone = cat.icone || '⚽';
                 const pontos = cat.pontos || 0;
                 
-                const escolhaAtual = escolhas[codigo] || '';
+                const escolhaAtual = escolhasSalvas[codigo] || '';
                 const temEscolha = !!escolhaAtual;
-                
-                if (temEscolha) preenchidos++;
-                
-                // Criar card da categoria
+
                 const card = document.createElement('div');
-                card.className = `categoria-card ${temEscolha ? 'preenchida' : ''}`;
-                card.setAttribute('data-codigo', codigo);
-                
+                card.className = `categoria ${temEscolha ? 'preenchida' : ''}`;
+                card.dataset.codigo = codigo;
+
                 // Header
                 const header = document.createElement('div');
                 header.className = 'categoria-header';
                 header.innerHTML = `
-                    <span class="categoria-icone">${icone}</span>
-                    <span class="categoria-nome">${nome}</span>
-                    <span class="categoria-pontos">${pontos} pts</span>
+                    <span class="icone">${icone}</span>
+                    <div class="info">
+                        <div class="nome">${nome}</div>
+                        <span class="pontos">${pontos} pontos</span>
+                    </div>
                 `;
-                
-                // Select wrapper
-                const selectWrapper = document.createElement('div');
-                selectWrapper.className = 'select-wrapper';
-                
-                // Criar select
+
+                // Select
                 const select = document.createElement('select');
-                select.setAttribute('data-codigo', codigo);
+                select.dataset.codigo = codigo;
                 
                 // Opção vazia
-                const optionVazia = document.createElement('option');
-                optionVazia.value = '';
-                optionVazia.textContent = '🔽 Selecione um time...';
-                select.appendChild(optionVazia);
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = '🔽 Escolha um time...';
+                select.appendChild(emptyOption);
                 
                 // Opções dos times
                 times.forEach(time => {
@@ -528,96 +464,79 @@
                     }
                     select.appendChild(option);
                 });
-                
-                // Arrow do select
-                const arrow = document.createElement('span');
-                arrow.className = 'select-arrow';
-                arrow.textContent = '▼';
-                
-                selectWrapper.appendChild(select);
-                selectWrapper.appendChild(arrow);
-                
+
                 card.appendChild(header);
-                card.appendChild(selectWrapper);
-                
-                // Mostrar escolha atual se houver
+                card.appendChild(select);
+
+                // Mostrar escolha atual
                 if (temEscolha) {
                     const escolhaDiv = document.createElement('div');
                     escolhaDiv.className = 'escolha-atual';
                     escolhaDiv.innerHTML = `
-                        <span>✅ Escolhido:</span>
-                        <strong style="margin-left: 8px;">${escolhaAtual}</strong>
+                        <span>✅</span>
+                        <span style="font-weight: 600;">${escolhaAtual}</span>
                     `;
                     card.appendChild(escolhaDiv);
                 }
-                
-                categoriasContainer.appendChild(card);
-                
-                // Adicionar evento de mudança
+
+                container.appendChild(card);
+
+                // Evento de mudança
                 select.addEventListener('change', function(e) {
                     const cod = this.dataset.codigo;
                     const valor = this.value;
                     
-                    // Atualizar contador
-                    atualizarContador();
+                    window.escolhasTemp[cod] = valor;
                     
-                    // Mostrar/esconder badge de escolha atual
-                    const escolhaDiv = card.querySelector('.escolha-atual');
+                    // Atualizar visual
                     if (valor) {
+                        card.classList.add('preenchida');
+                        
+                        let escolhaDiv = card.querySelector('.escolha-atual');
                         if (escolhaDiv) {
                             escolhaDiv.innerHTML = `
-                                <span>✅ Escolhido:</span>
-                                <strong style="margin-left: 8px;">${valor}</strong>
+                                <span>✅</span>
+                                <span style="font-weight: 600;">${valor}</span>
                             `;
                         } else {
-                            const novaEscolhaDiv = document.createElement('div');
-                            novaEscolhaDiv.className = 'escolha-atual';
-                            novaEscolhaDiv.innerHTML = `
-                                <span>✅ Escolhido:</span>
-                                <strong style="margin-left: 8px;">${valor}</strong>
+                            const novaDiv = document.createElement('div');
+                            novaDiv.className = 'escolha-atual';
+                            novaDiv.innerHTML = `
+                                <span>✅</span>
+                                <span style="font-weight: 600;">${valor}</span>
                             `;
-                            card.appendChild(novaEscolhaDiv);
+                            card.appendChild(novaDiv);
                         }
-                        
-                        // Marcar como preenchida
-                        card.classList.add('preenchida');
                     } else {
-                        if (escolhaDiv) {
-                            escolhaDiv.remove();
-                        }
                         card.classList.remove('preenchida');
+                        const escolhaDiv = card.querySelector('.escolha-atual');
+                        if (escolhaDiv) escolhaDiv.remove();
                     }
                     
-                    // Marcar que houve alteração
-                    window.escolhasAlteradas = true;
+                    atualizarContador();
+                    window.escolhasModificadas = true;
                 });
             });
-            
-            // ============ CONTADOR INICIAL ============
-            const contadorEl = document.getElementById('contador');
-            const barraEl = document.getElementById('barra-progresso');
-            
+
+            // ============ CONTADOR ============
             function atualizarContador() {
                 const selects = document.querySelectorAll('select[data-codigo]');
-                let preenchidosAgora = 0;
-                
+                let count = 0;
                 selects.forEach(select => {
-                    if (select.value) preenchidosAgora++;
+                    if (select.value) count++;
                 });
                 
-                contadorEl.textContent = `${preenchidosAgora}/${categorias.length}`;
-                const percentual = (preenchidosAgora / categorias.length) * 100;
-                barraEl.style.width = percentual + '%';
+                document.getElementById('contador').textContent = `${count}/${categorias.length}`;
+                const percent = (count / categorias.length) * 100;
+                document.getElementById('barra-progresso').style.width = percent + '%';
             }
             
-            // Inicializar contador
             atualizarContador();
-            
+
             // ============ BOTÃO SALVAR ============
             const btnSalvar = document.getElementById('btn-salvar');
             
             btnSalvar.onclick = function() {
-                // Coletar todas as escolhas
                 const selects = document.querySelectorAll('select[data-codigo]');
                 const escolhasArray = [];
                 
@@ -633,72 +552,48 @@
                     }
                 });
                 
-                console.log('📤 Enviando escolhas:', escolhasArray);
+                console.log('📤 Enviando escolhas:', escolhasArray.length);
                 
-                // Enviar para o bot
+                const payload = JSON.stringify({ escolhas: escolhasArray });
+                
                 if (Telegram) {
-                    Telegram.sendData(JSON.stringify({
-                        escolhas: escolhasArray
-                    }));
-                    
-                    // Feedback
-                    Telegram.showAlert(`✅ ${escolhasArray.length} palpites salvos com sucesso!`);
+                    Telegram.sendData(payload);
+                    Telegram.showAlert(`✅ ${escolhasArray.length} palpites salvos!`);
                 } else {
-                    alert('Fora do Telegram. Escolhas: ' + JSON.stringify(escolhasArray));
+                    alert('Escolhas: ' + payload);
                 }
             };
-            
-            // Debug (opcional)
-            if (window.location.hash.includes('debug')) {
-                const debugEl = document.getElementById('debug-info');
-                debugEl.style.display = 'block';
-                debugEl.innerHTML = `
-                    <strong>🔍 DEBUG INFO</strong><br>
-                    Times: ${times.length}<br>
-                    Categorias: ${categorias.length}<br>
-                    Escolhas carregadas: ${Object.keys(escolhas).length}<br>
-                    Usuário: ${usuario.nome || 'N/A'}<br>
-                    Prazo: ${prazo || 'N/A'}<br>
-                    Hash length: ${window.location.hash.length}
-                `;
-            }
         }
 
-        // ============ EXECUÇÃO PRINCIPAL ============
+        // ==================== INICIALIZAÇÃO ====================
         try {
-            // Tentar decodificar os dados
-            const dados = decodificarDados();
+            // Verificar se pako carregou
+            if (typeof pako === 'undefined') {
+                throw new Error('Biblioteca pako não carregada');
+            }
             
-            // Se chegou aqui, sucesso!
-            console.log('✅ Dados decodificados:', dados);
+            // Decodificar dados
+            const dados = decodeDataFromHash();
             
-            // Renderizar interface
-            renderizarInterface(dados);
+            // Renderizar
+            renderizarDados(dados);
             
         } catch (error) {
             console.error('❌ Erro fatal:', error);
             
-            // Mostrar erro detalhado
-            mostrarErro(
-                'Falha na decodificação',
-                'Não foi possível carregar os dados do bolão.',
-                error.message + '\n\nHash: ' + window.location.hash.substring(0, 100) + '...'
-            );
+            loadingScreen.style.display = 'none';
+            errorScreen.style.display = 'block';
             
-            // Tentar mostrar o hash para debug
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                console.log('Hash completo:', hash);
-            }
-        }
-
-        // Verificar se pako foi carregado
-        if (typeof pako === 'undefined') {
-            mostrarErro(
-                'Biblioteca não carregada',
-                'Erro ao carregar pako.min.js. Verifique sua conexão.',
-                'Tente recarregar a página.'
-            );
+            document.getElementById('error-message').innerHTML = error.message;
+            
+            const details = document.getElementById('error-details');
+            details.innerHTML = `
+                <strong>Hash:</strong> ${window.location.hash.substring(0, 100)}...<br>
+                <strong>Hash length:</strong> ${window.location.hash.length}<br>
+                <strong>User Agent:</strong> ${navigator.userAgent}<br>
+                <strong>Pako:</strong> ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
+                <strong>Telegram:</strong> ${Telegram ? '✅' : '❌'}<br>
+            `;
         }
     </script>
 </body>
