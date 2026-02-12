@@ -299,43 +299,53 @@
                    window.location.hostname === '127.0.0.1';
         }
         
-        // ============ 🔥 DECODIFICADOR UNIVERSAL COM GZIP ============
-       // ============ 🔥 DECODIFICADOR UNIVERSAL COM GZIP (CORRIGIDO) ============
+       // ============ 🔥 DECODIFICADOR CORRIGIDO E ROBUSTO ============
 function decodificarBase64ComGzip(base64Url) {
     try {
-        console.log('🔄 Decodificando Base64 URL-safe com GZIP...');
-        
-        // 1. Converte URL-safe para Base64 padrão
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        
-        // 2. Restaura padding
-        while (base64.length % 4) {
+        console.log('🔄 Iniciando decodificação...');
+
+        // 1. LIMPEZA E PADRONIZAÇÃO
+        // Remove o '#' do início se vier junto
+        // Remove espaços em branco acidentais
+        let base64 = base64Url.trim().replace(/^#/, '');
+
+        // 2. CONVERSÃO URL-SAFE -> STANDARD
+        // Troca '-' por '+' e '_' por '/'
+        base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
+
+        // 3. RESTAURAÇÃO DE PADDING (Obrigatório para atob)
+        // O tamanho da string DEVE ser múltiplo de 4. Se não for, adiciona '='
+        while (base64.length % 4 !== 0) {
             base64 += '=';
         }
-        
-        // 3. Decodifica Base64 para Binary String
-        const compressedData = atob(base64);
-        
-        // 4. Converte string binária para Uint8Array
-        const compressed = new Uint8Array(compressedData.length);
-        for (let i = 0; i < compressedData.length; i++) {
-            compressed[i] = compressedData.charCodeAt(i);
+
+        console.log('📝 Base64 normalizado (início):', base64.substring(0, 20) + '...');
+
+        // 4. DECODIFICAÇÃO BASE64 (atob)
+        // Converte a string Base64 em uma string binária
+        const binaryString = atob(base64);
+
+        // 5. CONVERSÃO PARA ARRAY DE BYTES (Uint8Array)
+        // Necessário para o Pako (GZIP) funcionar
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
         }
-        
-        // 5. Descomprime com pako (Retornando Uint8Array, NÃO string)
-        // Remover { to: 'string' } é crucial para funcionar com TextDecoder
-        const decompressed = pako.ungzip(compressed);
-        
-        // 6. Decodifica UTF-8 corretamente (Resolve problemas de Emojis/Acentos)
+
+        // 6. DESCOMPRESSÃO GZIP
+        // Pako descomprime os bytes
+        const decompressed = pako.ungzip(bytes);
+
+        // 7. DECODIFICAÇÃO UTF-8 (Para aceitar acentos e emojis 🏆⚽)
         const jsonStr = new TextDecoder("utf-8").decode(decompressed);
-        
-        console.log('✅ Descompressão GZIP bem-sucedida');
+
+        console.log('✅ JSON recuperado com sucesso!');
         return JSON.parse(jsonStr);
-        
+
     } catch (e) {
-        console.error('❌ Erro na descompressão GZIP:', e);
-        // Lança o erro para ser capturado pela função principal e exibir na tela
-        throw new Error(`Falha ao processar dados: ${e.message}`);
+        console.error('❌ CRITICAL ERROR:', e);
+        // Lança o erro para aparecer na tela vermelha de debug
+        throw new Error(`Falha na decodificação: ${e.message}`);
     }
 }
         
