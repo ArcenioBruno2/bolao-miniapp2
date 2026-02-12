@@ -7,6 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Mesmo estilo moderno */
         :root {
             --primary: #4361ee;
             --secondary: #3a0ca3;
@@ -96,84 +97,6 @@
             font-weight: 500;
         }
         
-        .header-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--light-gray);
-        }
-        
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .header-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-        }
-        
-        .header-text h2 {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-        
-        .header-text p {
-            font-size: 13px;
-            color: var(--gray);
-        }
-        
-        .stats-badge {
-            background: linear-gradient(135deg, #f1f5f9, #e6eaf0);
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        
-        .info-alert {
-            background: linear-gradient(135deg, #fff8e7, #fff3d4);
-            border-left: 6px solid var(--warning);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .info-alert i {
-            font-size: 20px;
-            color: var(--warning);
-            flex-shrink: 0;
-        }
-        
-        .info-alert-text {
-            font-size: 13px;
-            color: var(--dark);
-            line-height: 1.4;
-        }
-        
-        .info-alert-text strong {
-            color: var(--warning);
-        }
-        
         .items-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -205,7 +128,7 @@
             align-items: center;
             gap: 12px;
             flex: 1;
-            min-width: 180px;
+            min-width: 200px;
         }
         
         .item-icon {
@@ -237,12 +160,7 @@
         }
         
         .item-select {
-            min-width: 160px;
-        }
-        
-        .custom-select {
-            position: relative;
-            width: 100%;
+            min-width: 200px;
         }
         
         select {
@@ -258,6 +176,10 @@
             -webkit-appearance: none;
             cursor: pointer;
             transition: var(--transition);
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
         }
         
         select:focus {
@@ -268,20 +190,6 @@
         
         select:hover {
             border-color: var(--primary);
-        }
-        
-        .select-icon {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-            pointer-events: none;
-            font-size: 14px;
-        }
-        
-        select option {
-            padding: 12px;
         }
         
         .progress-section {
@@ -406,7 +314,7 @@
             font-weight: 600;
         }
         
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
             .item-card {
                 flex-direction: column;
                 align-items: flex-start;
@@ -422,7 +330,7 @@
             }
             
             .countdown-timer {
-                font-size: 34px;
+                font-size: 32px;
             }
             
             .action-buttons {
@@ -456,32 +364,7 @@
                     </div>
                 </div>
                 
-                <!-- HEADER -->
-                <div class="header-section">
-                    <div class="header-title">
-                        <div class="header-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <div class="header-text">
-                            <h2>⚽ Pontos Extras</h2>
-                            <p>Escolha seus palpites especiais</p>
-                        </div>
-                    </div>
-                    <div class="stats-badge">
-                        <i class="fas fa-list"></i>
-                        <span id="progress-counter">0/15</span>
-                    </div>
-                </div>
-                
-                <!-- ALERTA DE PRAZO -->
-                <div id="prazo-alerta" class="info-alert" style="display: none;">
-                    <i class="fas fa-hourglass-end"></i>
-                    <div class="info-alert-text">
-                        <strong>⏰ Prazo encerrado!</strong> Os Pontos Extras estão encerrados.
-                    </div>
-                </div>
-                
-                <!-- LISTA DE ITENS -->
+                <!-- LISTA DAS 15 CATEGORIAS -->
                 <div id="items-container" class="items-grid"></div>
                 
                 <!-- PROGRESSO -->
@@ -518,82 +401,60 @@
         tg.expand();
         tg.ready();
         
-        // ========== CONFIGURAÇÃO ==========
-        // 20 CATEGORIAS DE PONTOS EXTRAS
-        const ITENS_EXTRAS = [
-            "🏆 Campeão Geral",
-            "🥇 Campeão 1º Turno",
-            "🥈 Campeão 2º Turno",
-            "✈️ Melhor Visitante",
-            "🏠 Melhor Mandante",
-            "⚽ Melhor Ataque",
-            "🛡️ Melhor Defesa",
-            "🥉 2º Colocado",
-            "🏅 3º Colocado",
-            "🎖️ 4º Colocado",
-            "⬇️ 17º Colocado",
-            "⬇️ 18º Colocado",
-            "⬇️ 19º Colocado",
-            "⬇️ 20º Colocado",
-            "⭐ Time Estrela"
+        // ========== AS 15 CATEGORIAS EXATAS DO SEU SISTEMA ==========
+        const CATEGORIAS_EXTRAS = [
+            "Campeão Geral",
+            "Campeão 1º Turno", 
+            "Campeão 2º Turno",
+            "Melhor Visitante",
+            "Melhor Mandante",
+            "Melhor Ataque",
+            "Melhor Defesa",
+            "2º Colocado Final",
+            "3º Colocado Final",
+            "4º Colocado Final",
+            "17º Colocado Final",
+            "18º Colocado Final",
+            "19º Colocado Final",
+            "20º Colocado Final",
+            "Time Estrela"
         ];
         
-        let dadosOriginais = {};
+        let dadosOriginais = null;
         let escolhas = [];
         let prazoFinal = null;
         let countdownInterval = null;
         let timesOrdenados = [];
         
-        // ========== FUNÇÕES DE DATA (UTC-3 BRASÍLIA) ==========
+        // ========== FUNÇÃO PARA PARSE DE DATA (BRASÍLIA) ==========
         function parseDataBrasilia(dataStr) {
             if (!dataStr) return null;
             
             try {
-                // Formato esperado: "2026-12-31 23:59:59"
-                let dataLimpo = dataStr.trim();
+                // Formato recebido do bot: "2026-12-31 23:59:59"
+                // Interpretar como horário de Brasília (sem conversão)
+                const [data, hora] = dataStr.split(' ');
+                const [ano, mes, dia] = data.split('-').map(Number);
+                const [h, m, s] = hora.split(':').map(Number);
                 
-                // Substituir espaço por T e garantir UTC-3
-                if (dataLimpo.includes(' ')) {
-                    dataLimpo = dataLimpo.replace(' ', 'T') + '-03:00';
-                } else if (!dataLimpo.includes('T')) {
-                    dataLimpo = dataLimpo + 'T00:00:00-03:00';
-                } else if (!dataLimpo.includes('-03:00') && !dataLimpo.includes('Z')) {
-                    dataLimpo = dataLimpo + '-03:00';
-                }
-                
-                const dt = new Date(dataLimpo);
-                return isNaN(dt.getTime()) ? null : dt;
-                
+                // Criar data no fuso horário local (que é Brasília para o usuário)
+                return new Date(ano, mes - 1, dia, h, m, s);
             } catch (e) {
                 console.error('Erro ao parsear data:', e);
                 return null;
             }
         }
         
-        function formatarDataBrasilia(data) {
-            if (!data) return 'Data não definida';
-            
-            const dt = parseDataBrasilia(data);
-            if (!dt) return 'Data inválida';
-            
-            const dia = dt.getDate().toString().padStart(2, '0');
-            const mes = (dt.getMonth() + 1).toString().padStart(2, '0');
-            const ano = dt.getFullYear();
-            const hora = dt.getHours().toString().padStart(2, '0');
-            const min = dt.getMinutes().toString().padStart(2, '0');
-            
-            return `${dia}/${mes}/${ano} ${hora}:${min}`;
-        }
-        
-        // ========== CARREGAMENTO DE DADOS ==========
+        // ========== CARREGAR DADOS ==========
         function carregarDados() {
             try {
-                // Tentar obter dados da URL (hash ou query param)
+                console.log('📥 Carregando dados...');
+                
+                // Tentar obter dados do hash da URL
                 let dadosBase64 = null;
                 
-                // Verificar hash da URL
                 if (window.location.hash) {
-                    const hash = window.location.hash.substring(1); // remove #
+                    const hash = window.location.hash.substring(1);
                     if (hash.startsWith('data=')) {
                         dadosBase64 = hash.substring(5);
                     } else {
@@ -601,22 +462,23 @@
                     }
                 }
                 
-                // Verificar query params
                 if (!dadosBase64) {
                     const urlParams = new URLSearchParams(window.location.search);
                     dadosBase64 = urlParams.get('data');
                 }
                 
                 if (!dadosBase64) {
-                    throw new Error('Parâmetro data não encontrado na URL');
+                    throw new Error('Parâmetro data não encontrado');
                 }
+                
+                console.log('🔑 Base64 recebido, tamanho:', dadosBase64.length);
                 
                 // Decodificar Base64
                 try {
                     dadosBase64 = decodeURIComponent(dadosBase64);
                     const dadosJson = atob(dadosBase64);
                     dadosOriginais = JSON.parse(dadosJson);
-                } catch (e1) {
+                } catch (e) {
                     // Tentar sem decodeURIComponent
                     try {
                         const dadosJson = atob(dadosBase64);
@@ -624,9 +486,7 @@
                     } catch (e2) {
                         // Tentar com padding
                         let base64 = dadosBase64;
-                        while (base64.length % 4 !== 0) {
-                            base64 += '=';
-                        }
+                        while (base64.length % 4 !== 0) base64 += '=';
                         const dadosJson = atob(base64);
                         dadosOriginais = JSON.parse(dadosJson);
                     }
@@ -634,23 +494,22 @@
                 
                 console.log('✅ Dados carregados:', dadosOriginais);
                 
-                // ===== PROCESSAR TIMES (20 TIMES EM ORDEM ALFABÉTICA) =====
+                // ===== PROCESSAR TIMES =====
                 if (dadosOriginais.times && Array.isArray(dadosOriginais.times)) {
                     // Ordenar alfabeticamente
                     timesOrdenados = [...dadosOriginais.times].sort((a, b) => 
                         a.localeCompare(b, 'pt-BR')
                     );
+                    console.log(`⚽ ${timesOrdenados.length} times carregados`);
                 } else {
-                    // Fallback com 20 times do Brasileirão
+                    // Fallback para testes
                     timesOrdenados = [
-                        "Athletico-PR", "Atlético-GO", "Atlético-MG", "Bahia", "Botafogo",
-                        "Corinthians", "Criciúma", "Cruzeiro", "Cuiabá", "Flamengo",
-                        "Fluminense", "Fortaleza", "Grêmio", "Internacional", "Juventude",
-                        "Palmeiras", "Red Bull Bragantino", "São Paulo", "Vasco", "Vitória"
+                        "Athletico-PR", "Atlético-MG", "Bahia", "Botafogo", "Corinthians",
+                        "Cruzeiro", "Cuiabá", "Flamengo", "Fluminense", "Fortaleza",
+                        "Grêmio", "Internacional", "Juventude", "Palmeiras", "Red Bull Bragantino",
+                        "São Paulo", "Vasco", "Vitória"
                     ].sort();
                 }
-                
-                console.log(`⚽ ${timesOrdenados.length} times carregados em ordem alfabética`);
                 
                 // ===== PROCESSAR ESCOLHAS ANTERIORES =====
                 escolhas = [];
@@ -666,69 +525,92 @@
                 // ===== PROCESSAR PRAZO =====
                 if (dadosOriginais.prazo) {
                     prazoFinal = parseDataBrasilia(dadosOriginais.prazo);
+                    console.log('📅 Prazo final:', prazoFinal);
                 }
                 
-                // Atualizar interface
-                atualizarInterface();
+                // Renderizar tudo
+                renderizarCategorias();
+                atualizarProgresso();
+                verificarBotaoEnviar();
+                
+                if (prazoFinal) {
+                    iniciarContador();
+                }
                 
                 // Esconder loading
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
                 
             } catch (error) {
-                console.error('❌ Erro ao carregar dados:', error);
+                console.error('❌ Erro crítico:', error);
+                
+                // Mostrar erro amigável
                 document.getElementById('loading').innerHTML = `
                     <div style="color: var(--danger);">
                         <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 20px;"></i>
-                        <div style="font-size: 16px; font-weight: 600; margin-bottom: 10px;">
-                            Erro ao carregar dados
+                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 10px;">
+                            Erro ao carregar
                         </div>
-                        <div style="font-size: 13px; color: var(--gray);">
-                            ${error.message}<br>
-                            Clique em Cancelar e tente novamente.
+                        <div style="font-size: 14px; color: var(--gray); margin-bottom: 20px;">
+                            ${error.message}
                         </div>
+                        <button onclick="window.Telegram.WebApp.close()" 
+                                style="background: var(--primary); color: white; border: none; 
+                                       padding: 12px 24px; border-radius: 12px; font-weight: 700;">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </button>
                     </div>
                 `;
             }
         }
         
-        // ========== RENDERIZAÇÃO ==========
-        function renderizarItens() {
+        // ========== RENDERIZAR AS 15 CATEGORIAS ==========
+        function renderizarCategorias() {
             const container = document.getElementById('items-container');
             container.innerHTML = '';
             
-            ITENS_EXTRAS.forEach((item, index) => {
+            CATEGORIAS_EXTRAS.forEach((categoria, index) => {
                 // Buscar escolha anterior
-                const escolhaAnterior = escolhas.find(e => e.item === item);
+                const escolhaAnterior = escolhas.find(e => e.item === categoria);
                 const valorSelecionado = escolhaAnterior ? escolhaAnterior.time : '';
+                
+                // Ícone diferente para cada tipo
+                let icone = '🏆';
+                if (categoria.includes('Turno')) icone = '🥇';
+                else if (categoria.includes('Visitante')) icone = '✈️';
+                else if (categoria.includes('Mandante')) icone = '🏠';
+                else if (categoria.includes('Ataque')) icone = '⚽';
+                else if (categoria.includes('Defesa')) icone = '🛡️';
+                else if (categoria.includes('Colocado')) icone = '📊';
+                else if (categoria.includes('Estrela')) icone = '⭐';
                 
                 const card = document.createElement('div');
                 card.className = 'item-card';
+                
+                const selectId = `select-${index}`;
+                
                 card.innerHTML = `
                     <div class="item-info">
                         <div class="item-icon">
-                            ${index + 1}
+                            ${icone}
                         </div>
                         <div class="item-details">
-                            <h4>${item}</h4>
+                            <h4>${categoria}</h4>
                             <span>
                                 <i class="fas fa-futbol"></i>
-                                Selecione um time
+                                Selecione o time
                             </span>
                         </div>
                     </div>
                     <div class="item-select">
-                        <div class="custom-select">
-                            <select id="select-${index}" onchange="salvarEscolha('${item}', this.value)">
-                                <option value="">Selecione...</option>
-                                ${timesOrdenados.map(time => 
-                                    `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>
-                                        ${time}
-                                    </option>`
-                                ).join('')}
-                            </select>
-                            <i class="fas fa-chevron-down select-icon"></i>
-                        </div>
+                        <select id="${selectId}" onchange="salvarEscolha('${categoria}', this.value)">
+                            <option value="">🔽 Selecione um time...</option>
+                            ${timesOrdenados.map(time => 
+                                `<option value="${time}" ${valorSelecionado === time ? 'selected' : ''}>
+                                    ${time}
+                                </option>`
+                            ).join('')}
+                        </select>
                     </div>
                 `;
                 
@@ -736,60 +618,59 @@
             });
         }
         
-        function salvarEscolha(item, time) {
-            // Remover escolha anterior deste item
-            escolhas = escolhas.filter(e => e.item !== item);
+        // ========== SALVAR ESCOLHA ==========
+        function salvarEscolha(categoria, time) {
+            // Remover escolha anterior
+            escolhas = escolhas.filter(e => e.item !== categoria);
             
-            // Adicionar nova escolha se não for vazia
+            // Adicionar nova escolha
             if (time) {
                 escolhas.push({
-                    item: item,
+                    item: categoria,
                     time: time
                 });
             }
             
-            // Atualizar progresso
+            console.log(`✅ ${categoria}: ${time || 'removido'}`);
+            
             atualizarProgresso();
             verificarBotaoEnviar();
         }
         
+        // ========== ATUALIZAR PROGRESSO ==========
         function atualizarProgresso() {
             const preenchidas = escolhas.length;
-            const total = ITENS_EXTRAS.length;
+            const total = CATEGORIAS_EXTRAS.length;
             const percent = Math.round((preenchidas / total) * 100);
             
-            document.getElementById('progress-counter').innerHTML = `${preenchidas}/${total}`;
             document.getElementById('progress-percent').innerHTML = `${percent}%`;
             document.getElementById('progress-fill').style.width = `${percent}%`;
         }
         
+        // ========== VERIFICAR BOTÃO ENVIAR ==========
         function verificarBotaoEnviar() {
             const btn = document.getElementById('btn-enviar');
-            const completo = escolhas.length === ITENS_EXTRAS.length;
+            const completo = escolhas.length === CATEGORIAS_EXTRAS.length;
             
             btn.disabled = !completo;
             
             if (completo) {
                 btn.innerHTML = '<i class="fas fa-paper-plane btn-icon"></i> Enviar Escolhas';
             } else {
-                btn.innerHTML = `<i class="fas fa-lock btn-icon"></i> Faltam ${ITENS_EXTRAS.length - escolhas.length}`;
+                const faltam = CATEGORIAS_EXTRAS.length - escolhas.length;
+                btn.innerHTML = `<i class="fas fa-lock btn-icon"></i> Faltam ${faltam}`;
             }
         }
         
         // ========== CONTADOR REGRESSIVO ==========
         function iniciarContador() {
-            if (!prazoFinal) return;
-            
             if (countdownInterval) clearInterval(countdownInterval);
             countdownInterval = setInterval(atualizarContador, 1000);
             atualizarContador();
         }
         
         function atualizarContador() {
-            if (!prazoFinal) {
-                document.getElementById('countdown-timer').innerHTML = '--:--:--';
-                return;
-            }
+            if (!prazoFinal) return;
             
             const agora = new Date();
             const diff = prazoFinal - agora;
@@ -798,31 +679,29 @@
                 document.getElementById('countdown-timer').innerHTML = 'ENCERRADO';
                 document.getElementById('countdown-subtitle').innerHTML = 'Prazo finalizado';
                 document.getElementById('countdown-timer').style.color = '#f72585';
-                document.getElementById('prazo-alerta').style.display = 'flex';
                 
                 // Desabilitar selects
                 document.querySelectorAll('select').forEach(select => {
                     select.disabled = true;
                 });
                 
-                // Desabilitar botão enviar
-                const btn = document.getElementById('btn-enviar');
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
+                document.getElementById('btn-enviar').disabled = true;
+                document.getElementById('btn-enviar').innerHTML = '<i class="fas fa-ban btn-icon"></i> Encerrado';
                 
                 clearInterval(countdownInterval);
                 return;
             }
             
-            // Calcular dias, horas, minutos, segundos
-            const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const horas = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            // Calcular tempo restante
+            const horas = Math.floor(diff / (1000 * 60 * 60));
             const minutos = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const segundos = Math.floor((diff % (1000 * 60)) / 1000);
             
             let timerStr = '';
-            if (dias > 0) {
-                timerStr = `${dias}d ${horas}h ${minutos}m`;
+            if (horas > 24) {
+                const dias = Math.floor(horas / 24);
+                const hRest = horas % 24;
+                timerStr = `${dias}d ${hRest}h ${minutos}m`;
                 document.getElementById('countdown-timer').style.fontSize = '32px';
             } else {
                 timerStr = `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
@@ -831,27 +710,22 @@
             
             document.getElementById('countdown-timer').innerHTML = timerStr;
             document.getElementById('countdown-timer').style.color = 'white';
-            
-            // Alerta visual quando faltar menos de 1 hora
-            if (dias === 0 && horas === 0 && minutos < 60) {
-                document.getElementById('countdown-subtitle').innerHTML = '⏰ Últimos minutos! Envie logo.';
-            }
         }
         
-        // ========== ENVIO DOS DADOS ==========
+        // ========== ENVIAR ESCOLHAS ==========
         function enviarEscolhas() {
-            if (escolhas.length !== ITENS_EXTRAS.length) {
-                alert(`❌ Preencha todas as ${ITENS_EXTRAS.length} categorias!`);
+            if (escolhas.length !== CATEGORIAS_EXTRAS.length) {
+                alert(`❌ Preencha todas as ${CATEGORIAS_EXTRAS.length} categorias!`);
                 return;
             }
             
-            // Verificar se prazo já expirou
+            // Verificar prazo
             if (prazoFinal && new Date() > prazoFinal) {
-                alert('❌ Prazo encerrado! Não é mais possível enviar palpites.');
+                alert('❌ Prazo encerrado! Não é mais possível enviar.');
                 return;
             }
             
-            // Preparar dados
+            // Formatar dados para envio
             const dadosEnvio = {
                 escolhas: escolhas.map(e => ({
                     item: e.item,
@@ -859,52 +733,28 @@
                 }))
             };
             
-            // Efeito visual
+            console.log('📤 Enviando:', dadosEnvio);
+            
             const btn = document.getElementById('btn-enviar');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Enviando...';
             btn.disabled = true;
             
-            // Enviar para o bot
             setTimeout(() => {
                 if (tg && tg.sendData) {
                     tg.sendData(JSON.stringify(dadosEnvio));
                 } else {
-                    console.log('📤 Dados prontos para envio:', dadosEnvio);
-                    alert('✅ Escolhas salvas! (Modo simulação)');
+                    alert('✅ Escolhas salvas com sucesso!');
                     tg.close();
                 }
             }, 300);
-        }
-        
-        // ========== ATUALIZAÇÃO GERAL ==========
-        function atualizarInterface() {
-            renderizarItens();
-            atualizarProgresso();
-            verificarBotaoEnviar();
-            
-            if (prazoFinal) {
-                iniciarContador();
-                
-                // Verificar se já está encerrado
-                if (new Date() > prazoFinal) {
-                    document.getElementById('prazo-alerta').style.display = 'flex';
-                }
-            }
-            
-            // Mostrar data do prazo
-            if (dadosOriginais.prazo) {
-                const dataFormatada = formatarDataBrasilia(dadosOriginais.prazo);
-                document.getElementById('countdown-subtitle').innerHTML = 
-                    `Encerramento: ${dataFormatada}`;
-            }
         }
         
         // ========== EVENT LISTENERS ==========
         document.getElementById('btn-enviar').onclick = enviarEscolhas;
         
         document.getElementById('btn-cancelar').onclick = () => {
-            if (escolhas.length > 0 && escolhas.length < ITENS_EXTRAS.length) {
-                if (confirm('⚠️ Tem certeza? Suas escolhas não salvas serão perdidas.')) {
+            if (escolhas.length > 0 && escolhas.length < CATEGORIAS_EXTRAS.length) {
+                if (confirm('⚠️ Deseja realmente sair? Suas escolhas não serão salvas.')) {
                     tg.close();
                 }
             } else {
@@ -912,10 +762,8 @@
             }
         };
         
-        // ========== INICIALIZAÇÃO ==========
-        window.onload = function() {
-            carregarDados();
-        };
+        // ========== INICIAR ==========
+        window.onload = carregarDados;
     </script>
 </body>
 </html>
