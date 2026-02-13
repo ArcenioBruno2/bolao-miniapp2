@@ -364,50 +364,46 @@
 
         // ============ 3. CRONÔMETRO ============
 
-let timerInterval;
+        function iniciarCronometro(prazoStr) {
+            if (!prazoStr) return;
 
-function iniciarCronometro(prazoStr) {
-    if (!prazoStr) return;
+            // Tenta normalizar a data para formato ISO
+            let isoDate = prazoStr.replace(' ', 'T');
+            // Se não tiver fuso horário, assume -03:00 (Brasília)
+            if (!isoDate.includes('Z') && !isoDate.includes('+') && !isoDate.includes('-')) {
+                isoDate += '-03:00';
+            }
 
-    // 1. Transformamos "YYYY-MM-DD HH:MM:SS" em "YYYY-MM-DDTHH:MM:SS-03:00"
-    // O "-03:00" força o navegador a entender que o prazo é de Brasília, 
-    // não importa onde o usuário esteja (Angola, Portugal, etc).
-    const isoDate = prazoStr.replace(' ', 'T') + "-03:00";
-    const deadline = new Date(isoDate).getTime();
+            const deadline = new Date(isoDate).getTime();
 
-    if (timerInterval) clearInterval(timerInterval);
+            function update() {
+                const now = new Date().getTime();
+                const distance = deadline - now;
 
-    function update() {
-        const now = new Date().getTime(); // Hora atual absoluta
-        const distance = deadline - now;
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').innerHTML = "ENCERRADO";
+                    document.getElementById('timer').style.color = "#d32f2f";
+                    desabilitarTudo();
+                    return;
+                }
 
-        const timerElement = document.getElementById('timer');
-        if (!timerElement) return;
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        if (distance <= 0) {
-            clearInterval(timerInterval);
-            timerElement.innerHTML = "ENCERRADO";
-            timerElement.style.color = "#ff4d4d";
-            // Função para desabilitar botões de salvar se existir
-            if (typeof desabilitarTudo === "function") desabilitarTudo();
-            return;
+                let timeStr = "";
+                if (days > 0) timeStr += `${days}d `;
+                timeStr += `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+                
+                document.getElementById('timer').innerHTML = timeStr;
+            }
+
+            timerInterval = setInterval(update, 1000);
+            update(); // Executa primeira vez
         }
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        let timeStr = "";
-        if (days > 0) timeStr += `${days}d `;
-        timeStr += `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        
-        timerElement.innerHTML = timeStr;
-    }
-
-    timerInterval = setInterval(update, 1000);
-    update();
-}
         function desabilitarTudo() {
             document.querySelectorAll('select').forEach(s => s.disabled = true);
             document.getElementById('btn-save').disabled = true;
