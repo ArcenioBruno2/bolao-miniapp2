@@ -4,599 +4,504 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>⭐ Pontos Extras 2026</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f5f7fa);
+            --text-color: var(--tg-theme-text-color, #222);
+            --hint-color: var(--tg-theme-hint-color, #999);
+            --button-color: var(--tg-theme-button-color, #3390ec);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #ffffff);
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            background: #0a1c2a;
-            color: white;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            padding-bottom: 80px; /* Espaço para botões fixos se necessário */
         }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
+        
+        .container { max-width: 600px; margin: 0 auto; }
+        
+        /* HEADER E TIMER */
         .header {
+            background: var(--secondary-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
             text-align: center;
-            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .title { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+        
+        .timer-box {
+            background: rgba(0,0,0,0.03);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .timer {
+            font-size: 24px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--button-color);
+        }
+        .timer-label { font-size: 12px; color: var(--hint-color); text-transform: uppercase; }
+
+        /* BARRA DE PROGRESSO */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .progress-track {
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--button-color);
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
-        .header h1 {
-            font-size: 26px;
-            color: #FFD700;
-        }
-
-        .loading {
+        /* CARDS DE CATEGORIAS */
+        .card {
+            background: var(--secondary-bg);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-            gap: 20px;
+            gap: 12px;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255,215,0,0.2);
-            border-top: 4px solid #FFD700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .prazo-box {
-            background: rgba(255,215,0,0.1);
-            border: 1px solid #FFD700;
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 24px;
+        .card-header {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .progresso {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 24px;
-        }
-
-        .progresso-header {
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .contador {
-            color: #FFD700;
-            font-weight: bold;
+            align-items: center;
+            justify-content: center;
             font-size: 22px;
         }
 
-        .barra-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .barra {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .categoria {
-            background: rgba(255,255,255,0.05);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .categoria.preenchida {
-            border-color: #4CAF50;
-            background: rgba(76,175,80,0.1);
-        }
-
-        .categoria-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .icone {
-            font-size: 28px;
-            margin-right: 12px;
-        }
-
-        .info {
-            flex: 1;
-        }
-
-        .nome {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .pontos {
-            font-size: 13px;
-            color: #FFD700;
-            background: rgba(255,215,0,0.1);
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-        }
+        .card-info { flex: 1; }
+        .card-title { font-weight: 700; font-size: 15px; }
+        .card-points { font-size: 13px; color: var(--hint-color); }
 
         select {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 12px;
-            color: white;
-            font-size: 15px;
-            appearance: none;
-            cursor: pointer;
-        }
-
-        select option {
-            background: #0a1c2a;
-            color: white;
-        }
-
-        .escolha-atual {
-            margin-top: 12px;
-            padding: 10px 14px;
-            background: rgba(255,215,0,0.1);
+            padding: 12px;
             border-radius: 10px;
-            font-size: 14px;
-            color: #FFD700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            border: 1px solid rgba(0,0,0,0.15);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 15px;
+            appearance: none; /* Remove estilo padrão do navegador */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
         }
+        select:focus { outline: 2px solid var(--button-color); border-color: transparent; }
 
-        .btn-salvar {
-            width: 100%;
-            padding: 18px;
-            background: #FFD700;
-            border: none;
-            border-radius: 30px;
-            color: #0a1c2a;
-            font-size: 18px;
-            font-weight: 700;
+        /* BOTÕES */
+        .actions {
+            margin-top: 30px;
             display: flex;
-            align-items: center;
-            justify-content: center;
             gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
             cursor: pointer;
-            margin: 24px 0 40px;
             transition: opacity 0.2s;
         }
+        
+        .btn-primary { background: var(--button-color); color: var(--button-text); }
+        .btn-secondary { background: rgba(0,0,0,0.05); color: var(--text-color); }
+        .btn:active { opacity: 0.8; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .btn-salvar:active {
-            opacity: 0.8;
+        /* LOADING */
+        #loading {
+            position: fixed; inset: 0;
+            background: var(--bg-color);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 1000;
         }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top-color: var(--button-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* ERROR MESSAGE */
         .error-box {
-            background: rgba(244,67,54,0.1);
-            border: 1px solid #f44336;
+            color: #d32f2f;
+            text-align: center;
+            padding: 20px;
+            background: #ffebee;
             border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-        }
-
-        .debug-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 20px;
-            font-size: 12px;
-            font-family: monospace;
-            word-break: break-all;
-            color: #aaa;
-        }
-
-        .telegram-button {
-            background: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 16px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            margin-top: 24px;
-            width: 100%;
+            margin: 20px;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <!-- LOADING -->
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <h2 style="color: #FFD700;">Carregando Pontos Extras</h2>
-            <p id="loading-status" style="color: #aaa;">Processando dados...</p>
+
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Carregando Pontos Extras...</div>
+    </div>
+
+    <div class="container" id="main-content" style="display: none;">
+        
+        <div class="header">
+            <div class="title">🏆 PONTOS EXTRAS 2026</div>
+            <div class="timer-box">
+                <div class="timer-label">ENCERRA EM</div>
+                <div class="timer" id="timer">--:--:--</div>
+            </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div id="main" style="display: none;">
-            <div class="header">
-                <h1>⭐ PONTOS EXTRAS 2026</h1>
+        <div class="progress-container">
+            <div class="progress-header">
+                <span>Progresso</span>
+                <span id="progress-text">0/15</span>
             </div>
-
-            <div id="prazo-container"></div>
-
-            <div class="progresso">
-                <div class="progresso-header">
-                    <span>🎯 Seus palpites</span>
-                    <span class="contador" id="contador">0/15</span>
-                </div>
-                <div class="barra-container">
-                    <div class="barra" id="barra-progresso"></div>
-                </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
             </div>
-
-            <div id="categorias-container"></div>
-
-            <button class="btn-salvar" id="btn-salvar">
-                💾 SALVAR ESCOLHAS
-            </button>
         </div>
 
-        <!-- ERROR -->
-        <div id="error" style="display: none;">
-            <div class="error-box">
-                <h3 style="color: #ff8a80; margin-bottom: 16px;">🔧 Configuração Necessária</h3>
-                <p style="margin-bottom: 20px;" id="error-message"></p>
-                <div id="error-details" class="debug-box"></div>
-                <button class="telegram-button" id="force-send-button" onclick="forcarEnvioTelegram()">
-                    📤 TESTAR ENVIO AO TELEGRAM
-                </button>
-                <button class="btn-salvar" onclick="window.location.reload()" style="margin-top: 16px; background: #333; color: white;">
-                    🔄 Tentar Novamente
-                </button>
+        <div id="cards-container">
             </div>
+
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="fecharApp()">Cancelar</button>
+            <button class="btn btn-primary" id="btn-save" onclick="enviarEscolhas()">✅ Enviar Palpites</button>
         </div>
     </div>
 
     <script>
-        // ==================== MODO FORÇADO ====================
-        // Ignorar detecção do Telegram e forçar funcionamento
+        // ============ INICIALIZAÇÃO ============
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Ocupa toda a tela
+        tg.ready();
+
+        // Variáveis Globais
+        let dadosApp = null;
+        let timerInterval = null;
+
+        // ============ 1. LEITURA E DECODIFICAÇÃO (CORRIGIDO) ============
         
-        console.log('🚀 Iniciando WebApp em modo forçado...');
-        
-        const loadingEl = document.getElementById('loading');
-        const mainEl = document.getElementById('main');
-        const errorEl = document.getElementById('error');
-        const loadingStatus = document.getElementById('loading-status');
-
-        // ==================== FUNÇÃO DE DECODIFICAÇÃO MANUAL ====================
-        function base64UrlDecode(base64url) {
-            // Preparar string
-            let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-            
-            // Remover caracteres inválidos
-            base64 = base64.replace(/[^A-Za-z0-9+/=]/g, '');
-            
-            // Adicionar padding
-            while (base64.length % 4) {
-                base64 += '=';
-            }
-            
-            // Decodificação manual (mais compatível)
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-            let output = [];
-            let buffer = 0;
-            let bits = 0;
-            
-            for (let i = 0; i < base64.length; i++) {
-                if (base64[i] === '=') break;
-                
-                const val = chars.indexOf(base64[i]);
-                if (val === -1) continue;
-                
-                buffer = (buffer << 6) | val;
-                bits += 6;
-                
-                if (bits >= 8) {
-                    bits -= 8;
-                    output.push((buffer >> bits) & 0xFF);
-                }
-            }
-            
-            return new Uint8Array(output);
-        }
-
-        // ==================== PEGAR HASH DE VÁRIAS FORMAS ====================
-        function obterHash() {
-            // Método 1: window.location.hash
-            let hash = window.location.hash.substring(1);
-            
-            // Método 2: regex na URL completa
-            if (!hash || hash.length < 100) {
-                const match = window.location.href.match(/#(.*)$/);
-                if (match) hash = match[1];
-            }
-            
-            // Método 3: decodeURIComponent
-            if (!hash || hash.length < 100) {
-                try {
-                    hash = decodeURIComponent(window.location.hash.substring(1));
-                } catch (e) {}
-            }
-            
-            return hash;
-        }
-
-        // ==================== FORÇAR ENVIO AO TELEGRAM ====================
-        window.forcarEnvioTelegram = function() {
-            // Tentar diferentes formas de enviar ao Telegram
-            
-            // Forma 1: Telegram.WebApp
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.sendData(JSON.stringify({ teste: "ok" }));
-                window.Telegram.WebApp.showAlert("✅ Enviado via Telegram.WebApp");
-                return;
-            }
-            
-            // Forma 2: parent.Telegram
-            if (parent?.Telegram?.WebApp) {
-                parent.Telegram.WebApp.sendData(JSON.stringify({ teste: "ok" }));
-                parent.Telegram.WebApp.showAlert("✅ Enviado via parent.Telegram");
-                return;
-            }
-            
-            // Forma 3: window.parent.Telegram
-            if (window.parent?.Telegram?.WebApp) {
-                window.parent.Telegram.WebApp.sendData(JSON.stringify({ teste: "ok" }));
-                window.parent.Telegram.WebApp.showAlert("✅ Enviado via window.parent.Telegram");
-                return;
-            }
-            
-            alert("❌ Não foi possível encontrar o objeto Telegram.WebApp");
-        };
-
-        // ==================== TENTAR DECODIFICAR ====================
-        try {
-            const hash = obterHash();
-            
-            console.log('📦 Hash obtido:', hash.substring(0, 50) + '...');
-            console.log('📦 Tamanho:', hash.length);
-            
-            if (!hash || hash.length < 100) {
-                throw new Error('Dados não encontrados na URL. Use o bot do Telegram para abrir este link.');
-            }
-            
-            loadingStatus.textContent = `📦 Decodificando Base64 (${hash.length} chars)...`;
-            
-            // Decodificar Base64URL
-            const compressed = base64UrlDecode(hash);
-            console.log('📦 Bytes comprimidos:', compressed.length);
-            
-            loadingStatus.textContent = `🔓 Descomprimindo GZIP (${compressed.length} bytes)...`;
-            
-            // Descomprimir com pako
-            if (typeof pako === 'undefined') {
-                throw new Error('Biblioteca pako não carregada');
-            }
-            
-            let decompressed;
+        function lerDadosDaUrl() {
             try {
-                decompressed = pako.ungzip(compressed);
+                // Pega o hash da URL
+                let hash = window.location.hash;
+                if (!hash || hash.length < 2) {
+                    // Tenta pegar do search param (?data=) como fallback
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('data');
+                }
+
+                // Remove o '#' inicial
+                hash = hash.substring(1);
+
+                // IMPORTANTE: O Telegram adiciona parâmetros extras (ex: &tgWebAppData=...).
+                // Se a gente enviou com prefixo "data=", vamos buscar por ele.
+                if (hash.startsWith('data=')) {
+                    // Pega o conteúdo após "data=" até o primeiro "&" (se houver)
+                    return hash.split('&')[0].replace('data=', '');
+                } 
+                
+                // Suporte legado ou hash puro: pega tudo antes do primeiro "&"
+                if (hash.includes('&')) {
+                    return hash.split('&')[0];
+                }
+
+                return hash; // Retorna hash puro se não tiver separadores
+
             } catch (e) {
-                // Tentar inflate como fallback
-                decompressed = pako.inflate(compressed);
+                console.error("Erro ao ler hash:", e);
+                return null;
             }
-            
-            console.log('📦 Bytes descomprimidos:', decompressed.length);
-            
-            loadingStatus.textContent = '📄 Parseando JSON...';
-            
-            // Converter para texto
-            const jsonText = new TextDecoder('utf-8').decode(decompressed);
-            console.log('📄 JSON preview:', jsonText.substring(0, 200));
-            
-            // Parse JSON
-            const data = JSON.parse(jsonText);
-            
-            console.log('✅ Dados carregados!');
-            console.log('📊 Times:', data.times?.length);
-            console.log('📊 Categorias:', data.categorias?.length);
-            console.log('📊 Escolhas:', Object.keys(data.escolhas || {}).length);
-            
-            // ==================== RENDERIZAR INTERFACE ====================
-            loadingEl.style.display = 'none';
-            mainEl.style.display = 'block';
-            
-            const times = data.times || [];
-            const categorias = data.categorias || [];
-            const escolhas = data.escolhas || {};
-            const prazo = data.prazo || '';
-            
-            // Prazo
-            if (prazo) {
-                const [dataPart, horaPart] = prazo.split(' ');
-                const [ano, mes, dia] = dataPart.split('-');
-                const dataFormatada = `${dia}/${mes}/${ano} às ${horaPart}`;
+        }
+
+        function processarDados(base64String) {
+            try {
+                if (!base64String) throw new Error("String de dados vazia");
+
+                console.log("📦 Iniciando decodificação...");
+
+                // 1. Limpa string (remove espaços)
+                let base64 = base64String.trim();
+
+                // 2. Normaliza URL-Safe Base64 para Base64 padrão
+                base64 = base64.replace(/-/g, '+').replace(/_/g, '/');
                 
-                document.getElementById('prazo-container').innerHTML = `
-                    <div class="prazo-box">
-                        <span style="font-size: 28px;">⏰</span>
-                        <div>
-                            <div style="font-size: 13px; color: #aaa;">ENCERRAMENTO</div>
-                            <div style="font-size: 18px; font-weight: bold; color: #FFD700;">${dataFormatada}</div>
-                            <div style="font-size: 12px; color: #888;">Horário de Brasília</div>
-                        </div>
-                    </div>
-                `;
+                // 3. Adiciona padding se necessário
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+
+                // 4. Decodifica Base64 para string binária
+                const binaryString = atob(base64);
+
+                // 5. Converte para Array de Bytes (Uint8Array)
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // 6. Descomprime GZIP (usando Pako)
+                const decompressedBytes = pako.ungzip(bytes);
+
+                // 7. Decodifica UTF-8 (CRUCIAL PARA EMOJIS E ACENTOS)
+                const jsonString = new TextDecoder("utf-8").decode(decompressedBytes);
+
+                // 8. Parse JSON
+                return JSON.parse(jsonString);
+
+            } catch (e) {
+                console.error("Erro fatal na descompressão:", e);
+                throw e;
             }
-            
-            // Categorias
-            const container = document.getElementById('categorias-container');
-            container.innerHTML = '';
-            
+        }
+
+        // ============ 2. RENDERIZAÇÃO DA INTERFACE ============
+
+        function renderizarApp() {
+            const container = document.getElementById('cards-container');
+            const { times, categorias, escolhas } = dadosApp;
+
+            container.innerHTML = ''; // Limpa
+
             categorias.forEach(cat => {
-                const codigo = cat.item || cat.codigo;
-                const nome = cat.nome;
-                const icone = cat.icone || '⚽';
-                const pontos = cat.pontos || 0;
-                const escolhaAtual = escolhas[codigo] || '';
-                
-                const card = document.createElement('div');
-                card.className = `categoria ${escolhaAtual ? 'preenchida' : ''}`;
-                
-                // Criar select
-                let selectHtml = `<select data-codigo="${codigo}"><option value="">🔽 Selecione um time...</option>`;
+                const itemKey = cat.item || cat.codigo; // Compatibilidade
+                const valorAtual = escolhas[itemKey] || "";
+
+                // Cria o HTML do select
+                let optionsHtml = `<option value="">Selecione um time...</option>`;
                 times.forEach(time => {
-                    selectHtml += `<option value="${time}" ${time === escolhaAtual ? 'selected' : ''}>⚽ ${time}</option>`;
+                    const selected = (time === valorAtual) ? 'selected' : '';
+                    optionsHtml += `<option value="${time}" ${selected}>⚽ ${time}</option>`;
                 });
-                selectHtml += '</select>';
-                
+
+                // Cria o Card
+                const card = document.createElement('div');
+                card.className = 'card';
                 card.innerHTML = `
-                    <div class="categoria-header">
-                        <span class="icone">${icone}</span>
-                        <div class="info">
-                            <div class="nome">${nome}</div>
-                            <span class="pontos">${pontos} pts</span>
+                    <div class="card-header">
+                        <div class="card-icon">${cat.icone || '🏆'}</div>
+                        <div class="card-info">
+                            <div class="card-title">${cat.nome}</div>
+                            <div class="card-points">Valendo ${cat.pontos} pontos</div>
                         </div>
                     </div>
-                    ${selectHtml}
-                    ${escolhaAtual ? `<div class="escolha-atual"><span>✅</span><span>${escolhaAtual}</span></div>` : ''}
+                    <select class="escolha-select" data-item="${itemKey}" onchange="atualizarProgresso()">
+                        ${optionsHtml}
+                    </select>
                 `;
-                
                 container.appendChild(card);
-                
-                // Event listener
-                const select = card.querySelector('select');
-                select.addEventListener('change', function() {
-                    const valor = this.value;
-                    const cod = this.dataset.codigo;
-                    
-                    if (valor) {
-                        card.classList.add('preenchida');
-                        let div = card.querySelector('.escolha-atual');
-                        if (div) {
-                            div.innerHTML = `<span>✅</span><span>${valor}</span>`;
-                        } else {
-                            const nova = document.createElement('div');
-                            nova.className = 'escolha-atual';
-                            nova.innerHTML = `<span>✅</span><span>${valor}</span>`;
-                            card.appendChild(nova);
-                        }
-                    } else {
-                        card.classList.remove('preenchida');
-                        const div = card.querySelector('.escolha-atual');
-                        if (div) div.remove();
-                    }
-                    atualizarContador();
-                });
             });
-            
-            // Contador
-            function atualizarContador() {
-                const selects = document.querySelectorAll('select[data-codigo]');
-                let count = 0;
-                selects.forEach(s => { if (s.value) count++; });
-                document.getElementById('contador').textContent = `${count}/${categorias.length}`;
-                document.getElementById('barra-progresso').style.width = (count / categorias.length * 100) + '%';
+
+            atualizarProgresso();
+            iniciarCronometro(dadosApp.prazo);
+        }
+
+        function atualizarProgresso() {
+            const total = dadosApp.categorias.length;
+            const selects = document.querySelectorAll('.escolha-select');
+            let preenchidos = 0;
+
+            selects.forEach(s => {
+                if (s.value !== "") preenchidos++;
+            });
+
+            const porcentagem = (preenchidos / total) * 100;
+            document.getElementById('progress-text').innerText = `${preenchidos}/${total}`;
+            document.getElementById('progress-bar').style.width = `${porcentagem}%`;
+
+            // Opcional: Habilita/Desabilita botão de enviar se quiser obrigar tudo preenchido
+            // document.getElementById('btn-save').disabled = (preenchidos === 0);
+        }
+
+        // ============ 3. CRONÔMETRO ============
+
+        function iniciarCronometro(prazoStr) {
+            if (!prazoStr) return;
+
+            // Tenta normalizar a data para formato ISO
+            let isoDate = prazoStr.replace(' ', 'T');
+            // Se não tiver fuso horário, assume -03:00 (Brasília)
+            if (!isoDate.includes('Z') && !isoDate.includes('+') && !isoDate.includes('-')) {
+                isoDate += '-03:00';
             }
-            atualizarContador();
-            
-            // Botão salvar - VERSÃO FORÇADA
-            document.getElementById('btn-salvar').onclick = function() {
-                const selects = document.querySelectorAll('select[data-codigo]');
-                const escolhasArray = [];
-                selects.forEach(s => {
-                    if (s.value) {
-                        escolhasArray.push({
-                            item: s.dataset.codigo,
-                            time: s.value
-                        });
-                    }
-                });
-                
-                const payload = JSON.stringify({ escolhas: escolhasArray });
-                console.log('📤 Payload:', payload);
-                
-                // TENTAR TODAS AS FORMAS DE ENVIAR
-                let enviado = false;
-                
-                // Forma 1
-                if (window.Telegram?.WebApp) {
-                    window.Telegram.WebApp.sendData(payload);
-                    enviado = true;
+
+            const deadline = new Date(isoDate).getTime();
+
+            function update() {
+                const now = new Date().getTime();
+                const distance = deadline - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').innerHTML = "ENCERRADO";
+                    document.getElementById('timer').style.color = "#d32f2f";
+                    desabilitarTudo();
+                    return;
                 }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                let timeStr = "";
+                if (days > 0) timeStr += `${days}d `;
+                timeStr += `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
                 
-                // Forma 2
-                if (parent?.Telegram?.WebApp) {
-                    parent.Telegram.WebApp.sendData(payload);
-                    enviado = true;
+                document.getElementById('timer').innerHTML = timeStr;
+            }
+
+            timerInterval = setInterval(update, 1000);
+            update(); // Executa primeira vez
+        }
+
+        function desabilitarTudo() {
+            document.querySelectorAll('select').forEach(s => s.disabled = true);
+            document.getElementById('btn-save').disabled = true;
+            document.getElementById('btn-save').innerText = "Prazo Encerrado";
+        }
+
+        // ============ 4. AÇÕES (ENVIAR/CANCELAR) ============
+
+        function enviarEscolhas() {
+            const selects = document.querySelectorAll('.escolha-select');
+            const payload = [];
+            let count = 0;
+
+            selects.forEach(s => {
+                if (s.value) {
+                    payload.push({
+                        item: s.dataset.item,
+                        time: s.value
+                    });
+                    count++;
                 }
-                
-                // Forma 3
-                if (window.parent?.Telegram?.WebApp) {
-                    window.parent.Telegram.WebApp.sendData(payload);
-                    enviado = true;
-                }
-                
-                if (enviado) {
-                    alert(`✅ ${escolhasArray.length} palpites salvos!`);
-                } else {
-                    // Fallback: mostrar no console
-                    console.log('Escolhas:', escolhasArray);
-                    alert(`📦 Escolhas prontas! (${escolhasArray.length} itens)\nVerifique o console.`);
-                }
+            });
+
+            if (count === 0) {
+                tg.showAlert("⚠️ Por favor, escolha pelo menos um time.");
+                return;
+            }
+
+            const confirmar = () => {
+                // Envia dados de volta para o Bot
+                tg.sendData(JSON.stringify({ escolhas: payload }));
+                tg.close();
             };
-            
-        } catch (error) {
-            console.error('❌ Erro:', error);
-            
-            loadingEl.style.display = 'none';
-            errorEl.style.display = 'block';
-            
-            document.getElementById('error-message').innerHTML = error.message;
-            
-            // Mostrar diagnóstico
-            const hash = obterHash();
-            document.getElementById('error-details').innerHTML = `
-                <strong>🔍 DIAGNÓSTICO:</strong><br><br>
-                📌 URL: ${window.location.href.substring(0, 100)}...<br>
-                📦 Hash: ${hash.substring(0, 100)}...<br>
-                📦 Hash length: ${hash.length}<br>
-                📱 Telegram.WebApp: ${window.Telegram?.WebApp ? '✅' : '❌'}<br>
-                📱 parent.Telegram: ${parent?.Telegram?.WebApp ? '✅' : '❌'}<br>
-                🔧 Pako: ${typeof pako !== 'undefined' ? '✅' : '❌'}<br>
-                <br>
-                <strong>✅ SOLUÇÃO:</strong><br>
-                1. Clique no botão azul "TESTAR ENVIO AO TELEGRAM"<br>
-                2. Se funcionar, o bot receberá um teste<br>
-                3. Faça suas escolhas e tente salvar novamente
+
+            tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
+                if(ok) confirmar();
+            });
+        }
+
+        function fecharApp() {
+            tg.close();
+        }
+
+        function mostrarErro(msg, detalhe) {
+            const loading = document.getElementById('loading');
+            loading.innerHTML = `
+                <div class="error-box">
+                    <h3>❌ Ocorreu um erro</h3>
+                    <p>${msg}</p>
+                    <small style="opacity:0.7">${detalhe || ''}</small>
+                    <br><br>
+                    <button class="btn btn-primary" onclick="location.reload()">Tentar Novamente</button>
+                </div>
             `;
         }
+
+        // ============ 5. LÓGICA DE START ============
+
+        window.onload = function() {
+            const base64Data = lerDadosDaUrl();
+
+            if (base64Data) {
+                try {
+                    dadosApp = processarDados(base64Data);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    renderizarApp();
+                } catch (e) {
+                    mostrarErro("Não foi possível processar os dados.", e.message);
+                }
+            } else {
+                // Modo de Teste (se abrir fora do Telegram ou sem hash)
+                console.log("Modo Teste / Sem dados na URL");
+                
+                // Dados Fake para testar visual
+                dadosApp = {
+                    times: ["Flamengo", "Palmeiras", "São Paulo", "Vasco", "Corinthians"],
+                    categorias: [
+                        {item: "c1", nome: "Campeão", pontos: 20, icone: "🏆"},
+                        {item: "c2", nome: "Vice", pontos: 10, icone: "🥈"},
+                        {item: "c3", nome: "Rebaixado", pontos: 5, icone: "⬇️"}
+                    ],
+                    escolhas: {"c1": "Flamengo"},
+                    prazo: new Date(Date.now() + 86400000).toISOString()
+                };
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                renderizarApp();
+                
+                // Aviso visual
+                const aviso = document.createElement('div');
+                aviso.style = "background:orange; color:white; padding:5px; text-align:center; font-size:12px; margin-bottom:10px; border-radius:4px;";
+                aviso.innerText = "⚠️ MODO DE TESTE (SEM DADOS REAIS)";
+                document.querySelector('.container').prepend(aviso);
+            }
+        };
+
     </script>
 </body>
 </html>
