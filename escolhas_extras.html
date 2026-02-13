@@ -494,37 +494,44 @@
         // ============ 4. AÇÕES ============
 
         function enviarEscolhas() {
-            const selects = document.querySelectorAll('.escolha-select');
-            const payload = [];
-            let count = 0;
+    const selects = document.querySelectorAll('.escolha-select');
+    const payload = [];
+    let count = 0;
 
-            selects.forEach(s => {
-                if (s.value && s.value !== "") {
-                    payload.push({
-                        item: s.dataset.item,
-                        time: s.value
-                    });
-                    count++;
-                }
+    selects.forEach(s => {
+        if (s.value && s.value !== "") {
+            payload.push({
+                item: s.dataset.item,
+                time: s.value
             });
-
-            if (count === 0) {
-                tg.showAlert("⚠️ Por favor, escolha pelo menos um time.");
-                return;
-            }
-
-            tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
-                if (ok) {
-                    try {
-                        tg.sendData(JSON.stringify({ escolhas: payload }));
-                        tg.close();
-                    } catch (e) {
-                        console.error("Erro ao enviar:", e);
-                        tg.showAlert("❌ Erro ao enviar palpites. Tente novamente.");
-                    }
-                }
-            });
+            count++;
         }
+    });
+
+    if (count === 0) {
+        tg.showAlert("⚠️ Por favor, escolha pelo menos um time.");
+        return;
+    }
+
+    tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
+        if (ok) {
+            try {
+                // ENVIA OS DADOS COMPLETOS (inclui TODOS os dados do app)
+                tg.sendData(JSON.stringify({ 
+                    escolhas: payload,
+                    usuario: dadosApp.usuario,  // Mantém dados do usuário
+                    prazo: dadosApp.prazo,      // Mantém o prazo
+                    times: dadosApp.times,      // Mantém os times
+                    categorias: dadosApp.categorias // Mantém categorias
+                }));
+                tg.close();
+            } catch (e) {
+                console.error("Erro ao enviar:", e);
+                tg.showAlert("❌ Erro ao enviar palpites. Tente novamente.");
+            }
+        }
+    });
+}
 
         function fecharApp() {
             tg.close();
