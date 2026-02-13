@@ -116,7 +116,7 @@
                     // Enviamos para o Python a string pura "YYYY-MM-DD HH:MM:00"
                     const dataFormatada = valorInput.replace('T', ' ') + ":00";
                     tg.sendData(JSON.stringify({
-                        app: 'pontos_extras_admin',
+            
                         data_encerramento: dataFormatada
                     }));
                     tg.close();
