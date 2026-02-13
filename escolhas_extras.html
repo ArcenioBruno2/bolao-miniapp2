@@ -516,13 +516,9 @@
     tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
         if (ok) {
             try {
-                // ENVIA OS DADOS COMPLETOS (inclui TODOS os dados do app)
+                // ✅ ENVIA APENAS AS ESCOLHAS - NADA MAIS!
                 tg.sendData(JSON.stringify({ 
-                    escolhas: payload,
-                    usuario: dadosApp.usuario,  // Mantém dados do usuário
-                    prazo: dadosApp.prazo,      // Mantém o prazo
-                    times: dadosApp.times,      // Mantém os times
-                    categorias: dadosApp.categorias // Mantém categorias
+                    escolhas: payload
                 }));
                 tg.close();
             } catch (e) {
@@ -532,7 +528,6 @@
         }
     });
 }
-
         function fecharApp() {
             tg.close();
         }
