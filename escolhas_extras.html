@@ -17,6 +17,8 @@
             --button-color: var(--tg-theme-button-color, #3390ec);
             --button-text: var(--tg-theme-button-text-color, #ffffff);
             --secondary-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --error-color: #d32f2f;
+            --warning-bg: #ffebee;
         }
 
         * { 
@@ -101,6 +103,25 @@
             transition: width 0.3s ease;
         }
 
+        /* MENSAGEM DE ERRO/ALERTA */
+        .alert-message {
+            background: var(--warning-bg);
+            color: var(--error-color);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid var(--error-color);
+        }
+        
+        .alert-message svg {
+            flex-shrink: 0;
+        }
+
         /* CARDS DE CATEGORIAS */
         .card {
             background: var(--secondary-bg);
@@ -111,6 +132,12 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            transition: all 0.2s ease;
+        }
+        
+        .card.conflict {
+            border: 2px solid var(--error-color);
+            background: var(--warning-bg);
         }
 
         .card-header {
@@ -143,6 +170,16 @@
             font-size: 13px; 
             color: var(--hint-color); 
         }
+        
+        .conflict-badge {
+            background: var(--error-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
 
         select {
             width: 100%;
@@ -167,6 +204,10 @@
         select:disabled {
             opacity: 0.6;
             background-color: rgba(0,0,0,0.05);
+        }
+        
+        select.conflict {
+            border: 2px solid var(--error-color);
         }
 
         /* BOTÕES */
@@ -274,6 +315,18 @@
             </div>
         </div>
 
+        <!-- ÁREA DE ALERTA -->
+        <div id="alert-container" style="display: none;">
+            <div class="alert-message" id="alert-text">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span id="alert-message-text"></span>
+            </div>
+        </div>
+
         <div class="progress-container">
             <div class="progress-header">
                 <span>Progresso</span>
@@ -301,6 +354,169 @@
         // Variáveis Globais
         let dadosApp = null;
         let timerInterval = null;
+        
+        // ============ VALIDAÇÃO DE TIMES REPETIDOS ============
+        const CATEGORIAS_SEM_REPETICAO = [
+            'campeao_geral',
+            'segundo_colocado',
+            'terceiro_colocado',
+            'quarto_colocado',
+            'decimo_setimo',
+            'decimo_oitavo',
+            'decimo_nono',
+            'vigesimo'
+        ];
+
+        // Mapeamento de códigos para nomes amigáveis
+        const NOMES_CATEGORIAS = {
+            'campeao_geral': 'Campeão',
+            'segundo_colocado': '2º Colocado',
+            'terceiro_colocado': '3º Colocado',
+            'quarto_colocado': '4º Colocado',
+            'decimo_setimo': '17º Colocado',
+            'decimo_oitavo': '18º Colocado',
+            'decimo_nono': '19º Colocado',
+            'vigesimo': '20º Colocado'
+        };
+
+        function encontrarConflitos() {
+            const selects = document.querySelectorAll('.escolha-select');
+            const timesEscolhidos = new Map(); // time -> array de elementos select
+            
+            // Primeiro, mapeia todos os times escolhidos
+            selects.forEach(select => {
+                const time = select.value;
+                if (time && time !== "") {
+                    if (!timesEscolhidos.has(time)) {
+                        timesEscolhidos.set(time, []);
+                    }
+                    timesEscolhidos.get(time).push(select);
+                }
+            });
+            
+            // Depois, identifica conflitos (times que aparecem mais de uma vez)
+            const conflitos = [];
+            timesEscolhidos.forEach((selects, time) => {
+                if (selects.length > 1) {
+                    // Verifica se pelo menos um dos selects é de categoria proibida
+                    const categoriasConflitantes = selects.filter(select => {
+                        const item = select.dataset.item;
+                        return CATEGORIAS_SEM_REPETICAO.includes(item);
+                    });
+                    
+                    // Se houver mais de uma categoria proibida com o mesmo time, é conflito
+                    if (categoriasConflitantes.length > 1) {
+                        conflitos.push({
+                            time: time,
+                            selects: selects,
+                            categorias: selects.map(s => s.dataset.item)
+                        });
+                    }
+                }
+            });
+            
+            return conflitos;
+        }
+
+        function atualizarInterfaceConflitos() {
+            const conflitos = encontrarConflitos();
+            const alertContainer = document.getElementById('alert-container');
+            const alertMessage = document.getElementById('alert-message-text');
+            const btnSave = document.getElementById('btn-save');
+            
+            // Remove todas as marcações de conflito
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('conflict');
+            });
+            document.querySelectorAll('.escolha-select').forEach(select => {
+                select.classList.remove('conflict');
+            });
+            
+            if (conflitos.length > 0) {
+                // Mostra alerta
+                alertContainer.style.display = 'block';
+                
+                // Constrói mensagem de erro
+                let mensagem = '❌ Times repetidos nas posições:\n';
+                conflitos.forEach(conflito => {
+                    mensagem += `\n⚽ ${conflito.time}: `;
+                    const nomesCategorias = conflito.selects
+                        .map(s => NOMES_CATEGORIAS[s.dataset.item] || s.dataset.item)
+                        .join(', ');
+                    mensagem += nomesCategorias;
+                });
+                mensagem += '\n\nCada time pode aparecer apenas uma vez nestas categorias!';
+                alertMessage.textContent = mensagem;
+                
+                // Marca os cards e selects em conflito
+                conflitos.forEach(conflito => {
+                    conflito.selects.forEach(select => {
+                        select.classList.add('conflict');
+                        // Encontra o card pai e marca também
+                        const card = select.closest('.card');
+                        if (card) {
+                            card.classList.add('conflict');
+                        }
+                    });
+                });
+                
+                btnSave.disabled = true;
+            } else {
+                alertContainer.style.display = 'none';
+                btnSave.disabled = false;
+            }
+            
+            // Atualiza progresso
+            atualizarProgresso();
+        }
+
+        function verificarTimeRepetido(selectAlterado) {
+            const timeSelecionado = selectAlterado.value;
+            
+            // Se não selecionou nada, só atualiza a interface
+            if (!timeSelecionado || timeSelecionado === "") {
+                atualizarInterfaceConflitos();
+                return true;
+            }
+            
+            const itemAlterado = selectAlterado.dataset.item;
+            
+            // Se a categoria alterada não é uma das que proíbem repetição, não precisa verificar
+            if (!CATEGORIAS_SEM_REPETICAO.includes(itemAlterado)) {
+                atualizarInterfaceConflitos();
+                return true;
+            }
+            
+            // Verifica se este time já foi escolhido em outra categoria proibida
+            const selects = document.querySelectorAll('.escolha-select');
+            let timeRepetido = false;
+            let categoriasRepetidas = [];
+            
+            selects.forEach(select => {
+                if (select !== selectAlterado && 
+                    select.value === timeSelecionado && 
+                    CATEGORIAS_SEM_REPETICAO.includes(select.dataset.item)) {
+                    timeRepetido = true;
+                    categoriasRepetidas.push(NOMES_CATEGORIAS[select.dataset.item] || select.dataset.item);
+                }
+            });
+            
+            if (timeRepetido) {
+                // Mostra alerta
+                tg.showAlert(`⚠️ Time repetido!\n\nO time ${timeSelecionado} já foi escolhido como: ${categoriasRepetidas.join(', ')}.\n\nCada time pode aparecer apenas uma vez nas posições de classificação.`);
+                
+                // Reverte a seleção
+                selectAlterado.value = "";
+                
+                // Atualiza interface
+                atualizarInterfaceConflitos();
+                return false;
+            }
+            
+            // Se não houver repetição, atualiza interface
+            atualizarInterfaceConflitos();
+            return true;
+        }
 
         // ============ 1. LEITURA E DECODIFICAÇÃO ============
         
@@ -459,15 +675,21 @@
                             <div class="card-points">Valendo ${cat.pontos} pontos</div>
                         </div>
                     </div>
-                    <select class="escolha-select" data-item="${itemKey}" onchange="atualizarProgresso()">
+                    <select class="escolha-select" data-item="${itemKey}" onchange="handleSelectChange(this)">
                         ${optionsHtml}
                     </select>
                 `;
                 container.appendChild(card);
             });
 
-            atualizarProgresso();
+            // Verifica conflitos iniciais (se houver escolhas salvas anteriormente)
+            atualizarInterfaceConflitos();
             iniciarCronometro(dadosApp.prazo);
+        }
+
+        // Nova função handler para onChange do select
+        window.handleSelectChange = function(select) {
+            verificarTimeRepetido(select);
         }
 
         function atualizarProgresso() {
@@ -494,41 +716,57 @@
         // ============ 4. AÇÕES ============
 
         function enviarEscolhas() {
-    const selects = document.querySelectorAll('.escolha-select');
-    const payload = [];
-    let count = 0;
-
-    selects.forEach(s => {
-        if (s.value && s.value !== "") {
-            payload.push({
-                item: s.dataset.item,
-                time: s.value
-            });
-            count++;
-        }
-    });
-
-    if (count === 0) {
-        tg.showAlert("⚠️ Por favor, escolha pelo menos um time.");
-        return;
-    }
-
-    tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
-        if (ok) {
-            try {
-                // ✅ ENVIA APENAS AS ESCOLHAS - NADA MAIS!
-                tg.sendData(JSON.stringify({ 
-                    app: 'pontos_extras_usuario',
-                    escolhas: payload
-                }));
-                tg.close();
-            } catch (e) {
-                console.error("Erro ao enviar:", e);
-                tg.showAlert("❌ Erro ao enviar palpites. Tente novamente.");
+            // Verifica conflitos antes de enviar
+            const conflitos = encontrarConflitos();
+            
+            if (conflitos.length > 0) {
+                let mensagem = "❌ Corrija os times repetidos:\n";
+                conflitos.forEach(conflito => {
+                    const nomesCategorias = conflito.selects
+                        .map(s => NOMES_CATEGORIAS[s.dataset.item] || s.dataset.item)
+                        .join(', ');
+                    mensagem += `\n⚽ ${conflito.time} aparece em: ${nomesCategorias}`;
+                });
+                tg.showAlert(mensagem);
+                return;
             }
+
+            const selects = document.querySelectorAll('.escolha-select');
+            const payload = [];
+            let count = 0;
+
+            selects.forEach(s => {
+                if (s.value && s.value !== "") {
+                    payload.push({
+                        item: s.dataset.item,
+                        time: s.value
+                    });
+                    count++;
+                }
+            });
+
+            if (count === 0) {
+                tg.showAlert("⚠️ Por favor, escolha pelo menos um time.");
+                return;
+            }
+
+            tg.showConfirm(`Confirmar envio de ${count} palpites?`, (ok) => {
+                if (ok) {
+                    try {
+                        // ✅ ENVIA APENAS AS ESCOLHAS - NADA MAIS!
+                        tg.sendData(JSON.stringify({ 
+                            app: 'pontos_extras_usuario',
+                            escolhas: payload
+                        }));
+                        tg.close();
+                    } catch (e) {
+                        console.error("Erro ao enviar:", e);
+                        tg.showAlert("❌ Erro ao enviar palpites. Tente novamente.");
+                    }
+                }
+            });
         }
-    });
-}
+        
         function fecharApp() {
             tg.close();
         }
